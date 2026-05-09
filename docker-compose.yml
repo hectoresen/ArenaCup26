@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wmundial-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wmundial
+      POSTGRES_PASSWORD: wmundial
+      POSTGRES_DB: wmundial
+    ports:
+      - "5432:5432"
+    volumes:
+      - wmundial-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wmundial -d wmundial"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  wmundial-pg-data:

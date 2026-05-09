@@ -81,18 +81,49 @@ Fase actual: **entendimiento**. Próximas iteraciones:
 - [ ] Séptimo cambio: `add-public-profile` (página `/u/<username>`).
 - [ ] Octavo cambio: `add-achievements` (catálogo, evaluación, unlocks).
 
-## Comandos (placeholders)
+## Desarrollo local
 
-> Aún no hay `package.json`. Cuando arranque la implementación:
+Requisitos: **Node 22+**, **pnpm 9+** y **Docker** (o un Postgres 16 propio en `localhost:5432`).
 
 ```bash
+# 1. Variables de entorno
+cp .env.example .env
+# Rellena AUTH_SECRET (`openssl rand -base64 48`), GOOGLE_CLIENT_ID y
+# GOOGLE_CLIENT_SECRET (Google Cloud Console → OAuth 2.0 Client).
+
+# 2. Instalar dependencias
 pnpm install
-pnpm dev          # arranca Next.js
-pnpm test         # Vitest
-pnpm e2e          # Playwright
-pnpm db:migrate   # Drizzle migraciones
-pnpm db:studio    # Drizzle Studio
+
+# 3. Levantar Postgres con Docker Compose
+docker compose up -d
+# Usuario / pass / base: wmundial / wmundial / wmundial — coinciden con
+# el DATABASE_URL del .env.example.
+
+# 4. Generar y aplicar la migración inicial
+pnpm db:generate
+pnpm db:migrate
+
+# 5. Configurar OAuth en Google Cloud Console
+# Credentials → tu OAuth 2.0 Client ID → Authorized redirect URIs:
+#   http://localhost:3000/api/auth/callback/google
+
+# 6. Arrancar Next.js
+pnpm dev
+# → http://localhost:3000
 ```
+
+### Comandos útiles
+
+| Comando                   | Qué hace                                            |
+| ------------------------- | --------------------------------------------------- |
+| `pnpm dev`                | Next.js en `http://localhost:3000`                  |
+| `pnpm typecheck`          | `tsc --noEmit`                                      |
+| `pnpm test`               | Vitest (unit)                                       |
+| `pnpm e2e`                | Playwright (E2E)                                    |
+| `pnpm check`              | Biome formato + lint                                |
+| `pnpm db:studio`          | UI web de Drizzle para inspeccionar la BD           |
+| `docker compose down`     | Parar Postgres (los datos se conservan)             |
+| `docker compose down -v`  | Parar + **borrar** el volumen de datos              |
 
 ## Licencia
 
