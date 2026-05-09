@@ -27,9 +27,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   session: { strategy: "database" },
-  trustHost: env.AUTH_TRUST_HOST,
-  pages: {
-    // No custom pages yet. Auth.js falls back to its built-in routes
-    // (/api/auth/signin, /api/auth/error) which are fine for now.
-  },
+  // En dev confiamos siempre del Host header (localhost). En producción solo
+  // si AUTH_TRUST_HOST=true (necesario fuera de Vercel; Vercel lo detecta solo
+  // si no pasamos nada, pero aquí lo hacemos explícito para no depender del
+  // entorno).
+  trustHost: env.NODE_ENV !== "production" || env.AUTH_TRUST_HOST,
 });
