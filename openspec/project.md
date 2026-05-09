@@ -55,9 +55,12 @@ Experiencia social-competitiva alrededor del Mundial 2026. La estrella es un **r
 - **Perfil público** (2026-05-06) — alcance fijado en `docs/public-profile.md`: identidad, stats básicas, bandera opcional, catálogo de logros. Accesible sin login.
 - **Reglas de partidos** (2026-05-07) — taxonomía de 7 estados, ventana de predicción desde fixture, comportamiento de pospuesto y cancelado, reglas específicas de eliminatoria (marcador hasta 120', ganador con penaltis, dobles `1X`/`X2`/`12` desactivadas). Detalles en `docs/business-rules.md`.
 - **Reglas de cuenta** (2026-05-07) — username `[a-z0-9_]` 3-20 lowercase, lista cerrada de rutas reservadas, cambio único con reserva permanente del viejo, hard delete al eliminar cuenta. Detalles en `docs/business-rules.md`.
+- **Match-data — proveedores** (2026-05-09) — **API-Football Pro** (primaria, $19/mes) + **Live-Score-API Starter** (secundaria, €11/mes) ≈ €30/mes total. REST polling 15 s, sin WebSocket. Latencia esperada 10-20 s. Sportmonks WC descartado por presupuesto. Detalles del análisis en `docs/match-data-research.md`. Implementación detallada (adapter, primario/secundario, reconciliación) queda para la propuesta `add-match-data-providers`.
 
 ## Decisiones pendientes
 
-Cosas que el equipo debe cerrar antes de implementar:
+Ninguna a nivel estratégico. Las decisiones que quedan son **técnicas** y se cierran dentro de las propuestas OpenSpec correspondientes:
 
-1. **CRÍTICA — Origen de datos** de fixture, resultados y eventos en vivo (capability `match-data`). Requisitos ampliados: cobertura del Mundial 26, eventos en tiempo real (no solo resultado final), redundancia con **dos APIs en paralelo** (failover). Pre-análisis de candidatas en `docs/match-data-research.md`. **Bloquea** el modo en vivo de `scoring-engine` y `leaderboard`.
+- En `add-match-data-providers`: política exacta de reconciliación entre las dos APIs cuando discrepan, plan exacto de API-Football (Pro vs Ultra), verificación de cobertura del Mundial 26 en Live-Score-API.
+- En `add-public-profile`: patrón de URL definitivo (`/u/<username>`).
+- En `add-achievements`: animación de unlock, política de pinning de recién desbloqueados.

@@ -1,6 +1,18 @@
 # Match data — pre-análisis de fuentes
 
-> Estado: **DECISIÓN CRÍTICA PENDIENTE**. El equipo evaluará las APIs candidatas. Sin esta decisión no se puede arrancar la capability `match-data` ni el modo en vivo de `scoring-engine` y `leaderboard`.
+> Estado: **proveedores decididos** (2026-05-09). Implementación detallada pendiente en propuesta `add-match-data-providers`.
+
+## Decisión 2026-05-09
+
+- **Primaria**: **API-Football Pro** ($19/mes ≈ €18/mes), 7 500 req/día. REST polling 15 s.
+- **Secundaria (failover)**: **Live-Score-API Starter** (€11/mes), 14 500 req/día. REST polling.
+- **Coste total**: ~**€30/mes**.
+- **Latencia esperada**: 10-20 s típica, ~30 s peor caso. **No es "segundo a segundo"**, pero sí suficiente para un leaderboard que se mueve durante el partido.
+- **Sportmonks**: evaluado y **descartado por presupuesto** (su plan World Cup Advanced es €69/mes; el All-In con xG/predicciones es €129).
+- **Pendiente de cerrar en `add-match-data-providers`**:
+  - Verificación en sandbox de Live-Score-API de la cobertura del fixture del Mundial 26.
+  - Política de reconciliación cuando las dos APIs discrepan en marcador.
+  - Si arrancamos con **Pro $19** o **Ultra $29** en API-Football (ver cálculo de presupuesto en su sección).
 
 ## Requisitos derivados del scope
 
@@ -105,7 +117,9 @@
 
 **Contras**: opacidad en latencia/refresh rate, sin WebSocket documentado, falta confirmación oficial de cobertura del Mundial 2026.
 
-### Sportmonks (planes específicos del Mundial 26)
+### Sportmonks (planes específicos del Mundial 26) — DESCARTADO
+
+> **Estado: descartado** (2026-05-09) por presupuesto. Se mantiene la sección como referencia histórica.
 
 - **URL**: https://www.sportmonks.com/football-api/world-cup-api/world-cup-2026/
 - **Investigado** 2026-05-09 vía WebFetch + WebSearch.
@@ -199,15 +213,15 @@ En el peor caso, **~30 segundos** de latencia visible en pantalla. En la prácti
 
 Para cumplir la **redundancia** (dos APIs simultáneas), seleccionar dos con perfiles complementarios:
 
-| Combinación                                                       | Coste/mes               | Latencia típica           | Push?                | Pros                                                                                       | Contras                                                                  |
-| ----------------------------------------------------------------- | ----------------------: | ------------------------: | :------------------: | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| **API-Football Pro + Live-Score-API Starter**                     | $19 + €11 ≈ **€30**     | 10-20 s                   | No                   | Presupuesto bajo, dos vendors distintos, redundancia real.                                 | Sin push. Verificar cobertura WC en Live-Score-API.                      |
-| Sportmonks WC Advanced solo                                       | **€69** (€55 anual)     | 10-20 s · sub-5 si hay WS | ⚠️ verificar dashboard | Plan dedicado al Mundial, 104 partidos garantizados por contrato, único vendor.            | Sin redundancia (vendor único). Si cae Sportmonks durante un partido, no hay backup. |
-| **Sportmonks WC Advanced + Live-Score-API Starter**               | €69 + €11 = **€80**     | 10-20 s · sub-5 si Sportmonks tiene WS | ⚠️ posible           | Cobertura WC garantizada por contrato + redundancia con vendor distinto + presupuesto razonable. | Coste mayor que la primera fila.                                         |
-| Sportmonks WC Advanced + API-Football Pro                         | €69 + $19 ≈ **€88**     | 10-20 s                   | ⚠️ posible           | Las dos APIs más completas en eventos detallados.                                          | Coste mayor; misma latencia salvo que Sportmonks tenga Pusher.           |
-| Sportmonks WC All-In                                              | €129 (€103 anual)       | 10-20 s                   | ⚠️ verificar         | Añade xG, predicciones, odds → útil si queremos encuestas tipo "¿cuántos goles?"            | Caro para fase 1; sin redundancia.                                       |
-| API-Football Pro + Football-Data.org                              | ~$19 ≈ €18              | 15-25 s                   | No                   | Backup gratis.                                                                              | Football-Data lento en live.                                             |
-| Football-Data.org + TheSportsDB                                   | $0                      | 30+ s                     | No                   | Cero coste.                                                                                 | Latencia alta, eventos pobres. Riesgo MVP.                              |
+| Combinación                                                       | Coste/mes               | Latencia típica           | Push?                | Estado                                                                                     |
+| ----------------------------------------------------------------- | ----------------------: | ------------------------: | :------------------: | ------------------------------------------------------------------------------------------ |
+| **API-Football Pro + Live-Score-API Starter**                     | $19 + €11 ≈ **€30**     | 10-20 s                   | No                   | ✅ **Elegida** (2026-05-09). Dos vendors distintos, redundancia real, presupuesto contenido. |
+| API-Football Ultra + Live-Score-API Starter                       | ~$29 + €11 ≈ €38        | 10-20 s                   | No                   | Alternativa si vemos que Pro queda corto en sandbox.                                        |
+| API-Football Pro + Football-Data.org                              | ~$19 ≈ €18              | 15-25 s                   | No                   | Backup gratis pero Football-Data más lento en live.                                          |
+| Sportmonks WC Advanced solo                                       | €69                     | 10-20 s · sub-5 si hay WS | ⚠️ verificar         | ❌ Descartada por presupuesto.                                                               |
+| Sportmonks WC Advanced + Live-Score-API Starter                   | €80                     | 10-20 s · sub-5 si WS     | ⚠️ posible           | ❌ Descartada por presupuesto.                                                               |
+| Sportmonks WC All-In                                              | €129                    | 10-20 s                   | ⚠️ verificar         | ❌ Descartada por presupuesto.                                                               |
+| Football-Data.org + TheSportsDB                                   | $0                      | 30+ s                     | No                   | ❌ Latencia alta, eventos pobres.                                                            |
 
 ## Preguntas para tomar la decisión
 
@@ -220,11 +234,15 @@ Para cumplir la **redundancia** (dos APIs simultáneas), seleccionar dos con per
 
 ## Pasos siguientes
 
-1. Solicitar trial / claves de API en al menos dos candidatas (recomendado: API-Football y Sportmonks).
-2. Probar fixture del Mundial 26 en sandbox: comprobar IDs, estructura, latencia, formato de eventos.
-3. Decidir presupuesto.
-4. Cerrar decisión y abrir propuesta `add-match-data-providers` que defina:
+1. ✅ ~~Decidir presupuesto y proveedores~~ — cerrado 2026-05-09 (API-Football Pro + Live-Score-API Starter, ~€30/mes).
+2. Solicitar/activar claves de API:
+   - API-Football: registro y suscripción al plan Pro $19.
+   - Live-Score-API: aprovechar el Trial €0 (14 días) primero para verificar cobertura del Mundial 26, luego suscribir Starter €11.
+3. Probar fixture del Mundial 26 en sandbox: comprobar IDs, estructura, latencia, formato de eventos en ambas APIs.
+4. Abrir propuesta **`add-match-data-providers`** que defina:
    - Adapter pattern con interfaz común (`MatchDataProvider`).
    - Implementación de los dos providers seleccionados.
-   - Política de failover y reconciliación.
-   - Caching y rate-limit handling.
+   - Cuál es primario y cuál es failover (default: API-Football primaria).
+   - Política de reconciliación cuando discrepan.
+   - Caching y rate-limit handling (queue + backoff).
+   - Cron / poller server-side cada 15 s para partidos en estado `live`.
