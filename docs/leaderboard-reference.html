@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIFA World Cup 26 · Ranking</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+–bg: #0d1117;
+–bg2: #111820;
+–card: #161e28;
+–card2: #1c2635;
+–gold: #f5c842;
+–gold2: #e8a800;
+–gold-glow: rgba(245,200,66,0.25);
+–silver: #c8d8f0;
+–bronze: #e8834a;
+–green: #00e676;
+–red: #ff4d6d;
+–blue: #4fc3f7;
+–text: #f0f6ff;
+–muted: rgba(240,246,255,0.42);
+–border: rgba(255,255,255,0.07);
+}
+
+body {
+background: var(–bg);
+background-image:
+radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,200,66,0.06) 0%, transparent 60%),
+radial-gradient(ellipse 40% 60% at 10% 80%, rgba(0,230,118,0.04) 0%, transparent 50%),
+radial-gradient(ellipse 40% 40% at 90% 20%, rgba(79,195,247,0.04) 0%, transparent 50%);
+font-family: ‘Nunito’, sans-serif;
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 36px 20px;
+overflow-x: hidden;
+}
+
+/* ── Pitch texture overlay ── */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: repeating-linear-gradient(
+0deg,
+rgba(255,255,255,0.015) 0px,
+rgba(255,255,255,0.015) 1px,
+transparent 1px,
+transparent 48px
+);
+pointer-events: none;
+}
+
+.panel { width: 100%; max-width: 510px; }
+
+/* ══════════════════════════════
+HEADER / LOGO AREA
+══════════════════════════════ */
+.header {
+text-align: center;
+margin-bottom: 26px;
+opacity: 0;
+animation: popIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+
+/* Hand-drawn SVG trophy + “26” logo */
+.wc-logo-wrap {
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 14px;
+margin-bottom: 10px;
+}
+
+.wc-logo-svg {
+filter: drop-shadow(0 4px 20px rgba(245,200,66,0.45));
+animation: trophyFloat 3.5s ease-in-out infinite;
+}
+
+.wc-26 {
+font-family: ‘Fredoka One’, cursive;
+font-size: 68px;
+line-height: 1;
+color: transparent;
+-webkit-text-stroke: 3px var(–gold);
+letter-spacing: -4px;
+text-shadow: none;
+opacity: 0.9;
+}
+
+.we-are {
+font-family: ‘Fredoka One’, cursive;
+font-size: 11px;
+letter-spacing: 0.28em;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 2px;
+}
+
+.tagline {
+font-family: ‘Fredoka One’, cursive;
+font-size: 13px;
+color: var(–gold);
+letter-spacing: 0.18em;
+text-transform: uppercase;
+margin-bottom: 10px;
+opacity: 0.8;
+}
+
+.host-flags {
+font-size: 20px;
+letter-spacing: 4px;
+margin-bottom: 12px;
+display: block;
+}
+
+.live-pill {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+background: rgba(0,230,118,0.1);
+border: 2px solid rgba(0,230,118,0.28);
+border-radius: 99px;
+padding: 5px 14px;
+font-size: 11px;
+font-weight: 800;
+color: var(–green);
+letter-spacing: 0.1em;
+text-transform: uppercase;
+}
+.live-dot {
+width: 7px; height: 7px;
+border-radius: 50%;
+background: var(–green);
+animation: blink 1.4s ease infinite;
+}
+
+/* ══════════════════════════════
+PODIUM TOP 3
+══════════════════════════════ */
+.podium {
+display: grid;
+grid-template-columns: 1fr 1.1fr 1fr;
+gap: 8px;
+margin-bottom: 16px;
+align-items: end;
+opacity: 0;
+animation: popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.18s forwards;
+}
+
+.podium-card {
+border-radius: 16px;
+padding: 14px 10px 13px;
+text-align: center;
+position: relative;
+border: 2.5px solid;
+cursor: default;
+transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+overflow: hidden;
+}
+.podium-card::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: inherit;
+opacity: 0;
+transition: opacity 0.2s;
+}
+.podium-card:hover { transform: translateY(-6px) scale(1.03); }
+
+.podium-card.p1 {
+background: linear-gradient(160deg, #1e1a08 0%, #14120a 100%);
+border-color: var(–gold);
+box-shadow: 0 0 32px rgba(245,200,66,0.18), inset 0 1px 0 rgba(245,200,66,0.12);
+padding-top: 20px;
+}
+.podium-card.p2 {
+background: linear-gradient(160deg, #141e2a 0%, #0e1620 100%);
+border-color: rgba(200,216,240,0.55);
+box-shadow: 0 0 16px rgba(200,216,240,0.08);
+}
+.podium-card.p3 {
+background: linear-gradient(160deg, #1a1008 0%, #120e08 100%);
+border-color: rgba(232,131,74,0.6);
+box-shadow: 0 0 16px rgba(232,131,74,0.08);
+}
+
+/* Pitch lines behind podium cards */
+.podium-card::after {
+content: ‘’;
+position: absolute;
+bottom: 0; left: 0; right: 0;
+height: 3px;
+background: var(–border);
+}
+.p1::after { background: linear-gradient(90deg, transparent, var(–gold), transparent); }
+
+.ball-crown {
+position: absolute;
+top: -14px; left: 50%;
+transform: translateX(-50%);
+font-size: 24px;
+animation: ballSpin 4s linear infinite;
+filter: drop-shadow(0 2px 8px rgba(245,200,66,0.5));
+}
+
+.podium-rank-badge {
+position: absolute;
+top: 8px; right: 8px;
+font-family: ‘Fredoka One’, cursive;
+font-size: 10px;
+padding: 2px 6px;
+border-radius: 99px;
+line-height: 1.4;
+}
+.p1 .podium-rank-badge { background: var(–gold); color: #1a1000; }
+.p2 .podium-rank-badge { background: var(–silver); color: #0e1620; }
+.p3 .podium-rank-badge { background: var(–bronze); color: #1a0800; }
+
+.podium-avatar {
+width: 48px; height: 48px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-family: ‘Fredoka One’, cursive;
+font-size: 19px;
+margin: 0 auto 7px;
+border: 3px solid rgba(0,0,0,0.35);
+position: relative;
+}
+.p1 .podium-avatar { background: radial-gradient(135deg, #ffe066, #c8900a); color: #1a1000; }
+.p2 .podium-avatar { background: radial-gradient(135deg, #d8e8ff, #8090b0); color: #0e1620; }
+.p3 .podium-avatar { background: radial-gradient(135deg, #ffb870, #b05020); color: #1a0800; }
+
+.podium-flag { font-size: 16px; display: block; margin-bottom: 3px; }
+.podium-name {
+font-size: 11px; font-weight: 800;
+color: var(–text);
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+margin-bottom: 7px;
+}
+.podium-pts {
+font-family: ‘Fredoka One’, cursive;
+font-size: 26px;
+line-height: 1;
+display: block;
+}
+.p1 .podium-pts { color: var(–gold); text-shadow: 0 2px 8px rgba(245,200,66,0.4); }
+.p2 .podium-pts { color: var(–silver); }
+.p3 .podium-pts { color: var(–bronze); }
+
+.pts-label {
+font-size: 9px; font-weight: 800;
+letter-spacing: 0.1em; text-transform: uppercase;
+color: var(–muted);
+}
+
+/* ══════════════════════════════
+SEPARATOR
+══════════════════════════════ */
+.separator {
+display: flex;
+align-items: center;
+gap: 10px;
+margin: 14px 0;
+opacity: 0;
+animation: fadeUp 0.4s ease 0.3s forwards;
+}
+.sep-line { flex: 1; height: 1px; background: var(–border); }
+.sep-ball { font-size: 14px; opacity: 0.5; }
+
+/* ══════════════════════════════
+LIST ROWS
+══════════════════════════════ */
+.list { display: flex; flex-direction: column; gap: 5px; }
+
+.row {
+display: grid;
+grid-template-columns: 44px 1fr auto;
+align-items: center;
+gap: 10px;
+padding: 11px 14px;
+background: var(–card);
+border-radius: 13px;
+border: 2px solid var(–border);
+cursor: default;
+position: relative;
+overflow: hidden;
+transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s, background 0.2s;
+opacity: 0;
+animation: slideIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+.row::before {
+content: ‘’;
+position: absolute;
+left: 0; top: 0; bottom: 0;
+width: 3px;
+border-radius: 2px 0 0 2px;
+background: var(–border);
+transition: background 0.2s;
+}
+.row:hover { transform: translateX(4px); background: var(–card2); border-color: rgba(245,200,66,0.18); }
+.row:hover::before { background: var(–gold); }
+.row.moving-up   { animation: slideIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards, flashGreen 0.8s ease 0.5s; }
+.row.moving-down { animation: slideIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards, flashRed   0.8s ease 0.5s; }
+
+.rank-cell {
+display: flex; flex-direction: column;
+align-items: center; justify-content: center; gap: 1px;
+}
+.rank-num {
+font-family: ‘Fredoka One’, cursive;
+font-size: 20px; color: var(–text); line-height: 1;
+}
+.delta { font-size: 9px; font-weight: 900; line-height: 1; }
+.delta.up   { color: var(–green); }
+.delta.down { color: var(–red); }
+.delta.same { opacity: 0; }
+
+.info { min-width: 0; }
+.name {
+font-size: 14px; font-weight: 800;
+color: var(–text);
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.flag { margin-right: 4px; }
+.meta {
+display: flex; align-items: center; gap: 8px;
+margin-top: 2px;
+}
+.streak {
+font-size: 11px; font-weight: 700; color: var(–muted);
+}
+.streak.hot { color: #ffb347; }
+.correct-badge {
+font-size: 9px; font-weight: 800;
+background: rgba(79,195,247,0.12);
+color: var(–blue);
+border: 1px solid rgba(79,195,247,0.25);
+border-radius: 4px;
+padding: 1px 5px;
+letter-spacing: 0.06em;
+text-transform: uppercase;
+}
+
+.score-cell { text-align: right; }
+.pts-big {
+font-family: ‘Fredoka One’, cursive;
+font-size: 22px; color: var(–text);
+line-height: 1; display: block;
+transition: color 0.25s;
+}
+.pts-big.up-flash   { color: var(–green); }
+.pts-big.down-flash { color: var(–red); }
+.pts-tiny {
+font-size: 9px; font-weight: 800;
+letter-spacing: 0.1em; text-transform: uppercase;
+color: var(–muted);
+}
+
+/* ══════════════════════════════
+FOOTER
+══════════════════════════════ */
+.footer {
+display: flex; justify-content: space-between; align-items: center;
+margin-top: 16px; padding: 0 2px;
+opacity: 0;
+animation: fadeUp 0.4s ease 1s forwards;
+}
+.footer-txt {
+font-size: 11px; font-weight: 700; color: var(–muted);
+}
+.footer-slogan {
+font-family: ‘Fredoka One’, cursive;
+font-size: 12px; color: var(–gold);
+letter-spacing: 0.1em; opacity: 0.6;
+}
+
+/* ══════════════════════════════
+FLOATING FOOTBALLS
+══════════════════════════════ */
+.floater {
+position: fixed; pointer-events: none;
+font-size: 18px; opacity: 0.07;
+animation: floatUp linear infinite;
+}
+
+/* ══════════════════════════════
+KEYFRAMES
+══════════════════════════════ */
+@keyframes popIn {
+from { opacity:0; transform: scale(0.8); }
+to   { opacity:1; transform: scale(1); }
+}
+@keyframes fadeUp {
+from { opacity:0; transform: translateY(8px); }
+to   { opacity:1; transform: translateY(0); }
+}
+@keyframes slideIn {
+from { opacity:0; transform: translateX(-18px); }
+to   { opacity:1; transform: translateX(0); }
+}
+@keyframes trophyFloat {
+0%,100% { transform: translateY(0) rotate(-3deg); }
+50%     { transform: translateY(-8px) rotate(3deg); }
+}
+@keyframes ballSpin {
+from { transform: translateX(-50%) rotate(0deg); }
+to   { transform: translateX(-50%) rotate(360deg); }
+}
+@keyframes blink {
+0%,100% { opacity:1; } 50% { opacity:0.25; }
+}
+@keyframes flashGreen {
+0%   { background: rgba(0,230,118,0.14); border-color: rgba(0,230,118,0.4); }
+100% { background: var(–card); border-color: var(–border); }
+}
+@keyframes flashRed {
+0%   { background: rgba(255,77,109,0.12); border-color: rgba(255,77,109,0.35); }
+100% { background: var(–card); border-color: var(–border); }
+}
+@keyframes floatUp {
+from { transform: translateY(105vh) rotate(0deg); }
+to   { transform: translateY(-10vh) rotate(540deg); }
+}
+</style>
+
+</head>
+<body>
+
+<script>
+  // Floating footballs
+  ["⚽","🏃","⚽","🌍","⚽","🎯","⚽"].forEach((e,i) => {
+    const el = document.createElement("span");
+    el.className = "floater";
+    el.textContent = e;
+    el.style.left = (8 + i * 13) + "vw";
+    el.style.fontSize = (12 + Math.random()*16) + "px";
+    el.style.animationDuration = (20 + Math.random()*18) + "s";
+    el.style.animationDelay = (-Math.random()*22) + "s";
+    document.body.appendChild(el);
+  });
+</script>
+
+<div class="panel">
+
+  <!-- ── HEADER ── -->
+
+  <div class="header">
+    <div class="wc-logo-wrap">
+
+```
+  <!-- Hand-crafted World Cup Trophy SVG -->
+  <svg class="wc-logo-svg" width="72" height="88" viewBox="0 0 72 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Glow base -->
+    <ellipse cx="36" cy="82" rx="20" ry="4" fill="rgba(245,200,66,0.18)"/>
+
+    <!-- BASE PLATE -->
+    <rect x="16" y="74" width="40" height="6" rx="3" fill="url(#baseGrad)"/>
+    <rect x="20" y="70" width="32" height="5" rx="2.5" fill="url(#baseGrad)"/>
+
+    <!-- STEM -->
+    <rect x="31" y="56" width="10" height="16" rx="2" fill="url(#stemGrad)"/>
+    <!-- Stem highlight -->
+    <rect x="33" y="57" width="3" height="14" rx="1.5" fill="rgba(255,255,255,0.18)"/>
+
+    <!-- CUP BODY -->
+    <path d="M14 14 C10 14 6 18 6 26 C6 36 12 44 22 50 L28 54 L44 54 L50 50 C60 44 66 36 66 26 C66 18 62 14 58 14 Z"
+          fill="url(#cupGrad)" stroke="url(#cupStroke)" stroke-width="1.5"/>
+
+    <!-- Cup inner shadow -->
+    <path d="M18 18 C15 20 13 25 14 32 C16 39 21 45 28 49 L36 51 C44 49 50 43 53 36 C55 29 54 22 51 18 Z"
+          fill="url(#innerGrad)" opacity="0.35"/>
+
+    <!-- Cup shine -->
+    <ellipse cx="26" cy="26" rx="5" ry="8" fill="rgba(255,255,255,0.22)" transform="rotate(-10 26 26)"/>
+    <ellipse cx="24" cy="22" rx="2" ry="3" fill="rgba(255,255,255,0.35)" transform="rotate(-10 24 22)"/>
+
+    <!-- HANDLES -->
+    <!-- Left -->
+    <path d="M14 24 C4 22 2 30 4 36 C6 40 10 42 14 40" stroke="url(#handleGrad)" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <!-- Right -->
+    <path d="M58 24 C68 22 70 30 68 36 C66 40 62 42 58 40" stroke="url(#handleGrad)" stroke-width="4" stroke-linecap="round" fill="none"/>
+
+    <!-- Handle shine -->
+    <path d="M13 26 C6 24 4 31 6 36" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <path d="M59 26 C66 24 68 31 66 36" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+
+    <!-- TOP RIM -->
+    <ellipse cx="36" cy="14" rx="22" ry="4" fill="url(#rimGrad)"/>
+    <ellipse cx="36" cy="14" rx="18" ry="2.5" fill="rgba(255,255,255,0.12)"/>
+
+    <!-- FOOTBALL on top -->
+    <circle cx="36" cy="8" r="7" fill="#f0f0f0" stroke="#222" stroke-width="0.8"/>
+    <!-- Pentagon patches -->
+    <path d="M36 3 L39 6 L38 10 L34 10 L33 6 Z" fill="#111" opacity="0.85"/>
+    <path d="M29 7 L33 6 L34 10 L31 13 L28 11 Z" fill="#111" opacity="0.7"/>
+    <path d="M43 7 L39 6 L38 10 L41 13 L44 11 Z" fill="#111" opacity="0.7"/>
+
+    <defs>
+      <linearGradient id="cupGrad" x1="36" y1="8" x2="36" y2="56" gradientUnits="userSpaceOnUse">
+        <stop offset="0%"   stop-color="#ffe066"/>
+        <stop offset="40%"  stop-color="#f5c842"/>
+        <stop offset="80%"  stop-color="#c89010"/>
+        <stop offset="100%" stop-color="#a06800"/>
+      </linearGradient>
+      <linearGradient id="cupStroke" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffe88a"/>
+        <stop offset="100%" stop-color="#8a5a00"/>
+      </linearGradient>
+      <linearGradient id="innerGrad" x1="36" y1="18" x2="36" y2="52" gradientUnits="userSpaceOnUse">
+        <stop offset="0%"   stop-color="#1a1000"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </linearGradient>
+      <linearGradient id="stemGrad" x1="31" y1="56" x2="41" y2="72" gradientUnits="userSpaceOnUse">
+        <stop offset="0%"   stop-color="#d4920a"/>
+        <stop offset="50%"  stop-color="#f5c842"/>
+        <stop offset="100%" stop-color="#a06800"/>
+      </linearGradient>
+      <linearGradient id="baseGrad" x1="16" y1="70" x2="56" y2="80" gradientUnits="userSpaceOnUse">
+        <stop offset="0%"   stop-color="#c88800"/>
+        <stop offset="50%"  stop-color="#f0b830"/>
+        <stop offset="100%" stop-color="#a06800"/>
+      </linearGradient>
+      <linearGradient id="handleGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%"   stop-color="#ffe066"/>
+        <stop offset="100%" stop-color="#c88800"/>
+      </linearGradient>
+      <linearGradient id="rimGrad" cx="50%" cy="50%" r="50%" fx="50%" fy="50%" gradientUnits="objectBoundingBox">
+        <stop offset="0%"   stop-color="#ffe88a"/>
+        <stop offset="100%" stop-color="#b07800"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- "26" beside trophy -->
+  <div>
+    <div class="we-are">We Are</div>
+    <div class="wc-26">26</div>
+  </div>
+</div>
+
+<div class="tagline">FIFA World Cup · Canada · México · USA</div>
+<div class="host-flags">🇨🇦 🇲🇽 🇺🇸</div>
+<span class="live-pill"><span class="live-dot"></span>Ranking en vivo</span>
+```
+
+  </div>
+
+  <!-- ── PODIUM ── -->
+
+  <div class="podium" id="podium"></div>
+
+  <div class="separator">
+    <div class="sep-line"></div>
+    <span class="sep-ball">⚽</span>
+    <div class="sep-line"></div>
+  </div>
+
+  <!-- ── LIST ── -->
+
+  <div class="list" id="list"></div>
+
+  <div class="footer">
+    <span class="footer-txt" id="update-time">⏱ Actualizado ahora</span>
+    <span class="footer-slogan">WE ARE 26</span>
+  </div>
+</div>
+
+<script>
+const PLAYERS = [
+  { name: "Carlos Mendoza",  flag: "🇲🇽", pts: 4820, streak: 7,  correct: 34 },
+  { name: "Layla Hassan",    flag: "🇸🇦", pts: 4610, streak: 5,  correct: 31 },
+  { name: "Tomás Reyes",     flag: "🇦🇷", pts: 4390, streak: 4,  correct: 29 },
+  { name: "Yuki Tanaka",     flag: "🇯🇵", pts: 3970, streak: 3,  correct: 26 },
+  { name: "Amara Diallo",    flag: "🇸🇳", pts: 3740, streak: 2,  correct: 24 },
+  { name: "Erik Holmberg",   flag: "🇸🇪", pts: 3510, streak: 6,  correct: 22 },
+  { name: "Priya Sharma",    flag: "🇮🇳", pts: 3280, streak: 1,  correct: 20 },
+  { name: "Mateus Costa",    flag: "🇧🇷", pts: 3050, streak: 4,  correct: 18 },
+  { name: "Zara Al-Farsi",   flag: "🇴🇲", pts: 2820, streak: 2,  correct: 16 },
+  { name: "Jonas Becker",    flag: "🇩🇪", pts: 2640, streak: 0,  correct: 14 },
+];
+
+let state = PLAYERS.map((p,i) => ({ ...p, rank:i+1, prev:i+1 }));
+
+function initials(n){ return n.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase(); }
+
+function renderPodium(){
+  const cfgs = [
+    { cls:"p1", top:"⚽" },
+    { cls:"p2", badge:"2º" },
+    { cls:"p3", badge:"3º" },
+  ];
+  document.getElementById("podium").innerHTML = cfgs.map(({cls,top,badge},i)=>{
+    const p = state[i];
+    return `
+    <div class="podium-card ${cls}">
+      ${i===0 ? `<span class="ball-crown">${top}</span>` : ""}
+      <span class="podium-rank-badge">${badge||"1º"}</span>
+      <div class="podium-avatar">${initials(p.name)}</div>
+      <span class="podium-flag">${p.flag}</span>
+      <div class="podium-name">${p.name.split(" ")[0]}</div>
+      <span class="podium-pts">${p.pts.toLocaleString()}</span>
+      <div class="pts-label">puntos</div>
+    </div>`;
+  }).join("");
+}
+
+function renderList(){
+  document.getElementById("list").innerHTML = state.slice(3).map((p,i)=>{
+    const delay = (i*0.065+0.3).toFixed(2);
+    const diff = p.prev - p.rank;
+    const delta = diff>0?"up":diff<0?"down":"same";
+    const arrow = diff>0?"▲":diff<0?"▼":"·";
+    const mv = delta==="up"?"moving-up":delta==="down"?"moving-down":"";
+    const hot = p.streak >= 3;
+    return `
+    <div class="row ${mv}" style="animation-delay:${delay}s" data-id="${p.name}">
+      <div class="rank-cell">
+        <span class="rank-num">${p.rank}</span>
+        <span class="delta ${delta}">${arrow}</span>
+      </div>
+      <div class="info">
+        <div class="name"><span class="flag">${p.flag}</span>${p.name}</div>
+        <div class="meta">
+          <span class="streak ${hot?"hot":""}">${p.streak>0?`🔥 ×${p.streak}`:"sin racha"}</span>
+          <span class="correct-badge">✓ ${p.correct} acertadas</span>
+        </div>
+      </div>
+      <div class="score-cell">
+        <span class="pts-big" data-pts="${p.name}">${p.pts.toLocaleString()}</span>
+        <span class="pts-tiny">pts</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function render(){
+  renderPodium();
+  renderList();
+}
+
+function simulateUpdate(){
+  const idx = Math.floor(Math.random()*state.length);
+  const up = Math.random() > 0.22;
+  const gain = Math.floor(Math.random()*90+20) * (up?1:-1);
+  state.forEach(p=>p.prev=p.rank);
+  state[idx].pts = Math.max(0, state[idx].pts+gain);
+  if(up){ state[idx].streak++; state[idx].correct++; }
+  else if(state[idx].streak>0){ state[idx].streak=0; }
+  state.sort((a,b)=>b.pts-a.pts);
+  state.forEach((p,i)=>p.rank=i+1);
+  const name = state[idx].name;
+  render();
+  const el = document.querySelector(`[data-pts="${name}"]`);
+  if(el){
+    const cls = up?"up-flash":"down-flash";
+    el.classList.add(cls);
+    setTimeout(()=>el.classList.remove(cls), 900);
+  }
+  const now = new Date();
+  document.getElementById("update-time").textContent =
+    `⏱ ${now.getHours().toString().padStart(2,"0")}:${now.getMinutes().toString().padStart(2,"0")}:${now.getSeconds().toString().padStart(2,"0")}`;
+}
+
+render();
+setTimeout(()=>setInterval(simulateUpdate,2600),1000);
+</script>
+
+</body>
+</html>

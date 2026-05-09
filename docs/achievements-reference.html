@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIFA World Cup 26 · Logros</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+–bg: #0d1117;
+–card: #161e28;
+–card2: #1c2635;
+–gold: #f5c842;
+–gold2: #e8a800;
+–bronze: #e8834a;
+–text: #f0f6ff;
+–muted: rgba(240,246,255,0.42);
+–border: rgba(255,255,255,0.07);
+
+/* Tiers */
+–common-color:    #34d97b;
+–common-glow:     rgba(52,217,123,0.2);
+–rare-color:      #4fc3f7;
+–rare-glow:       rgba(79,195,247,0.2);
+–epic-color:      #c084fc;
+–epic-glow:       rgba(192,132,252,0.22);
+–legendary-color: #f5c842;
+–legendary-glow:  rgba(245,200,66,0.28);
+–mythic-color:    #ff8c42;
+–mythic-glow:     rgba(255,140,66,0.28);
+–goat-color:      #e8f4ff;
+–goat-accent:     #a8d8ff;
+–goat-glow:       rgba(168,216,255,0.2);
+}
+
+body {
+background: var(–bg);
+background-image:
+radial-gradient(ellipse 70% 40% at 50% 0%,  rgba(245,200,66,0.05)   0%, transparent 55%),
+radial-gradient(ellipse 40% 50% at 10% 75%, rgba(52,217,123,0.04)   0%, transparent 50%),
+radial-gradient(ellipse 35% 40% at 90% 25%, rgba(192,132,252,0.05)  0%, transparent 50%);
+font-family: ‘Nunito’, sans-serif;
+min-height: 100vh;
+display: flex; align-items: flex-start; justify-content: center;
+padding: 36px 20px 60px;
+overflow-x: hidden;
+}
+body::before {
+content:’’; position:fixed; inset:0;
+background-image: repeating-linear-gradient(0deg,rgba(255,255,255,0.012) 0px,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 52px);
+pointer-events:none;
+}
+.floater { position:fixed; pointer-events:none; opacity:0.06; animation:floatUp linear infinite; }
+.panel { width:100%; max-width:560px; }
+
+/* ── HEADER ── */
+.header { text-align:center; margin-bottom:30px; opacity:0; animation:popIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.wc-logo-wrap { display:flex; justify-content:center; align-items:center; gap:14px; margin-bottom:10px; }
+.wc-logo-svg { filter:drop-shadow(0 4px 18px rgba(245,200,66,0.4)); animation:trophyFloat 3.5s ease-in-out infinite; }
+.wc-26 { font-family:‘Fredoka One’,cursive; font-size:64px; line-height:1; color:transparent; -webkit-text-stroke:3px var(–gold); letter-spacing:-4px; opacity:0.9; }
+.we-are { font-family:‘Fredoka One’,cursive; font-size:11px; letter-spacing:.28em; text-transform:uppercase; color:var(–muted); margin-bottom:2px; }
+.page-title { font-family:‘Fredoka One’,cursive; font-size:32px; color:var(–text); letter-spacing:0.04em; margin-bottom:4px; }
+.page-sub { font-size:13px; font-weight:700; color:var(–muted); margin-bottom:12px; }
+.host-flags { font-size:18px; letter-spacing:4px; display:block; margin-bottom:12px; }
+
+/* ── PROGRESS ── */
+.progress-bar-wrap {
+background:var(–card); border:2px solid var(–border); border-radius:14px;
+padding:14px 18px; margin-bottom:28px; display:flex; align-items:center; gap:16px;
+opacity:0; animation:popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.15s forwards;
+}
+.progress-info { flex:1; }
+.progress-label { font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(–muted); margin-bottom:6px; }
+.progress-track { height:8px; background:rgba(255,255,255,0.07); border-radius:99px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(–gold2),var(–gold)); border-radius:99px; width:0%; animation:growBar 1.2s cubic-bezier(0.34,1.56,0.64,1) 0.6s forwards; }
+@keyframes growBar { from{width:0%} to{width:40%} }
+.progress-count { font-family:‘Fredoka One’,cursive; font-size:28px; color:var(–gold); line-height:1; white-space:nowrap; text-align:right; }
+.progress-count span { font-size:14px; color:var(–muted); font-family:‘Nunito’,sans-serif; font-weight:700; }
+
+/* ── SECTION LABELS ── */
+.section-label { display:flex; align-items:center; gap:10px; margin-bottom:12px; margin-top:28px; opacity:0; animation:fadeUp 0.4s ease forwards; }
+.sep-line { flex:1; height:1px; background:var(–border); }
+.section-title { font-family:‘Fredoka One’,cursive; font-size:13px; letter-spacing:0.12em; text-transform:uppercase; }
+.section-title.common    { color:var(–common-color); }
+.section-title.rare      { color:var(–rare-color); }
+.section-title.epic      { color:var(–epic-color); }
+.section-title.legendary { color:var(–legendary-color); }
+.section-title.mythic    { color:var(–mythic-color); }
+.section-title.goat      { color:var(–goat-color); letter-spacing:0.2em; }
+
+/* ── GRIDS ── */
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:4px; }
+.grid.single { grid-template-columns:1fr; }
+.span2 { grid-column: span 2; }
+
+/* ── BASE CARD ── */
+.ach {
+background:var(–card); border-radius:16px; border:2px solid var(–border);
+padding:16px 14px 14px; position:relative; overflow:hidden; cursor:pointer;
+transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s, box-shadow 0.2s;
+opacity:0; animation:slideIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+.ach::before { content:’’; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:2px 0 0 2px; }
+.ach::after {
+content:’’; position:absolute; inset:0;
+background:radial-gradient(ellipse 80% 50% at 50% 0%, var(–rarity-glow,transparent) 0%, transparent 70%);
+pointer-events:none; opacity:0; transition:opacity 0.3s;
+}
+.ach:hover::after { opacity:1; }
+
+/* Tier theming */
+.ach.common    { –rarity-glow:var(–common-glow); }
+.ach.rare      { –rarity-glow:var(–rare-glow); }
+.ach.epic      { –rarity-glow:var(–epic-glow); }
+.ach.legendary { –rarity-glow:var(–legendary-glow); }
+.ach.mythic    { –rarity-glow:var(–mythic-glow); }
+.ach.goat      { –rarity-glow:var(–goat-glow); }
+
+.ach.common::before    { background:var(–common-color); }
+.ach.rare::before      { background:var(–rare-color); }
+.ach.epic::before      { background:var(–epic-color); }
+.ach.legendary::before { background:linear-gradient(180deg,var(–gold),var(–bronze)); width:4px; }
+.ach.mythic::before    { background:linear-gradient(180deg,#ffb347,#ff5f1f); width:4px; }
+.ach.goat::before      { background:linear-gradient(180deg,#e8f4ff,#6ab4f0,#c8e8ff); width:5px; }
+
+.ach:hover { transform:translateY(-4px) scale(1.02); }
+.ach.common:hover    { border-color:rgba(52,217,123,0.45);  box-shadow:0 8px 24px rgba(52,217,123,0.14); }
+.ach.rare:hover      { border-color:rgba(79,195,247,0.4);   box-shadow:0 8px 24px rgba(79,195,247,0.15); }
+.ach.epic:hover      { border-color:rgba(192,132,252,0.45); box-shadow:0 8px 28px rgba(192,132,252,0.18); }
+.ach.legendary:hover { border-color:rgba(245,200,66,0.5);   box-shadow:0 8px 36px rgba(245,200,66,0.22); }
+.ach.mythic:hover    { border-color:rgba(255,140,66,0.55);  box-shadow:0 8px 36px rgba(255,140,66,0.22); }
+.ach.goat:hover      { border-color:rgba(200,232,255,0.55); box-shadow:0 10px 42px rgba(168,216,255,0.25); }
+
+.ach.locked { opacity:0.36 !important; filter:grayscale(0.7); pointer-events:none; }
+
+/* Rarity badge */
+.rarity-badge {
+position:absolute; top:10px; right:10px;
+font-size:9px; font-weight:900; letter-spacing:0.1em; text-transform:uppercase;
+padding:2px 7px; border-radius:99px; border:1.5px solid; line-height:1.5;
+}
+.common  .rarity-badge { color:var(–common-color);    border-color:rgba(52,217,123,0.3);   background:rgba(52,217,123,0.08); }
+.rare    .rarity-badge { color:var(–rare-color);       border-color:rgba(79,195,247,0.3);   background:rgba(79,195,247,0.08); }
+.epic    .rarity-badge { color:var(–epic-color);       border-color:rgba(192,132,252,0.3);  background:rgba(192,132,252,0.08); }
+.legendary .rarity-badge { color:var(–gold);           border-color:rgba(245,200,66,0.35);  background:rgba(245,200,66,0.08); }
+.mythic  .rarity-badge { color:var(–mythic-color);     border-color:rgba(255,140,66,0.35);  background:rgba(255,140,66,0.08); }
+.goat    .rarity-badge { color:var(–goat-color);       border-color:rgba(200,232,255,0.35); background:rgba(168,216,255,0.08); letter-spacing:0.2em; }
+
+/* Icon */
+.ach-icon { display:block; margin-bottom:8px; line-height:1; transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+.ach-icon svg { display:block; }
+.ach:hover .ach-icon { transform:scale(1.16) rotate(-5deg); }
+.ach.legendary .ach-icon svg { animation:iconPulse    2.5s ease-in-out infinite; }
+.ach.mythic    .ach-icon svg { animation:iconPulseFire 2s  ease-in-out infinite; }
+.ach.goat      .ach-icon svg { animation:iconPulseIce  3s  ease-in-out infinite; }
+.ach.epic      .ach-icon svg { filter:drop-shadow(0 0 6px rgba(192,132,252,0.4)); }
+.ach.rare      .ach-icon svg { filter:drop-shadow(0 0 5px rgba(79,195,247,0.3)); }
+.ach.common    .ach-icon svg { filter:drop-shadow(0 0 5px rgba(52,217,123,0.3)); }
+
+/* Title + desc */
+.ach-title { font-family:‘Fredoka One’,cursive; font-size:15px; line-height:1.15; margin-bottom:4px; padding-right:46px; }
+.common  .ach-title { color:#a8ffd4; }
+.rare    .ach-title { color:#b8e8ff; }
+.epic    .ach-title { color:#e8d4ff; }
+.legendary .ach-title { color:var(–gold); text-shadow:0 0 12px rgba(245,200,66,0.35); }
+.mythic  .ach-title { color:#ffd4a8; text-shadow:0 0 12px rgba(255,140,66,0.35); }
+.goat    .ach-title { color:var(–goat-color); text-shadow:0 0 14px rgba(168,216,255,0.5); font-size:17px; letter-spacing:0.03em; }
+.ach-desc { font-size:11px; font-weight:700; color:var(–muted); line-height:1.4; }
+
+/* Unlocked / Lock */
+.unlocked-badge { position:absolute; bottom:10px; right:10px; }
+.lock-overlay   { position:absolute; bottom:10px; right:10px; opacity:0.45; }
+
+/* Share chip */
+.share-chip {
+display:inline-flex; align-items:center; gap:5px; margin-top:8px;
+font-size:10px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase;
+border-radius:99px; padding:3px 10px; opacity:0; transition:opacity 0.2s; cursor:pointer; border:1.5px solid;
+}
+.legendary .share-chip { color:var(–gold);        background:rgba(245,200,66,0.08);  border-color:rgba(245,200,66,0.25); }
+.mythic    .share-chip { color:var(–mythic-color); background:rgba(255,140,66,0.08);  border-color:rgba(255,140,66,0.25); }
+.goat      .share-chip { color:var(–goat-color);   background:rgba(168,216,255,0.08); border-color:rgba(168,216,255,0.3); }
+.ach:hover .share-chip { opacity:1; }
+
+/* Wide card layout (legendary+) */
+.ach.wide {
+display:grid; grid-template-columns:auto 1fr; gap:0 16px; align-items:center; padding:20px 18px 18px;
+}
+.ach.wide .ach-icon { margin-bottom:0; }
+.ach.wide .ach-icon svg { width:52px; height:52px; }
+.ach.wide .ach-title { font-size:18px; padding-right:72px; }
+.ach.goat.wide .ach-title { font-size:20px; }
+
+/* GOAT card extras */
+.ach.goat {
+background: linear-gradient(135deg, #111e2e 0%, #0d1520 60%, #111e2e 100%);
+border-color: rgba(168,216,255,0.15);
+}
+.goat-shimmer {
+position:absolute; inset:0; pointer-events:none;
+background: linear-gradient(105deg, transparent 35%, rgba(168,216,255,0.06) 50%, transparent 65%);
+background-size: 200% 100%;
+animation: shimmer 3s linear infinite;
+}
+
+/* MYTHIC card extras */
+.ach.mythic {
+background: linear-gradient(135deg, #1a1208 0%, #120e08 60%, #1a1208 100%);
+}
+
+/* ── FOOTER ── */
+.footer { display:flex; justify-content:space-between; align-items:center; margin-top:28px; padding:0 2px; opacity:0; animation:fadeUp 0.4s ease 2.2s forwards; }
+.footer-txt    { font-size:11px; font-weight:700; color:var(–muted); }
+.footer-slogan { font-family:‘Fredoka One’,cursive; font-size:13px; color:var(–gold); letter-spacing:.1em; opacity:.6; }
+
+/* ── KEYFRAMES ── */
+@keyframes popIn   { from{opacity:0;transform:scale(0.82)} to{opacity:1;transform:scale(1)} }
+@keyframes fadeUp  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes trophyFloat { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-8px) rotate(3deg)} }
+@keyframes iconPulse     { 0%,100%{filter:drop-shadow(0 0 8px rgba(245,200,66,0.5))}  50%{filter:drop-shadow(0 0 20px rgba(245,200,66,0.95))} }
+@keyframes iconPulseFire { 0%,100%{filter:drop-shadow(0 0 8px rgba(255,140,66,0.5))}  50%{filter:drop-shadow(0 0 22px rgba(255,100,20,1))} }
+@keyframes iconPulseIce  { 0%,100%{filter:drop-shadow(0 0 10px rgba(168,216,255,0.5))} 50%{filter:drop-shadow(0 0 24px rgba(168,216,255,1))} }
+@keyframes shimmer { from{background-position:200% 0} to{background-position:-200% 0} }
+@keyframes floatUp { from{transform:translateY(105vh) rotate(0deg)} to{transform:translateY(-10vh) rotate(540deg)} }
+
+/* Delay classes */
+.d0{animation-delay:.06s}  .d1{animation-delay:.12s}  .d2{animation-delay:.18s}  .d3{animation-delay:.24s}
+.d4{animation-delay:.30s}  .d5{animation-delay:.36s}  .d6{animation-delay:.42s}  .d7{animation-delay:.48s}
+.d8{animation-delay:.54s}  .d9{animation-delay:.60s}  .d10{animation-delay:.66s} .d11{animation-delay:.72s}
+.d12{animation-delay:.78s} .d13{animation-delay:.84s} .d14{animation-delay:.90s} .d15{animation-delay:.96s}
+.d16{animation-delay:1.02s}.d17{animation-delay:1.08s}.d18{animation-delay:1.14s}.d19{animation-delay:1.20s}
+.d20{animation-delay:1.26s}.d21{animation-delay:1.32s}.d22{animation-delay:1.38s}.d23{animation-delay:1.44s}
+
+.sl0{animation-delay:.16s} .sl1{animation-delay:.36s} .sl2{animation-delay:.58s} .sl3{animation-delay:.82s}
+.sl4{animation-delay:1.06s}.sl5{animation-delay:1.30s}.sl6{animation-delay:1.54s}
+</style>
+
+</head>
+<body>
+
+<script>
+  for(let i=0;i<7;i++){
+    const el=document.createElement("span"); el.className="floater";
+    el.textContent="⚽";
+    el.style.left=(4+i*14)+"vw";
+    el.style.fontSize=(10+Math.random()*14)+"px";
+    el.style.animationDuration=(20+Math.random()*20)+"s";
+    el.style.animationDelay=(-Math.random()*22)+"s";
+    document.body.appendChild(el);
+  }
+</script>
+
+<!-- ─── SVG SYMBOL LIBRARY ─── -->
+
+<svg width="0" height="0" style="position:absolute;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+<defs>
+
+  <!-- DART -->
+
+  <symbol id="ico-dart" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="13" fill="none" stroke="#34d97b" stroke-width="1.4" stroke-dasharray="3 3" opacity="0.5"/>
+    <circle cx="18" cy="18" r="7.5" fill="none" stroke="#34d97b" stroke-width="1.4" opacity="0.7"/>
+    <circle cx="18" cy="18" r="2.8" fill="#34d97b"/>
+    <line x1="25" y1="11" x2="20.5" y2="15.5" stroke="#5df0a0" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="25,8 29,11 26,12.5 22.5,9.5" fill="#5df0a0"/>
+    <line x1="26.5" y1="8.5" x2="30" y2="6" stroke="#5df0a0" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="28.5" y1="10.5" x2="32" y2="9" stroke="#5df0a0" stroke-width="1.2" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- CHECK x10 -->
+
+  <symbol id="ico-check10" viewBox="0 0 36 36">
+    <rect x="4" y="5" width="28" height="26" rx="7" fill="none" stroke="#34d97b" stroke-width="1.6"/>
+    <text x="18" y="17" text-anchor="middle" font-family="Fredoka One,cursive" font-size="10" fill="#34d97b">10</text>
+    <polyline points="11,23 15.5,28 25,19" fill="none" stroke="#34d97b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- BINOCULARS -->
+
+  <symbol id="ico-binoculars" viewBox="0 0 36 36">
+    <rect x="3"  y="14" width="12" height="12" rx="5" fill="none" stroke="#34d97b" stroke-width="1.7"/>
+    <rect x="21" y="14" width="12" height="12" rx="5" fill="none" stroke="#34d97b" stroke-width="1.7"/>
+    <path d="M15 19 L21 19" stroke="#34d97b" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="9"  cy="20" r="2.5" fill="#34d97b" opacity="0.35"/>
+    <circle cx="27" cy="20" r="2.5" fill="#34d97b" opacity="0.35"/>
+    <path d="M12 12 L9 14"  stroke="#34d97b" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M24 12 L27 14" stroke="#34d97b" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- COIN -->
+
+  <symbol id="ico-coin" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="13" fill="none" stroke="#34d97b" stroke-width="1.7"/>
+    <circle cx="18" cy="18" r="8.5" fill="none" stroke="#34d97b" stroke-width="1" opacity="0.45"/>
+    <text x="18" y="22.5" text-anchor="middle" font-family="Fredoka One,cursive" font-size="10" fill="#34d97b">100</text>
+  </symbol>
+
+  <!-- INVITE (person + plus) -->
+
+  <symbol id="ico-invite" viewBox="0 0 36 36">
+    <circle cx="12" cy="11" r="5.5" fill="none" stroke="#34d97b" stroke-width="1.7"/>
+    <path d="M3 30 C3 22 7 18 12 18 C16 18 19 21 20 25" fill="none" stroke="#34d97b" stroke-width="1.7" stroke-linecap="round"/>
+    <line x1="27" y1="17" x2="27" y2="29" stroke="#34d97b" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="21" y1="23" x2="33" y2="23" stroke="#34d97b" stroke-width="2.2" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- 5 CROSSHAIRS: 5 resultados exactos (common) -->
+
+  <symbol id="ico-five-exact" viewBox="0 0 36 36">
+    <circle cx="12" cy="12" r="7" fill="none" stroke="#34d97b" stroke-width="1.4"/>
+    <circle cx="12" cy="12" r="3"  fill="none" stroke="#34d97b" stroke-width="1.2" opacity="0.6"/>
+    <circle cx="12" cy="12" r="1.2" fill="#34d97b"/>
+    <line x1="12" y1="4"  x2="12" y2="7"  stroke="#34d97b" stroke-width="1.3" stroke-linecap="round"/>
+    <line x1="12" y1="17" x2="12" y2="20" stroke="#34d97b" stroke-width="1.3" stroke-linecap="round"/>
+    <line x1="4"  y1="12" x2="7"  y2="12" stroke="#34d97b" stroke-width="1.3" stroke-linecap="round"/>
+    <line x1="17" y1="12" x2="20" y2="12" stroke="#34d97b" stroke-width="1.3" stroke-linecap="round"/>
+    <text x="26" y="30" text-anchor="middle" font-family="Fredoka One,cursive" font-size="16" fill="#34d97b">×5</text>
+  </symbol>
+
+  <!-- MEDAL -->
+
+  <symbol id="ico-medal" viewBox="0 0 36 36">
+    <line x1="13" y1="6" x2="10" y2="15" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round"/>
+    <line x1="23" y1="6" x2="26" y2="15" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="13,5 23,5 25,9 11,9" fill="#4fc3f7" opacity="0.65"/>
+    <circle cx="18" cy="25" r="10" fill="none" stroke="#4fc3f7" stroke-width="2"/>
+    <circle cx="18" cy="25" r="6.5" fill="none" stroke="#4fc3f7" stroke-width="1" opacity="0.4"/>
+    <text x="18" y="29" text-anchor="middle" font-family="Fredoka One,cursive" font-size="7.5" fill="#4fc3f7">200</text>
+  </symbol>
+
+  <!-- FLAME -->
+
+  <symbol id="ico-flame" viewBox="0 0 36 36">
+    <path d="M18 4 C18 4 27 13 27 21 C27 27.6 23 32 18 32 C13 32 9 27.6 9 21 C9 15 13 10 13 10 C13 10 12 17 17 19 C17 19 14.5 13.5 18 4Z"
+          fill="none" stroke="#4fc3f7" stroke-width="1.9" stroke-linejoin="round"/>
+    <path d="M18 18 C18 18 22 22 22 26 C22 29 20.2 31 18 31 C15.8 31 14 29 14 26 C14 22 18 18 18 18Z" fill="#4fc3f7" opacity="0.2"/>
+  </symbol>
+
+  <!-- CROSSHAIR -->
+
+  <symbol id="ico-crosshair" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="11.5" fill="none" stroke="#4fc3f7" stroke-width="1.7"/>
+    <circle cx="18" cy="18" r="4.5"  fill="none" stroke="#4fc3f7" stroke-width="1.5"/>
+    <circle cx="18" cy="18" r="1.8"  fill="#4fc3f7"/>
+    <line x1="18" y1="4"  x2="18" y2="11" stroke="#4fc3f7" stroke-width="1.7" stroke-linecap="round"/>
+    <line x1="18" y1="25" x2="18" y2="32" stroke="#4fc3f7" stroke-width="1.7" stroke-linecap="round"/>
+    <line x1="4"  y1="18" x2="11" y2="18" stroke="#4fc3f7" stroke-width="1.7" stroke-linecap="round"/>
+    <line x1="25" y1="18" x2="32" y2="18" stroke="#4fc3f7" stroke-width="1.7" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- TOP 100 badge -->
+
+  <symbol id="ico-top100" viewBox="0 0 36 36">
+    <polygon points="18,3 21,12 31,12 23,18 26,28 18,22 10,28 13,18 5,12 15,12" fill="none" stroke="#4fc3f7" stroke-width="1.7" stroke-linejoin="round"/>
+    <text x="18" y="20" text-anchor="middle" font-family="Fredoka One,cursive" font-size="7" fill="#4fc3f7">100</text>
+  </symbol>
+
+  <!-- CLIPBOARD (epic) -->
+
+  <symbol id="ico-clipboard" viewBox="0 0 36 36">
+    <rect x="7" y="8" width="22" height="24" rx="4" fill="none" stroke="#c084fc" stroke-width="1.8"/>
+    <rect x="13" y="5" width="10" height="6" rx="2.5" fill="none" stroke="#c084fc" stroke-width="1.5"/>
+    <line x1="11" y1="16" x2="25" y2="16" stroke="#c084fc" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+    <line x1="11" y1="20" x2="25" y2="20" stroke="#c084fc" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+    <line x1="11" y1="24" x2="19" y2="24" stroke="#c084fc" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+    <polyline points="20,23 23,27 30,19" fill="none" stroke="#c084fc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- HALF GLOBE (epic) -->
+
+  <symbol id="ico-halfglobe" viewBox="0 0 36 36">
+    <path d="M4 18 A14 14 0 0 1 32 18" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="4" y1="18" x2="32" y2="18" stroke="#c084fc" stroke-width="1.7"/>
+    <line x1="18" y1="4" x2="18" y2="18" stroke="#c084fc" stroke-width="1.7" stroke-linecap="round"/>
+    <path d="M6 12 Q18 15 30 12" fill="none" stroke="#c084fc" stroke-width="1.1" opacity="0.5"/>
+    <path d="M4 18 A14 14 0 0 0 32 18" fill="none" stroke="#c084fc" stroke-width="1" stroke-dasharray="2 3" opacity="0.28"/>
+    <text x="18" y="30" text-anchor="middle" font-family="Fredoka One,cursive" font-size="6.5" fill="#c084fc">50%</text>
+  </symbol>
+
+  <!-- BOLT (epic semifinal) -->
+
+  <symbol id="ico-bolt" viewBox="0 0 36 36">
+    <polygon points="22,3 11,21 18,21 14,33 25,15 18,15" fill="none" stroke="#c084fc" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- TOP 50 star (epic) -->
+
+  <symbol id="ico-top50" viewBox="0 0 36 36">
+    <polygon points="18,3 21,12 31,12 23,18 26,28 18,22 10,28 13,18 5,12 15,12" fill="none" stroke="#c084fc" stroke-width="1.7" stroke-linejoin="round"/>
+    <text x="18" y="20" text-anchor="middle" font-family="Fredoka One,cursive" font-size="7" fill="#c084fc">50</text>
+  </symbol>
+
+  <!-- DOUBLE FLAME (epic: 2 rachas) -->
+
+  <symbol id="ico-double-flame" viewBox="0 0 36 36">
+    <path d="M13 7 C13 7 19 13 19 19 C19 23.6 16.5 27 13 27 C9.5 27 7 23.6 7 19 C7 15 10 11 10 11 C10 11 9.2 16 12.5 18 C12.5 18 10.5 13 13 7Z"
+          fill="none" stroke="#c084fc" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M23 4 C23 4 30 11 30 19 C30 24.8 27 29 23 29 C19 29 16 24.8 16 19 C16 14 19.5 10 19.5 10 C19.5 10 18.5 16 22 18 C22 18 19.5 12 23 4Z"
+          fill="none" stroke="#c084fc" stroke-width="1.9" stroke-linejoin="round"/>
+    <path d="M23 18 C23 18 26 21 26 24.5 C26 27 24.7 29 23 29 C21.3 29 20 27 20 24.5 C20 21 23 18 23 18Z" fill="#c084fc" opacity="0.18"/>
+  </symbol>
+
+  <!-- CROSSHAIR x10 (epic, was doble precision) -->
+
+  <symbol id="ico-crosshair10" viewBox="0 0 36 36">
+    <circle cx="13" cy="13" r="8" fill="none" stroke="#c084fc" stroke-width="1.5"/>
+    <circle cx="13" cy="13" r="3.5" fill="none" stroke="#c084fc" stroke-width="1.2" opacity="0.6"/>
+    <circle cx="13" cy="13" r="1.5" fill="#c084fc"/>
+    <line x1="13" y1="4"  x2="13" y2="8"  stroke="#c084fc" stroke-width="1.3" stroke-linecap="round"/>
+    <line x1="13" y1="18" x2="13" y2="22" stroke="#c084fc" stroke-width="1.3" stroke-linecap="round"/>
+    <line x1="4"  y1="13" x2="8"  y2="13" stroke="#c084fc" stroke-width="1.3" stroke-linecap="round"/>
+    <line x1="18" y1="13" x2="22" y2="13" stroke="#c084fc" stroke-width="1.3" stroke-linecap="round"/>
+    <text x="27" y="32" text-anchor="middle" font-family="Fredoka One,cursive" font-size="15" fill="#c084fc">×10</text>
+  </symbol>
+
+  <!-- EYE ORB (legendary: vidente) -->
+
+  <symbol id="ico-eye" viewBox="0 0 36 36">
+    <path d="M2 18 C7 9 12 5 18 5 C24 5 29 9 34 18 C29 27 24 31 18 31 C12 31 7 27 2 18Z" fill="none" stroke="#f5c842" stroke-width="2"/>
+    <circle cx="18" cy="18" r="6"   fill="none" stroke="#f5c842" stroke-width="1.8"/>
+    <circle cx="18" cy="18" r="2.5" fill="#f5c842"/>
+    <circle cx="20.5" cy="15.5" r="1.2" fill="#fff8d0" opacity="0.75"/>
+    <line x1="18" y1="2"  x2="18" y2="5"  stroke="#f5c842" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="4"  x2="12.5" y2="6.5" stroke="#f5c842" stroke-width="1.2" stroke-linecap="round" opacity="0.55"/>
+    <line x1="25" y1="4"  x2="23.5" y2="6.5" stroke="#f5c842" stroke-width="1.2" stroke-linecap="round" opacity="0.55"/>
+  </symbol>
+
+  <!-- GLOBE (legendary: todos los partidos) -->
+
+  <symbol id="ico-globe" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="14" fill="none" stroke="#f5c842" stroke-width="2"/>
+    <ellipse cx="18" cy="18" rx="6" ry="14" fill="none" stroke="#f5c842" stroke-width="1.3" opacity="0.65"/>
+    <line x1="4"  y1="18" x2="32" y2="18" stroke="#f5c842" stroke-width="1.3" opacity="0.65"/>
+    <path d="M5 12 Q18 15.5 31 12" fill="none" stroke="#f5c842" stroke-width="1.1" opacity="0.5"/>
+    <path d="M5 24 Q18 20.5 31 24" fill="none" stroke="#f5c842" stroke-width="1.1" opacity="0.5"/>
+  </symbol>
+
+  <!-- TROPHY (legendary: final) -->
+
+  <symbol id="ico-trophy" viewBox="0 0 36 36">
+    <rect x="11" y="31" width="14" height="3" rx="1.5" fill="none" stroke="#f5c842" stroke-width="1.8"/>
+    <rect x="13.5" y="27" width="9" height="5" rx="1.5" fill="none" stroke="#f5c842" stroke-width="1.8"/>
+    <rect x="16" y="22" width="4" height="6" rx="1" fill="#f5c842" opacity="0.7"/>
+    <path d="M7 7 C5 7 3 9 3 14 C3 20 7 24 13 26 L18 27 L23 26 C29 24 33 20 33 14 C33 9 31 7 29 7 Z" fill="none" stroke="#f5c842" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M7 12 C2 11 1 17 3 20 C4 22 6 23 8 22"  fill="none" stroke="#f5c842" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M29 12 C34 11 35 17 33 20 C32 22 30 23 28 22" fill="none" stroke="#f5c842" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="12" y1="11" x2="12" y2="19" stroke="rgba(255,248,200,0.35)" stroke-width="2.5" stroke-linecap="round"/>
+    <polygon points="18,2 19.4,6 23.5,6 20.2,8.4 21.5,12.5 18,10 14.5,12.5 15.8,8.4 12.5,6 16.6,6" fill="#f5c842" opacity="0.9"/>
+  </symbol>
+
+  <!-- TOP 10 star (legendary) -->
+
+  <symbol id="ico-top10" viewBox="0 0 36 36">
+    <polygon points="18,2 21.5,12 33,12 23.5,18.5 27,29 18,22.5 9,29 12.5,18.5 3,12 14.5,12" fill="none" stroke="#f5c842" stroke-width="1.8" stroke-linejoin="round"/>
+    <text x="18" y="21" text-anchor="middle" font-family="Fredoka One,cursive" font-size="8" fill="#f5c842">10</text>
+  </symbol>
+
+  <!-- PODIUM 3 (mythic: top3) -->
+
+  <symbol id="ico-podium3" viewBox="0 0 36 36">
+    <rect x="3"  y="20" width="9"  height="13" rx="2" fill="none" stroke="#ff8c42" stroke-width="1.6"/>
+    <rect x="13.5" y="14" width="9" height="19" rx="2" fill="none" stroke="#ff8c42" stroke-width="1.9"/>
+    <rect x="24" y="23" width="9"  height="10" rx="2" fill="none" stroke="#ff8c42" stroke-width="1.6"/>
+    <text x="7.5"  y="31" text-anchor="middle" font-family="Fredoka One,cursive" font-size="7" fill="#ff8c42">2</text>
+    <text x="18"   y="31" text-anchor="middle" font-family="Fredoka One,cursive" font-size="7" fill="#ff8c42">1</text>
+    <text x="28.5" y="31" text-anchor="middle" font-family="Fredoka One,cursive" font-size="7" fill="#ff8c42">3</text>
+    <polygon points="18,2 19.5,7 24.5,7 20.5,10 22,15 18,12 14,15 15.5,10 11.5,7 16.5,7" fill="#ff8c42" opacity="0.85"/>
+  </symbol>
+
+  <!-- PODIUM 2 (mythic: top2) -->
+
+  <symbol id="ico-podium2" viewBox="0 0 36 36">
+    <rect x="5"  y="16" width="11" height="17" rx="2" fill="none" stroke="#ff8c42" stroke-width="1.7"/>
+    <rect x="20" y="20" width="11" height="13" rx="2" fill="none" stroke="#ff8c42" stroke-width="1.7"/>
+    <text x="10.5" y="31" text-anchor="middle" font-family="Fredoka One,cursive" font-size="8" fill="#ff8c42">1</text>
+    <text x="25.5" y="31" text-anchor="middle" font-family="Fredoka One,cursive" font-size="8" fill="#ff8c42">2</text>
+    <polygon points="10.5,3 12.5,9 19,9 14,12.5 16,18.5 10.5,15 5,18.5 7,12.5 2,9 8.5,9" fill="#ff8c42" opacity="0.9"/>
+  </symbol>
+
+  <!-- CROWN (mythic: top1) -->
+
+  <symbol id="ico-crown" viewBox="0 0 36 36">
+    <path d="M4 28 L7 14 L13 22 L18 8 L23 22 L29 14 L32 28 Z" fill="none" stroke="#ff8c42" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <line x1="4" y1="28" x2="32" y2="28" stroke="#ff8c42" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="18" cy="8"  r="2.2" fill="#ff8c42"/>
+    <circle cx="7"  cy="14" r="2"   fill="#ff8c42"/>
+    <circle cx="29" cy="14" r="2"   fill="#ff8c42"/>
+  </symbol>
+
+  <!-- GOAT HEAD (goat tier) -->
+
+  <symbol id="ico-goat" viewBox="0 0 36 36">
+    <!-- horns -->
+    <path d="M10 10 C7 6 4 4 3 7 C2 10 5 12 8 13" fill="none" stroke="#a8d8ff" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M26 10 C29 6 32 4 33 7 C34 10 31 12 28 13" fill="none" stroke="#a8d8ff" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- face -->
+    <ellipse cx="18" cy="18" rx="10" ry="11" fill="none" stroke="#a8d8ff" stroke-width="1.9"/>
+    <!-- ears -->
+    <ellipse cx="8"  cy="18" rx="3.5" ry="2.5" fill="none" stroke="#a8d8ff" stroke-width="1.4"/>
+    <ellipse cx="28" cy="18" rx="3.5" ry="2.5" fill="none" stroke="#a8d8ff" stroke-width="1.4"/>
+    <!-- eyes -->
+    <ellipse cx="14" cy="16" rx="2"   ry="1.5" fill="none" stroke="#a8d8ff" stroke-width="1.3"/>
+    <ellipse cx="22" cy="16" rx="2"   ry="1.5" fill="none" stroke="#a8d8ff" stroke-width="1.3"/>
+    <!-- pupils (horizontal goat pupils) -->
+    <rect x="13.2" y="15.6" width="1.6" height="0.8" rx="0.4" fill="#a8d8ff"/>
+    <rect x="21.2" y="15.6" width="1.6" height="0.8" rx="0.4" fill="#a8d8ff"/>
+    <!-- nose -->
+    <ellipse cx="18" cy="22" rx="3.5" ry="2.5" fill="none" stroke="#a8d8ff" stroke-width="1.3" opacity="0.7"/>
+    <line x1="16.5" y1="22" x2="19.5" y2="22" stroke="#a8d8ff" stroke-width="1" opacity="0.6"/>
+    <!-- beard -->
+    <path d="M16 28 C16 31 18 33 18 33 C18 33 20 31 20 28" fill="none" stroke="#a8d8ff" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- UNLOCKED CHECK -->
+
+  <symbol id="ico-unlocked" viewBox="0 0 16 16">
+    <circle cx="8" cy="8" r="7" fill="#00e676" opacity="0.12"/>
+    <circle cx="8" cy="8" r="7" fill="none" stroke="#00e676" stroke-width="1.2"/>
+    <polyline points="4.5,8.5 7,11 11.5,5.5" fill="none" stroke="#00e676" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- LOCK -->
+
+  <symbol id="ico-lock" viewBox="0 0 16 16">
+    <rect x="3" y="7" width="10" height="8" rx="2" fill="none" stroke="rgba(240,246,255,0.38)" stroke-width="1.2"/>
+    <path d="M5 7 V5 A3 3 0 0 1 11 5 V7" fill="none" stroke="rgba(240,246,255,0.38)" stroke-width="1.2"/>
+    <circle cx="8" cy="11" r="1.2" fill="rgba(240,246,255,0.38)"/>
+  </symbol>
+
+  <!-- SHARE -->
+
+  <symbol id="ico-share" viewBox="0 0 12 12">
+    <circle cx="9.5" cy="2.5" r="1.5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <circle cx="9.5" cy="9.5" r="1.5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <circle cx="2.5" cy="6"   r="1.5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <line x1="8" y1="3.2" x2="4" y2="5.3" stroke="currentColor" stroke-width="0.9"/>
+    <line x1="4" y1="6.7" x2="8" y2="8.8" stroke="currentColor" stroke-width="0.9"/>
+  </symbol>
+
+</defs>
+</svg>
+
+<div class="panel">
+
+  <!-- HEADER -->
+
+  <div class="header">
+    <div class="wc-logo-wrap">
+      <svg class="wc-logo-svg" width="62" height="76" viewBox="0 0 72 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="36" cy="82" rx="20" ry="4" fill="rgba(245,200,66,0.15)"/>
+        <rect x="16" y="74" width="40" height="6" rx="3" fill="url(#bG)"/>
+        <rect x="20" y="70" width="32" height="5" rx="2.5" fill="url(#bG)"/>
+        <rect x="31" y="56" width="10" height="16" rx="2" fill="url(#sG)"/>
+        <rect x="33" y="57" width="3" height="14" rx="1.5" fill="rgba(255,255,255,0.18)"/>
+        <path d="M14 14 C10 14 6 18 6 26 C6 36 12 44 22 50 L28 54 L44 54 L50 50 C60 44 66 36 66 26 C66 18 62 14 58 14 Z" fill="url(#cG)" stroke="url(#cS)" stroke-width="1.5"/>
+        <path d="M18 18 C15 20 13 25 14 32 C16 39 21 45 28 49 L36 51 C44 49 50 43 53 36 C55 29 54 22 51 18 Z" fill="url(#iG)" opacity="0.35"/>
+        <ellipse cx="26" cy="26" rx="5" ry="8" fill="rgba(255,255,255,0.22)" transform="rotate(-10 26 26)"/>
+        <path d="M14 24 C4 22 2 30 4 36 C6 40 10 42 14 40" stroke="url(#hG)" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M58 24 C68 22 70 30 68 36 C66 40 62 42 58 40" stroke="url(#hG)" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <ellipse cx="36" cy="14" rx="22" ry="4" fill="url(#rG)"/>
+        <circle cx="36" cy="8" r="7" fill="#f0f0f0" stroke="#222" stroke-width="0.8"/>
+        <path d="M36 3 L39 6 L38 10 L34 10 L33 6 Z" fill="#111" opacity="0.85"/>
+        <path d="M29 7 L33 6 L34 10 L31 13 L28 11 Z" fill="#111" opacity="0.7"/>
+        <path d="M43 7 L39 6 L38 10 L41 13 L44 11 Z" fill="#111" opacity="0.7"/>
+        <defs>
+          <linearGradient id="cG" x1="36" y1="8" x2="36" y2="56" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#ffe066"/><stop offset="40%" stop-color="#f5c842"/>
+            <stop offset="80%" stop-color="#c89010"/><stop offset="100%" stop-color="#a06800"/>
+          </linearGradient>
+          <linearGradient id="cS" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffe88a"/><stop offset="100%" stop-color="#8a5a00"/></linearGradient>
+          <linearGradient id="iG" x1="36" y1="18" x2="36" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#1a1000"/><stop offset="100%" stop-color="transparent"/></linearGradient>
+          <linearGradient id="sG" x1="31" y1="56" x2="41" y2="72" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#d4920a"/><stop offset="50%" stop-color="#f5c842"/><stop offset="100%" stop-color="#a06800"/></linearGradient>
+          <linearGradient id="bG" x1="16" y1="70" x2="56" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c88800"/><stop offset="50%" stop-color="#f0b830"/><stop offset="100%" stop-color="#a06800"/></linearGradient>
+          <linearGradient id="hG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffe066"/><stop offset="100%" stop-color="#c88800"/></linearGradient>
+          <linearGradient id="rG" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox"><stop offset="0%" stop-color="#ffe88a"/><stop offset="100%" stop-color="#b07800"/></linearGradient>
+        </defs>
+      </svg>
+      <div>
+        <div class="we-are">We Are</div>
+        <div class="wc-26">26</div>
+      </div>
+    </div>
+    <div class="page-title">Logros</div>
+    <div class="page-sub">Desbloquea hitos · Comparte tu historia</div>
+    <div class="host-flags">🇨🇦 🇲🇽 🇺🇸</div>
+  </div>
+
+  <!-- PROGRESS -->
+
+  <div class="progress-bar-wrap">
+    <div class="progress-info">
+      <div class="progress-label">⚽ Tu progreso global</div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
+    </div>
+    <div class="progress-count">8<span> / 22</span></div>
+  </div>
+
+  <!-- ══════════ COMÚN (verde) ══════════ -->
+
+  <div class="section-label sl0">
+    <div class="sep-line"></div>
+    <span class="section-title common">◈ Común</span>
+    <div class="sep-line"></div>
+  </div>
+
+  <div class="grid">
+
+```
+<div class="ach common d0">
+  <span class="rarity-badge">Común</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-dart"/></svg></span>
+  <div class="ach-title">Primer Acierto</div>
+  <div class="ach-desc">Acierta tu primera predicción del torneo</div>
+  <span class="unlocked-badge"><svg width="16" height="16"><use href="#ico-unlocked"/></svg></span>
+</div>
+
+<div class="ach common d1">
+  <span class="rarity-badge">Común</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-check10"/></svg></span>
+  <div class="ach-title">Buen Ojo</div>
+  <div class="ach-desc">Acierta 10 predicciones a lo largo del torneo</div>
+  <span class="unlocked-badge"><svg width="16" height="16"><use href="#ico-unlocked"/></svg></span>
+</div>
+
+<div class="ach common d2">
+  <span class="rarity-badge">Común</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-binoculars"/></svg></span>
+  <div class="ach-title">Analista de Grupos</div>
+  <div class="ach-desc">Predice al menos 10 partidos de la fase de grupos</div>
+  <span class="unlocked-badge"><svg width="16" height="16"><use href="#ico-unlocked"/></svg></span>
+</div>
+
+<div class="ach common d3">
+  <span class="rarity-badge">Común</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-coin"/></svg></span>
+  <div class="ach-title">Primer Centenar</div>
+  <div class="ach-desc">Acumula tus primeros 100 puntos en el ranking</div>
+  <span class="unlocked-badge"><svg width="16" height="16"><use href="#ico-unlocked"/></svg></span>
+</div>
+
+<div class="ach common d4">
+  <span class="rarity-badge">Común</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-invite"/></svg></span>
+  <div class="ach-title">Mejor con Amigos</div>
+  <div class="ach-desc">Invita a alguien y consigue que acierte su primera predicción</div>
+  <span class="unlocked-badge"><svg width="16" height="16"><use href="#ico-unlocked"/></svg></span>
+</div>
+
+<div class="ach common locked d5">
+  <span class="rarity-badge">Común</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-five-exact"/></svg></span>
+  <div class="ach-title">Cinco de Cinco</div>
+  <div class="ach-desc">Acierta el resultado exacto en 5 partidos distintos</div>
+  <span class="lock-overlay"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+```
+
+  </div>
+
+  <!-- ══════════ POCO COMÚN (azul) ══════════ -->
+
+  <div class="section-label sl1">
+    <div class="sep-line"></div>
+    <span class="section-title rare">◈ Poco Común</span>
+    <div class="sep-line"></div>
+  </div>
+
+  <div class="grid">
+
+```
+<div class="ach rare d6">
+  <span class="rarity-badge">Poco común</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-medal"/></svg></span>
+  <div class="ach-title">200 de Potencia</div>
+  <div class="ach-desc">Supera los 200 puntos acumulados en el ranking</div>
+  <span class="unlocked-badge"><svg width="16" height="16"><use href="#ico-unlocked"/></svg></span>
+</div>
+
+<div class="ach rare d7">
+  <span class="rarity-badge">Poco común</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-flame"/></svg></span>
+  <div class="ach-title">En Llamas</div>
+  <div class="ach-desc">Consigue una racha de aciertos consecutivos</div>
+  <span class="unlocked-badge"><svg width="16" height="16"><use href="#ico-unlocked"/></svg></span>
+</div>
+
+<div class="ach rare d8">
+  <span class="rarity-badge">Poco común</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-crosshair"/></svg></span>
+  <div class="ach-title">Exacto</div>
+  <div class="ach-desc">Acierta el marcador exacto de un partido</div>
+  <span class="unlocked-badge"><svg width="16" height="16"><use href="#ico-unlocked"/></svg></span>
+</div>
+
+<div class="ach rare locked d9">
+  <span class="rarity-badge">Poco común</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-top100"/></svg></span>
+  <div class="ach-title">Top 100</div>
+  <div class="ach-desc">Entra al menos una vez en el top 100 del ranking global</div>
+  <span class="lock-overlay"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+```
+
+  </div>
+
+  <!-- ══════════ ÉPICO (morado) ══════════ -->
+
+  <div class="section-label sl2">
+    <div class="sep-line"></div>
+    <span class="section-title epic">◈ Épico</span>
+    <div class="sep-line"></div>
+  </div>
+
+  <div class="grid">
+
+```
+<div class="ach epic locked d10">
+  <span class="rarity-badge">Épico</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-clipboard"/></svg></span>
+  <div class="ach-title">Estratega Total</div>
+  <div class="ach-desc">Predice todos los partidos de la fase de grupos sin excepción</div>
+  <span class="lock-overlay"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+
+<div class="ach epic locked d11">
+  <span class="rarity-badge">Épico</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-halfglobe"/></svg></span>
+  <div class="ach-title">Medio Mundo</div>
+  <div class="ach-desc">Realiza predicciones en al menos el 50% de todos los partidos del Mundial</div>
+  <span class="lock-overlay"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+
+<div class="ach epic locked d12">
+  <span class="rarity-badge">Épico</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-crosshair10"/></svg></span>
+  <div class="ach-title">Doble Precisión</div>
+  <div class="ach-desc">Acierta el marcador exacto en 10 partidos distintos</div>
+  <span class="lock-overlay"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+
+<div class="ach epic locked d13">
+  <span class="rarity-badge">Épico</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-top50"/></svg></span>
+  <div class="ach-title">Top 50</div>
+  <div class="ach-desc">Entra al menos una vez en el top 50 del ranking global</div>
+  <span class="lock-overlay"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+
+<div class="ach epic locked d14">
+  <span class="rarity-badge">Épico</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-double-flame"/></svg></span>
+  <div class="ach-title">Doble Racha</div>
+  <div class="ach-desc">Consigue al menos 2 rachas de aciertos a lo largo del torneo</div>
+  <span class="lock-overlay"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+
+<div class="ach epic locked d15 span2" style="grid-column:span 1">
+  <span class="rarity-badge">Épico</span>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-bolt"/></svg></span>
+  <div class="ach-title">El Penúltimo Paso</div>
+  <div class="ach-desc">Predices correctamente el resultado de una semifinal del Mundial</div>
+  <span class="lock-overlay"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+```
+
+  </div>
+
+  <!-- ══════════ LEGENDARIO (amarillo) ══════════ -->
+
+  <div class="section-label sl3">
+    <div class="sep-line"></div>
+    <span class="section-title legendary">◈ Legendario</span>
+    <div class="sep-line"></div>
+  </div>
+
+  <div class="grid single">
+
+```
+<div class="ach legendary wide locked d16">
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-eye"/></svg></span>
+  <div class="ach-content">
+    <span class="rarity-badge">Legendario</span>
+    <div class="ach-title">Vidente</div>
+    <div class="ach-desc">Acierta el marcador exacto en 5 partidos distintos. Esto no es suerte.</div>
+    <span class="share-chip"><svg width="12" height="12" style="margin-right:2px"><use href="#ico-share"/></svg>Compartir logro</span>
+  </div>
+  <span class="lock-overlay" style="bottom:14px;right:14px"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+
+<div class="ach legendary wide locked d17">
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-top10"/></svg></span>
+  <div class="ach-content">
+    <span class="rarity-badge">Legendario</span>
+    <div class="ach-title">Top 10</div>
+    <div class="ach-desc">Entra al menos una vez en el top 10 del ranking global del Mundial.</div>
+    <span class="share-chip"><svg width="12" height="12" style="margin-right:2px"><use href="#ico-share"/></svg>Compartir logro</span>
+  </div>
+  <span class="lock-overlay" style="bottom:14px;right:14px"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+
+<div class="ach legendary wide locked d18">
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-globe"/></svg></span>
+  <div class="ach-content">
+    <span class="rarity-badge">Legendario</span>
+    <div class="ach-title">Ciudadano del Mundo</div>
+    <div class="ach-desc">Intenta predecir absolutamente todos los partidos del Mundial 2026 sin saltarte ninguno.</div>
+    <span class="share-chip"><svg width="12" height="12" style="margin-right:2px"><use href="#ico-share"/></svg>Compartir logro</span>
+  </div>
+  <span class="lock-overlay" style="bottom:14px;right:14px"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+
+<div class="ach legendary wide locked d19">
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-trophy"/></svg></span>
+  <div class="ach-content">
+    <span class="rarity-badge">Legendario</span>
+    <div class="ach-title">El Gran Profeta</div>
+    <div class="ach-desc">Predices el resultado exacto de la Gran Final del Mundial 2026. Eres una leyenda.</div>
+    <span class="share-chip"><svg width="12" height="12" style="margin-right:2px"><use href="#ico-share"/></svg>Compartir logro</span>
+  </div>
+  <span class="lock-overlay" style="bottom:14px;right:14px"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+```
+
+  </div>
+
+  <!-- ══════════ MÍTICO (naranja) ══════════ -->
+
+  <div class="section-label sl4">
+    <div class="sep-line"></div>
+    <span class="section-title mythic">◈ Mítico</span>
+    <div class="sep-line"></div>
+  </div>
+
+  <div class="grid single">
+
+```
+<div class="ach mythic wide locked d20">
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-podium3"/></svg></span>
+  <div class="ach-content">
+    <span class="rarity-badge">Mítico</span>
+    <div class="ach-title">En el Podio</div>
+    <div class="ach-desc">Aparece al menos una vez en el top 3 del ranking durante el torneo.</div>
+    <span class="share-chip"><svg width="12" height="12" style="margin-right:2px"><use href="#ico-share"/></svg>Compartir logro</span>
+  </div>
+  <span class="lock-overlay" style="bottom:14px;right:14px"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+
+<div class="ach mythic wide locked d21">
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-podium2"/></svg></span>
+  <div class="ach-content">
+    <span class="rarity-badge">Mítico</span>
+    <div class="ach-title">Subcampeón</div>
+    <div class="ach-desc">Llega a ocupar el top 2 del ranking en algún momento del Mundial.</div>
+    <span class="share-chip"><svg width="12" height="12" style="margin-right:2px"><use href="#ico-share"/></svg>Compartir logro</span>
+  </div>
+  <span class="lock-overlay" style="bottom:14px;right:14px"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+
+<div class="ach mythic wide locked d22">
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-crown"/></svg></span>
+  <div class="ach-content">
+    <span class="rarity-badge">Mítico</span>
+    <div class="ach-title">El Rey del Momento</div>
+    <div class="ach-desc">Ocupa el número 1 del ranking al menos una vez durante el torneo.</div>
+    <span class="share-chip"><svg width="12" height="12" style="margin-right:2px"><use href="#ico-share"/></svg>Compartir logro</span>
+  </div>
+  <span class="lock-overlay" style="bottom:14px;right:14px"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+```
+
+  </div>
+
+  <!-- ══════════ GOAT (azul hielo) ══════════ -->
+
+  <div class="section-label sl5">
+    <div class="sep-line"></div>
+    <span class="section-title goat">◈ G · O · A · T</span>
+    <div class="sep-line"></div>
+  </div>
+
+  <div class="grid single">
+
+```
+<div class="ach goat wide locked d23">
+  <div class="goat-shimmer"></div>
+  <span class="ach-icon"><svg width="36" height="36"><use href="#ico-goat"/></svg></span>
+  <div class="ach-content">
+    <span class="rarity-badge">G.O.A.T</span>
+    <div class="ach-title">El Mayor de Todos</div>
+    <div class="ach-desc">Al finalizar el Mundial 2026 eres el número 1 absoluto del ranking. Solo puede haber uno.</div>
+    <span class="share-chip"><svg width="12" height="12" style="margin-right:2px"><use href="#ico-share"/></svg>Compartir logro</span>
+  </div>
+  <span class="lock-overlay" style="bottom:14px;right:14px"><svg width="16" height="16"><use href="#ico-lock"/></svg></span>
+</div>
+```
+
+  </div>
+
+  <div class="footer">
+    <span class="footer-txt">⏱ Sincronizado · Mundial 2026</span>
+    <span class="footer-slogan">WE ARE 26</span>
+  </div>
+
+</div>
+</body>
+</html>
