@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0d1117;
+  --color-foreground: #f0f6ff;
+  --color-muted: rgba(240, 246, 255, 0.42);
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-card: #161e28;
+  --color-card-hover: #1c2635;
+
+  --color-gold: #f5c842;
+  --color-gold-deep: #e8a800;
+  --color-silver: #c8d8f0;
+  --color-bronze: #e8834a;
+
+  --color-success: #00e676;
+  --color-danger: #ff4d6d;
+  --color-info: #4fc3f7;
+  --color-warm: #ffb347;
+
+  --font-display: var(--font-fredoka-one), cursive;
+  --font-sans: var(--font-nunito), system-ui, sans-serif;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-background);
+    background-image:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245, 200, 66, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(0, 230, 118, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 40% at 90% 20%, rgba(79, 195, 247, 0.04) 0%, transparent 50%);
+    color: var(--color-foreground);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 1px,
+      transparent 48px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+@layer utilities {
+  @keyframes popIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes trophyFloat {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-3deg);
+    }
+    50% {
+      transform: translateY(-8px) rotate(3deg);
+    }
+  }
+  @keyframes ballSpin {
+    from {
+      transform: translateX(-50%) rotate(0deg);
+    }
+    to {
+      transform: translateX(-50%) rotate(360deg);
+    }
+  }
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.25;
+    }
+  }
+  @keyframes flashGreen {
+    0% {
+      background: rgba(0, 230, 118, 0.14);
+      border-color: rgba(0, 230, 118, 0.4);
+    }
+    100% {
+      background: var(--color-card);
+      border-color: var(--color-border);
+    }
+  }
+  @keyframes flashRed {
+    0% {
+      background: rgba(255, 77, 109, 0.12);
+      border-color: rgba(255, 77, 109, 0.35);
+    }
+    100% {
+      background: var(--color-card);
+      border-color: var(--color-border);
+    }
+  }
+  @keyframes floatUp {
+    from {
+      transform: translateY(105vh) rotate(0deg);
+    }
+    to {
+      transform: translateY(-10vh) rotate(540deg);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
