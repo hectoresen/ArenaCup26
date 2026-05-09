@@ -105,15 +105,53 @@
 
 **Contras**: opacidad en latencia/refresh rate, sin WebSocket documentado, falta confirmación oficial de cobertura del Mundial 2026.
 
-### Sportmonks
+### Sportmonks (planes específicos del Mundial 26)
 
-- **URL**: https://www.sportmonks.com
-- **Plan barato**: ~$15-30/mes para fútbol.
-- **Cobertura Mundial**: sí.
-- **Eventos live**: completo (eventos, alineaciones, lesiones).
-- **WebSockets**: disponibles en planes superiores → push real-time sin polling.
-- **Pros**: documentación buena, push nativo evita rate limits de polling.
-- **Contras**: precio escala según dimensiones (estadísticas, alineaciones, etc.).
+- **URL**: https://www.sportmonks.com/football-api/world-cup-api/world-cup-2026/
+- **Investigado** 2026-05-09 vía WebFetch + WebSearch.
+
+Sportmonks ofrece **dos planes específicos para el Mundial 2026** (separados de su catálogo estándar de fútbol completo):
+
+| Plan          | Mensual  | Anual (mes equivalente) | Incluye                                                                                                          |
+| ------------- | -------: | ----------------------: | ---------------------------------------------------------------------------------------------------------------- |
+| **Advanced**  | **€69**  | €55/mo (anual)         | Fixtures, live scores, in-game events, squads, standings, bracket data, player stats. **Plan que tú creaste cuenta.** |
+| All-In        | €129     | €103/mo (anual)        | Todo lo del Advanced **+** predictions, xG (expected goals), Pressure Index, odds pre-match e in-play de 50+ casas. |
+
+**Cobertura del Mundial 2026** (verificado en su web):
+
+- Cobertura completa de los **104 partidos** (formato 48 equipos del Mundial 26).
+- Tres países anfitriones (USA, Canadá, México) con sus zonas horarias.
+- Datos en vivo: **"actualizados en menos de 15 segundos"** según su web.
+- Goles, tarjetas, sustituciones, penaltis y prórroga.
+- 99,99% de uptime con verificación multi-fuente 24/7.
+
+**WebSocket / Pusher** (⚠️ pendiente de confirmar):
+
+- **NO documentado públicamente** en los planes World Cup. Su web habla solo de REST y "livescore API".
+- Sportmonks históricamente ofrece **Pusher** (canal pub/sub, no WebSocket puro) en algunos planes premium del catálogo estándar — pero **no se confirma para los planes World Cup**.
+- **Acción para ti**: en el dashboard de tu cuenta, comprobar si el plan Advanced €69 expone "Pusher", "Streaming", "Push" o "Webhooks" en la sección de credenciales/integraciones. Si NO lo expone, es polling REST puro.
+
+**Cálculo de presupuesto del Advanced €69 mes**:
+
+- 104 partidos × ~90 min × 4 polls/min (15 s) = ~**37 500 polls** sobre datos en vivo durante todo el torneo.
+- Pico: 4 partidos en paralelo durante 90 min = ~1 440 polls/cluster — sobrado en cualquier plan de Sportmonks.
+
+**Pros**: plan dedicado al Mundial → coverage garantizada y por escrito en su web; precio fijo por torneo; vendor único (sin gestionar dos contratos durante el Mundial). El All-In a €129 añade xG y predictions si los queremos para encuestas/proyecciones.
+
+**Contras**: si su web dice solo "REST" y el dashboard no expone Pusher, no tenemos ventaja sobre API-Football a 15 s. Si lo expone, **es la única opción asequible con push real**.
+
+### Sportmonks (catálogo estándar — referencia)
+
+Por completitud, los planes estándar de Sportmonks Football (fútbol completo, no solo Mundial):
+
+| Plan        | Mensual   | Ligas          | Notas                                |
+| ----------- | --------: | -------------: | ------------------------------------ |
+| Starter     | €29       | 5              | Insuficiente, no incluye el Mundial. |
+| Growth      | €99       | 30             | Hay que verificar si incluye WC.     |
+| Pro         | €249      | 120            | Sobredimensionado para nuestro alcance. |
+| Enterprise  | Custom    | 2 300+         | Out of scope.                         |
+
+Conclusión: para nuestro caso, el plan **Advanced World Cup €69** es el match perfecto a nivel de cobertura. La duda crítica es si trae push.
 
 ### Sportradar
 
@@ -132,12 +170,15 @@
 - **Pros**: gratis, sin registro estricto.
 - **Contras**: calidad variable; no apto para producción crítica.
 
-## ¿"Segundo a segundo" es realista con estos dos providers?
+## ¿"Segundo a segundo" es realista con estos providers?
 
-**No con API-Football ni Live-Score-API solos**:
+**Refresco confirmado** (todos REST polling, salvo verificación pendiente en Sportmonks dashboard):
 
-- API-Football refresca cada **15 segundos** y solo expone REST. No hay WebSocket.
-- Live-Score-API no documenta refresco ni WS.
+| Provider              | Refresco oficial | WebSocket / Push        |
+| --------------------- | :--------------: | :---------------------: |
+| API-Football          | 15 s             | ❌ Solo REST            |
+| Live-Score-API        | No publicado     | ❌ No documentado       |
+| Sportmonks WC €69     | < 15 s           | ⚠️ Pendiente verificar en dashboard |
 
 Con polling REST cliente-servidor a 15 s, la **cadena completa** desde el evento real hasta el navegador del usuario es:
 
@@ -146,27 +187,27 @@ Con polling REST cliente-servidor a 15 s, la **cadena completa** desde el evento
    ~5-15s        ~0-15s                ~0-1s               ~0-1s
 ```
 
-En el peor caso, **~30 segundos** de latencia visible en pantalla. En la práctica, ~10-20 s. Eso es bueno para un leaderboard pero no es "segundo a segundo".
+En el peor caso, **~30 segundos** de latencia visible en pantalla. En la práctica, ~10-20 s. Aceptable para un leaderboard. **No es "segundo a segundo"** salvo que Sportmonks Advanced exponga Pusher en tu dashboard.
 
-**Para latencia sub-5 s genuina**, las opciones son:
+**Para latencia sub-5 s genuina** las opciones realistas hoy son:
 
-- **Sportmonks** plan Starter+ con sus WebSocket / live-stream endpoints (~€30-50/mes).
-- **AllSportsAPI** (allsportsapi.com) — anuncia "Football Push API" vía WebSocket que empuja al cliente cada vez que hay evento. Sin precios verificados aún en este doc.
-- **Sportradar** o **Roanuz** — enterprise, fuera del rango €0-50/mes.
-
-**Recomendación pragmática**: arrancar con **API-Football Pro $19** + **Live-Score-API Starter €11** como combinación redundante a 15 s. Si tras el arranque queremos verdadera latencia sub-5 s, abrir propuesta `update-match-data-providers-websocket` y migrar a Sportmonks o AllSportsAPI.
+- **Sportmonks** Advanced €69 **si expone Pusher/Streaming en el dashboard**. Hay que verificar.
+- **AllSportsAPI** (allsportsapi.com) — anuncia "Football Push API" vía WebSocket. Precios sin verificar aún.
+- **Sportradar** o **Roanuz** — enterprise, fuera del rango €0-100/mes.
 
 ## Combinaciones recomendables
 
 Para cumplir la **redundancia** (dos APIs simultáneas), seleccionar dos con perfiles complementarios:
 
-| Combinación                                 | Coste/mes      | Latencia típica | Push? | Pros                                                            | Contras                                                |
-| ------------------------------------------- | -------------: | --------------: | :---: | --------------------------------------------------------------- | ------------------------------------------------------ |
-| **API-Football Pro + Live-Score-API Starter** | ~**$19 + €11** ≈ **€30** | 10-20 s     | No    | Cobertura sólida, dos vendors distintos, redundancia real, presupuesto contenido. | Sin WebSocket, polling 15 s. Hay que verificar la cobertura del Mundial 26 en Live-Score-API. |
-| API-Football Ultra + Live-Score-API Starter | ~$29 + €11 ≈ €38 | 10-20 s    | No    | Más margen de requests para reintentos.                          | Igual que el anterior pero con coste algo mayor.       |
-| API-Football Pro + Football-Data.org        |    ~$19        | 15-25 s         | No    | Backup gratis. Datos canónicos de Football-Data como reconciliación. | Football-Data tiene latencia mayor en live.            |
-| Sportmonks Starter + API-Football Pro       |   ~€30 + $19 ≈ €48 | 5-10 s, sub-5 con WS | Sí (Sportmonks) | Push real-time en primaria, REST en backup. | Coste mayor. Requiere comprobar plan exacto de Sportmonks que incluya WS. |
-| Football-Data.org + TheSportsDB             |        $0      | 30+ s           | No    | Cero coste.                                                     | Latencia alta, eventos live pobres. Riesgo en MVP.     |
+| Combinación                                                       | Coste/mes               | Latencia típica           | Push?                | Pros                                                                                       | Contras                                                                  |
+| ----------------------------------------------------------------- | ----------------------: | ------------------------: | :------------------: | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| **API-Football Pro + Live-Score-API Starter**                     | $19 + €11 ≈ **€30**     | 10-20 s                   | No                   | Presupuesto bajo, dos vendors distintos, redundancia real.                                 | Sin push. Verificar cobertura WC en Live-Score-API.                      |
+| Sportmonks WC Advanced solo                                       | **€69** (€55 anual)     | 10-20 s · sub-5 si hay WS | ⚠️ verificar dashboard | Plan dedicado al Mundial, 104 partidos garantizados por contrato, único vendor.            | Sin redundancia (vendor único). Si cae Sportmonks durante un partido, no hay backup. |
+| **Sportmonks WC Advanced + Live-Score-API Starter**               | €69 + €11 = **€80**     | 10-20 s · sub-5 si Sportmonks tiene WS | ⚠️ posible           | Cobertura WC garantizada por contrato + redundancia con vendor distinto + presupuesto razonable. | Coste mayor que la primera fila.                                         |
+| Sportmonks WC Advanced + API-Football Pro                         | €69 + $19 ≈ **€88**     | 10-20 s                   | ⚠️ posible           | Las dos APIs más completas en eventos detallados.                                          | Coste mayor; misma latencia salvo que Sportmonks tenga Pusher.           |
+| Sportmonks WC All-In                                              | €129 (€103 anual)       | 10-20 s                   | ⚠️ verificar         | Añade xG, predicciones, odds → útil si queremos encuestas tipo "¿cuántos goles?"            | Caro para fase 1; sin redundancia.                                       |
+| API-Football Pro + Football-Data.org                              | ~$19 ≈ €18              | 15-25 s                   | No                   | Backup gratis.                                                                              | Football-Data lento en live.                                             |
+| Football-Data.org + TheSportsDB                                   | $0                      | 30+ s                     | No                   | Cero coste.                                                                                 | Latencia alta, eventos pobres. Riesgo MVP.                              |
 
 ## Preguntas para tomar la decisión
 
