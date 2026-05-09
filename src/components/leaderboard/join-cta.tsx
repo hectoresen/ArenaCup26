@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { signIn } from "next-auth/react";
+import { useRef, useState } from "react";
 
 export function JoinCta() {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [pending, setPending] = useState(false);
 
   function openDialog() {
     dialogRef.current?.showModal();
@@ -19,10 +21,14 @@ export function JoinCta() {
     }
   }
 
-  function handleGoogleSignIn() {
-    // Auth.js wiring lands in add-auth-google. Placeholder no-op.
-    if (typeof window !== "undefined") {
-      console.info("[wmundial] Google sign-in placeholder clicked");
+  async function handleGoogleSignIn() {
+    setPending(true);
+    try {
+      await signIn("google", { callbackUrl: "/" });
+    } catch (error) {
+      // signIn navega; este catch solo entra si algo cliente falla antes.
+      console.error("[wmundial] sign-in error", error);
+      setPending(false);
     }
   }
 
@@ -77,14 +83,15 @@ export function JoinCta() {
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-bold text-foreground transition-colors hover:border-white/25 hover:bg-white/[0.08]"
+            disabled={pending}
+            className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-bold text-foreground transition-colors hover:border-white/25 hover:bg-white/[0.08] disabled:cursor-wait disabled:opacity-60"
           >
             <GoogleLogo />
-            Continuar con Google
+            {pending ? "Redirigiendo…" : "Continuar con Google"}
           </button>
 
           <p className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.16em] text-muted">
-            Auth en construcción
+            Tus datos se usan solo para identificarte en el ranking
           </p>
         </div>
       </dialog>
