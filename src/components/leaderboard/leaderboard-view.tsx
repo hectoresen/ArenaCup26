@@ -1,5 +1,6 @@
 "use client";
 
+import { AccountMenu } from "@/components/auth/account-menu";
 import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/types";
 import { FloatingBalls } from "./floating-balls";
 import { JoinCta } from "./join-cta";
@@ -8,11 +9,23 @@ import { PodiumCard } from "./podium-card";
 import { RankRow } from "./rank-row";
 import { TrophyLogo } from "./trophy-logo";
 
+type SessionUser = {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+};
+
 export function LeaderboardView({
   snapshot,
+  user,
   events: _events,
 }: {
   snapshot: LeaderboardSnapshot;
+  /**
+   * Si hay sesión activa, el slot top-right muestra `<AccountMenu />`.
+   * Si no, muestra `<JoinCta />`.
+   */
+  user: SessionUser | null;
   /**
    * Reservado para conexión SSE futura (`add-leaderboard-sse`).
    * En esta iteración siempre llega vacía y la lista es estática.
@@ -25,12 +38,11 @@ export function LeaderboardView({
     <>
       <FloatingBalls count={7} />
       {/*
-        Slot top-right del viewport. Hoy aloja JoinCta (visitante anónimo);
-        cuando aterrice add-account-menu, el mismo slot lo ocupará un menú
-        de cuenta con avatar + hamburguesa.
+        Slot top-right del viewport. Visitante anónimo → JoinCta;
+        usuario autenticado → AccountMenu.
       */}
       <div className="fixed right-3 top-3 z-30 sm:right-5 sm:top-5">
-        <JoinCta />
+        {user ? <AccountMenu user={user} /> : <JoinCta />}
       </div>
       <div className="relative z-10 w-full max-w-[510px]">
         <header className="mb-6 text-center opacity-0 [animation:popIn_0.7s_cubic-bezier(0.34,1.56,0.64,1)_forwards]">

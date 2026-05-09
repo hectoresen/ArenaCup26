@@ -1,11 +1,12 @@
 import { LeaderboardView } from "@/components/leaderboard/leaderboard-view";
+import { auth } from "@/lib/auth";
 import { getInitialSnapshot } from "@/lib/leaderboard/mock";
 
 export default async function HomePage() {
-  const snapshot = await getInitialSnapshot();
+  const [snapshot, session] = await Promise.all([getInitialSnapshot(), auth()]);
   return (
     <main className="relative z-10 flex min-h-screen items-center justify-center px-5 py-9">
-      <LeaderboardView snapshot={snapshot} />
+      <LeaderboardView snapshot={snapshot} user={session?.user ?? null} />
     </main>
   );
 }
