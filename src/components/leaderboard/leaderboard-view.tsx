@@ -24,6 +24,14 @@ export function LeaderboardView({
   return (
     <>
       <FloatingBalls count={7} />
+      {/*
+        Slot top-right del viewport. Hoy aloja JoinCta (visitante anónimo);
+        cuando aterrice add-account-menu, el mismo slot lo ocupará un menú
+        de cuenta con avatar + hamburguesa.
+      */}
+      <div className="fixed right-3 top-3 z-30 sm:right-5 sm:top-5">
+        <JoinCta />
+      </div>
       <div className="relative z-10 w-full max-w-[510px]">
         <header className="mb-6 text-center opacity-0 [animation:popIn_0.7s_cubic-bezier(0.34,1.56,0.64,1)_forwards]">
           <div className="mb-2.5 flex items-center justify-center gap-3.5">
@@ -48,10 +56,7 @@ export function LeaderboardView({
             <span aria-label="México">🇲🇽</span>{" "}
             <span aria-label="Estados Unidos">🇺🇸</span>
           </div>
-          <div className="flex flex-col items-center gap-3">
-            <LiveBadge>Ranking en vivo</LiveBadge>
-            <JoinCta />
-          </div>
+          <LiveBadge>Ranking en vivo</LiveBadge>
         </header>
 
         {first && second && third && (

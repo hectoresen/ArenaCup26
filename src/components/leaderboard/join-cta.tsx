@@ -31,7 +31,7 @@ export function JoinCta() {
       <button
         type="button"
         onClick={openDialog}
-        className="inline-flex items-center gap-2 rounded-full border-2 border-gold/40 bg-gradient-to-br from-gold to-gold-deep px-5 py-2.5 font-display text-[13px] uppercase tracking-[0.14em] text-[#1a1000] shadow-[0_0_24px_rgba(245,200,66,0.32)] transition-[transform,box-shadow] duration-200 hover:scale-[1.04] hover:shadow-[0_0_32px_rgba(245,200,66,0.55)] active:scale-[0.98]"
+        className="inline-flex items-center gap-1.5 rounded-full border-2 border-gold/40 bg-gradient-to-br from-gold to-gold-deep px-3 py-2 font-display text-[11px] uppercase tracking-[0.12em] text-[#1a1000] shadow-[0_0_24px_rgba(245,200,66,0.32)] transition-[transform,box-shadow] duration-200 hover:scale-[1.04] hover:shadow-[0_0_32px_rgba(245,200,66,0.55)] active:scale-[0.98] sm:gap-2 sm:px-5 sm:py-2.5 sm:text-[13px] sm:tracking-[0.14em]"
       >
         <span aria-hidden="true">⚽</span>
         Predecir ahora
