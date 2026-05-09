@@ -31,7 +31,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${fredokaOne.variable} ${nunito.variable}`}>
-      <body className="font-sans antialiased">{children}</body>
+      <head>
+        {/*
+          Noto Color Emoji desde Google Fonts. En Windows, los emojis de
+          bandera (regional indicator pairs) no rinden por defecto; este
+          fallback garantiza que se vean en cualquier SO. Se cachea de forma
+          agresiva tras la primera carga.
+        */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap"
+        />
+      </head>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

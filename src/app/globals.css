@@ -20,6 +20,7 @@
 
   --font-display: var(--font-fredoka-one), cursive;
   --font-sans: var(--font-nunito), system-ui, sans-serif;
+  --font-emoji: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", emoji;
 }
 
 @layer base {
@@ -40,6 +41,9 @@
       radial-gradient(ellipse 40% 60% at 10% 80%, rgba(0, 230, 118, 0.04) 0%, transparent 50%),
       radial-gradient(ellipse 40% 40% at 90% 20%, rgba(79, 195, 247, 0.04) 0%, transparent 50%);
     color: var(--color-foreground);
+    /* Cadena con fallback a Noto Color Emoji para que las banderas (regional
+       indicator pairs) rendericen en Windows, donde el SO no las incluye. */
+    font-family: var(--font-nunito), system-ui, sans-serif, var(--font-emoji);
     min-height: 100vh;
     overflow-x: hidden;
   }
