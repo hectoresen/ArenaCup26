@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { Fredoka_One, Nunito } from "next/font/google";
+import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
 
-const fredokaOne = Fredoka_One({
+// "Fredoka One" se discontinuó en Google Fonts y se fusionó con la variable
+// "Fredoka". El peso 600 reproduce el look del antiguo "Fredoka One".
+const fredokaOne = Fredoka({
   subsets: ["latin"],
-  weight: "400",
+  weight: "600",
   variable: "--font-fredoka-one",
   display: "swap",
 });
