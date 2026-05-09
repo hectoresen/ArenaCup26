@@ -68,9 +68,14 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    // El adapter de Auth.js exige `name`, `email`, `emailVerified` e `image`.
+    // `name` lo dejamos nullable porque algunos providers no lo entregan, aunque
+    // Google sí. `emailVerified` se rellena cuando el provider lo confirma.
+    name: text("name"),
     email: text("email").notNull().unique(),
-    name: text("name").notNull(),
+    emailVerified: timestamp("email_verified", { mode: "date", withTimezone: true }),
     image: text("image"),
+    // Campos propios del dominio (no requeridos por Auth.js).
     country: varchar("country", { length: 3 }),
     username: varchar("username", { length: 20 }).unique(),
     lastActiveAt: timestamp("last_active_at", { withTimezone: true }),
@@ -81,6 +86,8 @@ export const users = pgTable(
   }),
 );
 
+// Las columnas siguen el contrato del Drizzle adapter de Auth.js, que exige
+// los nombres JS en snake_case para los campos OAuth (refresh_token, etc.).
 export const accounts = pgTable(
   "accounts",
   {
@@ -90,13 +97,13 @@ export const accounts = pgTable(
     type: text("type").notNull(),
     provider: text("provider").notNull(),
     providerAccountId: text("provider_account_id").notNull(),
-    refreshToken: text("refresh_token"),
-    accessToken: text("access_token"),
-    expiresAt: integer("expires_at"),
-    tokenType: text("token_type"),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: text("token_type"),
     scope: text("scope"),
-    idToken: text("id_token"),
-    sessionState: text("session_state"),
+    id_token: text("id_token"),
+    session_state: text("session_state"),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.provider, table.providerAccountId] }),
