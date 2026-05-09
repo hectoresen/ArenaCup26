@@ -2,6 +2,7 @@
 
 import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/types";
 import { FloatingBalls } from "./floating-balls";
+import { JoinCta } from "./join-cta";
 import { LiveBadge } from "./live-badge";
 import { PodiumCard } from "./podium-card";
 import { RankRow } from "./rank-row";
@@ -47,7 +48,10 @@ export function LeaderboardView({
             <span aria-label="México">🇲🇽</span>{" "}
             <span aria-label="Estados Unidos">🇺🇸</span>
           </div>
-          <LiveBadge>Ranking en vivo</LiveBadge>
+          <div className="flex flex-col items-center gap-3">
+            <LiveBadge>Ranking en vivo</LiveBadge>
+            <JoinCta />
+          </div>
         </header>
 
         {first && second && third && (
