@@ -55,5 +55,20 @@
       "fr": "Français",
       "ar": "العربية"
     }
+  },
+  "errors": {
+    "notFound": {
+      "code": "404",
+      "title": "Page not found",
+      "description": "This page doesn't exist or has been moved. Head back to the ranking and keep predicting.",
+      "homeButton": "Go home"
+    },
+    "runtime": {
+      "code": "Oops",
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. You can try again or go home.",
+      "retryButton": "Try again",
+      "homeButton": "Go home"
+    }
   }
 }

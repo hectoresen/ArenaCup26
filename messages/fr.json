@@ -55,5 +55,20 @@
       "fr": "Français",
       "ar": "العربية"
     }
+  },
+  "errors": {
+    "notFound": {
+      "code": "404",
+      "title": "Page introuvable",
+      "description": "Cette page n'existe pas ou a été déplacée. Retournez au classement et continuez à prédire.",
+      "homeButton": "Retour à l'accueil"
+    },
+    "runtime": {
+      "code": "Oops",
+      "title": "Une erreur est survenue",
+      "description": "Une erreur inattendue s'est produite. Vous pouvez réessayer ou retourner à l'accueil.",
+      "retryButton": "Réessayer",
+      "homeButton": "Retour à l'accueil"
+    }
   }
 }
