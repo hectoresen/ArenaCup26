@@ -3,7 +3,6 @@
 import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 
 type SessionUser = {
   name?: string | null;
@@ -130,10 +129,6 @@ export function AccountMenu({ user }: { user: SessionUser }) {
             </svg>
             {signingOut ? t("signingOut") : t("signOut")}
           </button>
-
-          <div className="border-t border-border px-4 py-3">
-            <LanguageSwitcher alignToEnd />
-          </div>
         </div>
       )}
     </div>

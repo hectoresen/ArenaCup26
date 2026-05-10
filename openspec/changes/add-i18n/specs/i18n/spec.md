@@ -26,21 +26,27 @@ La página `/` se sirve en el idioma adecuado según el locale resuelto por el m
 - **When** carga `/`
 - **Then** se sirve `/` (default `es`) sin redirección.
 
-## Requirement 2: Cambio de locale persistente
+## Requirement 2: Cambio de locale siempre visible y persistente
 
-El usuario puede cambiar de idioma desde el `LanguageSwitcher` y la elección se persiste.
+El `<LanguageSwitcher />` está siempre visible en la esquina superior **start** del viewport (top-left en LTR, top-right en RTL), sin necesidad de abrir ningún modal o menú. Cambiar el idioma persiste vía cookie `NEXT_LOCALE` con TTL de 1 año.
 
-### Scenario: Cambio desde el modal de JoinCta
+### Scenario: Switcher visible al cargar la página
 
-- **Given** un visitante anónimo con el modal abierto en español
-- **When** abre el `LanguageSwitcher` y elige "English"
-- **Then** la cookie `NEXT_LOCALE=en` se establece con TTL 1 año, el navegador navega a `/en/` y el modal se vuelve a renderizar con strings en inglés.
+- **Given** un visitante (anónimo o autenticado) en `/`
+- **When** se renderiza la página
+- **Then** ve el switcher fijo en la esquina superior start con el idioma actual (código `ES`/`EN`/`FR`/`AR` en mobile, nombre nativo en desktop).
 
-### Scenario: Cambio desde el AccountMenu
+### Scenario: Cambio de idioma desde el switcher
 
-- **Given** un usuario autenticado en `/`
-- **When** abre el `AccountMenu`, despliega el `LanguageSwitcher` y elige "Français"
-- **Then** se establece la cookie y se navega a `/fr/`. La sesión se mantiene.
+- **Given** el switcher visible en español con dropdown cerrado
+- **When** el usuario lo abre y elige "English"
+- **Then** la cookie `NEXT_LOCALE=en` se establece con TTL 1 año, el navegador navega a `/en/` y la página se vuelve a renderizar con strings en inglés. La sesión, si la había, se mantiene.
+
+### Scenario: Layout simétrico con el slot top-end
+
+- **Given** la página renderizada
+- **When** un visitante observa la cabecera
+- **Then** el switcher ocupa la esquina top-start y el `JoinCta`/`AccountMenu` ocupa la esquina top-end. En RTL ambos se mirror automáticamente.
 
 ## Requirement 3: RTL para árabe
 

@@ -26,7 +26,7 @@ Capability nueva: **`i18n`**.
   - `JoinCta` (botón + modal entero).
   - `AccountMenu` (trigger + dropdown).
   - `PodiumCard`, `RankRow` (labels y aria-labels).
-- Componente `<LanguageSwitcher />` reusable, embebido **en el modal de `JoinCta` y en el dropdown de `AccountMenu`**. No se añade un pill global aparte para no competir visualmente con el slot top-right.
+- Componente `<LanguageSwitcher />` reusable, fijado en el **slot top-start del viewport** (top-left en LTR, top-right en RTL). Siempre visible — el visitante no necesita abrir ningún menú para cambiar de idioma. Mobile: muestra solo el código del locale (ES/EN/FR/AR) para no comerse el header; desktop: muestra el nombre nativo (Español/English/Français/العربية).
 
 **No incluye**:
 
@@ -49,6 +49,6 @@ Capability nueva: **`i18n`**.
 - **`next-intl` v3 vs v4**: v3 es estable y compatible con Next 15.1 + React 19. v4 introduce cambios de API que aún están asentándose. Empezamos en v3; upgrade a v4 cuando madure como propuesta separada `update-i18n-v4`.
 - **`localePrefix: "as-needed"`**: el default (es) sin prefijo, los demás con prefijo. Coincide con la convención SEO más común para sitios con un mercado primario claro y otros secundarios.
 - **Cookie + Accept-Language**: cookie wins (preferencia explícita). Sin cookie, miramos `Accept-Language`. Sin coincidencia, default `es`.
-- **Switcher dentro de los menús existentes** en lugar de pill global: mantiene la UI visible idéntica. El usuario que quiera cambiar de idioma abre el modal de login o el menú de cuenta y elige.
+- **Switcher fijo en top-start del viewport**, simétrico al slot top-end (CTA/AccountMenu). La iteración inicial lo embebía dentro del modal y del dropdown, pero era poco descubrible: un visitante árabe que aterriza en `/` (es por defecto) tenía que pulsar "Predecir ahora" para encontrar el switcher. Top-start lo hace siempre visible y respeta el patrón estándar (Wikipedia, sitios gubernamentales, etc.).
 - **Sin localización del mock de jugadores** en esta iteración: pragmático. Cuando exista el seed real (`add-fixture-seed` o equivalente), las naciones se traducirán de verdad.
 - **RTL: logical properties solo donde importa**: el slot top-right pasa a `top-end`, los `text-right`/`text-left` pasan a `text-end`/`text-start`. Centrados, paddings simétricos y márgenes neutros NO se tocan (Tailwind ya hace lo correcto).

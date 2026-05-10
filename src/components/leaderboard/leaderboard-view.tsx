@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { AccountMenu } from "@/components/auth/account-menu";
+import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/types";
 import { FloatingBalls } from "./floating-balls";
 import { JoinCta } from "./join-cta";
@@ -39,6 +40,13 @@ export function LeaderboardView({
   return (
     <>
       <FloatingBalls count={7} />
+      {/*
+        Slot top-start: language switcher visible siempre.
+        Top-left en LTR, top-right en RTL.
+      */}
+      <div className="fixed start-3 top-3 z-30 sm:start-5 sm:top-5">
+        <LanguageSwitcher />
+      </div>
       {/*
         Slot top-end del viewport (top-right en LTR, top-left en RTL).
         Visitante anónimo → JoinCta; usuario autenticado → AccountMenu.

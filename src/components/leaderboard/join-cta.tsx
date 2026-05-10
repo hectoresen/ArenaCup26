@@ -3,7 +3,6 @@
 import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
-import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 
 export function JoinCta() {
   const t = useTranslations("joinCta");
@@ -93,10 +92,6 @@ export function JoinCta() {
           <p className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.16em] text-muted">
             {t("modal.footer")}
           </p>
-
-          <div className="mt-5 flex justify-center border-t border-border pt-4">
-            <LanguageSwitcher />
-          </div>
         </div>
       </dialog>
     </>
