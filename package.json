@@ -21,7 +21,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "seed:achievements": "tsx scripts/seed-achievements.ts"
+    "seed:achievements": "tsx scripts/seed-achievements.ts",
+    "seed:wc2022": "tsx scripts/seed-wc2022.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.4",
