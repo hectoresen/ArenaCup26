@@ -22,6 +22,15 @@ const schema = z.object({
   API_FOOTBALL_KEY: z.string().optional(),
   API_FOOTBALL_BASE_URL: z.string().url().default("https://v3.football.api-sports.io"),
 
+  // Match-data pipeline
+  // Cron secret para autenticar invocaciones al endpoint de sync. Required en
+  // producción; opcional en dev para invocar el endpoint manualmente sin auth.
+  CRON_SECRET: z.string().optional(),
+  // League/season que el cron sincroniza. Por defecto World Cup 2026 en
+  // api-football (league=1, season=2026). Para tests usamos season=2022.
+  MATCH_DATA_LEAGUE_ID: z.coerce.number().int().positive().default(1),
+  MATCH_DATA_SEASON: z.coerce.number().int().positive().default(2026),
+
   // Runtime
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });

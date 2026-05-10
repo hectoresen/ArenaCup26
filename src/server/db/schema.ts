@@ -176,6 +176,45 @@ export const matches = pgTable(
   }),
 );
 
+// ─── EXTERNAL ID MAPPING (provider → BD) ──────────────────
+
+// Tabla de mapping team-by-team. Múltiples providers conviven sin tocar
+// la tabla `teams`. La PK compuesta `(source, external_id)` garantiza
+// que un mismo external_id no se duplica para un mismo provider, pero
+// sí puede repetirse entre providers (api-football "6" ≠ live-score "6").
+export const teamExternalIds = pgTable(
+  "team_external_ids",
+  {
+    teamId: uuid("team_id")
+      .notNull()
+      .references(() => teams.id, { onDelete: "cascade" }),
+    source: text("source").notNull(),
+    externalId: text("external_id").notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.source, table.externalId] }),
+    teamIdx: index("team_external_ids_team_idx").on(table.teamId),
+  }),
+);
+
+// Mapping match-by-match. Mismo patrón. Necesario para que el upsert
+// del pipeline sepa qué fila de `matches` actualizar al recibir el
+// snapshot del provider.
+export const matchExternalIds = pgTable(
+  "match_external_ids",
+  {
+    matchId: uuid("match_id")
+      .notNull()
+      .references(() => matches.id, { onDelete: "cascade" }),
+    source: text("source").notNull(),
+    externalId: text("external_id").notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.source, table.externalId] }),
+    matchIdx: index("match_external_ids_match_idx").on(table.matchId),
+  }),
+);
+
 // ─── PREDICTIONS ───────────────────────────────────────────
 
 export const predictions = pgTable(
@@ -273,6 +312,21 @@ export const usersRelations = relations(users, ({ many, one }) => ({
 export const teamsRelations = relations(teams, ({ many }) => ({
   homeMatches: many(matches, { relationName: "home" }),
   awayMatches: many(matches, { relationName: "away" }),
+  externalIds: many(teamExternalIds),
+}));
+
+export const teamExternalIdsRelations = relations(teamExternalIds, ({ one }) => ({
+  team: one(teams, {
+    fields: [teamExternalIds.teamId],
+    references: [teams.id],
+  }),
+}));
+
+export const matchExternalIdsRelations = relations(matchExternalIds, ({ one }) => ({
+  match: one(matches, {
+    fields: [matchExternalIds.matchId],
+    references: [matches.id],
+  }),
 }));
 
 export const matchesRelations = relations(matches, ({ one, many }) => ({
@@ -292,6 +346,7 @@ export const matchesRelations = relations(matches, ({ one, many }) => ({
     relationName: "penaltyWinner",
   }),
   predictions: many(predictions),
+  externalIds: many(matchExternalIds),
 }));
 
 export const predictionsRelations = relations(predictions, ({ one }) => ({
