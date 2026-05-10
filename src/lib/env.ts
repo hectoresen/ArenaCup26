@@ -16,6 +16,12 @@ const schema = z.object({
   // App
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
 
+  // API-Football (primary match-data provider). Optional en dev: si no
+  // está, el adapter cae con mensaje claro al intentar usarse. La app
+  // sin esta variable arranca igual (la home pública no consume API).
+  API_FOOTBALL_KEY: z.string().optional(),
+  API_FOOTBALL_BASE_URL: z.string().url().default("https://v3.football.api-sports.io"),
+
   // Runtime
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });

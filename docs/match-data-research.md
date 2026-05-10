@@ -14,6 +14,35 @@
   - Política de reconciliación cuando las dos APIs discrepan en marcador.
   - Si arrancamos con **Pro $19** o **Ultra $29** en API-Football (ver cálculo de presupuesto en su sección).
 
+## API-Football — verificado en sandbox (2026-05-10)
+
+Verificación con la free tier ($0/día, 100 req):
+
+- **Autenticación**: header `x-apisports-key: <key>`. Base `https://v3.football.api-sports.io`.
+- **WC 2026 está catalogada** como `league_id = 1`, `current_season = 2026`. ✓
+- **PERO el free tier NO da acceso a 2026**: error `"Free plans do not have access to this season, try from 2022 to 2024."` — confirmado golpeando `GET /fixtures?league=1&season=2026`.
+- **Free tier sirve perfectamente para integration tests** contra `season=2022` (Qatar 2022). Casa con `add-fixture-seed-wc2022`: el adapter de API-Football se valida contra el mismo torneo que ya tenemos seedado a mano.
+- **Para producción real (WC 2026)**: hay que activar **plan Pro $19** o superior antes del 11 de junio.
+
+### Endpoints clave
+
+| Endpoint | Uso |
+| --- | --- |
+| `GET /leagues?id=1` | Metadata de la WC, lista de seasons soportadas. |
+| `GET /fixtures?league=1&season=2022` | Fixture completo de Qatar 2022 (free tier). |
+| `GET /fixtures?league=1&season=2026` | Fixture WC 2026 (Pro tier+). |
+| `GET /fixtures?live=all` | Partidos en vivo en tiempo casi-real (refresh 15 s). |
+| `GET /fixtures/events?fixture=<id>` | Goles, tarjetas, sustituciones del partido. |
+
+### Variables de entorno
+
+```
+API_FOOTBALL_KEY=<obtenida en https://dashboard.api-football.com/register>
+API_FOOTBALL_BASE_URL=https://v3.football.api-sports.io
+```
+
+`API_FOOTBALL_KEY` es opcional en dev (la app arranca sin ella; solo el adapter de match-data falla si se intenta usar).
+
 ## Requisitos derivados del scope
 
 1. **Cobertura completa del Mundial 26** — los 64 partidos, todas las fases (grupos, eliminatorias, prórroga, penaltis).
