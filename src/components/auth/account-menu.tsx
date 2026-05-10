@@ -3,6 +3,7 @@
 import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { Link } from "@/i18n/navigation";
 
 type SessionUser = {
   name?: string | null;
@@ -107,12 +108,34 @@ export function AccountMenu({ user }: { user: SessionUser }) {
             )}
           </div>
 
+          <Link
+            href="/faq"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05]"
+          >
+            <svg
+              className="h-4 w-4 text-muted"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="8" cy="8" r="6.5" />
+              <path d="M6 6.5 a2 2 0 1 1 2.5 1.9 V10 M8 12.5 v0.5" />
+            </svg>
+            {t("faq")}
+          </Link>
+
           <button
             type="button"
             role="menuitem"
             onClick={handleSignOut}
             disabled={signingOut}
-            className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05] disabled:cursor-wait disabled:opacity-60"
+            className="flex w-full cursor-pointer items-center gap-3 border-t border-border px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05] disabled:cursor-wait disabled:opacity-60"
           >
             <svg
               className="h-4 w-4 text-muted"

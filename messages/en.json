@@ -35,7 +35,8 @@
       "googleButton": "Continue with Google",
       "googlePending": "Redirecting…",
       "footer": "Your data is only used to identify you in the ranking",
-      "closeLabel": "Close"
+      "closeLabel": "Close",
+      "faqLink": "How does it work? Read the FAQ →"
     }
   },
   "accountMenu": {
@@ -43,6 +44,7 @@
     "closeLabel": "Close account menu",
     "menuLabel": "Account menu",
     "fallbackName": "User",
+    "faq": "Frequently asked questions",
     "signOut": "Sign out",
     "signingOut": "Signing out…"
   },
@@ -69,6 +71,109 @@
       "description": "An unexpected error occurred. You can try again or go home.",
       "retryButton": "Try again",
       "homeButton": "Go home"
+    }
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "subtitle": "Everything you need to know to predict, score points and unlock achievements.",
+    "backButton": "Back to the ranking",
+    "scoring": {
+      "title": "Scoring table",
+      "subtitle": "How many points each action is worth.",
+      "rows": {
+        "simple": {
+          "label": "Simple correct prediction",
+          "note": "You called the winner or the draw, without exact score.",
+          "value": "+10"
+        },
+        "exact": {
+          "label": "Exact correct prediction",
+          "note": "You called the exact score. Replaces the simple bonus, not added.",
+          "value": "+30"
+        },
+        "double": {
+          "label": "Correct double prediction",
+          "note": "You covered 2 of the 3 outcomes (1X, X2 or 12). Half of the simple.",
+          "value": "+5"
+        },
+        "fail": {
+          "label": "Miss",
+          "note": "If you don't get it right, 0 points and your streak resets.",
+          "value": "0"
+        },
+        "comboBase": {
+          "label": "Streak bonus at 3 / 5 / 10",
+          "note": "Awarded when reaching 3, 5 or 10 consecutive correct predictions.",
+          "value": "+5 / +15 / +50"
+        },
+        "comboModified": {
+          "label": "Streak bonus with doubles in the run",
+          "note": "If your active streak contains a correct double, bonuses are reduced.",
+          "value": "+3 / +5 / +9"
+        },
+        "pollParticipate": {
+          "label": "Take part in the daily poll",
+          "note": "Just for answering before the cutoff.",
+          "value": "+1"
+        },
+        "pollCorrect": {
+          "label": "Get the poll right",
+          "note": "On top of participating. Maximum +2 per poll.",
+          "value": "+1"
+        },
+        "referral": {
+          "label": "Your referral lands their 1st correct prediction",
+          "note": "One-time per invited friend. Just inviting doesn't grant points.",
+          "value": "+10"
+        },
+        "dailyLogin": {
+          "label": "Daily login",
+          "note": "No points awarded. Unlocks achievements visible in your public profile.",
+          "value": "0"
+        }
+      }
+    },
+    "questions": {
+      "title": "Common questions",
+      "subtitle": "Rules that affect how you predict and how your score is calculated.",
+      "items": {
+        "doublePrediction": {
+          "q": "How does a double prediction work?",
+          "a": "You can cover two of the three possible outcomes in a match: 1X (home or draw), X2 (draw or away) or 12 (either team wins). If you hit, you score half the points of a simple prediction. Doubles can't include an exact score. In knockout matches, 1X and X2 don't apply because there's no official draw."
+        },
+        "predictionWindow": {
+          "q": "When does a prediction lock?",
+          "a": "At the official kick-off. Until then you can edit it as many times as you want: the last version submitted before the lock counts. Predictions open as soon as the match exists in the system (from the start of the tournament)."
+        },
+        "postponedCancelled": {
+          "q": "What if a match is postponed or cancelled?",
+          "a": "If postponed, your prediction stays and remains editable until the new kick-off. If cancelled, the prediction is voided with 0 points and your streak 'skips' the match without breaking: the next correct prediction continues the streak."
+        },
+        "knockoutScoring": {
+          "q": "What about extra time and penalties in the knockouts?",
+          "a": "Exact score counts the result at the end of extra time (120'), without adding penalty kicks. The winner does include penalties if needed. In knockouts, 'draw' is not a valid simple prediction because there's always an official winner."
+        },
+        "provisional": {
+          "q": "What are provisional points?",
+          "a": "While a match is live, you see the points you would earn if it ended with the current score. They're tagged as provisional and confirmed when the match officially closes. Your streak and combo milestones only move with confirmed points, not provisional ones."
+        },
+        "streakAndCombo": {
+          "q": "How do streaks and combos work?",
+          "a": "Your streak is the number of consecutive correct predictions without a miss. Reaching 3, 5 or 10 in a row awards a bonus. If your active streak contains any correct double, the bonus is reduced. A miss resets the streak to 0. The 🔥 'On streak' label appears from the 3rd consecutive correct prediction."
+        },
+        "achievements": {
+          "q": "What are achievements?",
+          "a": "Badges you unlock by meeting conditions (streaks, first correct, top 100, etc.). They award no points: they're cosmetic and shown on your public profile. There are 24 achievements across 6 rarity tiers, from 'Common' to 'GOAT'."
+        },
+        "username": {
+          "q": "Can I change my username?",
+          "a": "Once, ever. After exercising the change, it's fixed. Your old username stays reserved to you; nobody else can register it."
+        },
+        "deleteAccount": {
+          "q": "How do I delete my account?",
+          "a": "From your account menu. Deletion is total: your user, predictions, points, streak and achievements are removed from the database. The leaderboard is recalculated without you. Complies with the GDPR right to be forgotten."
+        }
+      }
     }
   }
 }

@@ -35,7 +35,8 @@
       "googleButton": "Continuar con Google",
       "googlePending": "Redirigiendo…",
       "footer": "Tus datos se usan solo para identificarte en el ranking",
-      "closeLabel": "Cerrar"
+      "closeLabel": "Cerrar",
+      "faqLink": "¿Cómo funciona? Lee las preguntas frecuentes →"
     }
   },
   "accountMenu": {
@@ -43,6 +44,7 @@
     "closeLabel": "Cerrar menú de cuenta",
     "menuLabel": "Menú de cuenta",
     "fallbackName": "Usuario",
+    "faq": "Preguntas frecuentes",
     "signOut": "Cerrar sesión",
     "signingOut": "Cerrando sesión…"
   },
@@ -69,6 +71,109 @@
       "description": "Ha ocurrido un error inesperado. Puedes reintentar o volver al inicio.",
       "retryButton": "Intentar de nuevo",
       "homeButton": "Volver al inicio"
+    }
+  },
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "subtitle": "Todo lo que necesitas saber para predecir, sumar puntos y desbloquear logros.",
+    "backButton": "Volver al ranking",
+    "scoring": {
+      "title": "Tabla de puntuación",
+      "subtitle": "Cuántos puntos vale cada acción.",
+      "rows": {
+        "simple": {
+          "label": "Acierto simple",
+          "note": "Acertaste el ganador o el empate, sin marcador exacto.",
+          "value": "+10"
+        },
+        "exact": {
+          "label": "Acierto exacto",
+          "note": "Acertaste el marcador exacto. Sustituye al simple, no se suman.",
+          "value": "+30"
+        },
+        "double": {
+          "label": "Doble predicción acertada",
+          "note": "Cubriste 2 de los 3 resultados (1X, X2 o 12). La mitad del simple.",
+          "value": "+5"
+        },
+        "fail": {
+          "label": "Falla",
+          "note": "Si no aciertas, 0 puntos y se reinicia tu racha.",
+          "value": "0"
+        },
+        "comboBase": {
+          "label": "Combo a hito 3 / 5 / 10",
+          "note": "Bonus al alcanzar 3, 5 o 10 aciertos consecutivos.",
+          "value": "+5 / +15 / +50"
+        },
+        "comboModified": {
+          "label": "Combo con dobles en la racha",
+          "note": "Si la racha contiene alguna doble acertada, los bonus se reducen.",
+          "value": "+3 / +5 / +9"
+        },
+        "pollParticipate": {
+          "label": "Participar en encuesta diaria",
+          "note": "Por contestar antes del cierre.",
+          "value": "+1"
+        },
+        "pollCorrect": {
+          "label": "Acertar la encuesta",
+          "note": "Adicional. Máximo +2 por encuesta.",
+          "value": "+1"
+        },
+        "referral": {
+          "label": "Tu referido acierta su 1ª predicción",
+          "note": "One-time por amigo invitado. El acto de invitar no da puntos.",
+          "value": "+10"
+        },
+        "dailyLogin": {
+          "label": "Login diario",
+          "note": "No otorga puntos. Otorga logros visibles en tu perfil público.",
+          "value": "0"
+        }
+      }
+    },
+    "questions": {
+      "title": "Preguntas comunes",
+      "subtitle": "Reglas que afectan a cómo predices y a cómo se calcula tu puntuación.",
+      "items": {
+        "doublePrediction": {
+          "q": "¿Cómo funciona la doble predicción?",
+          "a": "Puedes cubrir dos de los tres resultados posibles en un partido: 1X (local o empate), X2 (empate o visitante) o 12 (cualquier equipo gana). Si aciertas, ganas la mitad de puntos que un simple. Las dobles no permiten predecir marcador exacto. En partidos de eliminatoria, las dobles 1X y X2 no aplican porque no existe el empate como resultado oficial."
+        },
+        "predictionWindow": {
+          "q": "¿Cuándo se cierra una predicción?",
+          "a": "Al kick-off oficial del partido. Hasta entonces puedes editarla todas las veces que quieras: cuenta la última versión enviada antes del bloqueo. Las predicciones se aceptan desde que el partido aparece en el sistema (al inicio del torneo)."
+        },
+        "postponedCancelled": {
+          "q": "¿Qué pasa si un partido se pospone o se cancela?",
+          "a": "Si se pospone, tu predicción se mantiene y queda editable hasta el nuevo kick-off. Si se cancela, la predicción se anula con 0 puntos y la racha 'salta' el partido sin romperse: el siguiente acierto continúa la racha donde estaba."
+        },
+        "knockoutScoring": {
+          "q": "¿Y en eliminatoria, si hay prórroga o penaltis?",
+          "a": "El marcador exacto cuenta el resultado al final de la prórroga (120'), sin sumar los penaltis. El ganador sí incluye los penaltis si los hubo. En eliminatoria, 'empate' no es predicción simple válida porque siempre hay un ganador oficial."
+        },
+        "provisional": {
+          "q": "¿Qué son los puntos provisionales?",
+          "a": "Mientras un partido está en curso, ves los puntos que ganarías si terminara con el marcador actual. Se identifican como provisionales y se confirman al cerrar oficialmente el partido. Tu racha y los hitos de combo solo se mueven con puntos confirmados, no con provisionales."
+        },
+        "streakAndCombo": {
+          "q": "¿Cómo funcionan las rachas y los combos?",
+          "a": "Tu racha es el número de aciertos consecutivos sin fallar. Al alcanzar 3, 5 o 10 aciertos seguidos recibes un bonus. Si tu racha contiene alguna doble acertada, el bonus se reduce. Una falla resetea la racha a 0. La etiqueta 🔥 'En racha' aparece a partir del 3er acierto consecutivo."
+        },
+        "achievements": {
+          "q": "¿Qué son los logros?",
+          "a": "Insignias que desbloqueas al cumplir condiciones (rachas, primer acierto, top 100, etc.). No otorgan puntos: son cosméticos y se muestran en tu perfil público. Hay 24 logros en 6 niveles de rareza, desde 'Común' hasta 'GOAT'."
+        },
+        "username": {
+          "q": "¿Puedo cambiar mi nombre de usuario?",
+          "a": "Una sola vez en toda la vida de la cuenta. Una vez ejercido el cambio, queda fijo. El username viejo queda reservado a ti, nadie más puede registrarlo."
+        },
+        "deleteAccount": {
+          "q": "¿Cómo elimino mi cuenta?",
+          "a": "Desde tu menú de cuenta. La eliminación es total: tu usuario, predicciones, puntos, racha y logros se borran de la base de datos. El leaderboard se recalcula sin ti. Cumple con el derecho al olvido del RGPD."
+        }
+      }
     }
   }
 }

@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
+import { Link } from "@/i18n/navigation";
 
 export function JoinCta() {
   const t = useTranslations("joinCta");
@@ -92,6 +93,14 @@ export function JoinCta() {
           <p className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.16em] text-muted">
             {t("modal.footer")}
           </p>
+
+          <Link
+            href="/faq"
+            onClick={closeDialog}
+            className="mt-4 inline-block text-[11px] font-bold text-muted underline-offset-4 transition-colors hover:text-gold hover:underline"
+          >
+            {t("modal.faqLink")}
+          </Link>
         </div>
       </dialog>
     </>

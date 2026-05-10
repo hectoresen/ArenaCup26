@@ -1,11 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { AccountMenu } from "@/components/auth/account-menu";
-import { LanguageSwitcher } from "@/components/i18n/language-switcher";
+import { TopChrome } from "@/components/layout/top-chrome";
 import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/types";
 import { FloatingBalls } from "./floating-balls";
-import { JoinCta } from "./join-cta";
 import { LiveBadge } from "./live-badge";
 import { PodiumCard } from "./podium-card";
 import { RankRow } from "./rank-row";
@@ -40,20 +38,7 @@ export function LeaderboardView({
   return (
     <>
       <FloatingBalls count={7} />
-      {/*
-        Slot top-start: language switcher visible siempre.
-        Top-left en LTR, top-right en RTL.
-      */}
-      <div className="fixed start-3 top-3 z-30 sm:start-5 sm:top-5">
-        <LanguageSwitcher />
-      </div>
-      {/*
-        Slot top-end del viewport (top-right en LTR, top-left en RTL).
-        Visitante anónimo → JoinCta; usuario autenticado → AccountMenu.
-      */}
-      <div className="fixed end-3 top-3 z-30 sm:end-5 sm:top-5">
-        {user ? <AccountMenu user={user} /> : <JoinCta />}
-      </div>
+      <TopChrome user={user} />
       <div className="relative z-10 w-full max-w-[510px]">
         <header className="mb-6 text-center opacity-0 [animation:popIn_0.7s_cubic-bezier(0.34,1.56,0.64,1)_forwards]">
           <div className="mb-2.5 flex items-center justify-center gap-3.5">

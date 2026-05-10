@@ -35,7 +35,8 @@
       "googleButton": "Continuer avec Google",
       "googlePending": "Redirection…",
       "footer": "Vos données ne servent qu'à vous identifier dans le classement",
-      "closeLabel": "Fermer"
+      "closeLabel": "Fermer",
+      "faqLink": "Comment ça marche ? Lire la FAQ →"
     }
   },
   "accountMenu": {
@@ -43,6 +44,7 @@
     "closeLabel": "Fermer le menu du compte",
     "menuLabel": "Menu du compte",
     "fallbackName": "Utilisateur",
+    "faq": "Questions fréquentes",
     "signOut": "Se déconnecter",
     "signingOut": "Déconnexion…"
   },
@@ -69,6 +71,109 @@
       "description": "Une erreur inattendue s'est produite. Vous pouvez réessayer ou retourner à l'accueil.",
       "retryButton": "Réessayer",
       "homeButton": "Retour à l'accueil"
+    }
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "subtitle": "Tout ce qu'il faut savoir pour prédire, marquer des points et débloquer des succès.",
+    "backButton": "Retour au classement",
+    "scoring": {
+      "title": "Tableau des points",
+      "subtitle": "Combien de points vaut chaque action.",
+      "rows": {
+        "simple": {
+          "label": "Prédiction simple réussie",
+          "note": "Vous avez deviné le vainqueur ou le match nul, sans score exact.",
+          "value": "+10"
+        },
+        "exact": {
+          "label": "Prédiction exacte réussie",
+          "note": "Vous avez deviné le score exact. Remplace la prédiction simple, pas cumulable.",
+          "value": "+30"
+        },
+        "double": {
+          "label": "Prédiction double réussie",
+          "note": "Vous avez couvert 2 des 3 issues (1X, X2 ou 12). La moitié de la simple.",
+          "value": "+5"
+        },
+        "fail": {
+          "label": "Échec",
+          "note": "Si vous ne devinez pas, 0 point et votre série est remise à zéro.",
+          "value": "0"
+        },
+        "comboBase": {
+          "label": "Bonus de série à 3 / 5 / 10",
+          "note": "Attribué en atteignant 3, 5 ou 10 prédictions correctes consécutives.",
+          "value": "+5 / +15 / +50"
+        },
+        "comboModified": {
+          "label": "Bonus de série avec doubles dans la série",
+          "note": "Si votre série active contient une double réussie, les bonus sont réduits.",
+          "value": "+3 / +5 / +9"
+        },
+        "pollParticipate": {
+          "label": "Participer au sondage du jour",
+          "note": "Pour avoir répondu avant la clôture.",
+          "value": "+1"
+        },
+        "pollCorrect": {
+          "label": "Réussir le sondage",
+          "note": "En plus de la participation. Maximum +2 par sondage.",
+          "value": "+1"
+        },
+        "referral": {
+          "label": "Votre filleul réussit sa 1ère prédiction",
+          "note": "Une seule fois par ami invité. Inviter ne donne pas de points.",
+          "value": "+10"
+        },
+        "dailyLogin": {
+          "label": "Connexion quotidienne",
+          "note": "N'attribue pas de points. Débloque des succès visibles sur votre profil public.",
+          "value": "0"
+        }
+      }
+    },
+    "questions": {
+      "title": "Questions courantes",
+      "subtitle": "Règles qui influent sur vos prédictions et le calcul du score.",
+      "items": {
+        "doublePrediction": {
+          "q": "Comment fonctionne une prédiction double ?",
+          "a": "Vous pouvez couvrir deux des trois issues d'un match : 1X (locaux ou nul), X2 (nul ou visiteurs) ou 12 (l'une ou l'autre équipe gagne). Si vous trouvez, vous marquez la moitié des points d'une prédiction simple. Les doubles n'incluent pas le score exact. En phase à élimination directe, 1X et X2 ne s'appliquent pas car il n'y a pas de match nul officiel."
+        },
+        "predictionWindow": {
+          "q": "Quand une prédiction est-elle verrouillée ?",
+          "a": "Au coup d'envoi officiel. Jusque-là vous pouvez la modifier autant de fois que vous voulez : la dernière version envoyée avant le verrouillage compte. Les prédictions s'ouvrent dès que le match existe dans le système (au début du tournoi)."
+        },
+        "postponedCancelled": {
+          "q": "Que se passe-t-il si un match est reporté ou annulé ?",
+          "a": "S'il est reporté, votre prédiction est conservée et reste modifiable jusqu'au nouveau coup d'envoi. S'il est annulé, la prédiction est annulée avec 0 point et votre série 'saute' le match sans casser : la prochaine prédiction réussie continue la série."
+        },
+        "knockoutScoring": {
+          "q": "Et en cas de prolongation ou de tirs au but en élimination directe ?",
+          "a": "Le score exact compte le résultat à la fin de la prolongation (120'), sans les tirs au but. Le vainqueur inclut bien les tirs au but s'il y en a eu. En élimination directe, 'match nul' n'est pas une prédiction simple valide car il y a toujours un vainqueur officiel."
+        },
+        "provisional": {
+          "q": "Que sont les points provisoires ?",
+          "a": "Pendant qu'un match est en cours, vous voyez les points que vous gagneriez si le score final était celui du moment. Ils sont marqués comme provisoires et confirmés à la clôture officielle. Votre série et les paliers de combo n'avancent qu'avec des points confirmés."
+        },
+        "streakAndCombo": {
+          "q": "Comment marchent les séries et les combos ?",
+          "a": "Votre série est le nombre de prédictions correctes consécutives sans échec. Atteindre 3, 5 ou 10 d'affilée donne un bonus. Si votre série active contient une double réussie, le bonus est réduit. Un échec remet la série à 0. Le label 🔥 'En série' apparaît à partir de la 3e bonne prédiction consécutive."
+        },
+        "achievements": {
+          "q": "Que sont les succès ?",
+          "a": "Des badges débloqués en remplissant des conditions (séries, première bonne prédiction, top 100, etc.). Ils ne donnent pas de points : ils sont cosmétiques et visibles sur votre profil public. Il y a 24 succès répartis sur 6 niveaux de rareté, de 'Commun' à 'GOAT'."
+        },
+        "username": {
+          "q": "Puis-je changer mon nom d'utilisateur ?",
+          "a": "Une seule fois dans la vie du compte. Après le changement, il est fixé. L'ancien nom d'utilisateur vous reste réservé : personne d'autre ne peut l'enregistrer."
+        },
+        "deleteAccount": {
+          "q": "Comment supprimer mon compte ?",
+          "a": "Depuis votre menu de compte. La suppression est totale : votre utilisateur, prédictions, points, série et succès sont effacés de la base de données. Le classement est recalculé sans vous. Conforme au droit à l'oubli du RGPD."
+        }
+      }
     }
   }
 }
