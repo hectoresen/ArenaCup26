@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Fredoka, Nunito } from "next/font/google";
 import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
+import { isValidLocale, routing } from "@/i18n/routing";
 import "../globals.css";
 
 // "Fredoka One" se discontinuó en Google Fonts y se fusionó con la variable
@@ -47,7 +47,7 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) {
+  if (!isValidLocale(locale)) {
     notFound();
   }
   setRequestLocale(locale);
