@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { formatPointsEs } from "@/lib/format/number";
 import type { Player } from "@/lib/leaderboard/types";
 
 type Place = 1 | 2 | 3;
@@ -90,7 +91,7 @@ export function PodiumCard({ player, place }: { player: Player; place: Place }) 
         {player.name.split(" ")[0] ?? player.name}
       </div>
       <span className={`block font-display text-2xl leading-none ${tone.points}`}>
-        {player.points.toLocaleString("es-ES")}
+        {formatPointsEs(player.points)}
       </span>
       <div className="text-[9px] font-extrabold uppercase tracking-[0.1em] text-muted">
         {t("pointsLabel")}

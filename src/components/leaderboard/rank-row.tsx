@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { formatPointsEs } from "@/lib/format/number";
 import type { Player } from "@/lib/leaderboard/types";
 
 function arrow(delta: number) {
@@ -62,7 +63,7 @@ export function RankRow({ player, index = 0 }: { player: Player; index?: number 
       </div>
       <div className="text-end">
         <span className="block font-display text-[22px] leading-none text-foreground">
-          {player.points.toLocaleString("es-ES")}
+          {formatPointsEs(player.points)}
         </span>
         <span className="text-[9px] font-extrabold uppercase tracking-[0.1em] text-muted">
           {t("pts")}

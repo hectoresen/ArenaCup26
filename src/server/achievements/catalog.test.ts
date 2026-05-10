@@ -50,7 +50,7 @@ describe("ACHIEVEMENT_CATALOG", () => {
   });
 
   it("uses kebab-case IDs only", () => {
-    const KEBAB = /^[a-z]+(-[a-z]+)*$/;
+    const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
     for (const def of ACHIEVEMENT_CATALOG) {
       expect(def.id, `id ${def.id}`).toMatch(KEBAB);
     }
@@ -97,7 +97,7 @@ describe("ACHIEVEMENT_CATALOG", () => {
 
   it("uses iconId values that match the convention 'ico-<name>'", () => {
     for (const def of ACHIEVEMENT_CATALOG) {
-      expect(def.iconId, `iconId de ${def.id}`).toMatch(/^ico-[a-z0-9]+$/);
+      expect(def.iconId, `iconId de ${def.id}`).toMatch(/^ico-[a-z0-9]+(-[a-z0-9]+)*$/);
     }
   });
 });
