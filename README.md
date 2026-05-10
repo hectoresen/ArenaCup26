@@ -64,22 +64,48 @@ Justificaciones y trade-offs en [`openspec/project.md`](openspec/project.md).
 3. La propuesta incluye `proposal.md`, `tasks.md` y, opcionalmente, `design.md` y los specs del estado futuro.
 4. Una vez aprobada, se implementa siguiendo el `tasks.md` y se archiva en `openspec/changes/archive/YYYY-MM-DD-<nombre>/`.
 
-## Roadmap a corto plazo
+## Roadmap
 
-Fase actual: **entendimiento**. Próximas iteraciones:
+Snapshot 2026-05-10. Detalle de cada propuesta en `openspec/changes/<nombre>/`.
 
-- [x] Fijar tabla de puntuación oficial en `docs/scoring.md` (cerrada 2026-05-05).
-- [x] Cerrar scope de notificaciones y auth para fase 1.
-- [x] Cerrar catálogo de `achievements` en `docs/achievements.md` y alcance de perfil público en `docs/public-profile.md`.
-- [ ] **Crítico**: cerrar fuente de `match-data` (ver `docs/match-data-research.md`).
-- [ ] Primer cambio OpenSpec: `add-auth-google` (login + sesión).
-- [ ] Segundo cambio: `add-match-data-providers` (adapters con dos APIs redundantes).
-- [ ] Tercer cambio: `add-leaderboard-realtime` (SSE + ranking inicial).
-- [ ] Cuarto cambio: `add-prediction-flow` (UI de predicción + persistencia, incluye doble).
-- [ ] Quinto cambio: `add-scoring-engine` (motor con cálculo provisional en vivo).
-- [ ] Sexto cambio: `add-notifications-inapp` (toasts, feed, badge campana).
-- [ ] Séptimo cambio: `add-public-profile` (página `/u/<username>`).
-- [ ] Octavo cambio: `add-achievements` (catálogo, evaluación, unlocks).
+### Cerradas (mergeadas en main)
+
+- ✅ `add-data-model` — schema Drizzle + migración inicial.
+- ✅ `add-leaderboard-public` — home `/` con snapshot del top 10.
+- ✅ `add-join-cta` — CTA "Predecir ahora" + modal stub.
+- ✅ `add-auth-google` — Google OAuth real vía Auth.js v5 + Drizzle adapter.
+- ✅ `add-account-menu` — hamburguesa con avatar al estar logueado, "Cerrar sesión".
+- ✅ `add-i18n` — es/en/fr/ar con RTL, switcher en top-start.
+- ✅ `add-error-pages` — 404 + error.tsx + global-error.tsx i18n-aware.
+- ✅ `add-faq` — `/faq` con tabla de scoring + 9 Q&A.
+- ✅ `add-testing-tooling` — RTL + jsdom + helper de providers + sample tests.
+
+### Bloqueadas por **diseño / mockup**
+
+- ⏸ `add-prediction-flow` — UI selector simple/exacto/doble.
+- ⏸ `add-public-profile` — página `/u/<username>`.
+- ⏸ `add-achievements` — vistas privada y pública del catálogo.
+- ⏸ `add-auth-onboarding` — form username + país tras primer login.
+- ⏸ `add-dashboard` — área privada principal.
+
+### Bloqueadas por **integración API**
+
+- ⏸ `add-match-data-providers` — adapters de API-Football + Live-Score-API (necesita claves reales para validar end-to-end).
+- ⏸ `add-leaderboard-sse` — push en vivo del ranking (depende de match-data).
+- ⏸ `add-notifications-inapp` — depende de eventos del scoring engine y match-data.
+
+### **Disponibles ya** (no dependen de diseño ni de claves API)
+
+- 🟢 `add-scoring-engine` — función pura del motor de puntuación. Tests con fixtures.
+- 🟢 `add-edge-case-fixtures` — 8 escenarios sintéticos (prórroga, penaltis, pospuesto, cancelado, etc.) con tests del scoring engine.
+- 🟢 `add-fixture-seed-wc2022` — dataset histórico del Mundial 2022 para replay end-to-end.
+- 🟢 `add-achievements-seed` — script que siembra los 24 logros del catálogo.
+- 🟢 `add-rate-limiting` — middleware simple (token bucket) sobre `/api/auth/*` y futuras APIs.
+- 🟢 `add-security-headers` — CSP, HSTS, etc. vía middleware o `next.config`.
+- 🟢 `add-ci-pipeline` — GitHub Actions con `npm test`, `npm run typecheck`, `npm run check`.
+- 🟢 Más tests de componentes existentes (`<JoinCta />`, `<AccountMenu />`, `<LanguageSwitcher />`, `<ErrorScreen />`, `<ScoringTable />`).
+
+Estrategia de validación pre-Mundial en [`docs/pre-launch-testing.md`](docs/pre-launch-testing.md).
 
 ## Desarrollo local
 

@@ -14,3 +14,4 @@ Documentación humana del proyecto. Para el flujo de trabajo de specs e IA, ver 
 - [`leaderboard-reference.html`](leaderboard-reference.html) — referencia visual del ranking en vivo.
 - [`achievements-reference.html`](achievements-reference.html) — referencia visual del catálogo de logros.
 - [`public-profile-reference.html`](public-profile-reference.html) — referencia visual del perfil público (identity + stats + logros).
+- [`pre-launch-testing.md`](pre-launch-testing.md) — estrategia de validación de predicciones y leaderboard antes del 11 de junio.
