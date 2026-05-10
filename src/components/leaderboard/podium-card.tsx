@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { Player } from "@/lib/leaderboard/types";
 
 type Place = 1 | 2 | 3;
@@ -52,27 +53,33 @@ function initials(name: string) {
 }
 
 export function PodiumCard({ player, place }: { player: Player; place: Place }) {
-  const t = TONE[place];
+  const t = useTranslations("leaderboard.podium");
+  const tone = TONE[place];
   return (
     <div
-      className={`relative cursor-default overflow-hidden rounded-2xl border-[2.5px] px-2.5 pb-3.5 pt-3.5 text-center transition-transform duration-200 hover:-translate-y-1.5 hover:scale-[1.03] ${t.container} ${t.border}`}
-      aria-label={`Posición ${place}: ${player.name}, ${player.countryName}, ${player.points} puntos`}
+      className={`relative cursor-default overflow-hidden rounded-2xl border-[2.5px] px-2.5 pb-3.5 pt-3.5 text-center transition-transform duration-200 hover:-translate-y-1.5 hover:scale-[1.03] ${tone.container} ${tone.border}`}
+      aria-label={t("ariaPosition", {
+        place,
+        name: player.name,
+        country: player.countryName,
+        points: player.points,
+      })}
     >
       {place === 1 && (
         <span
           aria-hidden="true"
-          className="absolute left-1/2 -top-3.5 animate-[ballSpin_4s_linear_infinite] text-2xl drop-shadow-[0_2px_8px_rgba(245,200,66,0.5)]"
+          className="absolute -top-3.5 left-1/2 -translate-x-1/2 animate-[ballSpin_4s_linear_infinite] text-2xl drop-shadow-[0_2px_8px_rgba(245,200,66,0.5)]"
         >
           ⚽
         </span>
       )}
       <span
-        className={`absolute right-2 top-2 rounded-full px-1.5 py-0.5 font-display text-[10px] leading-[1.4] ${t.badge}`}
+        className={`absolute end-2 top-2 rounded-full px-1.5 py-0.5 font-display text-[10px] leading-[1.4] ${tone.badge}`}
       >
-        {t.label}
+        {tone.label}
       </span>
       <div
-        className={`mx-auto mb-1.5 flex h-12 w-12 items-center justify-center rounded-full border-[3px] border-black/35 font-display text-lg ${t.avatar}`}
+        className={`mx-auto mb-1.5 flex h-12 w-12 items-center justify-center rounded-full border-[3px] border-black/35 font-display text-lg ${tone.avatar}`}
       >
         {initials(player.name)}
       </div>
@@ -82,11 +89,11 @@ export function PodiumCard({ player, place }: { player: Player; place: Place }) 
       <div className="mb-1.5 truncate text-[11px] font-extrabold text-foreground">
         {player.name.split(" ")[0] ?? player.name}
       </div>
-      <span className={`block font-display text-2xl leading-none ${t.points}`}>
+      <span className={`block font-display text-2xl leading-none ${tone.points}`}>
         {player.points.toLocaleString("es-ES")}
       </span>
       <div className="text-[9px] font-extrabold uppercase tracking-[0.1em] text-muted">
-        puntos
+        {t("pointsLabel")}
       </div>
     </div>
   );

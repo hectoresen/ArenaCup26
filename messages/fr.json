@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "title": "WebMundial 26 · Classement",
+    "description": "Plateforme sociale et compétitive autour de la Coupe du Monde 2026. Prédisez les matchs, montez au classement, débloquez des succès."
+  },
+  "leaderboard": {
+    "tagline": "FIFA Coupe du Monde · Canada · Mexique · USA",
+    "liveBadge": "Classement en direct",
+    "hostFlags": {
+      "canada": "Canada",
+      "mexico": "Mexique",
+      "usa": "États-Unis"
+    },
+    "footer": {
+      "updatedNow": "Mis à jour à l'instant"
+    },
+    "row": {
+      "noStreak": "sans série",
+      "correctBadge": "{count} réussies",
+      "pts": "pts",
+      "ariaPosition": "Position {rank} : {name}, {country}, {points} points",
+      "ariaStreak": "série de {count}",
+      "ariaCorrect": "{count} prédictions réussies"
+    },
+    "podium": {
+      "pointsLabel": "points",
+      "ariaPosition": "Position {place} : {name}, {country}, {points} points"
+    }
+  },
+  "joinCta": {
+    "button": "Prédire maintenant",
+    "modal": {
+      "title": "Rejoignez la Coupe du Monde 26",
+      "subtitle": "Prédisez les matchs, montez au classement et débloquez des succès.",
+      "googleButton": "Continuer avec Google",
+      "googlePending": "Redirection…",
+      "footer": "Vos données ne servent qu'à vous identifier dans le classement",
+      "closeLabel": "Fermer"
+    }
+  },
+  "accountMenu": {
+    "openLabel": "Ouvrir le menu du compte",
+    "closeLabel": "Fermer le menu du compte",
+    "menuLabel": "Menu du compte",
+    "fallbackName": "Utilisateur",
+    "signOut": "Se déconnecter",
+    "signingOut": "Déconnexion…"
+  },
+  "languageSwitcher": {
+    "label": "Langue",
+    "openLabel": "Changer de langue",
+    "names": {
+      "es": "Español",
+      "en": "English",
+      "fr": "Français",
+      "ar": "العربية"
+    }
+  }
+}

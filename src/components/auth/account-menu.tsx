@@ -1,7 +1,9 @@
 "use client";
 
 import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 
 type SessionUser = {
   name?: string | null;
@@ -10,6 +12,7 @@ type SessionUser = {
 };
 
 export function AccountMenu({ user }: { user: SessionUser }) {
+  const t = useTranslations("accountMenu");
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +68,7 @@ export function AccountMenu({ user }: { user: SessionUser }) {
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={open ? "Cerrar menú de cuenta" : "Abrir menú de cuenta"}
+        aria-label={open ? t("closeLabel") : t("openLabel")}
         className="flex cursor-pointer items-center gap-2 rounded-full border-2 border-gold/30 bg-card/90 px-2 py-1.5 backdrop-blur transition-colors hover:border-gold/50 hover:bg-card-hover/90"
       >
         <span className="inline-flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-gold to-gold-deep font-display text-[11px] text-[#1a1000]">
@@ -93,12 +96,12 @@ export function AccountMenu({ user }: { user: SessionUser }) {
       {open && (
         <div
           role="menu"
-          aria-label="Menú de cuenta"
-          className="absolute right-0 mt-2 w-64 origin-top-right overflow-hidden rounded-2xl border-2 border-gold/30 bg-gradient-to-br from-card-hover to-card text-foreground shadow-[0_24px_48px_rgba(0,0,0,0.5)] [animation:popIn_0.2s_cubic-bezier(0.34,1.56,0.64,1)_forwards]"
+          aria-label={t("menuLabel")}
+          className="absolute end-0 mt-2 w-64 origin-top-end overflow-hidden rounded-2xl border-2 border-gold/30 bg-gradient-to-br from-card-hover to-card text-foreground shadow-[0_24px_48px_rgba(0,0,0,0.5)] [animation:popIn_0.2s_cubic-bezier(0.34,1.56,0.64,1)_forwards]"
         >
-          <div className="border-b border-border px-4 py-3 text-left">
+          <div className="border-b border-border px-4 py-3 text-start">
             <div className="truncate font-display text-sm text-gold">
-              {user.name ?? "Usuario"}
+              {user.name ?? t("fallbackName")}
             </div>
             {user.email && (
               <div className="truncate text-[11px] font-bold text-muted">{user.email}</div>
@@ -110,7 +113,7 @@ export function AccountMenu({ user }: { user: SessionUser }) {
             role="menuitem"
             onClick={handleSignOut}
             disabled={signingOut}
-            className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05] disabled:cursor-wait disabled:opacity-60"
+            className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05] disabled:cursor-wait disabled:opacity-60"
           >
             <svg
               className="h-4 w-4 text-muted"
@@ -125,8 +128,12 @@ export function AccountMenu({ user }: { user: SessionUser }) {
               <path d="M6 2 H3 a1 1 0 0 0 -1 1 v10 a1 1 0 0 0 1 1 h3" />
               <path d="M11 5 L14 8 L11 11 M14 8 H7" />
             </svg>
-            {signingOut ? "Cerrando sesión…" : "Cerrar sesión"}
+            {signingOut ? t("signingOut") : t("signOut")}
           </button>
+
+          <div className="border-t border-border px-4 py-3">
+            <LanguageSwitcher alignToEnd />
+          </div>
         </div>
       )}
     </div>

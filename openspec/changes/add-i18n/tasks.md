@@ -1,0 +1,25 @@
+# Tasks — add-i18n
+
+- [x] 1. Añadir `next-intl@^3.26` a `package.json`.
+- [x] 2. `next.config.ts`: envolver con `createNextIntlPlugin("./src/i18n/request.ts")`.
+- [x] 3. `src/i18n/routing.ts` con la lista de locales y `localePrefix: "as-needed"`.
+- [x] 4. `src/i18n/request.ts` que carga el JSON de mensajes según el locale.
+- [x] 5. `src/middleware.ts` con `createMiddleware(routing)` y matcher que excluye `/api`, `/_next` y assets.
+- [x] 6. Mover `src/app/layout.tsx` → `src/app/[locale]/layout.tsx` con `<html lang dir>` dinámicos y `<NextIntlClientProvider>`.
+- [x] 7. Mover `src/app/page.tsx` → `src/app/[locale]/page.tsx` y consumir `setRequestLocale`.
+- [x] 8. `messages/es.json` con todas las claves actuales.
+- [x] 9. `messages/en.json`, `messages/fr.json`, `messages/ar.json` con las traducciones equivalentes.
+- [x] 10. `src/components/i18n/language-switcher.tsx`: dropdown reusable con los 4 idiomas en su nombre nativo.
+- [x] 11. Refactor de `LeaderboardView` para usar `useTranslations` y eliminar strings hardcoded.
+- [x] 12. Refactor de `JoinCta` (incluido modal y mensaje de Auth en construcción → "Tus datos…").
+- [x] 13. Refactor de `AccountMenu` (trigger, header del dropdown, "Cerrar sesión", fallbacks). Embeber `<LanguageSwitcher />` debajo del usuario.
+- [x] 14. Refactor de `PodiumCard` ("puntos" + aria-label).
+- [x] 15. Refactor de `RankRow` ("sin racha", "× N acertadas", "pts", aria-label).
+- [x] 16. Embeber `<LanguageSwitcher />` también en el modal de `JoinCta` para visitantes anónimos.
+- [x] 17. Sustituir clases físicas por logical donde el sentido importa: slot `top-end`, `text-end`/`text-start` en footer y dropdown header, `me-`/`ms-` en separadores entre icono y texto.
+- [x] 18. Tipar el alias `@` de imports si es necesario tras la reestructura (no debería).
+- [ ] 19. Smoke check manual: probar `/`, `/en`, `/fr`, `/ar` y verificar que el árabe rinde RTL correctamente.
+- [ ] 20. Promover `specs/i18n/spec.md` a `openspec/specs/i18n/spec.md` y archivar la propuesta.
+- [ ] (deferred) Revisión nativa de las traducciones, especialmente del árabe.
+- [ ] (deferred) Localización de nombres de países cuando aterrice el seed real del fixture.
+- [ ] (deferred) Animación `slideInRtl` paralela para que `RankRow` entre desde la dirección de lectura en árabe.

@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "title": "WebMundial 26 · التصنيف",
+    "description": "منصة اجتماعية وتنافسية حول كأس العالم 2026. توقّع المباريات، تقدّم في التصنيف، افتح الإنجازات."
+  },
+  "leaderboard": {
+    "tagline": "كأس العالم فيفا · كندا · المكسيك · الولايات المتحدة",
+    "liveBadge": "التصنيف المباشر",
+    "hostFlags": {
+      "canada": "كندا",
+      "mexico": "المكسيك",
+      "usa": "الولايات المتحدة"
+    },
+    "footer": {
+      "updatedNow": "تم التحديث الآن"
+    },
+    "row": {
+      "noStreak": "بدون سلسلة",
+      "correctBadge": "{count} صحيحة",
+      "pts": "نقطة",
+      "ariaPosition": "المركز {rank}: {name}، {country}، {points} نقطة",
+      "ariaStreak": "سلسلة من {count}",
+      "ariaCorrect": "{count} توقعات صحيحة"
+    },
+    "podium": {
+      "pointsLabel": "نقاط",
+      "ariaPosition": "المركز {place}: {name}، {country}، {points} نقطة"
+    }
+  },
+  "joinCta": {
+    "button": "توقّع الآن",
+    "modal": {
+      "title": "انضم إلى مونديال 26",
+      "subtitle": "توقّع المباريات، تقدّم في التصنيف وافتح الإنجازات.",
+      "googleButton": "المتابعة مع Google",
+      "googlePending": "جارٍ التحويل…",
+      "footer": "تُستخدم بياناتك فقط لتعريفك في التصنيف",
+      "closeLabel": "إغلاق"
+    }
+  },
+  "accountMenu": {
+    "openLabel": "فتح قائمة الحساب",
+    "closeLabel": "إغلاق قائمة الحساب",
+    "menuLabel": "قائمة الحساب",
+    "fallbackName": "مستخدم",
+    "signOut": "تسجيل الخروج",
+    "signingOut": "جارٍ تسجيل الخروج…"
+  },
+  "languageSwitcher": {
+    "label": "اللغة",
+    "openLabel": "تغيير اللغة",
+    "names": {
+      "es": "Español",
+      "en": "English",
+      "fr": "Français",
+      "ar": "العربية"
+    }
+  }
+}

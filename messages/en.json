@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "title": "WebMundial 26 · Ranking",
+    "description": "Social and competitive platform around the 2026 FIFA World Cup. Predict matches, climb the ranking, unlock achievements."
+  },
+  "leaderboard": {
+    "tagline": "FIFA World Cup · Canada · Mexico · USA",
+    "liveBadge": "Live ranking",
+    "hostFlags": {
+      "canada": "Canada",
+      "mexico": "Mexico",
+      "usa": "United States"
+    },
+    "footer": {
+      "updatedNow": "Just updated"
+    },
+    "row": {
+      "noStreak": "no streak",
+      "correctBadge": "{count} correct",
+      "pts": "pts",
+      "ariaPosition": "Position {rank}: {name}, {country}, {points} points",
+      "ariaStreak": "streak of {count}",
+      "ariaCorrect": "{count} correct predictions"
+    },
+    "podium": {
+      "pointsLabel": "points",
+      "ariaPosition": "Position {place}: {name}, {country}, {points} points"
+    }
+  },
+  "joinCta": {
+    "button": "Predict now",
+    "modal": {
+      "title": "Join the 2026 World Cup",
+      "subtitle": "Predict matches, climb the ranking and unlock achievements.",
+      "googleButton": "Continue with Google",
+      "googlePending": "Redirecting…",
+      "footer": "Your data is only used to identify you in the ranking",
+      "closeLabel": "Close"
+    }
+  },
+  "accountMenu": {
+    "openLabel": "Open account menu",
+    "closeLabel": "Close account menu",
+    "menuLabel": "Account menu",
+    "fallbackName": "User",
+    "signOut": "Sign out",
+    "signingOut": "Signing out…"
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "openLabel": "Change language",
+    "names": {
+      "es": "Español",
+      "en": "English",
+      "fr": "Français",
+      "ar": "العربية"
+    }
+  }
+}

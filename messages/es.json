@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "title": "WebMundial 26 · Ranking",
+    "description": "Plataforma social y competitiva alrededor del Mundial de Fútbol 2026. Predice partidos, sube en el ranking, desbloquea logros."
+  },
+  "leaderboard": {
+    "tagline": "FIFA World Cup · Canadá · México · USA",
+    "liveBadge": "Ranking en vivo",
+    "hostFlags": {
+      "canada": "Canadá",
+      "mexico": "México",
+      "usa": "Estados Unidos"
+    },
+    "footer": {
+      "updatedNow": "Actualizado ahora"
+    },
+    "row": {
+      "noStreak": "sin racha",
+      "correctBadge": "{count} acertadas",
+      "pts": "pts",
+      "ariaPosition": "Posición {rank}: {name}, {country}, {points} puntos",
+      "ariaStreak": "racha de {count}",
+      "ariaCorrect": "{count} predicciones acertadas"
+    },
+    "podium": {
+      "pointsLabel": "puntos",
+      "ariaPosition": "Posición {place}: {name}, {country}, {points} puntos"
+    }
+  },
+  "joinCta": {
+    "button": "Predecir ahora",
+    "modal": {
+      "title": "Únete al Mundial 26",
+      "subtitle": "Predice partidos, sube en el ranking y desbloquea logros.",
+      "googleButton": "Continuar con Google",
+      "googlePending": "Redirigiendo…",
+      "footer": "Tus datos se usan solo para identificarte en el ranking",
+      "closeLabel": "Cerrar"
+    }
+  },
+  "accountMenu": {
+    "openLabel": "Abrir menú de cuenta",
+    "closeLabel": "Cerrar menú de cuenta",
+    "menuLabel": "Menú de cuenta",
+    "fallbackName": "Usuario",
+    "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión…"
+  },
+  "languageSwitcher": {
+    "label": "Idioma",
+    "openLabel": "Cambiar idioma",
+    "names": {
+      "es": "Español",
+      "en": "English",
+      "fr": "Français",
+      "ar": "العربية"
+    }
+  }
+}

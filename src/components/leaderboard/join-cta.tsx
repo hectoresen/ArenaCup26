@@ -1,9 +1,12 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
+import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 
 export function JoinCta() {
+  const t = useTranslations("joinCta");
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [pending, setPending] = useState(false);
 
@@ -26,7 +29,6 @@ export function JoinCta() {
     try {
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
-      // signIn navega; este catch solo entra si algo cliente falla antes.
       console.error("[wmundial] sign-in error", error);
       setPending(false);
     }
@@ -40,8 +42,8 @@ export function JoinCta() {
         className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border-2 border-gold/40 bg-gradient-to-br from-gold to-gold-deep px-3 py-2 font-display text-[11px] uppercase tracking-[0.12em] text-[#1a1000] shadow-[0_0_24px_rgba(245,200,66,0.32)] transition-[transform,box-shadow] duration-200 hover:scale-[1.04] hover:shadow-[0_0_32px_rgba(245,200,66,0.55)] active:scale-[0.98] sm:gap-2 sm:px-5 sm:py-2.5 sm:text-[13px] sm:tracking-[0.14em]"
       >
         <span aria-hidden="true">⚽</span>
-        Predecir ahora
-        <span aria-hidden="true" className="ml-0.5">
+        {t("button")}
+        <span aria-hidden="true" className="ms-0.5">
           →
         </span>
       </button>
@@ -52,12 +54,12 @@ export function JoinCta() {
         onClick={handleBackdropClick}
         className="m-auto max-w-[380px] rounded-3xl border-2 border-gold/30 bg-gradient-to-br from-card-hover to-card p-0 text-foreground shadow-[0_24px_64px_rgba(0,0,0,0.6),0_0_60px_rgba(245,200,66,0.18)] backdrop:bg-black/65 backdrop:backdrop-blur-sm open:[animation:popIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)_forwards]"
       >
-        <div className="relative overflow-hidden rounded-3xl px-7 pb-7 pt-9 text-center">
+        <div className="relative overflow-hidden rounded-3xl px-7 pt-9 pb-7 text-center">
           <button
             type="button"
             onClick={closeDialog}
-            aria-label="Cerrar"
-            className="absolute right-3 top-3 inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-border bg-white/[0.04] text-muted transition-colors hover:bg-white/[0.08] hover:text-foreground"
+            aria-label={t("modal.closeLabel")}
+            className="absolute end-3 top-3 inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-border bg-white/[0.04] text-muted transition-colors hover:bg-white/[0.08] hover:text-foreground"
           >
             <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" aria-hidden="true">
               <path
@@ -74,11 +76,9 @@ export function JoinCta() {
           </div>
 
           <h2 id="join-cta-title" className="font-display text-2xl text-gold">
-            Únete al Mundial 26
+            {t("modal.title")}
           </h2>
-          <p className="mt-2 text-[13px] font-bold text-muted">
-            Predice partidos, sube en el ranking y desbloquea logros.
-          </p>
+          <p className="mt-2 text-[13px] font-bold text-muted">{t("modal.subtitle")}</p>
 
           <button
             type="button"
@@ -87,12 +87,16 @@ export function JoinCta() {
             className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-bold text-foreground transition-colors hover:border-white/25 hover:bg-white/[0.08] disabled:cursor-wait disabled:opacity-60"
           >
             <GoogleLogo />
-            {pending ? "Redirigiendo…" : "Continuar con Google"}
+            {pending ? t("modal.googlePending") : t("modal.googleButton")}
           </button>
 
           <p className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.16em] text-muted">
-            Tus datos se usan solo para identificarte en el ranking
+            {t("modal.footer")}
           </p>
+
+          <div className="mt-5 flex justify-center border-t border-border pt-4">
+            <LanguageSwitcher />
+          </div>
         </div>
       </dialog>
     </>

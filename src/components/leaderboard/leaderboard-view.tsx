@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AccountMenu } from "@/components/auth/account-menu";
 import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/types";
 import { FloatingBalls } from "./floating-balls";
@@ -22,7 +23,7 @@ export function LeaderboardView({
 }: {
   snapshot: LeaderboardSnapshot;
   /**
-   * Si hay sesión activa, el slot top-right muestra `<AccountMenu />`.
+   * Si hay sesión activa, el slot top-end muestra `<AccountMenu />`.
    * Si no, muestra `<JoinCta />`.
    */
   user: SessionUser | null;
@@ -32,16 +33,17 @@ export function LeaderboardView({
    */
   events?: LeaderboardEvent[];
 }) {
+  const t = useTranslations("leaderboard");
   const [first, second, third, ...rest] = snapshot.players;
 
   return (
     <>
       <FloatingBalls count={7} />
       {/*
-        Slot top-right del viewport. Visitante anónimo → JoinCta;
-        usuario autenticado → AccountMenu.
+        Slot top-end del viewport (top-right en LTR, top-left en RTL).
+        Visitante anónimo → JoinCta; usuario autenticado → AccountMenu.
       */}
-      <div className="fixed right-3 top-3 z-30 sm:right-5 sm:top-5">
+      <div className="fixed end-3 top-3 z-30 sm:end-5 sm:top-5">
         {user ? <AccountMenu user={user} /> : <JoinCta />}
       </div>
       <div className="relative z-10 w-full max-w-[510px]">
@@ -61,14 +63,14 @@ export function LeaderboardView({
             </div>
           </div>
           <div className="mb-2.5 font-display text-[13px] uppercase tracking-[0.18em] text-gold opacity-80">
-            FIFA World Cup · Canadá · México · USA
+            {t("tagline")}
           </div>
           <div className="mb-3 block text-xl tracking-[4px]">
-            <span aria-label="Canadá">🇨🇦</span>{" "}
-            <span aria-label="México">🇲🇽</span>{" "}
-            <span aria-label="Estados Unidos">🇺🇸</span>
+            <span aria-label={t("hostFlags.canada")}>🇨🇦</span>{" "}
+            <span aria-label={t("hostFlags.mexico")}>🇲🇽</span>{" "}
+            <span aria-label={t("hostFlags.usa")}>🇺🇸</span>
           </div>
-          <LiveBadge>Ranking en vivo</LiveBadge>
+          <LiveBadge>{t("liveBadge")}</LiveBadge>
         </header>
 
         {first && second && third && (
@@ -97,7 +99,7 @@ export function LeaderboardView({
         </ol>
 
         <footer className="mt-4 flex items-center justify-between px-0.5 opacity-0 [animation:fadeUp_0.4s_ease_1s_forwards]">
-          <span className="text-[11px] font-bold text-muted">⏱ Actualizado ahora</span>
+          <span className="text-[11px] font-bold text-muted">⏱ {t("footer.updatedNow")}</span>
           <span className="font-display text-xs uppercase tracking-[0.1em] text-gold opacity-60">
             WE ARE 26
           </span>
