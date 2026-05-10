@@ -1,6 +1,6 @@
 import { type RenderOptions, render } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import type { ReactElement } from "react";
+import type { ReactNode } from "react";
 import esMessages from "../../messages/es.json";
 
 type Messages = typeof esMessages;
@@ -15,10 +15,10 @@ type Options = Omit<RenderOptions, "wrapper"> & {
  * next-intl. Por defecto usa los mensajes en español; se puede
  * sobreescribir pasando otro fichero JSON.
  */
-export function renderWithProviders(ui: ReactElement, options: Options = {}) {
+export function renderWithProviders(ui: ReactNode, options: Options = {}) {
   const { locale = "es", messages = esMessages as Messages, ...rest } = options;
 
-  function Wrapper({ children }: { children: ReactElement }) {
+  function Wrapper({ children }: { children: ReactNode }) {
     return (
       <NextIntlClientProvider locale={locale} messages={messages}>
         {children}
