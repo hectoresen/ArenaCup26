@@ -101,7 +101,7 @@ npm run dev
 
 1. Abre `http://localhost:3000/` → landing pública con leaderboard (mock).
 2. Pulsa **Predecir ahora** → modal Google.
-3. Tras autenticar, vuelves al sitio. Navega a `http://localhost:3000/inicio`.
+3. Tras autenticar, te llevan a `/inicio`.
 4. Deberías ver:
    - Top-nav fijo con tabs Inicio/Partidos/Ranking/Logros + avatar dorado + bell.
    - Hero personalizado: `Hola, <Tu nombre> 👋`.
@@ -114,14 +114,13 @@ npm run dev
 
 ## 9. Trucos para ver datos reales
 
-### 9.1 Adelantar los kickoffs de WC 2022 al futuro
+### 9.1 Adelantar los kickoffs al futuro (para ver `/inicio` con datos)
 
 ```bash
-docker compose exec postgres psql -U wmundial -d wmundial -c \
-  "UPDATE matches SET kickoff_at = kickoff_at + interval '4 years' WHERE kickoff_at < now();"
+npm run dev:shift-matches
 ```
 
-Esto reescribe los 24 partidos de Qatar 2022 desplazándolos 4 años; ahora caen en 2026 y la sección **Próximos partidos** se llena.
+Calcula el delta entre `now()` y el partido más antiguo en BD y lo aplica a todos los `kickoffAt < now()` (manteniendo el espaciado original). El primer partido queda en `now() + 6h`. **Idempotente** — lanzarlo dos veces no rompe nada porque la segunda vez no encuentra matches `< now()`. Tras ejecutarlo, la sección **Próximos partidos** en `/inicio` se llena con los 24 fixtures.
 
 ### 9.2 Probar el cron de sync (API-Football real)
 
@@ -197,7 +196,7 @@ npm run seed:wc2022
 
 **Aún no implementado (capabilities futuras):**
 
-- `/partidos`, `/ranking`, `/logros` — los tabs del nav apuntan a estas rutas, pero devuelven 404.
+- `/partidos`, `/logros` — placeholder con "próximamente" y link de vuelta al panel.
 - Flujo de submit/edit de predicción (`add-prediction-flow`).
 - Recálculo automático de puntos cuando un partido cambia (`add-scoring-pipeline`).
 - Refresco en tiempo real del panel (`add-leaderboard-sse`).

@@ -1,9 +1,9 @@
 "use client";
 
+import { Link } from "@/i18n/navigation";
 import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
-import { Link } from "@/i18n/navigation";
 
 export function JoinCta() {
   const t = useTranslations("joinCta");
@@ -27,7 +27,8 @@ export function JoinCta() {
   async function handleGoogleSignIn() {
     setPending(true);
     try {
-      await signIn("google", { callbackUrl: "/" });
+      // Tras autenticar, llevamos al panel privado, no a la landing.
+      await signIn("google", { callbackUrl: "/inicio" });
     } catch (error) {
       console.error("[wmundial] sign-in error", error);
       setPending(false);
@@ -48,6 +49,7 @@ export function JoinCta() {
         </span>
       </button>
 
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: el `<dialog>` nativo ya soporta Escape para cerrar; el click solo es un atajo extra (clic fuera del contenido). */}
       <dialog
         ref={dialogRef}
         aria-labelledby="join-cta-title"

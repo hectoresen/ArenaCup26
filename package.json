@@ -22,7 +22,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "seed:achievements": "tsx --env-file=.env scripts/seed-achievements.ts",
-    "seed:wc2022": "tsx --env-file=.env scripts/seed-wc2022.ts"
+    "seed:wc2022": "tsx --env-file=.env scripts/seed-wc2022.ts",
+    "dev:shift-matches": "tsx --env-file=.env scripts/dev-shift-matches.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.4",

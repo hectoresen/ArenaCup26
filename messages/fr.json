@@ -39,6 +39,17 @@
       "faqLink": "Comment ça marche ? Lire la FAQ →"
     }
   },
+  "comingSoon": {
+    "title": {
+      "matches": "Calendrier complet des matchs",
+      "achievements": "Catalogue de succès"
+    },
+    "body": {
+      "matches": "La liste et le détail de chaque match arrivent avec `add-matches-page`. En attendant, les prochains s'affichent depuis le tableau de bord.",
+      "achievements": "Le catalogue navigable et le détail par succès arrivent avec `add-achievements-page`. En attendant, ceux que tu as débloqués sont sur ton profil."
+    },
+    "backToHome": "Retour au tableau de bord"
+  },
   "publicProfile": {
     "identityLabel": "Profil de {name}",
     "avatarLabel": "Avatar de {name}",

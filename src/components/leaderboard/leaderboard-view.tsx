@@ -1,8 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { TopChrome } from "@/components/layout/top-chrome";
 import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/types";
+import { useTranslations } from "next-intl";
 import { FloatingBalls } from "./floating-balls";
 import { LiveBadge } from "./live-badge";
 import { PodiumCard } from "./podium-card";
@@ -19,27 +19,26 @@ export function LeaderboardView({
   snapshot,
   user,
   events: _events,
+  /**
+   * `true` (default) → renderiza `<TopChrome>` + `<FloatingBalls>` para
+   * uso standalone en la landing pública. `false` → solo el contenido
+   * para anidarse dentro de un layout con shell propio (área logada).
+   */
+  withChrome = true,
 }: {
   snapshot: LeaderboardSnapshot;
-  /**
-   * Si hay sesión activa, el slot top-end muestra `<AccountMenu />`.
-   * Si no, muestra `<JoinCta />`.
-   */
   user: SessionUser | null;
-  /**
-   * Reservado para conexión SSE futura (`add-leaderboard-sse`).
-   * En esta iteración siempre llega vacía y la lista es estática.
-   */
   events?: LeaderboardEvent[];
+  withChrome?: boolean;
 }) {
   const t = useTranslations("leaderboard");
   const [first, second, third, ...rest] = snapshot.players;
 
   return (
     <>
-      <FloatingBalls count={7} />
-      <TopChrome user={user} />
-      <div className="relative z-10 w-full max-w-[510px]">
+      {withChrome && <FloatingBalls count={7} />}
+      {withChrome && <TopChrome user={user} />}
+      <div className="relative z-10 mx-auto w-full max-w-[510px]">
         <header className="mb-6 text-center opacity-0 [animation:popIn_0.7s_cubic-bezier(0.34,1.56,0.64,1)_forwards]">
           <div className="mb-2.5 flex items-center justify-center gap-3.5">
             <TrophyLogo className="animate-[trophyFloat_3.5s_ease-in-out_infinite] drop-shadow-[0_4px_20px_rgba(245,200,66,0.45)]" />
