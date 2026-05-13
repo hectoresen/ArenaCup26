@@ -2,7 +2,10 @@
 
 Plataforma social y competitiva alrededor del Mundial de Fútbol 2026, centrada en un **ranking en tiempo real** de usuarios que predicen partidos, completan desafíos y suman puntos.
 
-> Estado: **fase de entendimiento**. Sin código todavía. Las especificaciones se generan vía OpenSpec en `openspec/changes/`.
+> Estado: **construcción activa**. Panel `/inicio`, auth con Google, modelo de datos, scoring engine, pipeline de partidos y catálogo de logros operativos. Próximas piezas en `openspec/changes/`.
+>
+> **Empezar a hacer rodar el proyecto en local → [`docs/quickstart.md`](docs/quickstart.md).**
+> **Decisiones técnicas vigentes → [`docs/decisions.md`](docs/decisions.md).**
 
 ## Visión
 
