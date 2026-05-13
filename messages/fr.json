@@ -39,6 +39,67 @@
       "faqLink": "Comment ça marche ? Lire la FAQ →"
     }
   },
+  "dashboard": {
+    "greeting": "Salut, <em>{name}</em> 👋",
+    "greetingNew": "Bienvenue 👋",
+    "subtitle": "Tu es #{rank} sur {total} joueurs",
+    "subtitleNew": "Commence ta première prédiction",
+    "miniStats": {
+      "points": "Points",
+      "streak": "En série",
+      "streakNone": "Sans série",
+      "achievements": "Succès"
+    },
+    "sections": {
+      "live": "En direct",
+      "next": "Prochain match",
+      "upcoming": "◈ Prochains matchs",
+      "progress": "◈ Ta progression",
+      "miniLeaderboard": "◈ Top du moment"
+    },
+    "live": {
+      "badge": "En direct",
+      "minute": "Min. {minute}'",
+      "yourPrediction": "Ta prédiction",
+      "noPrediction": "Tu n'as pas prédit ce match",
+      "provisional": "Provisoire",
+      "computedAtEnd": "Calculé à la fin du match",
+      "ariaLive": "Match en direct: {home} {homeScore} – {awayScore} {away}, minute {minute}"
+    },
+    "next": {
+      "kickoffIn": "Coup d'envoi dans {countdown}",
+      "kickoffAt": "{date} · {time}"
+    },
+    "upcoming": {
+      "predictBadge": "Envoyée",
+      "predictEditable": "Modifiable",
+      "predictButton": "Prédire",
+      "tbdPending": "En attente",
+      "tbdLabel": "Équipes à déterminer",
+      "tbdRow": "? vs ?",
+      "versus": "vs",
+      "meta": "{date} · {time}",
+      "predictLabel": "Prédire le résultat de {home} vs {away}"
+    },
+    "progress": {
+      "achievementsLabel": "Succès débloqués",
+      "rankLabel": "Ta position globale",
+      "lastUnlocked": "Dernier: {title} · il y a {days, plural, =0 {aujourd'hui} =1 {1 j} other {# j}}",
+      "lastUnlockedNone": "Aucun débloqué encore",
+      "viewAll": "Voir tout",
+      "viewFullRanking": "Voir le classement complet",
+      "historyStarting": "Suivi à partir du 11 juin",
+      "rankDeltaUp": "▲ +{delta} places cette semaine",
+      "rankDeltaDown": "▼ {delta} places cette semaine",
+      "rankDeltaFlat": "Aucun changement cette semaine"
+    },
+    "miniLeaderboard": {
+      "viewFullRanking": "Voir le classement complet",
+      "youTag": "(toi)",
+      "ariaMyRow": "Ta position : numéro {rank}, {name}, {points} points",
+      "ariaRow": "Position {rank} : {name}, {points} points"
+    }
+  },
   "appShell": {
     "brand": {
       "year": "26",

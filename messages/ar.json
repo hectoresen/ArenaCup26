@@ -39,6 +39,67 @@
       "faqLink": "كيف يعمل؟ اقرأ الأسئلة الشائعة ←"
     }
   },
+  "dashboard": {
+    "greeting": "مرحبًا، <em>{name}</em> 👋",
+    "greetingNew": "مرحبًا بك 👋",
+    "subtitle": "أنت في المركز #{rank} من {total} لاعب",
+    "subtitleNew": "ابدأ بأول توقع لك",
+    "miniStats": {
+      "points": "النقاط",
+      "streak": "في سلسلة",
+      "streakNone": "بدون سلسلة",
+      "achievements": "الإنجازات"
+    },
+    "sections": {
+      "live": "مباشر الآن",
+      "next": "المباراة التالية",
+      "upcoming": "◈ المباريات القادمة",
+      "progress": "◈ تقدّمك",
+      "miniLeaderboard": "◈ أفضل اللاعبين الآن"
+    },
+    "live": {
+      "badge": "مباشر",
+      "minute": "الدقيقة {minute}'",
+      "yourPrediction": "توقعك",
+      "noPrediction": "لم تتوقع هذه المباراة",
+      "provisional": "مؤقت",
+      "computedAtEnd": "يُحتسب عند انتهاء المباراة",
+      "ariaLive": "مباراة مباشرة: {home} {homeScore} – {awayScore} {away}، الدقيقة {minute}"
+    },
+    "next": {
+      "kickoffIn": "ضربة البداية بعد {countdown}",
+      "kickoffAt": "{date} · {time}"
+    },
+    "upcoming": {
+      "predictBadge": "أُرسل",
+      "predictEditable": "قابل للتعديل",
+      "predictButton": "توقع",
+      "tbdPending": "معلّق",
+      "tbdLabel": "الفرق ستُحدَّد لاحقًا",
+      "tbdRow": "؟ ضد ؟",
+      "versus": "ضد",
+      "meta": "{date} · {time}",
+      "predictLabel": "توقّع نتيجة {home} ضد {away}"
+    },
+    "progress": {
+      "achievementsLabel": "الإنجازات المفتوحة",
+      "rankLabel": "ترتيبك العالمي",
+      "lastUnlocked": "آخر إنجاز: {title} · منذ {days, plural, =0 {اليوم} =1 {يوم} other {# أيام}}",
+      "lastUnlockedNone": "لا توجد إنجازات بعد",
+      "viewAll": "عرض الكل",
+      "viewFullRanking": "عرض الترتيب الكامل",
+      "historyStarting": "نبدأ التسجيل في 11 يونيو",
+      "rankDeltaUp": "▲ +{delta} مركز هذا الأسبوع",
+      "rankDeltaDown": "▼ {delta} مركز هذا الأسبوع",
+      "rankDeltaFlat": "بدون تغيير هذا الأسبوع"
+    },
+    "miniLeaderboard": {
+      "viewFullRanking": "عرض الترتيب الكامل",
+      "youTag": "(أنت)",
+      "ariaMyRow": "ترتيبك: رقم {rank}، {name}، {points} نقطة",
+      "ariaRow": "الترتيب {rank}: {name}، {points} نقطة"
+    }
+  },
   "appShell": {
     "brand": {
       "year": "26",

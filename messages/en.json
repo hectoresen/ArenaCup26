@@ -39,6 +39,67 @@
       "faqLink": "How does it work? Read the FAQ →"
     }
   },
+  "dashboard": {
+    "greeting": "Hi, <em>{name}</em> 👋",
+    "greetingNew": "Welcome 👋",
+    "subtitle": "You're #{rank} of {total} players",
+    "subtitleNew": "Start your first prediction",
+    "miniStats": {
+      "points": "Points",
+      "streak": "On fire",
+      "streakNone": "No streak",
+      "achievements": "Achievements"
+    },
+    "sections": {
+      "live": "Live now",
+      "next": "Next match",
+      "upcoming": "◈ Upcoming matches",
+      "progress": "◈ Your progress",
+      "miniLeaderboard": "◈ Top right now"
+    },
+    "live": {
+      "badge": "Live",
+      "minute": "Min. {minute}'",
+      "yourPrediction": "Your prediction",
+      "noPrediction": "You didn't predict this match",
+      "provisional": "Provisional",
+      "computedAtEnd": "Calculated when the match ends",
+      "ariaLive": "Live match: {home} {homeScore} – {awayScore} {away}, minute {minute}"
+    },
+    "next": {
+      "kickoffIn": "Kick-off in {countdown}",
+      "kickoffAt": "{date} · {time}"
+    },
+    "upcoming": {
+      "predictBadge": "Sent",
+      "predictEditable": "Editable",
+      "predictButton": "Predict",
+      "tbdPending": "Pending",
+      "tbdLabel": "Teams to be determined",
+      "tbdRow": "? vs ?",
+      "versus": "vs",
+      "meta": "{date} · {time}",
+      "predictLabel": "Predict result of {home} vs {away}"
+    },
+    "progress": {
+      "achievementsLabel": "Achievements unlocked",
+      "rankLabel": "Your global rank",
+      "lastUnlocked": "Last: {title} · {days, plural, =0 {today} =1 {1 d ago} other {# d ago}}",
+      "lastUnlockedNone": "Nothing unlocked yet",
+      "viewAll": "View all",
+      "viewFullRanking": "View full ranking",
+      "historyStarting": "We start tracking on June 11",
+      "rankDeltaUp": "▲ +{delta} positions this week",
+      "rankDeltaDown": "▼ {delta} positions this week",
+      "rankDeltaFlat": "No change this week"
+    },
+    "miniLeaderboard": {
+      "viewFullRanking": "View full ranking",
+      "youTag": "(you)",
+      "ariaMyRow": "Your position: number {rank}, {name}, {points} points",
+      "ariaRow": "Position {rank}: {name}, {points} points"
+    }
+  },
   "appShell": {
     "brand": {
       "year": "26",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPointsEs } from "./number";
+import { formatPoints, formatPointsEs } from "./number";
 
 describe("formatPointsEs", () => {
   it.each([
@@ -21,5 +21,18 @@ describe("formatPointsEs", () => {
 
   it("truncates fractional part (points are always integers)", () => {
     expect(formatPointsEs(4820.7)).toBe("4.820");
+  });
+});
+
+describe("formatPoints (locale-aware)", () => {
+  it.each([
+    ["es", 4820, "4.820"],
+    ["en", 4820, "4,820"],
+    ["fr", 4820, "4 820"],
+    ["ar", 4820, "4,820"],
+    ["es", 1000000, "1.000.000"],
+    ["fr", 1000000, "1 000 000"],
+  ] as const)("formatPoints(%s, %i) → %s", (locale, n, expected) => {
+    expect(formatPoints(n, locale)).toBe(expected);
   });
 });
