@@ -172,6 +172,7 @@ npm run db:studio
 | Banderas (🇲🇽, 🇦🇷) no se ven en Windows/WSL | El SO no incluye los pares de Regional Indicator. | El proyecto carga Noto Color Emoji como fallback en `<head>`; refresca con caché limpia. |
 | `npm test` rompe con `"4.820"` esperado y recibe `"4820"` | Build de Node con `small-icu`. | Ya cubierto por `formatPointsEs` (ver `docs/decisions.md` §10). Si pasa, abre issue. |
 | `db:migrate` falla con "relation already exists" | El schema fue creado antes con `db:push`. | Borra la BD: `docker compose down -v && docker compose up -d` y vuelve a empezar desde el paso 5. |
+| `Could not find the module ... in the React Client Manifest` o `Cannot find module './XXX.js'` en tiempo de dev | El cache de Next 15 (`.next/`) quedó desincronizado tras un cambio en caliente. Pasa típicamente al añadir rutas nuevas o cambiar callbacks de Auth.js sin reiniciar. | Para el dev server (Ctrl+C), `rm -rf .next`, `npm run dev`. |
 
 ## 13. Resetear todo (nuke local)
 
