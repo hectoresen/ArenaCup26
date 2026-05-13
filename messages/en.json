@@ -39,6 +39,31 @@
       "faqLink": "How does it work? Read the FAQ →"
     }
   },
+  "appShell": {
+    "brand": {
+      "year": "26",
+      "tag": "WC 26",
+      "logoAria": "WebMundial 26 — back to home"
+    },
+    "tabs": {
+      "home": "Home",
+      "matches": "Matches",
+      "ranking": "Ranking",
+      "achievements": "Achievements",
+      "sectionsLabel": "Sections",
+      "mobileLabel": "Mobile navigation"
+    },
+    "bell": {
+      "label": "Notifications",
+      "labelWithCount": "Notifications — {count} unread"
+    },
+    "avatar": {
+      "labelOf": "{name}'s avatar"
+    },
+    "nav": {
+      "main": "Main navigation"
+    }
+  },
   "accountMenu": {
     "openLabel": "Open account menu",
     "closeLabel": "Close account menu",

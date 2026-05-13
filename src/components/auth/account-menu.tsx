@@ -1,9 +1,9 @@
 "use client";
 
+import { Link } from "@/i18n/navigation";
 import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
-import { Link } from "@/i18n/navigation";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
 type SessionUser = {
   name?: string | null;
@@ -11,7 +11,20 @@ type SessionUser = {
   image?: string | null;
 };
 
-export function AccountMenu({ user }: { user: SessionUser }) {
+/**
+ * Si se pasa `trigger`, se usa como contenido del botón que abre el
+ * menú (en lugar del avatar + hamburger por defecto). Los hooks de
+ * estado, click-outside y escape siguen activos para que el dropdown
+ * funcione exactamente igual. El shell aprovecha esto para mostrar el
+ * `<AppAvatar>` con su ring conic dentro del top-nav.
+ */
+export function AccountMenu({
+  user,
+  trigger,
+}: {
+  user: SessionUser;
+  trigger?: ReactNode;
+}) {
   const t = useTranslations("accountMenu");
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -69,28 +82,31 @@ export function AccountMenu({ user }: { user: SessionUser }) {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={open ? t("closeLabel") : t("openLabel")}
-        className="flex cursor-pointer items-center gap-2 rounded-full border-2 border-gold/30 bg-card/90 px-2 py-1.5 backdrop-blur transition-colors hover:border-gold/50 hover:bg-card-hover/90"
+        className={
+          trigger
+            ? "flex cursor-pointer items-center rounded-full border-none bg-transparent p-0 transition-opacity hover:opacity-90"
+            : "flex cursor-pointer items-center gap-2 rounded-full border-2 border-gold/30 bg-card/90 px-2 py-1.5 backdrop-blur transition-colors hover:border-gold/50 hover:bg-card-hover/90"
+        }
       >
-        <span className="inline-flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-gold to-gold-deep font-display text-[11px] text-[#1a1000]">
-          {user.image ? (
-            // biome-ignore lint/performance/noImgElement: Next/image needs domain config; el avatar de Google es pequeño y cacheado.
-            <img src={user.image} alt="" className="h-full w-full object-cover" />
-          ) : (
-            fallbackInitials
-          )}
-        </span>
-        <svg
-          className="h-3.5 w-4 text-foreground/80"
-          viewBox="0 0 16 14"
-          aria-hidden="true"
-        >
-          <path
-            d="M2 3 H14 M2 7 H14 M2 11 H14"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
+        {trigger ?? (
+          <>
+            <span className="inline-flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-gold to-gold-deep font-display text-[11px] text-[#1a1000]">
+              {user.image ? (
+                <img src={user.image} alt="" className="h-full w-full object-cover" />
+              ) : (
+                fallbackInitials
+              )}
+            </span>
+            <svg className="h-3.5 w-4 text-foreground/80" viewBox="0 0 16 14" aria-hidden="true">
+              <path
+                d="M2 3 H14 M2 7 H14 M2 11 H14"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </>
+        )}
       </button>
 
       {open && (

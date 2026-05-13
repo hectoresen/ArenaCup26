@@ -39,6 +39,31 @@
       "faqLink": "كيف يعمل؟ اقرأ الأسئلة الشائعة ←"
     }
   },
+  "appShell": {
+    "brand": {
+      "year": "26",
+      "tag": "WC 26",
+      "logoAria": "ويب موندیال 26 — العودة إلى الرئيسية"
+    },
+    "tabs": {
+      "home": "الرئيسية",
+      "matches": "المباريات",
+      "ranking": "الترتيب",
+      "achievements": "الإنجازات",
+      "sectionsLabel": "الأقسام",
+      "mobileLabel": "تنقل الجوال"
+    },
+    "bell": {
+      "label": "الإشعارات",
+      "labelWithCount": "الإشعارات — {count} غير مقروءة"
+    },
+    "avatar": {
+      "labelOf": "الصورة الرمزية لـ {name}"
+    },
+    "nav": {
+      "main": "التنقل الرئيسي"
+    }
+  },
   "accountMenu": {
     "openLabel": "فتح قائمة الحساب",
     "closeLabel": "إغلاق قائمة الحساب",

@@ -39,6 +39,31 @@
       "faqLink": "¿Cómo funciona? Lee las preguntas frecuentes →"
     }
   },
+  "appShell": {
+    "brand": {
+      "year": "26",
+      "tag": "WC 26",
+      "logoAria": "WebMundial 26 — volver al inicio"
+    },
+    "tabs": {
+      "home": "Inicio",
+      "matches": "Partidos",
+      "ranking": "Ranking",
+      "achievements": "Logros",
+      "sectionsLabel": "Secciones",
+      "mobileLabel": "Navegación móvil"
+    },
+    "bell": {
+      "label": "Notificaciones",
+      "labelWithCount": "Notificaciones — {count} sin leer"
+    },
+    "avatar": {
+      "labelOf": "Avatar de {name}"
+    },
+    "nav": {
+      "main": "Navegación principal"
+    }
+  },
   "accountMenu": {
     "openLabel": "Abrir menú de cuenta",
     "closeLabel": "Cerrar menú de cuenta",
