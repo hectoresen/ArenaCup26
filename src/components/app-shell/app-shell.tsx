@@ -10,6 +10,7 @@ type SessionUser = {
   name?: string | null;
   email?: string | null;
   image?: string | null;
+  username?: string | null;
 };
 
 type Props = {

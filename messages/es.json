@@ -39,6 +39,34 @@
       "faqLink": "¿Cómo funciona? Lee las preguntas frecuentes →"
     }
   },
+  "publicProfile": {
+    "identityLabel": "Perfil de {name}",
+    "avatarLabel": "Avatar de {name}",
+    "flagAria": "País: {country}",
+    "copyLink": "Copiar enlace",
+    "copied": "¡Copiado!",
+    "rankLabel": "Tu posición",
+    "rankOfTotal": "de {total} jugadores",
+    "rankNone": "Sin actividad todavía",
+    "pointsLabel": "Puntos oficiales",
+    "weeklyDeltaUp": "▲ +{delta} esta semana",
+    "weeklyDeltaDown": "▼ {delta} esta semana",
+    "weeklyDeltaFlat": "Sin cambios esta semana",
+    "weeklyDeltaNone": "El histórico empieza el 11 de junio",
+    "accordionLabel": "Logros",
+    "unlockedCount": "{unlocked} de {total} desbloqueados",
+    "unlockedLabel": "Desbloqueado",
+    "lockedLabel": "Bloqueado",
+    "shareLabel": "Compartir logro",
+    "tier": {
+      "common": "Común",
+      "rare": "Poco común",
+      "epic": "Épico",
+      "legendary": "Legendario",
+      "mythic": "Mítico",
+      "goat": "GOAT"
+    }
+  },
   "dashboard": {
     "greeting": "Hola, <em>{name}</em> 👋",
     "greetingNew": "Bienvenido 👋",
@@ -130,6 +158,7 @@
     "closeLabel": "Cerrar menú de cuenta",
     "menuLabel": "Menú de cuenta",
     "fallbackName": "Usuario",
+    "profile": "Mi perfil",
     "faq": "Preguntas frecuentes",
     "signOut": "Cerrar sesión",
     "signingOut": "Cerrando sesión…"

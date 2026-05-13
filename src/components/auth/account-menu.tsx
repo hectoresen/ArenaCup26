@@ -9,6 +9,7 @@ type SessionUser = {
   name?: string | null;
   email?: string | null;
   image?: string | null;
+  username?: string | null;
 };
 
 /**
@@ -123,6 +124,30 @@ export function AccountMenu({
               <div className="truncate text-[11px] font-bold text-muted">{user.email}</div>
             )}
           </div>
+
+          {user.username && (
+            <Link
+              href={`/u/${user.username}`}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex w-full cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05]"
+            >
+              <svg
+                className="h-4 w-4 text-muted"
+                viewBox="0 0 16 16"
+                aria-hidden="true"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="8" cy="6" r="3" />
+                <path d="M2.5 14 a5.5 5.5 0 0 1 11 0" />
+              </svg>
+              {t("profile")}
+            </Link>
+          )}
 
           <Link
             href="/faq"

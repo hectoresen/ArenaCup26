@@ -39,6 +39,34 @@
       "faqLink": "كيف يعمل؟ اقرأ الأسئلة الشائعة ←"
     }
   },
+  "publicProfile": {
+    "identityLabel": "الملف الشخصي لـ {name}",
+    "avatarLabel": "الصورة الرمزية لـ {name}",
+    "flagAria": "البلد: {country}",
+    "copyLink": "نسخ الرابط",
+    "copied": "تم النسخ!",
+    "rankLabel": "الترتيب",
+    "rankOfTotal": "من {total} لاعب",
+    "rankNone": "لا نشاط بعد",
+    "pointsLabel": "النقاط الرسمية",
+    "weeklyDeltaUp": "▲ +{delta} هذا الأسبوع",
+    "weeklyDeltaDown": "▼ {delta} هذا الأسبوع",
+    "weeklyDeltaFlat": "بدون تغيير هذا الأسبوع",
+    "weeklyDeltaNone": "يبدأ التسجيل في 11 يونيو",
+    "accordionLabel": "الإنجازات",
+    "unlockedCount": "{unlocked} من {total} مفتوحة",
+    "unlockedLabel": "مفتوح",
+    "lockedLabel": "مغلق",
+    "shareLabel": "مشاركة الإنجاز",
+    "tier": {
+      "common": "شائع",
+      "rare": "نادر",
+      "epic": "ملحمي",
+      "legendary": "أسطوري",
+      "mythic": "أسطوري نادر",
+      "goat": "الأعظم"
+    }
+  },
   "dashboard": {
     "greeting": "مرحبًا، <em>{name}</em> 👋",
     "greetingNew": "مرحبًا بك 👋",
@@ -130,6 +158,7 @@
     "closeLabel": "إغلاق قائمة الحساب",
     "menuLabel": "قائمة الحساب",
     "fallbackName": "مستخدم",
+    "profile": "ملفي الشخصي",
     "faq": "الأسئلة الشائعة",
     "signOut": "تسجيل الخروج",
     "signingOut": "جارٍ تسجيل الخروج…"

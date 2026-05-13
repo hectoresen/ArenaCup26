@@ -39,6 +39,34 @@
       "faqLink": "How does it work? Read the FAQ →"
     }
   },
+  "publicProfile": {
+    "identityLabel": "{name}'s profile",
+    "avatarLabel": "{name}'s avatar",
+    "flagAria": "Country: {country}",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "rankLabel": "Rank",
+    "rankOfTotal": "of {total} players",
+    "rankNone": "No activity yet",
+    "pointsLabel": "Official points",
+    "weeklyDeltaUp": "▲ +{delta} this week",
+    "weeklyDeltaDown": "▼ {delta} this week",
+    "weeklyDeltaFlat": "No change this week",
+    "weeklyDeltaNone": "History starts on June 11",
+    "accordionLabel": "Achievements",
+    "unlockedCount": "{unlocked} of {total} unlocked",
+    "unlockedLabel": "Unlocked",
+    "lockedLabel": "Locked",
+    "shareLabel": "Share achievement",
+    "tier": {
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary",
+      "mythic": "Mythic",
+      "goat": "GOAT"
+    }
+  },
   "dashboard": {
     "greeting": "Hi, <em>{name}</em> 👋",
     "greetingNew": "Welcome 👋",
@@ -130,6 +158,7 @@
     "closeLabel": "Close account menu",
     "menuLabel": "Account menu",
     "fallbackName": "User",
+    "profile": "My profile",
     "faq": "Frequently asked questions",
     "signOut": "Sign out",
     "signingOut": "Signing out…"
