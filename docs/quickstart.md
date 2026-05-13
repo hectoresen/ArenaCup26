@@ -165,6 +165,7 @@ npm run db:studio
 | Síntoma | Causa probable | Fix |
 | --- | --- | --- |
 | `Invalid environment variables` al arrancar | Falta una key obligatoria en `.env`. | Revisa que `AUTH_SECRET`, `GOOGLE_CLIENT_*`, `DATABASE_URL` están rellenos. |
+| `Invalid environment variables` al correr `npm run seed:*` | `.env` no se está leyendo desde el script. | Los scripts `seed:*` ya pasan `--env-file=.env` a `tsx`. Si lo ves, asegúrate de estar en la raíz del repo (donde vive `.env`) cuando lances el comando. |
 | `redirect_uri_mismatch` en Google | La URL del callback no está autorizada. | Añade `http://localhost:3000/api/auth/callback/google` en Google Cloud Console → OAuth client → Authorized redirect URIs. |
 | `ECONNREFUSED 5432` | Postgres no está levantado. | `docker compose up -d`. |
 | `UntrustedHost` de Auth.js | Auth no confía en `localhost`. | En dev se confía automáticamente; si te aparece en prod, exporta `AUTH_TRUST_HOST=true`. |
