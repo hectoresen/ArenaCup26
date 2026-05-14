@@ -127,25 +127,27 @@ Los `fixtures` cubren la fase de "ver cómo se ve el diseño". Para probar la **
 ### 9.1 Forzar un partido en vivo
 
 ```bash
-docker compose exec postgres psql -U wmundial -d wmundial -c \
-  "UPDATE matches SET status='live', home_score=2, away_score=1 \
-   WHERE id = (SELECT id FROM matches ORDER BY kickoff_at LIMIT 1);"
+npm run dev:set-live                       # 1-0 al primer match futuro
+HOME_SCORE=2 AWAY_SCORE=1 npm run dev:set-live   # marcador custom
 ```
 
-Tras esto, el panel muestra la sección **En vivo ahora** con el marcador en lugar de **Próximo partido**.
+Tras esto, `/inicio` muestra la sección **En vivo ahora** con el marcador en lugar de **Próximo partido**.
 
-### 9.2 Probar el cron de sync (API-Football real)
+### 9.2 Sincronizar manualmente con API-Football real
 
-Con `API_FOOTBALL_KEY` en `.env`:
+> **No hay cron automático**. El backend NO sondea a la API en bucle. Cuando quieras refrescar partidos con datos reales, dispara el endpoint manualmente:
 
 ```bash
-# En dev sin CRON_SECRET aceptamos cualquier POST a localhost.
 curl -X POST http://localhost:3000/api/cron/sync-fixtures | jq
 ```
 
-Sin la key responde `500 provider_not_configured`. Con la key sincroniza la temporada configurada en `.env` (`MATCH_DATA_LEAGUE_ID`/`MATCH_DATA_SEASON`). Esto valida la lógica del reconciler contra datos reales.
+En dev sin `CRON_SECRET` configurado se acepta cualquier POST a localhost. Sin `API_FOOTBALL_KEY` responde `500 provider_not_configured`. Con la key sincroniza la temporada configurada en `.env` (`MATCH_DATA_LEAGUE_ID`/`MATCH_DATA_SEASON`). Cada llamada consume 1 request del cupo diario (100 en el free tier).
 
 > El plan free de api-football solo permite seasons 2022–2024. Para testear, pon `MATCH_DATA_SEASON=2022`.
+
+**Arquitectura real cuando aterrice `add-leaderboard-sse`**:
+- Backend ↔ API-Football: pull manual o cron a medida (no Vercel Cron automático).
+- Backend ↔ navegador: push vía Server-Sent Events. El usuario nunca espera datos.
 
 ## 10. Tests y validaciones
 

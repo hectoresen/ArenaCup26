@@ -186,11 +186,15 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
 - **Decisión**: si `snapshot.scoreAt90 === null`, el reconciler no incluye `homeScore`/`awayScore` en el patch.
 - **Razón**: cuando un partido entra en `live`, el provider deja `scoreAt90 = null` (todavía no es regulación final). Si sobreescribiéramos, perderíamos el marcador real previo. Lo mismo aplica a `scoreAtExtra` y a `penaltyWinner`.
 
-### 7.3 Cron `*/5 * * * *` en Vercel Cron
+### 7.3 Sync con API-Football: pull manual, NO cron automático
 
-- **Decisión**: `vercel.json` con un cron cada 5 minutos contra `POST /api/cron/sync-fixtures`. Header `Authorization: Bearer ${CRON_SECRET}`.
-- **Razón**: granularidad suficiente para SSE consumer del leaderboard sin agotar el cupo del provider (Pro = 7500 req/mes ⇒ ~10/h ⇒ holgado a 12/h).
-- **Revisar**: si en pretest el rate-limit del provider aprieta, bajar a `*/10`.
+- **Contexto**: el patrón "frontend ↔ backend ↔ provider" debe ser claro. Frontend va con push (SSE/WebSocket) hacia el backend; backend ↔ provider hace pull porque API-Football no expone webhooks ni websockets en ningún plan.
+- **Decisión (2026-05-14)**: el cron de Vercel está **desactivado**. `vercel.json` ya no declara crons. El endpoint `POST /api/cron/sync-fixtures` se mantiene operativo para disparo manual (con `curl`) o cron externo cuando aterrice `add-leaderboard-sse`.
+- **Razón**:
+  1. En fase de desarrollo no necesitamos un cron quemando cupo del free tier (100 req/día).
+  2. El cron automático sin SSE no aporta nada al usuario — los cambios en BD no llegan al navegador sin push.
+  3. Decisión de re-enable se tomará junto con la activación de SSE y midiendo cupo real del Mundial.
+- **Revisar cuando**: aterrice `add-leaderboard-sse`. Entonces se evalúa cadencia + cupo necesario y se vuelve a activar (probablemente con `*/15` durante kickoffs + off fuera de ventanas activas).
 
 ### 7.4 Cron handler puro separado del wiring Next
 
