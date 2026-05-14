@@ -51,27 +51,33 @@ Para entorno de pruebas con esa URL basta. Si más adelante quieres dominio prop
    ```
 3. Save. Cambios tardan unos minutos en propagar en Google.
 
-## 6. Aplicar el schema y datos de prueba
+## 6. Migraciones automáticas en cada deploy
 
-Desde tu máquina local con la `DATABASE_URL` de Railway (Postgres → tab `Variables` → `DATABASE_URL`):
+Configura Railway para que aplique las migraciones por ti antes de arrancar el server:
+
+1. En el servicio web → **Settings** → sección **Deploy** → campo **Pre-Deploy Command**.
+2. Pega: `npm run db:migrate`
+3. Save.
+
+Cada deploy ahora:
+1. Compila el código (`pnpm run build`).
+2. Aplica migraciones pendientes (`drizzle-kit migrate`) — solo las nuevas, las ya aplicadas se saltan automáticamente porque drizzle mantiene una tabla `__drizzle_migrations` con el journal.
+3. Si las migraciones fallan, el deploy se cancela (no arranca un server contra una BD inconsistente).
+4. Arranca `pnpm run start`.
+
+> No hagas `db:push` manual contra Railway. `db:push` empuja el schema sin journal y entra en conflicto con `migrate`. Usa solo `migrate` (que es lo que el pre-deploy lanza).
+
+### Datos de prueba (opcional)
+
+Una vez las tablas existen, siembra fixtures de demo desde tu máquina local apuntando a la BD pública de Railway:
 
 ```bash
-DATABASE_URL='<la-url-de-railway>' npm run db:push
+DATABASE_URL='<la-url-publica-de-postgres-de-railway>' npm run fixtures
 ```
 
-Aplica las 3 migraciones del schema. Verifica con:
-
-```bash
-DATABASE_URL='<la-url-de-railway>' npm run db:studio
-```
-
-Como es entorno de testing, **sí puedes sembrar fixtures de WC22 con fechas desplazadas** para ver datos en `/inicio`:
-
-```bash
-DATABASE_URL='<la-url-de-railway>' npm run fixtures
-```
-
-> Esto borra y recrea `teams` + `matches`. Si en algún momento conectas el sync real con api-football, los partidos del cron irán a las mismas tablas. No mezcles ambos enfoques en la misma BD.
+> La URL pública la sacas en Postgres → tab `Variables` → `DATABASE_PUBLIC_URL`. Si solo ves `DATABASE_URL` con un host interno (`containers-us-west`), activa Public Networking en Postgres → Settings.
+>
+> `fixtures` borra y recrea `teams` + `matches`. Si en algún momento conectas el sync real con api-football, los partidos del cron irán a las mismas tablas. No mezcles ambos enfoques en la misma BD.
 
 ## 7. Verificar
 

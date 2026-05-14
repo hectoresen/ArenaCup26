@@ -69,14 +69,14 @@ docker compose ps
 Hay dos opciones; elige una:
 
 ```bash
-# Opción A — migraciones versionadas (recomendado para casos reales)
-npm run db:migrate
-
-# Opción B — push directo del schema actual (más rápido para dev local)
+# Opción A — push directo del schema actual (más rápido para dev local)
 npm run db:push
+
+# Opción B — migraciones versionadas (lo que corre Railway en deploy)
+npm run db:migrate
 ```
 
-Ambas dejan la BD lista con las 14 tablas del modelo.
+Ambas dejan la BD lista con las 14 tablas del modelo. En local da igual cuál uses; **en Railway solo `db:migrate`** porque Railway lo lanza solo en el pre-deploy (ver `docs/deployment.md` §6).
 
 ## 6. Fixtures de dev
 

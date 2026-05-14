@@ -302,7 +302,18 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
   - Custom domain + SSL, backups automáticos diarios, PR environments para staging.
 - **Documentación operativa**: ver `docs/deployment.md`.
 
-### 12.2 Cron de sync deshabilitado en producción inicial
+### 12.2 Migraciones aplicadas en deploy, no a mano
+
+- **Contexto**: la primera vez que desplegamos en Railway las tablas no existían y el login fallaba con `relation "accounts" does not exist`. La opción "lanza `npm run db:push` desde tu máquina apuntando a la BD remota" funciona pero exige acordarse cada vez, y `db:push` no respeta el journal de migraciones.
+- **Decisión (2026-05-14)**: configurar **Pre-Deploy Command = `npm run db:migrate`** en Railway. El propio deploy aplica las migraciones pendientes antes de arrancar el server.
+- **Razón**:
+  1. Una sola fuente de verdad sobre cuándo se aplican (en el deploy).
+  2. `drizzle-kit migrate` respeta el journal — solo aplica las nuevas.
+  3. Si las migraciones fallan, el deploy se cancela: no se arranca un server contra una BD inconsistente.
+  4. Funciona igual en futuros entornos (cualquier copia o nuevo deploy se prepara solo).
+- **Caveat**: no mezclar `db:push` (sin journal) con `db:migrate` (con journal) sobre la misma BD. En Railway usamos exclusivamente `migrate`. En local sigue siendo válido `db:push` durante desarrollo iterativo.
+
+### 12.3 Cron de sync deshabilitado en producción inicial
 
 - **Decisión**: `vercel.json` sin crons (decisión 7.3). En Railway tampoco activamos cron automático en el primer despliegue. El endpoint `POST /api/cron/sync-fixtures` queda funcional para disparo manual con bearer.
 - **Razón**: hasta que aterrice `add-leaderboard-sse` el cron quema cupo de api-football sin que nadie observe los datos en tiempo real. Activar al mismo tiempo que SSE.
