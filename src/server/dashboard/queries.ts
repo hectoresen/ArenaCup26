@@ -11,6 +11,7 @@ import {
 } from "@/server/db/schema";
 import type { MatchStage } from "@/server/scoring/types";
 import { and, asc, desc, eq, gt, inArray, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { UPCOMING_LIMIT, buildMiniLeaderboard, sortUpcomingMatches } from "./transforms";
 import type {
   DashboardData,
@@ -175,25 +176,27 @@ export async function getLiveMatchForUser(
   db: Database,
   userId: string,
 ): Promise<LiveMatchView | null> {
-  const homeAlias = sql`home_team`;
-  const awayAlias = sql`away_team`;
-  // Usamos joins explícitos porque queremos los datos de los dos teams.
+  // Drizzle `alias()` para self-join (la misma tabla `teams` actúa
+  // como home y away). Sin esto el SQL generado colapsaría las
+  // columnas de los dos lados.
+  const homeTeam = alias(teams, "home_team");
+  const awayTeam = alias(teams, "away_team");
   const rows = await db
     .select({
       id: matches.id,
       stage: matches.stage,
       homeScore: matches.homeScore,
       awayScore: matches.awayScore,
-      homeTeamName: sql<string>`${homeAlias}.name`,
-      homeTeamCode: sql<string>`${homeAlias}.code`,
-      homeTeamFlag: sql<string | null>`${homeAlias}.flag`,
-      awayTeamName: sql<string>`${awayAlias}.name`,
-      awayTeamCode: sql<string>`${awayAlias}.code`,
-      awayTeamFlag: sql<string | null>`${awayAlias}.flag`,
+      homeTeamName: homeTeam.name,
+      homeTeamCode: homeTeam.code,
+      homeTeamFlag: homeTeam.flag,
+      awayTeamName: awayTeam.name,
+      awayTeamCode: awayTeam.code,
+      awayTeamFlag: awayTeam.flag,
     })
     .from(matches)
-    .innerJoin(sql`${teams} AS home_team`, sql`home_team.id = ${matches.homeTeamId}`)
-    .innerJoin(sql`${teams} AS away_team`, sql`away_team.id = ${matches.awayTeamId}`)
+    .innerJoin(homeTeam, eq(homeTeam.id, matches.homeTeamId))
+    .innerJoin(awayTeam, eq(awayTeam.id, matches.awayTeamId))
     .where(eq(matches.status, "live"))
     .orderBy(asc(matches.kickoffAt))
     .limit(1);
@@ -230,6 +233,8 @@ export async function getUpcomingMatches(
   userId: string,
   limit: number,
 ): Promise<UpcomingMatch[]> {
+  const homeTeam = alias(teams, "home_team");
+  const awayTeam = alias(teams, "away_team");
   const rows = await db
     .select({
       id: matches.id,
@@ -237,16 +242,16 @@ export async function getUpcomingMatches(
       kickoffAt: matches.kickoffAt,
       homeTeamId: matches.homeTeamId,
       awayTeamId: matches.awayTeamId,
-      homeTeamName: sql<string | null>`home_team.name`,
-      homeTeamCode: sql<string | null>`home_team.code`,
-      homeTeamFlag: sql<string | null>`home_team.flag`,
-      awayTeamName: sql<string | null>`away_team.name`,
-      awayTeamCode: sql<string | null>`away_team.code`,
-      awayTeamFlag: sql<string | null>`away_team.flag`,
+      homeTeamName: homeTeam.name,
+      homeTeamCode: homeTeam.code,
+      homeTeamFlag: homeTeam.flag,
+      awayTeamName: awayTeam.name,
+      awayTeamCode: awayTeam.code,
+      awayTeamFlag: awayTeam.flag,
     })
     .from(matches)
-    .leftJoin(sql`${teams} AS home_team`, sql`home_team.id = ${matches.homeTeamId}`)
-    .leftJoin(sql`${teams} AS away_team`, sql`away_team.id = ${matches.awayTeamId}`)
+    .leftJoin(homeTeam, eq(homeTeam.id, matches.homeTeamId))
+    .leftJoin(awayTeam, eq(awayTeam.id, matches.awayTeamId))
     .where(
       and(
         gt(matches.kickoffAt, sql`now()`),
