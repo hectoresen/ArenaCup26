@@ -43,6 +43,32 @@
     "title": "Your achievements",
     "subtitle": "{unlocked} of {total} unlocked"
   },
+  "history": {
+    "title": "Your history",
+    "subtitle": "{total} predictions · {correct} correct · {points} pts earned",
+    "yourPrediction": "Your prediction",
+    "pending": "Pending",
+    "miss": "0 pts",
+    "pts": "pts",
+    "predLocal": "Home",
+    "predAway": "Away",
+    "predDraw": "Draw",
+    "predDouble1x": "Double 1X",
+    "predDoubleX2": "Double X2",
+    "predDouble12": "Double 12",
+    "status": {
+      "finished": "Finished",
+      "live": "Live",
+      "scheduled": "Scheduled",
+      "postponed": "Postponed",
+      "cancelled": "Cancelled"
+    },
+    "empty": {
+      "title": "No predictions yet",
+      "body": "When you submit your first prediction, it will show up here with the result and the points you earned.",
+      "cta": "Go to matches"
+    }
+  },
   "matches": {
     "title": "Matches",
     "empty": {
@@ -285,6 +311,7 @@
     "menuLabel": "Account menu",
     "fallbackName": "User",
     "profile": "My profile",
+    "history": "My history",
     "faq": "Frequently asked questions",
     "signOut": "Sign out",
     "signingOut": "Signing out…"

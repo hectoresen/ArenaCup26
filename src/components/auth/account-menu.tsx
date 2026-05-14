@@ -150,6 +150,29 @@ export function AccountMenu({
           )}
 
           <Link
+            href="/historial"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05]"
+          >
+            <svg
+              className="h-4 w-4 text-muted"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M2.5 4 a5.5 5.5 0 1 1 1.2 5.5" />
+              <path d="M2 2 V5 H5" />
+              <path d="M8 5 V8 L10.5 9.5" />
+            </svg>
+            {t("history")}
+          </Link>
+
+          <Link
             href="/faq"
             role="menuitem"
             onClick={() => setOpen(false)}

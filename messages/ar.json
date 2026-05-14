@@ -43,6 +43,32 @@
     "title": "إنجازاتك",
     "subtitle": "{unlocked} من {total} مفتوحة"
   },
+  "history": {
+    "title": "سجلّك",
+    "subtitle": "{total} توقّعات · {correct} صحيحة · {points} نقاط مكتسبة",
+    "yourPrediction": "توقّعك",
+    "pending": "قيد الانتظار",
+    "miss": "0 نقاط",
+    "pts": "نقاط",
+    "predLocal": "المضيف",
+    "predAway": "الضيف",
+    "predDraw": "تعادل",
+    "predDouble1x": "مزدوج 1X",
+    "predDoubleX2": "مزدوج X2",
+    "predDouble12": "مزدوج 12",
+    "status": {
+      "finished": "انتهت",
+      "live": "مباشر",
+      "scheduled": "مجدولة",
+      "postponed": "مؤجّلة",
+      "cancelled": "ملغاة"
+    },
+    "empty": {
+      "title": "لا توجد توقّعات بعد",
+      "body": "عندما ترسل أول توقّع لك، سيظهر هنا مع نتيجته والنقاط التي حصلت عليها.",
+      "cta": "اذهب إلى المباريات"
+    }
+  },
   "matches": {
     "title": "المباريات",
     "empty": {
@@ -285,6 +311,7 @@
     "menuLabel": "قائمة الحساب",
     "fallbackName": "مستخدم",
     "profile": "ملفي الشخصي",
+    "history": "سجلّي",
     "faq": "الأسئلة الشائعة",
     "signOut": "تسجيل الخروج",
     "signingOut": "جارٍ تسجيل الخروج…"

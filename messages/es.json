@@ -43,6 +43,32 @@
     "title": "Tus logros",
     "subtitle": "{unlocked} de {total} desbloqueados"
   },
+  "history": {
+    "title": "Tu historial",
+    "subtitle": "{total} predicciones · {correct} aciertos · {points} pts ganados",
+    "yourPrediction": "Tu predicción",
+    "pending": "Pendiente",
+    "miss": "0 pts",
+    "pts": "pts",
+    "predLocal": "Local",
+    "predAway": "Visitante",
+    "predDraw": "Empate",
+    "predDouble1x": "Doble 1X",
+    "predDoubleX2": "Doble X2",
+    "predDouble12": "Doble 12",
+    "status": {
+      "finished": "Finalizado",
+      "live": "En vivo",
+      "scheduled": "Programado",
+      "postponed": "Aplazado",
+      "cancelled": "Cancelado"
+    },
+    "empty": {
+      "title": "Aún no has predicho nada",
+      "body": "Cuando hagas tu primera predicción, aparecerá aquí con su resultado y los puntos que ganaste.",
+      "cta": "Ir a partidos"
+    }
+  },
   "matches": {
     "title": "Partidos",
     "empty": {
@@ -285,6 +311,7 @@
     "menuLabel": "Menú de cuenta",
     "fallbackName": "Usuario",
     "profile": "Mi perfil",
+    "history": "Mi historial",
     "faq": "Preguntas frecuentes",
     "signOut": "Cerrar sesión",
     "signingOut": "Cerrando sesión…"
