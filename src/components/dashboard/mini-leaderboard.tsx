@@ -33,7 +33,7 @@ export function MiniLeaderboard({ mini }: Props) {
       <div className="mt-2 pr-1 text-right">
         <button
           type="button"
-          className="inline-flex items-center gap-1 border-0 bg-transparent p-0 text-xs font-extrabold text-gold transition-[gap] hover:gap-2"
+          className="inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-xs font-extrabold text-gold transition-[gap] hover:gap-2"
         >
           {t("viewFullRanking")} <span aria-hidden="true">→</span>
         </button>

@@ -1,6 +1,7 @@
-import { type SupportedLocale, formatMatchDate, formatMatchTime } from "@/lib/format/date";
-import type { UpcomingHeroView } from "@/server/dashboard/types";
 import { useLocale, useTranslations } from "next-intl";
+import { formatMatchDate, formatMatchTime, type SupportedLocale } from "@/lib/format/date";
+import { Link } from "@/i18n/navigation";
+import type { PredictionView, UpcomingHeroView } from "@/server/dashboard/types";
 
 type Props = {
   next: UpcomingHeroView;
@@ -10,8 +11,10 @@ type Props = {
 
 /**
  * Card "Próximo partido" — se muestra cuando no hay live ahora pero
- * sí hay un partido próximo. Layout más sobrio que la live (sin
- * glow), enfocado en informar del kickoff.
+ * sí hay un partido próximo. Click → detalle del partido.
+ *
+ * Si el usuario ya envió una predicción para ese partido, la muestra
+ * resumida como chip verde. Si no, muestra un CTA "Predecir".
  */
 export function UpcomingHeroCard({ next, now }: Props) {
   const t = useTranslations("dashboard.next");
@@ -20,9 +23,10 @@ export function UpcomingHeroCard({ next, now }: Props) {
   const time = formatMatchTime(next.kickoffAt);
 
   return (
-    <article
+    <Link
+      href={`/partidos/${next.matchId}` as never}
       aria-label={t("kickoffAt", { date, time })}
-      className="rounded-2xl border-2 border-border bg-card px-4 py-4 [animation:fadeUp_0.5s_ease_0.18s_forwards] opacity-0"
+      className="block cursor-pointer rounded-2xl border-2 border-border bg-card px-4 py-4 no-underline transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-[2px] hover:border-gold/30 hover:shadow-[0_8px_24px_rgba(245,200,66,0.1)] [animation:fadeUp_0.5s_ease_0.18s_forwards] opacity-0"
     >
       <div className="mb-3 text-[10px] font-black uppercase tracking-[0.14em] text-muted">
         {t("kickoffAt", { date, time })}
@@ -32,7 +36,9 @@ export function UpcomingHeroCard({ next, now }: Props) {
         <span className="font-display text-2xl text-muted">vs</span>
         <Team name={next.awayTeam.name} flag={next.awayTeam.flag ?? next.awayTeam.code} />
       </div>
-    </article>
+
+      <PredictionRow prediction={next.prediction} home={next.homeTeam.name} away={next.awayTeam.name} />
+    </Link>
   );
 }
 
@@ -43,6 +49,59 @@ function Team({ name, flag }: { name: string; flag: string | null }) {
         {flag ?? "🏳️"}
       </span>
       <span className="text-center text-xs font-extrabold text-foreground">{name}</span>
+    </div>
+  );
+}
+
+function PredictionRow({
+  prediction,
+  home,
+  away,
+}: {
+  prediction: PredictionView | null;
+  home: string;
+  away: string;
+}) {
+  const t = useTranslations("dashboard.next");
+  const tSum = useTranslations("predictions.summary");
+
+  if (prediction === null) {
+    return (
+      <div className="mt-4 text-center text-[12px] font-extrabold text-gold">
+        {t("predictCta")} →
+      </div>
+    );
+  }
+
+  const summary = (() => {
+    switch (prediction.kind) {
+      case "exact":
+        return tSum("exact", {
+          home,
+          away,
+          homeScore: prediction.predictedHomeScore ?? 0,
+          awayScore: prediction.predictedAwayScore ?? 0,
+        });
+      case "simple":
+        if (prediction.predictedWinner === "home") return tSum("teamWins", { team: home });
+        if (prediction.predictedWinner === "away") return tSum("teamWins", { team: away });
+        return tSum("draw");
+      case "double-1x":
+        return tSum("teamOrDraw", { team: home });
+      case "double-x2":
+        return tSum("teamOrDraw", { team: away });
+      case "double-12":
+        // Legacy: ya no se permite crear, pero datos viejos podrían existir.
+        return `${home} / ${away}`;
+    }
+  })();
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center justify-center gap-2 rounded-xl border-[1.5px] border-success/30 bg-success/10 px-3 py-2">
+      <span className="text-[10px] font-black uppercase tracking-[0.1em] text-success">
+        ✓ {t("predictionSent")}
+      </span>
+      <span className="text-[12px] font-bold text-foreground">{summary}</span>
     </div>
   );
 }

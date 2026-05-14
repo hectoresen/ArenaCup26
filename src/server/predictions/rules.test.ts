@@ -2,14 +2,18 @@ import { describe, expect, it } from "vitest";
 import { allowedKindsForStage, isPredictionWindowOpen, validatePrediction } from "./rules";
 
 describe("allowedKindsForStage", () => {
-  it("group permits all 5 kinds", () => {
+  it("group permits simple + exact + the two doubles that cover the draw", () => {
     expect([...allowedKindsForStage("group")]).toEqual([
       "simple",
       "exact",
       "double-1x",
       "double-x2",
-      "double-12",
     ]);
+  });
+
+  it("double-12 ('gana cualquiera') is no longer allowed anywhere", () => {
+    expect([...allowedKindsForStage("group")]).not.toContain("double-12");
+    expect([...allowedKindsForStage("final")]).not.toContain("double-12");
   });
 
   it.each(["round-of-16", "quarter", "semi", "third-place", "final"] as const)(
@@ -163,7 +167,7 @@ describe("validatePrediction — exact", () => {
 });
 
 describe("validatePrediction — doubles", () => {
-  it.each(["double-1x", "double-x2", "double-12"] as const)("%s with no extras passes", (kind) => {
+  it.each(["double-1x", "double-x2"] as const)("%s with no extras passes", (kind) => {
     expect(
       validatePrediction(
         {

@@ -57,7 +57,7 @@ export function MatchPanelCard({ match, now }: Props) {
   return (
     <Link
       href={`/partidos/${match.matchId}` as never}
-      className={`group block rounded-2xl border-2 px-4 py-4 no-underline transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(245,200,66,0.1)] ${
+      className={`group block cursor-pointer rounded-2xl border-2 px-4 py-4 no-underline transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(245,200,66,0.1)] ${
         match.status === "live"
           ? "border-danger/30 bg-card hover:border-danger/50"
           : match.status === "finished"

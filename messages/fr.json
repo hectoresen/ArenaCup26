@@ -99,22 +99,29 @@
   "predictions": {
     "titleNew": "Fais ta prédiction",
     "titleEdit": "Modifie ta prédiction",
+    "subtitle": "Choisis une option. Le score exact rapporte plus de points.",
+    "optionsLabel": "Options de prédiction",
     "submitNew": "Envoyer la prédiction",
     "submitEdit": "Enregistrer les modifs",
     "submitting": "Enregistrement…",
     "savedOk": "Prédiction enregistrée",
     "draw": "Match nul",
-    "kind": {
-      "simple": "Simple",
-      "exact": "Score exact",
-      "double-1x": "1X (domicile ou nul)",
-      "double-x2": "X2 (nul ou extérieur)",
-      "double-12": "12 (l'une des deux équipes gagne)"
+    "option": {
+      "teamWins": "{team} gagne",
+      "draw": "Match nul",
+      "teamOrDraw": "{team} gagne ou nul",
+      "exact": "Score exact"
     },
-    "doubleHint": {
-      "double-1x": "Deux sur trois : domicile ou nul. Si l'un des deux se produit, tu gagnes (+5 pts).",
-      "double-x2": "Deux sur trois : nul ou extérieur. Si l'un des deux se produit, tu gagnes (+5 pts).",
-      "double-12": "Deux sur trois : n'importe quelle équipe gagne. S'il n'y a pas de nul, tu gagnes (+5 pts)."
+    "bonus": {
+      "simple": "+10 pts si correct",
+      "exact": "+30 pts si correct",
+      "double": "+5 pts si correct"
+    },
+    "summary": {
+      "teamWins": "{team} gagne",
+      "draw": "Match nul",
+      "teamOrDraw": "{team} ou nul",
+      "exact": "{home} {homeScore}–{awayScore} {away}"
     },
     "errors": {
       "fallback": "Impossible d'enregistrer la prédiction. Réessaie.",
@@ -187,7 +194,9 @@
     },
     "next": {
       "kickoffIn": "Coup d'envoi dans {countdown}",
-      "kickoffAt": "{date} · {time}"
+      "kickoffAt": "{date} · {time}",
+      "predictCta": "Prédire",
+      "predictionSent": "Ta prédiction"
     },
     "upcoming": {
       "predictBadge": "Envoyée",

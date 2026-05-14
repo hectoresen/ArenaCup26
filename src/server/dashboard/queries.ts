@@ -51,19 +51,29 @@ export async function getDashboardData(db: Database, userId: string): Promise<Da
     countAchievementDefinitions(db),
   ]);
 
-  const upcoming = sortUpcomingMatches(upcomingRaw).slice(0, UPCOMING_LIMIT);
+  const sortedAll = sortUpcomingMatches(upcomingRaw);
 
   // Si no hay live, el primer próximo se promueve a "hero card".
+  const nextSource = sortedAll[0];
   const nextMatch: UpcomingHeroView | null =
-    live === null && upcoming[0] && upcoming[0].homeTeam && upcoming[0].awayTeam
+    live === null && nextSource && nextSource.homeTeam && nextSource.awayTeam
       ? {
-          matchId: upcoming[0].matchId,
-          stage: upcoming[0].stage,
-          kickoffAt: upcoming[0].kickoffAt,
-          homeTeam: upcoming[0].homeTeam,
-          awayTeam: upcoming[0].awayTeam,
+          matchId: nextSource.matchId,
+          stage: nextSource.stage,
+          kickoffAt: nextSource.kickoffAt,
+          homeTeam: nextSource.homeTeam,
+          awayTeam: nextSource.awayTeam,
+          prediction: nextSource.prediction,
         }
       : null;
+
+  // El match que ocupa la "hero card" no se duplica en la lista de
+  // próximos. La lista mantiene su tamaño (UPCOMING_LIMIT) excluyendo
+  // ese matchId — pedimos algunos extra arriba para no quedarnos
+  // cortos cuando excluimos.
+  const upcoming = sortedAll
+    .filter((m) => m.matchId !== nextMatch?.matchId)
+    .slice(0, UPCOMING_LIMIT);
 
   return {
     userName,

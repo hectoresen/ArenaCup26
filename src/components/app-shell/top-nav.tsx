@@ -55,7 +55,7 @@ export function TopNav({ trailing }: Props) {
               href={tab.href}
               prefetch
               aria-current={active ? "page" : undefined}
-              className={`flex items-center gap-1.5 whitespace-nowrap rounded-[10px] border-[1.5px] px-3.5 py-1.5 text-[13px] font-extrabold no-underline transition-colors ${
+              className={`flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-[10px] border-[1.5px] px-3.5 py-1.5 text-[13px] font-extrabold no-underline transition-colors ${
                 active
                   ? "border-gold/25 bg-gold/10 text-gold"
                   : "border-transparent text-muted hover:bg-white/[0.05] hover:text-foreground"

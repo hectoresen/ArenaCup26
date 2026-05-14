@@ -18,9 +18,10 @@ function buildMatch(overrides: Partial<UpcomingMatch> = {}): UpcomingMatch {
 }
 
 describe("<MatchCard>", () => {
-  it("renders 'Predecir' button when no prediction exists", () => {
+  it("renders 'Predecir' affordance when no prediction exists", () => {
     renderWithProviders(<MatchCard match={buildMatch()} now={NOW} />);
-    expect(screen.getByRole("button", { name: /Predecir resultado/ })).toBeInTheDocument();
+    // El card entero es un <Link>; el chip "Predecir" es decorativo.
+    expect(screen.getByLabelText(/Predecir resultado/)).toBeInTheDocument();
   });
 
   it("renders 'Enviada' badge when prediction exists", () => {
@@ -111,7 +112,7 @@ describe("<MatchCard>", () => {
 
   it("renders an aria-label with both team names and the date", () => {
     renderWithProviders(<MatchCard match={buildMatch()} now={NOW} />);
-    // El article es role=listitem con aria-label.
-    expect(screen.getByRole("listitem", { name: /Argentina vs México/ })).toBeInTheDocument();
+    // El card es ahora un <Link> al detalle.
+    expect(screen.getByRole("link", { name: /Argentina vs México/ })).toBeInTheDocument();
   });
 });

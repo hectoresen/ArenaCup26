@@ -99,22 +99,29 @@
   "predictions": {
     "titleNew": "Make your prediction",
     "titleEdit": "Edit your prediction",
+    "subtitle": "Pick one option. Going for the exact score earns more points.",
+    "optionsLabel": "Prediction options",
     "submitNew": "Submit prediction",
     "submitEdit": "Save changes",
     "submitting": "Saving…",
     "savedOk": "Prediction saved",
     "draw": "Draw",
-    "kind": {
-      "simple": "Simple",
-      "exact": "Exact score",
-      "double-1x": "1X (home or draw)",
-      "double-x2": "X2 (draw or away)",
-      "double-12": "12 (either team wins)"
+    "option": {
+      "teamWins": "{team} wins",
+      "draw": "Draw",
+      "teamOrDraw": "{team} wins or draw",
+      "exact": "Exact score"
     },
-    "doubleHint": {
-      "double-1x": "Two of three: home or draw. If either happens, you win (+5 pts).",
-      "double-x2": "Two of three: draw or away. If either happens, you win (+5 pts).",
-      "double-12": "Two of three: either team wins. If there's no draw, you win (+5 pts)."
+    "bonus": {
+      "simple": "+10 pts if correct",
+      "exact": "+30 pts if correct",
+      "double": "+5 pts if correct"
+    },
+    "summary": {
+      "teamWins": "{team} wins",
+      "draw": "Draw",
+      "teamOrDraw": "{team} or draw",
+      "exact": "{home} {homeScore}–{awayScore} {away}"
     },
     "errors": {
       "fallback": "Couldn't save the prediction. Try again.",
@@ -187,7 +194,9 @@
     },
     "next": {
       "kickoffIn": "Kick-off in {countdown}",
-      "kickoffAt": "{date} · {time}"
+      "kickoffAt": "{date} · {time}",
+      "predictCta": "Predict",
+      "predictionSent": "Your prediction"
     },
     "upcoming": {
       "predictBadge": "Sent",

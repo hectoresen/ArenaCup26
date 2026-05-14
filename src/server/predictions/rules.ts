@@ -19,20 +19,23 @@ const KNOCKOUT_STAGES = new Set<MatchStage>([
 /**
  * Qué `kind` de predicción permite cada etapa.
  *
- * - En **fase de grupos**: todos. El empate es válido como simple y
- *   las dobles 1X/X2 que cubren el empate también.
+ * - En **fase de grupos**: simple (home/draw/away), exact y las dos
+ *   dobles que cubren el empate (1X = local-o-empate, X2 =
+ *   empate-o-visitante). NO se permite `double-12` ("gana cualquiera")
+ *   — retirada por feedback de UX: no es una predicción significativa
+ *   ("casi siempre acierto"). Si llega del cliente, validamos como
+ *   `kind_not_allowed_for_stage`. El enum DB la mantiene por
+ *   compatibilidad con datos históricos.
  * - En **eliminatoria** (round-of-16+): solo simple `home`/`away` y
  *   `exact`. No hay empate oficial (siempre hay un ganador tras
  *   prórroga o penales), así que ni simple-draw ni dobles tienen
  *   sentido.
- *
- * Pure function — no lee BD.
  */
 export function allowedKindsForStage(stage: MatchStage): readonly PredictionKind[] {
   if (KNOCKOUT_STAGES.has(stage)) {
     return ["simple", "exact"] as const;
   }
-  return ["simple", "exact", "double-1x", "double-x2", "double-12"] as const;
+  return ["simple", "exact", "double-1x", "double-x2"] as const;
 }
 
 export type PredictionValidationResult =

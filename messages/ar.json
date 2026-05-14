@@ -99,22 +99,29 @@
   "predictions": {
     "titleNew": "ضع توقعك",
     "titleEdit": "عدّل توقعك",
+    "subtitle": "اختر خيارًا. النتيجة الدقيقة تمنحك نقاطًا أكثر.",
+    "optionsLabel": "خيارات التوقع",
     "submitNew": "إرسال التوقع",
     "submitEdit": "حفظ التغييرات",
     "submitting": "جاري الحفظ…",
     "savedOk": "تم حفظ التوقع",
     "draw": "تعادل",
-    "kind": {
-      "simple": "بسيط",
-      "exact": "نتيجة دقيقة",
-      "double-1x": "1X (المضيف أو تعادل)",
-      "double-x2": "X2 (تعادل أو الضيف)",
-      "double-12": "12 (يفوز أحد الفريقين)"
+    "option": {
+      "teamWins": "فوز {team}",
+      "draw": "تعادل",
+      "teamOrDraw": "فوز {team} أو تعادل",
+      "exact": "نتيجة دقيقة"
     },
-    "doubleHint": {
-      "double-1x": "اثنان من ثلاثة: المضيف أو تعادل. إذا حصل أحدهما، تربح (+5 نقاط).",
-      "double-x2": "اثنان من ثلاثة: تعادل أو الضيف. إذا حصل أحدهما، تربح (+5 نقاط).",
-      "double-12": "اثنان من ثلاثة: يفوز أحد الفريقين. إذا لم يكن هناك تعادل، تربح (+5 نقاط)."
+    "bonus": {
+      "simple": "+10 نقاط إن أصبت",
+      "exact": "+30 نقطة إن أصبت",
+      "double": "+5 نقاط إن أصبت"
+    },
+    "summary": {
+      "teamWins": "فوز {team}",
+      "draw": "تعادل",
+      "teamOrDraw": "{team} أو تعادل",
+      "exact": "{home} {homeScore}–{awayScore} {away}"
     },
     "errors": {
       "fallback": "تعذّر حفظ التوقع. أعد المحاولة.",
@@ -187,7 +194,9 @@
     },
     "next": {
       "kickoffIn": "ضربة البداية بعد {countdown}",
-      "kickoffAt": "{date} · {time}"
+      "kickoffAt": "{date} · {time}",
+      "predictCta": "توقّع",
+      "predictionSent": "توقعك"
     },
     "upcoming": {
       "predictBadge": "أُرسل",

@@ -27,6 +27,7 @@ const nextMatch: UpcomingHeroView = {
   kickoffAt: new Date("2026-06-12T21:00:00Z"),
   homeTeam: { name: "Argentina", flag: "🇦🇷", code: "ARG" },
   awayTeam: { name: "México", flag: "🇲🇽", code: "MEX" },
+  prediction: null,
 };
 
 describe("<LiveSection>", () => {

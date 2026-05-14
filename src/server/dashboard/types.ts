@@ -49,6 +49,7 @@ export type UpcomingHeroView = {
   kickoffAt: Date;
   homeTeam: TeamView;
   awayTeam: TeamView;
+  prediction: PredictionView | null;
 };
 
 export type UpcomingMatch = {

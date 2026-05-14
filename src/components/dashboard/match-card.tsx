@@ -1,7 +1,8 @@
-import { type SupportedLocale, formatMatchDate, formatMatchTime } from "@/lib/format/date";
+import { useLocale, useTranslations } from "next-intl";
+import { formatMatchDate, formatMatchTime, type SupportedLocale } from "@/lib/format/date";
+import { Link } from "@/i18n/navigation";
 import { isMatchTBD } from "@/server/dashboard/transforms";
 import type { PredictionView, UpcomingMatch } from "@/server/dashboard/types";
-import { useLocale, useTranslations } from "next-intl";
 
 type Props = {
   match: UpcomingMatch;
@@ -29,8 +30,6 @@ export function MatchCard({ match, now }: Props) {
   if (tbd) {
     return (
       <article
-        // biome-ignore lint/a11y/useSemanticElements: el `<article>` puede estar dentro de un `<ul>/<li>` o aislado en otros contextos (modal, hero); usamos role para que ambos casos lean bien.
-        role="listitem"
         aria-disabled="true"
         aria-label={t("tbdLabel")}
         className="flex cursor-not-allowed items-center gap-3.5 rounded-[14px] border-2 border-border bg-card px-4 py-3.5 opacity-45 [filter:grayscale(0.65)]"
@@ -58,11 +57,10 @@ export function MatchCard({ match, now }: Props) {
   const away = match.awayTeam;
 
   return (
-    <article
-      // biome-ignore lint/a11y/useSemanticElements: ver nota arriba; el role permite usar este card también fuera de un `<ul>`.
-      role="listitem"
+    <Link
+      href={`/partidos/${match.matchId}` as never}
       aria-label={`${home.name} vs ${away.name} — ${date} ${time}`}
-      className="group flex cursor-pointer items-center gap-3.5 rounded-[14px] border-2 border-border bg-card px-4 py-3.5 transition-[transform,border-color] duration-200 hover:-translate-y-[3px] hover:border-gold/30"
+      className="group flex cursor-pointer items-center gap-3.5 rounded-[14px] border-2 border-border bg-card px-4 py-3.5 no-underline transition-[transform,border-color] duration-200 hover:-translate-y-[3px] hover:border-gold/30"
     >
       <div className="min-w-0 flex-1">
         <div className="text-sm font-extrabold text-foreground">
@@ -79,16 +77,15 @@ export function MatchCard({ match, now }: Props) {
         {match.prediction ? (
           <PredictedTrailing prediction={match.prediction} />
         ) : (
-          <button
-            type="button"
+          <span
             aria-label={t("predictLabel", { home: home.name, away: away.name })}
-            className="rounded-[10px] border-2 border-gold/40 bg-transparent px-4 py-1.5 text-[13px] font-extrabold text-gold transition-colors hover:border-gold hover:bg-gold/10"
+            className="inline-flex cursor-pointer items-center rounded-[10px] border-2 border-gold/40 px-4 py-1.5 text-[13px] font-extrabold text-gold transition-colors group-hover:border-gold group-hover:bg-gold/10"
           >
             {t("predictButton")}
-          </button>
+          </span>
         )}
       </div>
-    </article>
+    </Link>
   );
 }
 

@@ -28,7 +28,7 @@ export function CopyLinkButton({ className }: { className?: string }) {
       type="button"
       onClick={handleClick}
       aria-label={t("copyLink")}
-      className={`inline-flex items-center gap-1.5 rounded-full border-2 border-gold/30 bg-card/80 px-3 py-1 text-xs font-extrabold text-gold transition-colors hover:border-gold/60 hover:bg-card-hover/80 ${className ?? ""}`}
+      className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border-2 border-gold/30 bg-card/80 px-3 py-1 text-xs font-extrabold text-gold transition-colors hover:border-gold/60 hover:bg-card-hover/80 ${className ?? ""}`}
     >
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <rect x="3" y="5" width="9" height="9" rx="2" stroke="currentColor" strokeWidth="1.5" />
