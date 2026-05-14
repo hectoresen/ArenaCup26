@@ -86,6 +86,48 @@
       "titleNew": "Predicción",
       "titleEdit": "Tu predicción",
       "body": "El formulario para predecir simple, exacto o doble está en camino. Mientras tanto puedes ver el detalle del partido aquí."
+    },
+    "closedWindow": {
+      "title": {
+        "started": "Ventana cerrada",
+        "locked": "Bloqueado por la app"
+      },
+      "bodyHadPrediction": "Tu predicción se guardó antes del kick-off y se está evaluando.",
+      "bodyNoPrediction": "Las predicciones se cierran al sonar el pitido inicial. La próxima vez no te lo pienses."
+    }
+  },
+  "predictions": {
+    "titleNew": "Haz tu predicción",
+    "titleEdit": "Edita tu predicción",
+    "submitNew": "Enviar predicción",
+    "submitEdit": "Guardar cambios",
+    "submitting": "Guardando…",
+    "savedOk": "Predicción guardada",
+    "draw": "Empate",
+    "kind": {
+      "simple": "Acierto simple",
+      "exact": "Marcador exacto",
+      "double-1x": "1X (local o empate)",
+      "double-x2": "X2 (empate o visitante)",
+      "double-12": "12 (cualquier equipo gana)"
+    },
+    "doubleHint": {
+      "double-1x": "Cubres dos de tres: local o empate. Si ocurre uno de los dos, aciertas (+5 pts).",
+      "double-x2": "Cubres dos de tres: empate o visitante. Si ocurre uno de los dos, aciertas (+5 pts).",
+      "double-12": "Cubres dos de tres: gana cualquiera de los dos equipos. Si no hay empate, aciertas (+5 pts)."
+    },
+    "errors": {
+      "fallback": "No se ha podido guardar la predicción. Inténtalo de nuevo.",
+      "match_not_found": "El partido no existe o ha sido eliminado.",
+      "match_window_closed": "El partido ya empezó. Las predicciones se cierran al kick-off.",
+      "match_already_started": "El partido ya empezó. Las predicciones se cierran al kick-off.",
+      "kind_not_allowed_for_stage": "Este tipo de predicción no aplica a esta etapa.",
+      "simple_missing_winner": "Elige uno de los tres resultados.",
+      "simple_draw_in_knockout": "En eliminatoria no hay empate oficial. Elige local o visitante.",
+      "exact_missing_scores": "Indica el marcador de ambos equipos.",
+      "exact_negative_scores": "Los goles no pueden ser negativos.",
+      "exact_unreasonable_scores": "Ese marcador es poco realista. Prueba algo más razonable.",
+      "double_has_winner_or_scores": "Las dobles no llevan marcador ni ganador concreto."
     }
   },
   "publicProfile": {

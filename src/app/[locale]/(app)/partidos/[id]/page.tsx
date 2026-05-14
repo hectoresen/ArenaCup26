@@ -2,10 +2,13 @@ import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { MatchDetailHero } from "@/components/matches/match-detail-hero";
+import { PredictionForm } from "@/components/predictions/prediction-form";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { getMatchById } from "@/server/matches/queries";
+import { isPredictionWindowOpen } from "@/server/predictions/rules";
+import { submitPredictionAction } from "./actions";
 
 export default async function MatchDetailPage({
   params,
@@ -21,11 +24,28 @@ export default async function MatchDetailPage({
   const match = await getMatchById(db, id, session.user.id);
   if (!match) notFound();
 
+  const canPredict =
+    isPredictionWindowOpen(match.kickoffAt) &&
+    (match.status === "scheduled" || match.status === "scheduled-tbd") &&
+    match.homeTeam !== null &&
+    match.awayTeam !== null;
+
   return (
     <>
       <BackLink />
       <MatchDetailHero match={match} />
-      <PredictionPlaceholder hasPrediction={match.prediction !== null} />
+      {canPredict ? (
+        <PredictionForm
+          matchId={match.matchId}
+          stage={match.stage}
+          homeTeamName={match.homeTeam?.name ?? "—"}
+          awayTeamName={match.awayTeam?.name ?? "—"}
+          initial={match.prediction}
+          onSubmit={submitPredictionAction}
+        />
+      ) : (
+        <ClosedPredictionBanner status={match.status} hasPrediction={match.prediction !== null} />
+      )}
     </>
   );
 }
@@ -43,18 +63,24 @@ function BackLink() {
 }
 
 /**
- * Placeholder del formulario de predicción. Lo sustituirá el componente
- * real de `add-prediction-flow` (tarea siguiente).
+ * Banner cuando la ventana de predicción está cerrada (kickoff
+ * pasado, live, finished, etc.). Si el user tenía predicción la
+ * mostramos a modo informativo.
  */
-function PredictionPlaceholder({ hasPrediction }: { hasPrediction: boolean }) {
-  const t = useTranslations("matches.predictionStub");
+function ClosedPredictionBanner({
+  status,
+  hasPrediction,
+}: {
+  status: string;
+  hasPrediction: boolean;
+}) {
+  const t = useTranslations("matches.closedWindow");
+  const key = status === "live" || status === "finished" ? "started" : "locked";
   return (
     <article className="mt-4 rounded-2xl border-2 border-border bg-card px-5 py-5 text-center">
-      <div className="mb-2 font-display text-base text-gold">
-        {hasPrediction ? t("titleEdit") : t("titleNew")}
-      </div>
+      <div className="mb-2 font-display text-base text-muted">{t(`title.${key}`)}</div>
       <p className="mx-auto max-w-xs text-[12px] font-bold leading-snug text-muted">
-        {t("body")}
+        {hasPrediction ? t("bodyHadPrediction") : t("bodyNoPrediction")}
       </p>
     </article>
   );

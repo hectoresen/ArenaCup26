@@ -86,6 +86,48 @@
       "titleNew": "Prédiction",
       "titleEdit": "Ta prédiction",
       "body": "Le formulaire pour soumettre des prédictions simple/exacte/double arrive. En attendant, voici le détail du match."
+    },
+    "closedWindow": {
+      "title": {
+        "started": "Fenêtre fermée",
+        "locked": "Verrouillé par l'app"
+      },
+      "bodyHadPrediction": "Ta prédiction a été sauvegardée avant le coup d'envoi et elle s'évalue.",
+      "bodyNoPrediction": "Les prédictions se ferment au coup d'envoi. La prochaine fois, n'attends pas."
+    }
+  },
+  "predictions": {
+    "titleNew": "Fais ta prédiction",
+    "titleEdit": "Modifie ta prédiction",
+    "submitNew": "Envoyer la prédiction",
+    "submitEdit": "Enregistrer les modifs",
+    "submitting": "Enregistrement…",
+    "savedOk": "Prédiction enregistrée",
+    "draw": "Match nul",
+    "kind": {
+      "simple": "Simple",
+      "exact": "Score exact",
+      "double-1x": "1X (domicile ou nul)",
+      "double-x2": "X2 (nul ou extérieur)",
+      "double-12": "12 (l'une des deux équipes gagne)"
+    },
+    "doubleHint": {
+      "double-1x": "Deux sur trois : domicile ou nul. Si l'un des deux se produit, tu gagnes (+5 pts).",
+      "double-x2": "Deux sur trois : nul ou extérieur. Si l'un des deux se produit, tu gagnes (+5 pts).",
+      "double-12": "Deux sur trois : n'importe quelle équipe gagne. S'il n'y a pas de nul, tu gagnes (+5 pts)."
+    },
+    "errors": {
+      "fallback": "Impossible d'enregistrer la prédiction. Réessaie.",
+      "match_not_found": "Match introuvable ou supprimé.",
+      "match_window_closed": "Le match a déjà commencé. Les prédictions ferment au coup d'envoi.",
+      "match_already_started": "Le match a déjà commencé. Les prédictions ferment au coup d'envoi.",
+      "kind_not_allowed_for_stage": "Ce type de prédiction ne s'applique pas à cette étape.",
+      "simple_missing_winner": "Choisis l'un des trois résultats.",
+      "simple_draw_in_knockout": "Pas de match nul officiel en élimination. Choisis domicile ou extérieur.",
+      "exact_missing_scores": "Indique les scores des deux équipes.",
+      "exact_negative_scores": "Les buts ne peuvent pas être négatifs.",
+      "exact_unreasonable_scores": "Ce score est irréaliste. Essaie quelque chose de plus raisonnable.",
+      "double_has_winner_or_scores": "Les doubles ne portent pas de score ni de vainqueur précis."
     }
   },
   "publicProfile": {

@@ -86,6 +86,48 @@
       "titleNew": "Prediction",
       "titleEdit": "Your prediction",
       "body": "The form to submit simple/exact/double predictions is on the way. Meanwhile you can see the match detail here."
+    },
+    "closedWindow": {
+      "title": {
+        "started": "Window closed",
+        "locked": "Locked by the app"
+      },
+      "bodyHadPrediction": "Your prediction was saved before kick-off and it's being scored.",
+      "bodyNoPrediction": "Predictions close at the kick-off whistle. Don't sleep on it next time."
+    }
+  },
+  "predictions": {
+    "titleNew": "Make your prediction",
+    "titleEdit": "Edit your prediction",
+    "submitNew": "Submit prediction",
+    "submitEdit": "Save changes",
+    "submitting": "Saving…",
+    "savedOk": "Prediction saved",
+    "draw": "Draw",
+    "kind": {
+      "simple": "Simple",
+      "exact": "Exact score",
+      "double-1x": "1X (home or draw)",
+      "double-x2": "X2 (draw or away)",
+      "double-12": "12 (either team wins)"
+    },
+    "doubleHint": {
+      "double-1x": "Two of three: home or draw. If either happens, you win (+5 pts).",
+      "double-x2": "Two of three: draw or away. If either happens, you win (+5 pts).",
+      "double-12": "Two of three: either team wins. If there's no draw, you win (+5 pts)."
+    },
+    "errors": {
+      "fallback": "Couldn't save the prediction. Try again.",
+      "match_not_found": "Match not found or removed.",
+      "match_window_closed": "The match already started. Predictions close at kick-off.",
+      "match_already_started": "The match already started. Predictions close at kick-off.",
+      "kind_not_allowed_for_stage": "This prediction kind doesn't apply to this stage.",
+      "simple_missing_winner": "Pick one of the three outcomes.",
+      "simple_draw_in_knockout": "There's no official draw in knockouts. Pick home or away.",
+      "exact_missing_scores": "Set both team scores.",
+      "exact_negative_scores": "Goals can't be negative.",
+      "exact_unreasonable_scores": "That score is unrealistic. Try something more reasonable.",
+      "double_has_winner_or_scores": "Doubles don't carry a specific score or winner."
     }
   },
   "publicProfile": {
