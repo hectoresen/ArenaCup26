@@ -1,6 +1,6 @@
-import { sql } from "drizzle-orm";
-import { db } from "@/server/db/client";
 import { getUpcomingMatches } from "@/server/dashboard/queries";
+import { db } from "@/server/db/client";
+import { sql } from "drizzle-orm";
 
 /**
  * Diagnóstico rápido para entender por qué /inicio no muestra

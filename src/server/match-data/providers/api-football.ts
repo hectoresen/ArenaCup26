@@ -1,8 +1,8 @@
 import {
   type GetFixturesOptions,
   type MatchDataProvider,
-  type ProviderErrorCode,
   ProviderError,
+  type ProviderErrorCode,
   type ProviderMatch,
 } from "../types";
 import { type ApiFootballFixture, parseApiFootballFixture } from "./api-football.parser";

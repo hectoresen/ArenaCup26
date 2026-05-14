@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { renderWithProviders, screen } from "@/test/render-with-providers";
 import type { Player } from "@/lib/leaderboard/types";
+import { renderWithProviders, screen } from "@/test/render-with-providers";
+import { describe, expect, it } from "vitest";
 import { RankRow } from "./rank-row";
 
 const basePlayer: Player = {

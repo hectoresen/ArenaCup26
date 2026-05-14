@@ -13,6 +13,11 @@ vi.mock("@/components/app-shell/app-shell", () => ({
     <div data-testid="app-shell">{children}</div>
   ),
 }));
+vi.mock("@/server/db/client", () => ({ db: {} }));
+vi.mock("@/server/notifications/queries", () => ({
+  getNotificationsForUser: async () => ({ items: [], unreadCount: 0 }),
+}));
+vi.mock("./_actions", () => ({ markAllReadAction: async () => {} }));
 
 const { default: AppGroupLayout } = await import("./layout");
 
@@ -55,7 +60,7 @@ describe("(app) layout — auth guard", () => {
 
   it("renders the AppShell when there IS a session", async () => {
     authMock.mockResolvedValueOnce({
-      user: { name: "Carlos Mendoza", email: "c@example.com", image: null },
+      user: { id: "user-1", name: "Carlos Mendoza", email: "c@example.com", image: null },
     });
     const el = await AppGroupLayout({
       children: <div data-testid="child">page-content</div>,

@@ -232,21 +232,18 @@ describe("scoreMatchPrediction", () => {
       ["12", 2, 0, true, "home wins → 12 covers"],
       ["12", 0, 2, true, "away wins → 12 covers"],
       ["12", 1, 1, false, "draw → 12 miss"],
-    ] as const)(
-      "double-%s on %d-%d → %s (%s)",
-      (kind, home, away, hits, _label) => {
-        const result = scoreMatchPrediction(group(home, away), dbl(kind), NO_STREAK);
-        if (hits) {
-          expect(result.points).toBe(5);
-          expect(result.kind).toBe("double");
-          expect(result.streakAfter).toEqual({ current: 1, containsDouble: true });
-        } else {
-          expect(result.kind).toBe("miss");
-          expect(result.points).toBe(0);
-          expect(result.streakAfter).toEqual({ current: 0, containsDouble: false });
-        }
-      },
-    );
+    ] as const)("double-%s on %d-%d → %s (%s)", (kind, home, away, hits, _label) => {
+      const result = scoreMatchPrediction(group(home, away), dbl(kind), NO_STREAK);
+      if (hits) {
+        expect(result.points).toBe(5);
+        expect(result.kind).toBe("double");
+        expect(result.streakAfter).toEqual({ current: 1, containsDouble: true });
+      } else {
+        expect(result.kind).toBe("miss");
+        expect(result.points).toBe(0);
+        expect(result.streakAfter).toEqual({ current: 0, containsDouble: false });
+      }
+    });
   });
 
   // ─────────────────────── ELIMINATORIA · SIMPLE ────────────────────────

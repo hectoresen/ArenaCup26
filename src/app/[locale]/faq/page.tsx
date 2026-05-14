@@ -1,11 +1,11 @@
-import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
 import { FaqItem } from "@/components/faq/faq-item";
 import { ScoringTable } from "@/components/faq/scoring-table";
 import { TopChrome } from "@/components/layout/top-chrome";
 import { FloatingBalls } from "@/components/leaderboard/floating-balls";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
+import { useTranslations } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 
 const QUESTION_IDS = [
   "doublePrediction",
@@ -27,9 +27,7 @@ export default async function FaqPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const session = await auth();
-  return (
-    <FaqPageContent user={session?.user ?? null} />
-  );
+  return <FaqPageContent user={session?.user ?? null} />;
 }
 
 function FaqPageContent({
@@ -52,10 +50,7 @@ function FaqPageContent({
         <ScoringTable />
 
         <section className="mt-10" aria-labelledby="faq-questions-title">
-          <h2
-            id="faq-questions-title"
-            className="mb-1 font-display text-xl text-gold sm:text-2xl"
-          >
+          <h2 id="faq-questions-title" className="mb-1 font-display text-xl text-gold sm:text-2xl">
             {t("questions.title")}
           </h2>
           <p className="mb-4 text-sm font-bold text-muted">{t("questions.subtitle")}</p>

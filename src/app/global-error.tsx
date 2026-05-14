@@ -67,8 +67,7 @@ export default function GlobalError({
         <div style={codeStyle}>!</div>
         <h1 style={titleStyle}>Something went wrong</h1>
         <p style={descriptionStyle}>
-          A critical error occurred and the application could not recover. Please reload
-          the page.
+          A critical error occurred and the application could not recover. Please reload the page.
         </p>
         <button type="button" style={buttonStyle} onClick={reset}>
           Reload

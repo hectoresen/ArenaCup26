@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { parseApiFootballFixture, parseStage } from "./api-football.parser";
 import {
   GROUP_DRAW_RAW,
   KO_EXTRA_TIME_HOME_WIN_RAW,
@@ -9,6 +8,7 @@ import {
   SCHEDULED_RAW,
   WC2022_FINAL_RAW,
 } from "./api-football.fixtures";
+import { parseApiFootballFixture, parseStage } from "./api-football.parser";
 
 describe("parseStage", () => {
   it.each([

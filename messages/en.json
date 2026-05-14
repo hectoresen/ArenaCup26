@@ -235,7 +235,18 @@
     },
     "bell": {
       "label": "Notifications",
-      "labelWithCount": "Notifications — {count} unread"
+      "labelWithCount": "Notifications — {count} unread",
+      "dropdown": {
+        "title": "Notifications",
+        "empty": "Nothing here yet.",
+        "kind": {
+          "prediction_sent": "Prediction sent",
+          "prediction_locked": "Prediction locked",
+          "match_finished": "Match finished",
+          "achievement_unlocked": "Achievement unlocked",
+          "system": "System"
+        }
+      }
     },
     "avatar": {
       "labelOf": "{name}'s avatar"

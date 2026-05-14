@@ -1,6 +1,3 @@
-import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
-import { notFound, redirect } from "next/navigation";
 import { MatchDetailHero } from "@/components/matches/match-detail-hero";
 import { PredictionForm } from "@/components/predictions/prediction-form";
 import { Link } from "@/i18n/navigation";
@@ -8,6 +5,9 @@ import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { getMatchById } from "@/server/matches/queries";
 import { isPredictionWindowOpen } from "@/server/predictions/rules";
+import { useTranslations } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import { notFound, redirect } from "next/navigation";
 import { submitPredictionAction } from "./actions";
 
 export default async function MatchDetailPage({

@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { db } from "@/server/db/client";
 import { createApiFootballProvider } from "@/server/match-data/providers/api-football";
 import { createMatchRepo } from "@/server/match-data/sync/repo";
 import { syncFixtures } from "@/server/match-data/sync/sync";
+import { NextResponse } from "next/server";
 import { handleCronRequest } from "./handler";
 
 export async function POST(req: Request) {

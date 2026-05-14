@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { matchExternalIds, matches, teamExternalIds } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 import type {
   CurrentMatchRow,
   DbMatchStatus,

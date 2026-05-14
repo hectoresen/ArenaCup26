@@ -103,8 +103,7 @@ export function parseStage(round: string | null | undefined): MatchStage | null 
   if (lower.includes("semi")) return "semi";
   if (lower.includes("3rd place") || lower.includes("third place") || lower.includes("third-place"))
     return "third-place";
-  if (lower === "final" || lower.endsWith("- final") || lower.endsWith(" final"))
-    return "final";
+  if (lower === "final" || lower.endsWith("- final") || lower.endsWith(" final")) return "final";
   return null;
 }
 
@@ -173,9 +172,7 @@ function extractScoreAt90(
  *
  * Devolvemos null si no hubo prórroga (extratime con ambos lados null).
  */
-function extractScoreAtExtra(
-  raw: ApiFootballFixture,
-): { home: number; away: number } | null {
+function extractScoreAtExtra(raw: ApiFootballFixture): { home: number; away: number } | null {
   const et = raw.score.extratime;
   if (et.home === null || et.away === null) return null;
   // Hay prórroga: el marcador acumulado coincide con `goals` (que api-football
@@ -189,9 +186,7 @@ function extractScoreAtExtra(
   return { home: raw.goals.home, away: raw.goals.away };
 }
 
-function extractPenaltyWinner(
-  raw: ApiFootballFixture,
-): "home" | "away" | null {
+function extractPenaltyWinner(raw: ApiFootballFixture): "home" | "away" | null {
   const pen = raw.score.penalty;
   if (pen.home === null || pen.away === null) return null;
   if (pen.home > pen.away) return "home";

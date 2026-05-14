@@ -1,5 +1,5 @@
-import { ProviderError } from "@/server/match-data/types";
 import type { SyncReport } from "@/server/match-data/sync/types";
+import { ProviderError } from "@/server/match-data/types";
 
 export type CronHandlerEnv = {
   CRON_SECRET: string | undefined;
@@ -18,7 +18,9 @@ export type CronResponse =
   | { status: 405; body: { error: "method_not_allowed" } }
   | {
       status: 500;
-      body: { error: "provider_not_configured"; detail: string } | { error: "internal_error"; message: string };
+      body:
+        | { error: "provider_not_configured"; detail: string }
+        | { error: "internal_error"; message: string };
     }
   | { status: 502; body: { error: "provider_failed"; code: string; message: string } };
 

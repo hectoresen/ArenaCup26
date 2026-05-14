@@ -1,10 +1,10 @@
-import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
-import { redirect } from "next/navigation";
 import { MatchesList } from "@/components/matches/matches-list";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { getAllMatches } from "@/server/matches/queries";
+import { useTranslations } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 /**
  * Listado de todos los partidos disponibles, agrupados por día.
@@ -41,9 +41,7 @@ function PartidosLayout({
   return (
     <>
       <header className="mb-6">
-        <h1 className="mb-1 font-display text-[26px] leading-none text-foreground">
-          {t("title")}
-        </h1>
+        <h1 className="mb-1 font-display text-[26px] leading-none text-foreground">{t("title")}</h1>
         <p className="text-[13px] font-bold text-muted">
           {count} {count === 1 ? t("matchCount.one") : t("matchCount.many")}
         </p>

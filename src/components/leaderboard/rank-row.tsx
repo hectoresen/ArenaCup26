@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
 import { formatPointsEs } from "@/lib/format/number";
 import type { Player } from "@/lib/leaderboard/types";
+import { useTranslations } from "next-intl";
 
 function arrow(delta: number) {
   if (delta > 0) return "▲";
@@ -41,7 +41,10 @@ export function RankRow({ player, index = 0 }: { player: Player; index?: number 
       />
       <div className="flex flex-col items-center justify-center gap-px">
         <span className="font-display text-xl leading-none text-foreground">{player.rank}</span>
-        <span aria-hidden="true" className={`text-[9px] font-black leading-none ${deltaClass(delta)}`}>
+        <span
+          aria-hidden="true"
+          className={`text-[9px] font-black leading-none ${deltaClass(delta)}`}
+        >
           {arrow(delta)}
         </span>
       </div>

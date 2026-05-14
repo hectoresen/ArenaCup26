@@ -1,9 +1,9 @@
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+import type { PredictionView, TeamView } from "@/server/dashboard/types";
 import type { Database } from "@/server/db/client";
 import { matches, predictions, teams } from "@/server/db/schema";
-import type { PredictionView, TeamView } from "@/server/dashboard/types";
 import type { MatchStage, MatchStatus } from "@/server/scoring/types";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import type { MatchDetail, MatchListItem } from "./types";
 
 function teamView(row: {
@@ -30,9 +30,7 @@ async function fetchPredictionMap(
       predictedAwayScore: predictions.predictedAwayScore,
     })
     .from(predictions)
-    .where(
-      and(eq(predictions.userId, userId), inArray(predictions.matchId, matchIds)),
-    );
+    .where(and(eq(predictions.userId, userId), inArray(predictions.matchId, matchIds)));
   return new Map(
     rows.map((r) => [
       r.matchId,
@@ -51,10 +49,7 @@ async function fetchPredictionMap(
  * `kickoffAt` ASC. Para una BD con cientos de partidos esto debería
  * paginarse, pero hoy (24 partidos del seed) basta así.
  */
-export async function getAllMatches(
-  db: Database,
-  userId: string,
-): Promise<MatchListItem[]> {
+export async function getAllMatches(db: Database, userId: string): Promise<MatchListItem[]> {
   const homeTeam = alias(teams, "home_team");
   const awayTeam = alias(teams, "away_team");
   const rows = await db

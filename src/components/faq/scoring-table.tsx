@@ -41,10 +41,7 @@ export function ScoringTable() {
   const t = useTranslations("faq.scoring");
   return (
     <section className="mt-8" aria-labelledby="faq-scoring-title">
-      <h2
-        id="faq-scoring-title"
-        className="mb-1 font-display text-xl text-gold sm:text-2xl"
-      >
+      <h2 id="faq-scoring-title" className="mb-1 font-display text-xl text-gold sm:text-2xl">
         {t("title")}
       </h2>
       <p className="mb-4 text-sm font-bold text-muted">{t("subtitle")}</p>

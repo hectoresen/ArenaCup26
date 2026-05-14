@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
-import { ProviderError } from "@/server/match-data/types";
 import type { SyncReport } from "@/server/match-data/sync/types";
-import { handleCronRequest, type CronHandlerEnv } from "./handler";
+import { ProviderError } from "@/server/match-data/types";
+import { describe, expect, it, vi } from "vitest";
+import { type CronHandlerEnv, handleCronRequest } from "./handler";
 
 const EMPTY_REPORT: SyncReport = {
   source: "api-football",
@@ -23,7 +23,7 @@ function buildReq({
     method,
     headers: {
       get: (name: string) =>
-        name.toLowerCase() === "authorization" ? authorization ?? null : null,
+        name.toLowerCase() === "authorization" ? (authorization ?? null) : null,
     },
   };
 }
@@ -59,10 +59,10 @@ describe("handleCronRequest — auth", () => {
   });
 
   it("returns 401 when bearer token doesn't match", async () => {
-    const result = await handleCronRequest(
-      buildReq({ authorization: "Bearer wrong" }),
-      { env: PROD_ENV, runSync: async () => EMPTY_REPORT },
-    );
+    const result = await handleCronRequest(buildReq({ authorization: "Bearer wrong" }), {
+      env: PROD_ENV,
+      runSync: async () => EMPTY_REPORT,
+    });
     expect(result.status).toBe(401);
   });
 
@@ -83,10 +83,10 @@ describe("handleCronRequest — auth", () => {
   });
 
   it("accepts request when bearer token matches", async () => {
-    const result = await handleCronRequest(
-      buildReq({ authorization: "Bearer topsecret" }),
-      { env: PROD_ENV, runSync: async () => EMPTY_REPORT },
-    );
+    const result = await handleCronRequest(buildReq({ authorization: "Bearer topsecret" }), {
+      env: PROD_ENV,
+      runSync: async () => EMPTY_REPORT,
+    });
     expect(result.status).toBe(200);
     expect(result.body).toEqual(EMPTY_REPORT);
   });
@@ -94,13 +94,10 @@ describe("handleCronRequest — auth", () => {
 
 describe("handleCronRequest — outcomes", () => {
   it("returns 500 if API_FOOTBALL_KEY is missing", async () => {
-    const result = await handleCronRequest(
-      buildReq({ authorization: "Bearer topsecret" }),
-      {
-        env: { ...PROD_ENV, API_FOOTBALL_KEY: undefined },
-        runSync: async () => EMPTY_REPORT,
-      },
-    );
+    const result = await handleCronRequest(buildReq({ authorization: "Bearer topsecret" }), {
+      env: { ...PROD_ENV, API_FOOTBALL_KEY: undefined },
+      runSync: async () => EMPTY_REPORT,
+    });
     expect(result.status).toBe(500);
     if (result.status === 500) {
       expect(result.body).toMatchObject({ error: "provider_not_configured" });
@@ -111,10 +108,10 @@ describe("handleCronRequest — outcomes", () => {
     const runSync = vi.fn(async () => {
       throw new ProviderError("plan limited", "api-football", "plan_limited");
     });
-    const result = await handleCronRequest(
-      buildReq({ authorization: "Bearer topsecret" }),
-      { env: PROD_ENV, runSync },
-    );
+    const result = await handleCronRequest(buildReq({ authorization: "Bearer topsecret" }), {
+      env: PROD_ENV,
+      runSync,
+    });
     expect(result.status).toBe(502);
     if (result.status === 502) {
       expect(result.body.code).toBe("plan_limited");
@@ -126,10 +123,10 @@ describe("handleCronRequest — outcomes", () => {
     const runSync = vi.fn(async () => {
       throw new Error("connection refused");
     });
-    const result = await handleCronRequest(
-      buildReq({ authorization: "Bearer topsecret" }),
-      { env: PROD_ENV, runSync },
-    );
+    const result = await handleCronRequest(buildReq({ authorization: "Bearer topsecret" }), {
+      env: PROD_ENV,
+      runSync,
+    });
     expect(result.status).toBe(500);
     if (result.status === 500) {
       expect(result.body).toMatchObject({ error: "internal_error", message: "connection refused" });
@@ -145,10 +142,10 @@ describe("handleCronRequest — outcomes", () => {
       skipped: 0,
       errors: [],
     };
-    const result = await handleCronRequest(
-      buildReq({ authorization: "Bearer topsecret" }),
-      { env: PROD_ENV, runSync: async () => report },
-    );
+    const result = await handleCronRequest(buildReq({ authorization: "Bearer topsecret" }), {
+      env: PROD_ENV,
+      runSync: async () => report,
+    });
     expect(result.status).toBe(200);
     expect(result.body).toEqual(report);
   });

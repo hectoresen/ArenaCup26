@@ -62,6 +62,14 @@ export const pointEventKindEnum = pgEnum("point_event_kind", [
   "referral",
 ]);
 
+export const notificationKindEnum = pgEnum("notification_kind", [
+  "prediction_sent",
+  "prediction_locked",
+  "match_finished",
+  "achievement_unlocked",
+  "system",
+]);
+
 // ─── USERS & AUTH (Auth.js compatible) ─────────────────────
 
 export const users = pgTable(
@@ -265,6 +273,33 @@ export const pointEvents = pgTable(
   },
   (table) => ({
     userIdx: index("point_events_user_idx").on(table.userId),
+  }),
+);
+
+// ─── NOTIFICATIONS ─────────────────────────────────────────
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: notificationKindEnum("kind").notNull(),
+    // `title` y `body` se guardan en es (idioma por defecto). En el
+    // futuro podemos guardar un `templateKey` + `params` para
+    // renderizar en el locale del usuario al leer.
+    title: text("title").notNull(),
+    body: text("body"),
+    // Referencias opcionales para deep-link desde el dropdown.
+    matchId: uuid("match_id").references(() => matches.id, { onDelete: "set null" }),
+    achievementId: text("achievement_id"),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    userCreatedIdx: index("notifications_user_created_idx").on(table.userId, table.createdAt),
+    userUnreadIdx: index("notifications_user_unread_idx").on(table.userId, table.readAt),
   }),
 );
 

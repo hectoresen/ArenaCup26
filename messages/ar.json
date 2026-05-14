@@ -235,7 +235,18 @@
     },
     "bell": {
       "label": "الإشعارات",
-      "labelWithCount": "الإشعارات — {count} غير مقروءة"
+      "labelWithCount": "الإشعارات — {count} غير مقروءة",
+      "dropdown": {
+        "title": "الإشعارات",
+        "empty": "لا شيء هنا بعد.",
+        "kind": {
+          "prediction_sent": "تم إرسال التوقع",
+          "prediction_locked": "تم قفل التوقع",
+          "match_finished": "انتهت المباراة",
+          "achievement_unlocked": "تم فتح إنجاز",
+          "system": "النظام"
+        }
+      }
     },
     "avatar": {
       "labelOf": "الصورة الرمزية لـ {name}"

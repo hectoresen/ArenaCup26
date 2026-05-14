@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { scoreMatchPrediction } from "@/server/scoring/engine";
 import type { Prediction, PredictionWinner, StreakState } from "@/server/scoring/types";
+import { describe, expect, it } from "vitest";
 import { WC2022_MATCHES } from "./matches";
 import { WC2022_TEAMS } from "./teams";
 
@@ -31,16 +31,7 @@ describe("WC2022 teams seed", () => {
     for (const team of WC2022_TEAMS) {
       byGroup[team.group] = (byGroup[team.group] ?? 0) + 1;
     }
-    expect(Object.keys(byGroup).sort()).toEqual([
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H",
-    ]);
+    expect(Object.keys(byGroup).sort()).toEqual(["A", "B", "C", "D", "E", "F", "G", "H"]);
     for (const count of Object.values(byGroup)) {
       expect(count).toBe(4);
     }

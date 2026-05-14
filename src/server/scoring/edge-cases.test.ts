@@ -4,11 +4,7 @@ import { scoreMatchPrediction } from "./engine";
 
 describe("edge-case fixtures", () => {
   it.each(EDGE_CASE_FIXTURES)("$id — $description", (fixture) => {
-    const result = scoreMatchPrediction(
-      fixture.match,
-      fixture.prediction,
-      fixture.streakBefore,
-    );
+    const result = scoreMatchPrediction(fixture.match, fixture.prediction, fixture.streakBefore);
     expect(result).toEqual(fixture.expected);
   });
 
@@ -23,7 +19,9 @@ describe("edge-case fixtures", () => {
     const stages = new Set(EDGE_CASE_FIXTURES.map((f) => f.match.stage));
     expect(stages.has("group")).toBe(true);
     expect(
-      [...stages].some((s) => s === "round-of-16" || s === "quarter" || s === "semi" || s === "final"),
+      [...stages].some(
+        (s) => s === "round-of-16" || s === "quarter" || s === "semi" || s === "final",
+      ),
     ).toBe(true);
 
     const kinds = new Set(EDGE_CASE_FIXTURES.map((f) => f.expected.kind));

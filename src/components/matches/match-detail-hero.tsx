@@ -1,6 +1,6 @@
-import { useLocale, useTranslations } from "next-intl";
-import { formatMatchDate, formatMatchTime, type SupportedLocale } from "@/lib/format/date";
+import { type SupportedLocale, formatMatchDate, formatMatchTime } from "@/lib/format/date";
 import type { MatchDetail } from "@/server/matches/types";
+import { useLocale, useTranslations } from "next-intl";
 
 type Props = {
   match: MatchDetail;
@@ -29,8 +29,7 @@ export function MatchDetailHero({ match, now }: Props) {
         {t(`stages.${match.stage}`)}
       </div>
       <div className="mb-4 text-[11px] font-bold text-muted">
-        {formatMatchDate(match.kickoffAt, locale, now)} ·{" "}
-        {formatMatchTime(match.kickoffAt)} h
+        {formatMatchDate(match.kickoffAt, locale, now)} · {formatMatchTime(match.kickoffAt)} h
       </div>
 
       <div className="mb-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">

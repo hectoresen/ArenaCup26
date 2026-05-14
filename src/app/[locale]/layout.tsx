@@ -1,9 +1,9 @@
+import { isValidLocale, routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Fredoka, Nunito } from "next/font/google";
 import { notFound } from "next/navigation";
-import { isValidLocale, routing } from "@/i18n/routing";
 import "../globals.css";
 
 // "Fredoka One" se discontinuó en Google Fonts y se fusionó con la variable

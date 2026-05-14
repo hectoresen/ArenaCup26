@@ -1,7 +1,7 @@
-import { setRequestLocale } from "next-intl/server";
 import { LeaderboardView } from "@/components/leaderboard/leaderboard-view";
 import { auth } from "@/lib/auth";
 import { getInitialSnapshot } from "@/lib/leaderboard/mock";
+import { setRequestLocale } from "next-intl/server";
 
 export default async function HomePage({
   params,

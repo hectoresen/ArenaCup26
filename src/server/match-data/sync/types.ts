@@ -61,10 +61,7 @@ export type MatchInsertRow = {
   penaltyWinnerTeamId: string | null;
 };
 
-export type ReconcileSkipReason =
-  | "team_not_mapped"
-  | "stage_unresolved"
-  | "self_match";
+export type ReconcileSkipReason = "team_not_mapped" | "stage_unresolved" | "self_match";
 
 export type ReconcileResult =
   | {

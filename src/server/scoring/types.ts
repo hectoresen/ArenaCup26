@@ -1,12 +1,6 @@
 import type { ComboMilestone } from "./rules";
 
-export type MatchStage =
-  | "group"
-  | "round-of-16"
-  | "quarter"
-  | "semi"
-  | "final"
-  | "third-place";
+export type MatchStage = "group" | "round-of-16" | "quarter" | "semi" | "final" | "third-place";
 
 export type MatchStatus =
   | "scheduled-tbd"
@@ -41,12 +35,7 @@ export type MatchOutcome = {
   penaltyWinner: Side | null;
 };
 
-export type PredictionKind =
-  | "simple"
-  | "exact"
-  | "double-1x"
-  | "double-x2"
-  | "double-12";
+export type PredictionKind = "simple" | "exact" | "double-1x" | "double-x2" | "double-12";
 
 export type PredictionWinner = "home" | "away" | "draw";
 

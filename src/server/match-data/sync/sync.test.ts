@@ -2,12 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ProviderError } from "../types";
 import type { MatchDataProvider, ProviderMatch } from "../types";
 import { syncFixtures } from "./sync";
-import type {
-  CurrentMatchRow,
-  MatchInsertRow,
-  MatchRepo,
-  MatchUpdatePatch,
-} from "./types";
+import type { CurrentMatchRow, MatchInsertRow, MatchRepo, MatchUpdatePatch } from "./types";
 
 const TEAM_MAP = new Map([
   ["6", "uuid-arg"],
@@ -46,11 +41,13 @@ function buildSnapshot(overrides: Partial<ProviderMatch> = {}): ProviderMatch {
  * Repo en memoria. Suficiente para validar el orquestador sin tocar
  * Postgres. La integración real se valida en `sync.integration.test.ts`.
  */
-function buildInMemoryRepo(initial: {
-  teams?: Map<string, string>;
-  matches?: Map<string, string>;
-  matchRows?: Map<string, CurrentMatchRow>;
-} = {}): MatchRepo & { matchRows: Map<string, CurrentMatchRow>; matchMap: Map<string, string> } {
+function buildInMemoryRepo(
+  initial: {
+    teams?: Map<string, string>;
+    matches?: Map<string, string>;
+    matchRows?: Map<string, CurrentMatchRow>;
+  } = {},
+): MatchRepo & { matchRows: Map<string, CurrentMatchRow>; matchMap: Map<string, string> } {
   const teamMap = initial.teams ?? new Map();
   const matchMap = initial.matches ?? new Map();
   const matchRows = initial.matchRows ?? new Map();
@@ -231,8 +228,20 @@ describe("syncFixtures", () => {
     // pero un provider podría devolverlo dos veces en un edge case), el segundo no
     // intenta insertar de nuevo: encuentra el matchId del primero y va por update.
     const provider = buildProvider([
-      buildSnapshot({ externalId: "dup", status: "scheduled", scoreAt90: null, scoreAtExtra: null, penaltyWinner: null }),
-      buildSnapshot({ externalId: "dup", status: "live", scoreAt90: null, scoreAtExtra: null, penaltyWinner: null }),
+      buildSnapshot({
+        externalId: "dup",
+        status: "scheduled",
+        scoreAt90: null,
+        scoreAtExtra: null,
+        penaltyWinner: null,
+      }),
+      buildSnapshot({
+        externalId: "dup",
+        status: "live",
+        scoreAt90: null,
+        scoreAtExtra: null,
+        penaltyWinner: null,
+      }),
     ]);
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 

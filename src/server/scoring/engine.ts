@@ -118,10 +118,7 @@ function evaluateHit(
       return null;
     }
     case "exact": {
-      if (
-        prediction.predictedHomeScore === null ||
-        prediction.predictedAwayScore === null
-      ) {
+      if (prediction.predictedHomeScore === null || prediction.predictedAwayScore === null) {
         return null;
       }
       if (
@@ -142,9 +139,7 @@ function evaluateHit(
   }
 }
 
-function coverageForDouble(
-  kind: "double-1x" | "double-x2" | "double-12",
-): Set<PredictionWinner> {
+function coverageForDouble(kind: "double-1x" | "double-x2" | "double-12"): Set<PredictionWinner> {
   switch (kind) {
     case "double-1x":
       return new Set<PredictionWinner>(["home", "draw"]);
@@ -160,11 +155,7 @@ function coverageForDouble(
  * Por construcción `after === before + 1`, así que como mucho cruza un
  * hito, pero el código generaliza por seguridad.
  */
-function computeComboBonuses(
-  before: number,
-  after: number,
-  containsDouble: boolean,
-): ComboBonus[] {
+function computeComboBonuses(before: number, after: number, containsDouble: boolean): ComboBonus[] {
   const table = containsDouble ? COMBO_BONUS.modified : COMBO_BONUS.base;
   const bonuses: ComboBonus[] = [];
   for (const milestone of COMBO_MILESTONES) {

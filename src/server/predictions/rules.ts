@@ -70,10 +70,7 @@ export function validatePrediction(
       if (!input.predictedWinner) {
         return { ok: false, code: "simple_missing_winner" };
       }
-      if (
-        input.predictedWinner === "draw" &&
-        KNOCKOUT_STAGES.has(stage)
-      ) {
+      if (input.predictedWinner === "draw" && KNOCKOUT_STAGES.has(stage)) {
         return { ok: false, code: "simple_draw_in_knockout" };
       }
       return { ok: true };
@@ -113,9 +110,6 @@ export function validatePrediction(
  * bloqueado por kickoff). Pure function — el caller le pasa el
  * `kickoffAt` de la fila.
  */
-export function isPredictionWindowOpen(
-  kickoffAt: Date,
-  now: Date = new Date(),
-): boolean {
+export function isPredictionWindowOpen(kickoffAt: Date, now: Date = new Date()): boolean {
   return now.getTime() < kickoffAt.getTime();
 }

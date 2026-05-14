@@ -1,11 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { useEffect } from "react";
 import { ErrorScreen } from "@/components/error/error-screen";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { FloatingBalls } from "@/components/leaderboard/floating-balls";
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 
 export default function ErrorPage({
   error,

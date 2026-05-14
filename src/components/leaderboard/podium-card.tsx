@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
 import { formatPointsEs } from "@/lib/format/number";
 import type { Player } from "@/lib/leaderboard/types";
+import { useTranslations } from "next-intl";
 
 type Place = 1 | 2 | 3;
 

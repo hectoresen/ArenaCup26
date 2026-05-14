@@ -1,11 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
 import type { PredictionKind, PredictionWinner } from "@/server/dashboard/types";
 import { allowedKindsForStage } from "@/server/predictions/rules";
 import type { SubmitPredictionResult } from "@/server/predictions/submit";
 import type { MatchStage } from "@/server/scoring/types";
+import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 
 /**
  * Codes que sí tienen traducción específica. El resto cae al
@@ -67,9 +67,7 @@ export function PredictionForm({
   const allowed = allowedKindsForStage(stage);
 
   const [kind, setKind] = useState<PredictionKind>(initial?.kind ?? "simple");
-  const [winner, setWinner] = useState<PredictionWinner | null>(
-    initial?.predictedWinner ?? null,
-  );
+  const [winner, setWinner] = useState<PredictionWinner | null>(initial?.predictedWinner ?? null);
   const [home, setHome] = useState<string>(
     initial?.predictedHomeScore !== null && initial?.predictedHomeScore !== undefined
       ? String(initial.predictedHomeScore)
@@ -81,11 +79,9 @@ export function PredictionForm({
       : "",
   );
   const [pending, startTransition] = useTransition();
-  const [feedback, setFeedback] = useState<
-    | { type: "ok" }
-    | { type: "error"; code: string }
-    | null
-  >(null);
+  const [feedback, setFeedback] = useState<{ type: "ok" } | { type: "error"; code: string } | null>(
+    null,
+  );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -261,6 +257,7 @@ function SimpleSelector({
         <button
           key={v}
           type="button"
+          // biome-ignore lint/a11y/useSemanticElements: usamos <button> con role=radio para mantener el styling de chip y permitir Tab+Space; un <input type=radio> rompe el layout.
           role="radio"
           aria-checked={value === v}
           onClick={() => onChange(v)}

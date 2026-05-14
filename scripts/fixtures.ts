@@ -1,7 +1,7 @@
-import { sql } from "drizzle-orm";
-import { db } from "@/server/db/client";
 import { seedAchievements } from "@/server/achievements/seed";
+import { db } from "@/server/db/client";
 import { seedWC2022 } from "@/server/seeds/wc2022/seed";
+import { sql } from "drizzle-orm";
 
 /**
  * Entrypoint único para preparar la BD local con datos de dev.

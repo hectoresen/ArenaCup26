@@ -1,9 +1,4 @@
-import type {
-  MatchOutcome,
-  Prediction,
-  ScoreResult,
-  StreakState,
-} from "./types";
+import type { MatchOutcome, Prediction, ScoreResult, StreakState } from "./types";
 
 /**
  * Un fixture es un escenario nominal del producto descrito en datos:
@@ -103,7 +98,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   },
   {
     id: "04-exacto-falla-mismo-ganador",
-    description: "Predicción exacta 2-1 contra resultado real 3-0: miss (no hay fallback a simple aunque el ganador sea correcto).",
+    description:
+      "Predicción exacta 2-1 contra resultado real 3-0: miss (no hay fallback a simple aunque el ganador sea correcto).",
     match: {
       status: "finished",
       stage: "group",
@@ -129,7 +125,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   // ──────────────── ELIMINATORIA ──────────────────────────────
   {
     id: "05-eliminatoria-prorroga-simple",
-    description: "Eliminatoria 1-1 al 90', 2-1 en prórroga; predicción simple 'home' acierta usando el marcador de prórroga.",
+    description:
+      "Eliminatoria 1-1 al 90', 2-1 en prórroga; predicción simple 'home' acierta usando el marcador de prórroga.",
     match: {
       status: "finished",
       stage: "round-of-16",
@@ -153,7 +150,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   },
   {
     id: "06-eliminatoria-penaltis-simple-home",
-    description: "Eliminatoria 1-1@120', penaltis ganados por home; predicción simple 'home' acierta.",
+    description:
+      "Eliminatoria 1-1@120', penaltis ganados por home; predicción simple 'home' acierta.",
     match: {
       status: "finished",
       stage: "quarter",
@@ -177,7 +175,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   },
   {
     id: "07-eliminatoria-penaltis-exacto",
-    description: "Eliminatoria 1-1@120', penaltis ganados por home; predicción exacta 1-1 acierta (penaltis no suman al marcador).",
+    description:
+      "Eliminatoria 1-1@120', penaltis ganados por home; predicción exacta 1-1 acierta (penaltis no suman al marcador).",
     match: {
       status: "finished",
       stage: "semi",
@@ -201,7 +200,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   },
   {
     id: "08-eliminatoria-empate-prediction-simple-falla",
-    description: "Eliminatoria 1-1@120' decidida por penaltis: predecir 'draw' siempre falla en eliminatoria.",
+    description:
+      "Eliminatoria 1-1@120' decidida por penaltis: predecir 'draw' siempre falla en eliminatoria.",
     match: {
       status: "finished",
       stage: "final",
@@ -225,7 +225,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   },
   {
     id: "09-eliminatoria-doble-12-siempre-acierta",
-    description: "En eliminatoria, doble 12 cubre cualquier ganador (home o away). Aquí gana home outright.",
+    description:
+      "En eliminatoria, doble 12 cubre cualquier ganador (home o away). Aquí gana home outright.",
     match: {
       status: "finished",
       stage: "round-of-16",
@@ -251,7 +252,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   // ──────────────── ESTADOS ANULADOS ──────────────────────────
   {
     id: "10-cancelado-racha-preservada",
-    description: "Partido cancelado: la predicción se anula y la racha de 5 se conserva (no se rompe ni avanza).",
+    description:
+      "Partido cancelado: la predicción se anula y la racha de 5 se conserva (no se rompe ni avanza).",
     match: {
       status: "cancelled",
       stage: "group",
@@ -275,7 +277,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   },
   {
     id: "11-pospuesto-racha-con-doble-preservada",
-    description: "Partido pospuesto: racha con doble previa se conserva intacta, incluyendo containsDouble=true.",
+    description:
+      "Partido pospuesto: racha con doble previa se conserva intacta, incluyendo containsDouble=true.",
     match: {
       status: "postponed",
       stage: "group",
@@ -301,7 +304,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   // ──────────────── COMBOS / RACHA ────────────────────────────
   {
     id: "12-combo-hito-3-base",
-    description: "Racha de 2 (sin dobles) + simple acertado → cruza hito 3 con bonus base +5. Total 15.",
+    description:
+      "Racha de 2 (sin dobles) + simple acertado → cruza hito 3 con bonus base +5. Total 15.",
     match: {
       status: "finished",
       stage: "group",
@@ -325,7 +329,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   },
   {
     id: "13-combo-hito-3-modificado-por-doble-en-curso",
-    description: "Racha {2, true}: la racha ya contenía una doble. Un simple cruza hito 3 con bonus modificado +3. Total 13.",
+    description:
+      "Racha {2, true}: la racha ya contenía una doble. Un simple cruza hito 3 con bonus modificado +3. Total 13.",
     match: {
       status: "finished",
       stage: "group",
@@ -349,7 +354,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   },
   {
     id: "14-combo-hito-3-cruzado-por-doble",
-    description: "Racha {2, false}: una doble acertada cruza el hito 3. La doble entra en la racha → containsDouble=true → bonus modificado +3. Total 5+3=8.",
+    description:
+      "Racha {2, false}: una doble acertada cruza el hito 3. La doble entra en la racha → containsDouble=true → bonus modificado +3. Total 5+3=8.",
     match: {
       status: "finished",
       stage: "group",
@@ -397,7 +403,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   },
   {
     id: "16-combo-hito-5-modificado",
-    description: "Racha {4, true} (con doble previa) + simple acierta → hito 5 modificado +5. Total 15.",
+    description:
+      "Racha {4, true} (con doble previa) + simple acierta → hito 5 modificado +5. Total 15.",
     match: {
       status: "finished",
       stage: "group",
@@ -421,7 +428,8 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
   },
   {
     id: "17-miss-resetea-racha-larga",
-    description: "Racha de 7 con doble previa: un miss en eliminatoria (predicción 'draw' siempre falla) resetea racha completa.",
+    description:
+      "Racha de 7 con doble previa: un miss en eliminatoria (predicción 'draw' siempre falla) resetea racha completa.",
     match: {
       status: "finished",
       stage: "semi",

@@ -36,9 +36,11 @@
 
   body {
     background-color: var(--color-background);
-    background-image:
-      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245, 200, 66, 0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(0, 230, 118, 0.04) 0%, transparent 50%),
+    background-image: radial-gradient(
+        ellipse 70% 50% at 50% 0%,
+        rgba(245, 200, 66, 0.06) 0%,
+        transparent 60%
+      ), radial-gradient(ellipse 40% 60% at 10% 80%, rgba(0, 230, 118, 0.04) 0%, transparent 50%),
       radial-gradient(ellipse 40% 40% at 90% 20%, rgba(79, 195, 247, 0.04) 0%, transparent 50%);
     color: var(--color-foreground);
     /* Cadena con fallback a Noto Color Emoji para que las banderas (regional

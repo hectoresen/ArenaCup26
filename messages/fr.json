@@ -235,7 +235,18 @@
     },
     "bell": {
       "label": "Notifications",
-      "labelWithCount": "Notifications — {count} non lues"
+      "labelWithCount": "Notifications — {count} non lues",
+      "dropdown": {
+        "title": "Notifications",
+        "empty": "Rien ici pour l'instant.",
+        "kind": {
+          "prediction_sent": "Prédiction envoyée",
+          "prediction_locked": "Prédiction verrouillée",
+          "match_finished": "Match terminé",
+          "achievement_unlocked": "Succès débloqué",
+          "system": "Système"
+        }
+      }
     },
     "avatar": {
       "labelOf": "Avatar de {name}"

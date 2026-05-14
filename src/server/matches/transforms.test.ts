@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { MatchListItem } from "./types";
 import { groupMatchesByDay, utcDayKey } from "./transforms";
+import type { MatchListItem } from "./types";
 
 describe("utcDayKey", () => {
   it.each([

@@ -119,6 +119,9 @@ npm run dev
    - **Top del momento** vacío (nadie ha puntuado todavía).
 5. Click en el avatar → **Mi perfil** → `/u/<tu-username>`.
 6. Click en **Ranking** del nav → mismo leaderboard del público dentro del shell.
+7. Click en **Partidos** del nav → listado completo agrupado por día con cards (live, scheduled, finished, postponed, cancelled, TBD).
+8. Click en cualquier card → `/partidos/<id>` con detalle y formulario de predicción (simple / exacto / doble — el tipo permitido depende de la etapa).
+9. Tras enviar tu primera predicción, abre la campana del top-nav → **dropdown con la notificación "Predicción enviada"** que enlaza al partido. Al abrir el dropdown, todas las pendientes se marcan como leídas y el badge desaparece.
 
 ## 9. Trucos para datos más realistas
 
@@ -201,16 +204,22 @@ npm run fixtures
 **Funciona:**
 
 - `/` — landing pública con leaderboard mock (no BD).
-- `/inicio` — panel del usuario (BD real, pero sin puntos hasta `add-prediction-flow`).
+- `/inicio` — panel privado con hero + live/next match + próximos + progreso + mini-leaderboard.
+- `/partidos` — listado completo agrupado por día con cards adaptadas por estado.
+- `/partidos/<id>` — detalle con formulario de predicción (simple / exacto / doble).
+- `/ranking` — mismo leaderboard que la landing dentro del shell privado.
+- `/u/<username>` — perfil público con identidad, stats y acordeón de logros.
 - `/faq` — preguntas frecuentes.
-- Login con Google.
-- Sync de partidos vía `POST /api/cron/sync-fixtures` (necesita API-Football).
-- 376/377 tests pasando.
+- **Notificaciones in-app**: dropdown del bell con tipos `prediction_sent` (y futuros `prediction_locked`, `match_finished`, `achievement_unlocked`). Sin push real todavía.
+- Login con Google + auto-gen de username + backfill idempotente.
+- Sync manual a partidos reales vía `POST /api/cron/sync-fixtures` (necesita API-Football).
+- 461/462 tests pasando.
 
 **Aún no implementado (capabilities futuras):**
 
-- `/partidos`, `/logros` — placeholder con "próximamente" y link de vuelta al panel.
-- Flujo de submit/edit de predicción (`add-prediction-flow`).
+- `/logros` — placeholder con "próximamente" (la página completa llegará con `add-achievements-page`).
+- **Sync automático contra API-Football** — hoy es disparo manual con `curl`. Se decidirá la cadencia cuando aterrice `add-leaderboard-sse`.
+- **Push de notificaciones en tiempo real** — el dropdown funciona pero requiere recargar para ver nuevas. SSE llega con `add-leaderboard-sse`.
 - Recálculo automático de puntos cuando un partido cambia (`add-scoring-pipeline`).
 - Refresco en tiempo real del panel (`add-leaderboard-sse`).
 - Histórico de ranking para sparkline + delta (`add-ranking-history`).

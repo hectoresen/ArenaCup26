@@ -1,14 +1,14 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
-import { db } from "@/server/db/client";
 import type { PredictionKind, PredictionWinner } from "@/server/dashboard/types";
+import { db } from "@/server/db/client";
 import {
+  type SubmitPredictionResult,
   deletePrediction,
   submitPrediction,
-  type SubmitPredictionResult,
 } from "@/server/predictions/submit";
+import { revalidatePath } from "next/cache";
 
 type SubmitArgs = {
   matchId: string;
@@ -23,9 +23,7 @@ type SubmitArgs = {
  * Devuelve un `SubmitPredictionResult` que el cliente usa para
  * mostrar feedback (toast / inline error).
  */
-export async function submitPredictionAction(
-  args: SubmitArgs,
-): Promise<SubmitPredictionResult> {
+export async function submitPredictionAction(args: SubmitArgs): Promise<SubmitPredictionResult> {
   const session = await auth();
   if (!session?.user?.id) {
     return { ok: false, code: "match_not_found" };

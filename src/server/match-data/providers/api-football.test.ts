@@ -23,9 +23,7 @@ const MIN_ENVELOPE = {
 describe("createApiFootballProvider", () => {
   it("calls the right URL with the api key header", async () => {
     const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      expect(String(input)).toBe(
-        "https://v3.football.api-sports.io/fixtures?league=1&season=2022",
-      );
+      expect(String(input)).toBe("https://v3.football.api-sports.io/fixtures?league=1&season=2022");
       const headers = new Headers(init?.headers);
       expect(headers.get("x-apisports-key")).toBe("test-key");
       return new Response(JSON.stringify(MIN_ENVELOPE), {
@@ -46,9 +44,7 @@ describe("createApiFootballProvider", () => {
 
   it("strips a trailing slash from baseUrl", async () => {
     const fetcher = vi.fn(async (input: RequestInfo | URL) => {
-      expect(String(input)).toBe(
-        "https://example.test/fixtures?league=1&season=2022",
-      );
+      expect(String(input)).toBe("https://example.test/fixtures?league=1&season=2022");
       return new Response(JSON.stringify(MIN_ENVELOPE), { status: 200 });
     });
     const provider = createApiFootballProvider({

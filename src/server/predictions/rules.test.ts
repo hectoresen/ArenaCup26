@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  allowedKindsForStage,
-  isPredictionWindowOpen,
-  validatePrediction,
-} from "./rules";
+import { allowedKindsForStage, isPredictionWindowOpen, validatePrediction } from "./rules";
 
 describe("allowedKindsForStage", () => {
   it("group permits all 5 kinds", () => {

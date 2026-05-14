@@ -15,13 +15,7 @@
  * con fallback a estos campos si la clave no existe.
  */
 
-export type AchievementTier =
-  | "common"
-  | "rare"
-  | "epic"
-  | "legendary"
-  | "mythic"
-  | "goat";
+export type AchievementTier = "common" | "rare" | "epic" | "legendary" | "mythic" | "goat";
 
 export type AchievementDefinition = {
   id: string;
@@ -255,7 +249,8 @@ export const ACHIEVEMENT_CATALOG: AchievementDefinition[] = [
   {
     id: "the-goat",
     title: "El Mayor de Todos",
-    description: "Al finalizar el Mundial 2026 eres el número 1 absoluto del ranking. Solo puede haber uno.",
+    description:
+      "Al finalizar el Mundial 2026 eres el número 1 absoluto del ranking. Solo puede haber uno.",
     tier: "goat",
     isShareable: true,
     iconId: "ico-goat",

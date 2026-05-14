@@ -90,7 +90,10 @@ describe("reconcileMatch — skip cases", () => {
   });
 
   it("skips a self-match (defensive: home === away after mapping)", () => {
-    const sameTeamMap: TeamExternalMap = new Map([["6", "uuid-arg"], ["7", "uuid-arg"]]);
+    const sameTeamMap: TeamExternalMap = new Map([
+      ["6", "uuid-arg"],
+      ["7", "uuid-arg"],
+    ]);
     const result = reconcileMatch({
       current: null,
       matchId: null,

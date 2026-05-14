@@ -235,7 +235,18 @@
     },
     "bell": {
       "label": "Notificaciones",
-      "labelWithCount": "Notificaciones — {count} sin leer"
+      "labelWithCount": "Notificaciones — {count} sin leer",
+      "dropdown": {
+        "title": "Notificaciones",
+        "empty": "Aún no hay nada por aquí.",
+        "kind": {
+          "prediction_sent": "Predicción enviada",
+          "prediction_locked": "Predicción bloqueada",
+          "match_finished": "Partido terminado",
+          "achievement_unlocked": "Logro desbloqueado",
+          "system": "Sistema"
+        }
+      }
     },
     "avatar": {
       "labelOf": "Avatar de {name}"

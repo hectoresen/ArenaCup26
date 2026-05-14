@@ -1,12 +1,10 @@
-import { describe, expect, it } from "vitest";
 import { renderWithProviders, screen, userEvent } from "@/test/render-with-providers";
+import { describe, expect, it } from "vitest";
 import { FaqItem } from "./faq-item";
 
 describe("FaqItem", () => {
   it("renders the question and the answer body", () => {
-    renderWithProviders(
-      <FaqItem question="¿Cómo funciona?">Respuesta de ejemplo.</FaqItem>,
-    );
+    renderWithProviders(<FaqItem question="¿Cómo funciona?">Respuesta de ejemplo.</FaqItem>);
     expect(screen.getByText("¿Cómo funciona?")).toBeInTheDocument();
     expect(screen.getByText("Respuesta de ejemplo.")).toBeInTheDocument();
   });

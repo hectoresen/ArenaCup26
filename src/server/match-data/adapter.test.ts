@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
 import { scoreMatchPrediction } from "@/server/scoring/engine";
 import type { Prediction, StreakState } from "@/server/scoring/types";
+import { describe, expect, it } from "vitest";
 import { toMatchOutcome } from "./adapter";
-import { parseApiFootballFixture } from "./providers/api-football.parser";
 import { WC2022_FINAL_RAW } from "./providers/api-football.fixtures";
+import { parseApiFootballFixture } from "./providers/api-football.parser";
 import type { ProviderMatch } from "./types";
 
 const NO_STREAK: StreakState = { current: 0, containsDouble: false };
@@ -71,9 +71,9 @@ describe("toMatchOutcome", () => {
   });
 
   it("throws when stage is null (provider couldn't classify the round)", () => {
-    expect(() => toMatchOutcome(baseProviderMatch({ stage: null, roundLabel: "Friendly" }))).toThrow(
-      /stage is null/,
-    );
+    expect(() =>
+      toMatchOutcome(baseProviderMatch({ stage: null, roundLabel: "Friendly" })),
+    ).toThrow(/stage is null/);
   });
 });
 

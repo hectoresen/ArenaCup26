@@ -1,8 +1,8 @@
-import { useTranslations } from "next-intl";
 import { ErrorScreen } from "@/components/error/error-screen";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { FloatingBalls } from "@/components/leaderboard/floating-balls";
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 export default function NotFoundPage() {
   const t = useTranslations("errors.notFound");

@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { matches, predictions, teams } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 import { WC2022_MATCHES } from "./matches";
 import { WC2022_TEAMS } from "./teams";
 
