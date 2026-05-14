@@ -1,6 +1,7 @@
 import { useLocale, useTranslations } from "next-intl";
+import { LocalTime } from "@/components/common/local-time";
 import { TeamFlag } from "@/components/common/team-flag";
-import { formatMatchDate, formatMatchTime, type SupportedLocale } from "@/lib/format/date";
+import { formatMatchDate, type SupportedLocale } from "@/lib/format/date";
 import { Link } from "@/i18n/navigation";
 import type { PredictionView, UpcomingHeroView } from "@/server/dashboard/types";
 import { basePointsForKind } from "@/server/predictions/rules";
@@ -23,16 +24,15 @@ export function UpcomingHeroCard({ next, now }: Props) {
   const t = useTranslations("dashboard.next");
   const locale = useLocale() as SupportedLocale;
   const date = formatMatchDate(next.kickoffAt, locale, now);
-  const time = formatMatchTime(next.kickoffAt);
 
   return (
     <Link
       href={`/partidos/${next.matchId}` as never}
-      aria-label={t("kickoffAt", { date, time })}
+      aria-label={`${date} kickoff`}
       className="block cursor-pointer rounded-2xl border-2 border-border bg-card px-4 py-4 no-underline transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-[2px] hover:border-gold/30 hover:shadow-[0_8px_24px_rgba(245,200,66,0.1)] [animation:fadeUp_0.5s_ease_0.18s_forwards] opacity-0"
     >
       <div className="mb-3 text-[10px] font-black uppercase tracking-[0.14em] text-muted">
-        {t("kickoffAt", { date, time })}
+        {date} · <LocalTime date={next.kickoffAt} />
       </div>
       <div className="flex items-center justify-center gap-3">
         <Team name={next.homeTeam.name} flag={next.homeTeam.flag ?? next.homeTeam.code} />

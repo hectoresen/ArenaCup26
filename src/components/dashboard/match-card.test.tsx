@@ -63,10 +63,12 @@ describe("<MatchCard>", () => {
     expect(container.querySelector("[aria-disabled='true']")).not.toBeNull();
   });
 
-  it("shows 'Hoy · 21:00 h' when match is today", () => {
-    renderWithProviders(<MatchCard match={buildMatch()} now={NOW} />);
+  it("shows 'Hoy' label and a kickoff time when match is today", () => {
+    const { container } = renderWithProviders(<MatchCard match={buildMatch()} now={NOW} />);
     expect(screen.getByText(/Hoy/)).toBeInTheDocument();
-    expect(screen.getByText(/21:00/)).toBeInTheDocument();
+    // <LocalTime> usa la timezone del runner para el texto visible.
+    // El aria-label es estable en UTC y sirve de checkpoint.
+    expect(container.querySelector('[aria-label="Kickoff: 21:00 UTC"]')).toBeInTheDocument();
   });
 
   it("shows 'Mañana' for tomorrow's matches", () => {

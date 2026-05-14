@@ -1,6 +1,7 @@
 import { useLocale, useTranslations } from "next-intl";
+import { LocalTime } from "@/components/common/local-time";
 import { TeamFlag } from "@/components/common/team-flag";
-import { formatMatchDate, formatMatchTime, type SupportedLocale } from "@/lib/format/date";
+import { formatMatchDate, type SupportedLocale } from "@/lib/format/date";
 import { Link } from "@/i18n/navigation";
 import { isMatchTBD } from "@/server/dashboard/transforms";
 import type { PredictionView, UpcomingMatch } from "@/server/dashboard/types";
@@ -26,7 +27,6 @@ export function MatchCard({ match, now }: Props) {
   const locale = useLocale() as SupportedLocale;
   const tbd = isMatchTBD(match);
   const date = formatMatchDate(match.kickoffAt, locale, now);
-  const time = formatMatchTime(match.kickoffAt);
 
   if (tbd) {
     return (
@@ -38,7 +38,7 @@ export function MatchCard({ match, now }: Props) {
         <div className="min-w-0 flex-1">
           <div className="text-base font-bold tracking-[2px] text-muted">{t("tbdRow")}</div>
           <div className="text-[11px] font-bold text-muted">
-            {date} · {time} h · {t("tbdLabel")}
+            {date} · <LocalTime date={match.kickoffAt} /> · {t("tbdLabel")}
           </div>
         </div>
         <div className="flex-shrink-0 text-right">
@@ -68,7 +68,7 @@ export function MatchCard({ match, now }: Props) {
   return (
     <Link
       href={`/partidos/${match.matchId}` as never}
-      aria-label={`${home.name} vs ${away.name} — ${date} ${time}`}
+      aria-label={`${home.name} vs ${away.name} — ${date}`}
       className="group flex cursor-pointer items-center gap-3.5 rounded-[14px] border-2 border-border bg-card px-4 py-3.5 no-underline transition-[transform,border-color] duration-200 hover:-translate-y-[3px] hover:border-gold/30"
     >
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -80,7 +80,7 @@ export function MatchCard({ match, now }: Props) {
           <span className="truncate">{away.name}</span>
         </div>
         <div className="text-[11px] font-bold text-muted">
-          <strong className="text-foreground">{date}</strong> · {time} h
+          <strong className="text-foreground">{date}</strong> · <LocalTime date={match.kickoffAt} />
         </div>
       </div>
 

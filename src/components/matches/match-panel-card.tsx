@@ -1,6 +1,7 @@
+import { LocalTime } from "@/components/common/local-time";
 import { TeamFlag } from "@/components/common/team-flag";
 import { Link } from "@/i18n/navigation";
-import { type SupportedLocale, formatMatchDate, formatMatchTime } from "@/lib/format/date";
+import { type SupportedLocale, formatMatchDate } from "@/lib/format/date";
 import type { MatchListItem } from "@/server/matches/types";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -40,8 +41,8 @@ export function MatchPanelCard({ match, now }: Props) {
         <div className="flex-1">
           <div className="text-base font-bold tracking-wider text-muted">? vs ?</div>
           <div className="text-[11px] font-bold text-muted">
-            {formatMatchDate(match.kickoffAt, locale, now)} · {formatMatchTime(match.kickoffAt)} h ·{" "}
-            {t("tbdLabel")}
+            {formatMatchDate(match.kickoffAt, locale, now)} ·{" "}
+            <LocalTime date={match.kickoffAt} /> · {t("tbdLabel")}
           </div>
         </div>
         <span className="rounded-md border-[1.5px] border-border bg-white/[0.06] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.1em] text-muted">
@@ -70,7 +71,7 @@ export function MatchPanelCard({ match, now }: Props) {
     >
       <div className="mb-2 flex items-center justify-between text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted">
         <span>
-          {formatMatchDate(match.kickoffAt, locale, now)} · {formatMatchTime(match.kickoffAt)} h
+          {formatMatchDate(match.kickoffAt, locale, now)} · <LocalTime date={match.kickoffAt} />
         </span>
         <StatusChip status={match.status} />
       </div>
