@@ -39,16 +39,9 @@
       "faqLink": "How does it work? Read the FAQ →"
     }
   },
-  "comingSoon": {
-    "title": {
-      "matches": "Full match calendar",
-      "achievements": "Achievement catalog"
-    },
-    "body": {
-      "matches": "The match list + detail page lands with `add-matches-page`. Meanwhile, upcoming ones are on the home dashboard.",
-      "achievements": "The browsable catalog + per-achievement detail lands with `add-achievements-page`. Meanwhile, the ones you unlocked are on your profile."
-    },
-    "backToHome": "Back to dashboard"
+  "achievementsPage": {
+    "title": "Your achievements",
+    "subtitle": "{unlocked} of {total} unlocked"
   },
   "matches": {
     "title": "Matches",

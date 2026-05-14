@@ -1,6 +1,6 @@
 import type { LeaderboardSnapshot, Player } from "./types";
 
-type Seed = Omit<Player, "rank" | "previousRank">;
+type Seed = Omit<Player, "rank" | "previousRank" | "username"> & { username?: string | null };
 
 const seed: Seed[] = [
   {
@@ -117,6 +117,7 @@ export async function getInitialSnapshot(): Promise<LeaderboardSnapshot> {
   const sorted = [...seed].sort((a, b) => b.points - a.points);
   const players: Player[] = sorted.map((p, i) => ({
     ...p,
+    username: p.username ?? null,
     rank: i + 1,
     previousRank: i + 1,
   }));

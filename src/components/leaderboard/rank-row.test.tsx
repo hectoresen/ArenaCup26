@@ -5,6 +5,7 @@ import { RankRow } from "./rank-row";
 
 const basePlayer: Player = {
   id: "u1",
+  username: "carlos-mendoza",
   name: "Carlos Mendoza",
   countryCode: "MX",
   countryName: "México",

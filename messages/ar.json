@@ -39,16 +39,9 @@
       "faqLink": "كيف يعمل؟ اقرأ الأسئلة الشائعة ←"
     }
   },
-  "comingSoon": {
-    "title": {
-      "matches": "تقويم المباريات الكامل",
-      "achievements": "كتالوج الإنجازات"
-    },
-    "body": {
-      "matches": "قائمة المباريات وصفحات تفاصيلها تصل مع `add-matches-page`. في هذه الأثناء، تجد القادمة منها في لوحة التحكم.",
-      "achievements": "الكتالوج التفصيلي وصفحات الإنجازات تصل مع `add-achievements-page`. في هذه الأثناء، تجد ما فتحته في ملفك الشخصي."
-    },
-    "backToHome": "العودة إلى لوحة التحكم"
+  "achievementsPage": {
+    "title": "إنجازاتك",
+    "subtitle": "{unlocked} من {total} مفتوحة"
   },
   "matches": {
     "title": "المباريات",

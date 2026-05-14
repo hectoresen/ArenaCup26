@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import { formatPointsEs } from "@/lib/format/number";
 import type { Player } from "@/lib/leaderboard/types";
 import { useTranslations } from "next-intl";
@@ -56,16 +57,16 @@ function initials(name: string) {
 export function PodiumCard({ player, place }: { player: Player; place: Place }) {
   const t = useTranslations("leaderboard.podium");
   const tone = TONE[place];
-  return (
-    <div
-      className={`relative cursor-default overflow-hidden rounded-2xl border-[2.5px] px-2.5 pb-3.5 pt-3.5 text-center transition-transform duration-200 hover:-translate-y-1.5 hover:scale-[1.03] ${tone.container} ${tone.border}`}
-      aria-label={t("ariaPosition", {
-        place,
-        name: player.name,
-        country: player.countryName,
-        points: player.points,
-      })}
-    >
+  const cursorClass = player.username ? "cursor-pointer" : "cursor-default";
+  const cardClass = `relative block overflow-hidden rounded-2xl border-[2.5px] px-2.5 pb-3.5 pt-3.5 text-center transition-transform duration-200 hover:-translate-y-1.5 hover:scale-[1.03] no-underline text-inherit ${cursorClass} ${tone.container} ${tone.border}`;
+  const ariaLabel = t("ariaPosition", {
+    place,
+    name: player.name,
+    country: player.countryName,
+    points: player.points,
+  });
+  const inner = (
+    <>
       {place === 1 && (
         <span
           aria-hidden="true"
@@ -96,6 +97,20 @@ export function PodiumCard({ player, place }: { player: Player; place: Place }) 
       <div className="text-[9px] font-extrabold uppercase tracking-[0.1em] text-muted">
         {t("pointsLabel")}
       </div>
+    </>
+  );
+
+  if (player.username) {
+    return (
+      <Link href={`/u/${player.username}`} className={cardClass} aria-label={ariaLabel}>
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <div className={cardClass} aria-label={ariaLabel}>
+      {inner}
     </div>
   );
 }

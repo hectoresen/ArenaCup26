@@ -39,16 +39,9 @@
       "faqLink": "¿Cómo funciona? Lee las preguntas frecuentes →"
     }
   },
-  "comingSoon": {
-    "title": {
-      "matches": "Calendario completo de partidos",
-      "achievements": "Catálogo de logros"
-    },
-    "body": {
-      "matches": "El listado y detalle de cada partido llega con `add-matches-page`. Mientras tanto, los próximos los ves desde el panel.",
-      "achievements": "El catálogo navegable y el detalle por logro llega con `add-achievements-page`. Mientras tanto, los desbloqueas están en tu perfil."
-    },
-    "backToHome": "Volver al panel"
+  "achievementsPage": {
+    "title": "Tus logros",
+    "subtitle": "{unlocked} de {total} desbloqueados"
   },
   "matches": {
     "title": "Partidos",

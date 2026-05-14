@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import { formatPointsEs } from "@/lib/format/number";
 import type { Player } from "@/lib/leaderboard/types";
 import { useTranslations } from "next-intl";
@@ -29,12 +30,11 @@ export function RankRow({ player, index = 0 }: { player: Player; index?: number 
   const streakAria = hot ? `, ${t("ariaStreak", { count: player.streak })}` : "";
   const correctAria = `, ${t("ariaCorrect", { count: player.correctCount })}`;
 
-  return (
-    <div
-      style={{ animationDelay }}
-      aria-label={baseAria + streakAria + correctAria}
-      className="group relative grid cursor-default grid-cols-[44px_1fr_auto] items-center gap-2.5 overflow-hidden rounded-[13px] border-2 border-border bg-card px-3.5 py-[11px] opacity-0 transition-[transform,border-color,background-color] duration-200 animate-[slideIn_0.5s_cubic-bezier(0.34,1.56,0.64,1)_forwards] hover:translate-x-1 hover:border-gold/20 hover:bg-card-hover"
-    >
+  const cursorClass = player.username ? "cursor-pointer" : "cursor-default";
+  const cardClass = `group relative grid grid-cols-[44px_1fr_auto] items-center gap-2.5 overflow-hidden rounded-[13px] border-2 border-border bg-card px-3.5 py-[11px] opacity-0 transition-[transform,border-color,background-color] duration-200 animate-[slideIn_0.5s_cubic-bezier(0.34,1.56,0.64,1)_forwards] hover:translate-x-1 hover:border-gold/20 hover:bg-card-hover no-underline text-inherit ${cursorClass}`;
+
+  const inner = (
+    <>
       <span
         aria-hidden="true"
         className="absolute bottom-0 start-0 top-0 w-[3px] rounded-s-[2px] bg-border transition-colors group-hover:bg-gold"
@@ -72,6 +72,32 @@ export function RankRow({ player, index = 0 }: { player: Player; index?: number 
           {t("pts")}
         </span>
       </div>
+    </>
+  );
+
+  // Si tenemos username, el row entero es un Link a `/u/<username>`.
+  // En otro caso (legacy data), queda como un div decorativo no
+  // clicable — preferible a un Link que iría a /u/null.
+  if (player.username) {
+    return (
+      <Link
+        href={`/u/${player.username}`}
+        style={{ animationDelay }}
+        aria-label={baseAria + streakAria + correctAria}
+        className={cardClass}
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      style={{ animationDelay }}
+      aria-label={baseAria + streakAria + correctAria}
+      className={cardClass}
+    >
+      {inner}
     </div>
   );
 }
