@@ -15,42 +15,101 @@ import { userAchievements, userPoints, users } from "@/server/db/schema";
  *
  * IDs estables (`seed-*`) para que la función sea idempotente.
  */
+/**
+ * Puntos calculados para que un user real pueda **superarlos rápido**
+ * acertando predicciones (1 simple = 10 pts, 1 exact = 30 pts). Top 1
+ * son ~85 pts: alcanzable con ~3 exactos o un combo de 3 hits.
+ *
+ * Distribución elegida (de top a bottom):
+ *   85 → 70 → 55 → 40 → 30 → 20 → 10
+ *
+ * El user puede ir viendo cómo escala posición a posición a medida
+ * que va acertando, en lugar de quedarse en #8 indefinidamente.
+ */
 const SEED_USERS = [
   {
     id: "00000000-0000-4000-a000-000000000001",
-    email: "seed-carlos@webmundial.local",
-    username: "carlos-mendoza",
-    name: "Carlos Mendoza",
-    country: "MX",
+    email: "seed-maya@webmundial.local",
+    username: "maya-petrova",
+    name: "Maya Petrova",
+    country: "BG",
     image: null as string | null,
-    totalPoints: 4820,
-    streak: 7,
-    correctCount: 34,
+    totalPoints: 85,
+    streak: 2,
+    correctCount: 4,
     /** IDs de logros del catálogo a desbloquear (ver `achievements/catalog.ts`). */
-    unlockedAchievements: ["first-hit", "good-eye", "first-hundred"],
+    unlockedAchievements: ["first-hit", "exact-shot"],
   },
   {
     id: "00000000-0000-4000-a000-000000000002",
-    email: "seed-layla@webmundial.local",
-    username: "layla-hassan",
-    name: "Layla Hassan",
-    country: "SA",
+    email: "seed-kenji@webmundial.local",
+    username: "kenji-yamamoto",
+    name: "Kenji Yamamoto",
+    country: "JP",
     image: null as string | null,
-    totalPoints: 4610,
-    streak: 5,
-    correctCount: 31,
-    unlockedAchievements: ["first-hit", "first-hundred"],
+    totalPoints: 70,
+    streak: 2,
+    correctCount: 4,
+    unlockedAchievements: ["first-hit", "exact-shot"],
   },
   {
     id: "00000000-0000-4000-a000-000000000003",
-    email: "seed-tomas@webmundial.local",
-    username: "tomas-reyes",
-    name: "Tomás Reyes",
-    country: "AR",
+    email: "seed-sofia@webmundial.local",
+    username: "sofia-rojas",
+    name: "Sofía Rojas",
+    country: "PE",
     image: null as string | null,
-    totalPoints: 4390,
-    streak: 4,
-    correctCount: 29,
+    totalPoints: 55,
+    streak: 1,
+    correctCount: 3,
+    unlockedAchievements: ["first-hit", "exact-shot"],
+  },
+  {
+    id: "00000000-0000-4000-a000-000000000004",
+    email: "seed-ahmed@webmundial.local",
+    username: "ahmed-salah",
+    name: "Ahmed Salah",
+    country: "EG",
+    image: null as string | null,
+    totalPoints: 40,
+    streak: 0,
+    correctCount: 2,
+    unlockedAchievements: ["first-hit"],
+  },
+  {
+    id: "00000000-0000-4000-a000-000000000005",
+    email: "seed-linnea@webmundial.local",
+    username: "linnea-borg",
+    name: "Linnea Borg",
+    country: "SE",
+    image: null as string | null,
+    totalPoints: 30,
+    streak: 0,
+    correctCount: 2,
+    unlockedAchievements: ["first-hit"],
+  },
+  {
+    id: "00000000-0000-4000-a000-000000000006",
+    email: "seed-diego@webmundial.local",
+    username: "diego-vargas",
+    name: "Diego Vargas",
+    country: "CL",
+    image: null as string | null,
+    totalPoints: 20,
+    streak: 0,
+    correctCount: 1,
+    unlockedAchievements: ["first-hit"],
+  },
+  {
+    id: "00000000-0000-4000-a000-000000000007",
+    email: "seed-aicha@webmundial.local",
+    username: "aicha-diallo",
+    name: "Aïcha Diallo",
+    country: "CI",
+    image: null as string | null,
+    totalPoints: 10,
+    streak: 0,
+    correctCount: 1,
     unlockedAchievements: ["first-hit"],
   },
 ] as const;

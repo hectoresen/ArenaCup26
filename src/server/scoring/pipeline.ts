@@ -9,6 +9,7 @@ import {
   teams,
   userPoints,
 } from "@/server/db/schema";
+import { evaluateAndUnlock } from "@/server/achievements/unlock";
 import { createNotification } from "@/server/notifications/create";
 import { scoreMatchPrediction } from "./engine";
 import type {
@@ -141,6 +142,20 @@ export async function processFinishedMatch(
         scored,
         matchup: matchupLabel(match.homeTeamName, match.awayTeamName),
       });
+
+      // Tras persistir puntos/racha, evaluamos los logros del user. El
+      // unlocker es idempotente (no re-desbloquea), notifica al user
+      // cuando un logro nuevo se abre, y no aborta el scoring si falla
+      // algún unlock concreto.
+      try {
+        await evaluateAndUnlock(db, p.userId);
+      } catch (err) {
+        dlog("scoring", "evaluateAndUnlock threw", {
+          userId: p.userId,
+          err: err instanceof Error ? err.message : String(err),
+        });
+      }
+
       result.processed++;
     } catch (err) {
       dlog("scoring", "error persisting score", {
