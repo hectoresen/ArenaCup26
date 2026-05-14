@@ -187,15 +187,18 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
 - **Decisión**: si `snapshot.scoreAt90 === null`, el reconciler no incluye `homeScore`/`awayScore` en el patch.
 - **Razón**: cuando un partido entra en `live`, el provider deja `scoreAt90 = null` (todavía no es regulación final). Si sobreescribiéramos, perderíamos el marcador real previo. Lo mismo aplica a `scoreAtExtra` y a `penaltyWinner`.
 
-### 7.3 Sync con API-Football: pull manual, NO cron automático
+### 7.3 Sync con API-Football: pull periódico desde un cron externo
 
 - **Contexto**: el patrón "frontend ↔ backend ↔ provider" debe ser claro. Frontend va con push (SSE/WebSocket) hacia el backend; backend ↔ provider hace pull porque API-Football no expone webhooks ni websockets en ningún plan.
-- **Decisión (2026-05-14)**: el cron de Vercel está **desactivado**. `vercel.json` ya no declara crons. El endpoint `POST /api/cron/sync-fixtures` se mantiene operativo para disparo manual (con `curl`) o cron externo cuando aterrice `add-leaderboard-sse`.
-- **Razón**:
-  1. En fase de desarrollo no necesitamos un cron quemando cupo del free tier (100 req/día).
-  2. El cron automático sin SSE no aporta nada al usuario — los cambios en BD no llegan al navegador sin push.
-  3. Decisión de re-enable se tomará junto con la activación de SSE y midiendo cupo real del Mundial.
-- **Revisar cuando**: aterrice `add-leaderboard-sse`. Entonces se evalúa cadencia + cupo necesario y se vuelve a activar (probablemente con `*/15` durante kickoffs + off fuera de ventanas activas).
+- **Decisión inicial (2026-05-12)**: arrancamos sin ningún cron — solo `curl` manual al endpoint. `vercel.json` no declara crons (la app ya no corre en Vercel; está en Railway).
+- **Decisión actualizada (2026-05-14)**: activamos un **cron externo en GitHub Actions** (`.github/workflows/sync-fixtures.yml`, `*/15 * * * *`) que llama `POST /api/cron/sync-fixtures` contra el dominio de Railway. El endpoint exige `Authorization: Bearer <CRON_SECRET>` cuando esa env var está configurada en Railway; el workflow inyecta el mismo valor desde `secrets.CRON_SECRET` en GitHub.
+- **Razón para subirlo ya** (a pesar de no haber SSE todavía):
+  1. El sync trae fixtures, detecta transiciones a `finished` y dispara `processFinishedMatch` (decisión [7.6 / 12.3](#123-scoring-se-dispara-en-transición-a-finished-durante-el-sync)). Sin cron, sin scoring automático.
+  2. El usuario no quiere depender de `curl` manual — "al final tendrás que hacer lo mismo con el Mundial y nada será manual".
+  3. Cabe en el free tier: `*/15` con una sola liga = ~96 req/día (límite 100/día). Si añadimos más ligas, bajamos a `*/30` o partimos en dos workflows con ventanas distintas.
+- **Por qué fuera de Railway**: no queremos depender de un scheduler propio de la plataforma (Railway no lo expone de forma estable y atarnos a Vercel/Railway hace el cambio doloroso). GitHub Actions es gratis, portable y ya tenemos el repo allí.
+- **Modelo de auth**: el endpoint en local acepta cualquier POST si no hay `CRON_SECRET`; en cuanto se configura, exige el bearer. Defensa contra que un tercero descubra la URL en Railway.
+- **Revisar cuando**: aterrice `add-leaderboard-sse`. El cron NO desaparece — el push solo cambia el último tramo (BD → cliente). Sí se revisará la cadencia: ventanas activas (durante kickoffs) más agresivas, off fuera. Posiblemente dos workflows con schedules distintos.
 
 ### 7.4 Cron handler puro separado del wiring Next
 
@@ -342,10 +345,12 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
   3. Si solo hay un user activo en este entorno de pruebas, 1 request cada 30s al server es despreciable.
 - **Revisar cuando**: aterrice `add-leaderboard-sse`. Este componente se sustituye por un EventSource sin cambiar la UI del dashboard.
 
-### 12.6 Cron de sync deshabilitado en producción inicial
+### 12.6 Cron de sync: GitHub Actions `*/15`, externo a Railway
 
-- **Decisión**: `vercel.json` sin crons (decisión 7.3). En Railway tampoco activamos cron automático en el primer despliegue. El endpoint `POST /api/cron/sync-fixtures` queda funcional para disparo manual con bearer.
-- **Razón**: hasta que aterrice `add-leaderboard-sse` el cron quema cupo de api-football sin que nadie observe los datos en tiempo real. Activar al mismo tiempo que SSE.
+- **Decisión (2026-05-14)**: activamos el workflow `.github/workflows/sync-fixtures.yml` con `schedule: */15 * * * *` + `workflow_dispatch`. El job hace `curl -X POST` contra `https://<dominio>.up.railway.app/api/cron/sync-fixtures` con `Authorization: Bearer <CRON_SECRET>` si el secret está configurado. Setup completo en `docs/deployment.md` §9.
+- **Razón**: ver decisión 7.3. Resumen: sin cron, ningún partido cambia de estado y por tanto el scoring no se dispara — no es viable depender de `curl` manual ni en pruebas. GitHub Actions evita acoplarnos al scheduler de la plataforma de hosting.
+- **Coste de API**: `*/15` × 1 liga ≈ 96 req/día (free tier 100/día). Margen pequeño; si añadimos La Liga + otra competición, bajar a `*/30` o partir en dos schedules con ventanas.
+- **Si el cron falla**: GitHub Actions notifica al owner por email. El endpoint sigue siendo idempotente, así que un tick perdido se recupera en el siguiente. Para forzar manual: Actions → Sync fixtures → Run workflow.
 
 ---
 
