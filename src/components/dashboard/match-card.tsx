@@ -1,4 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
+import { TeamFlag } from "@/components/common/team-flag";
 import { formatMatchDate, formatMatchTime, type SupportedLocale } from "@/lib/format/date";
 import { Link } from "@/i18n/navigation";
 import { isMatchTBD } from "@/server/dashboard/transforms";
@@ -64,9 +65,9 @@ export function MatchCard({ match, now }: Props) {
     >
       <div className="min-w-0 flex-1">
         <div className="text-sm font-extrabold text-foreground">
-          <span aria-label={home.name}>{home.flag ?? home.code}</span> {home.name}
+          <TeamFlag flag={home.flag} name={home.name} size={18} fallback={home.code ?? "🏳️"} /> {home.name}
           <span className="mx-1.5 font-semibold text-muted">{t("versus")}</span>
-          <span aria-label={away.name}>{away.flag ?? away.code}</span> {away.name}
+          <TeamFlag flag={away.flag} name={away.name} size={18} fallback={away.code ?? "🏳️"} /> {away.name}
         </div>
         <div className="text-[11px] font-bold text-muted">
           <strong className="text-foreground">{date}</strong> · {time} h

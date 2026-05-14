@@ -1,4 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
+import { TeamFlag } from "@/components/common/team-flag";
 import { formatMatchDate, formatMatchTime, type SupportedLocale } from "@/lib/format/date";
 import { Link } from "@/i18n/navigation";
 import type { PredictionView, UpcomingHeroView } from "@/server/dashboard/types";
@@ -47,9 +48,7 @@ export function UpcomingHeroCard({ next, now }: Props) {
 function Team({ name, flag }: { name: string; flag: string | null }) {
   return (
     <div className="flex flex-1 flex-col items-center gap-1">
-      <span className="text-2xl leading-none" role="img" aria-label={name}>
-        {flag ?? "🏳️"}
-      </span>
+      <TeamFlag flag={flag} name={name} size={28} className="text-2xl leading-none" />
       <span className="text-center text-xs font-extrabold text-foreground">{name}</span>
     </div>
   );

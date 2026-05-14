@@ -1,3 +1,4 @@
+import { TeamFlag } from "@/components/common/team-flag";
 import { type SupportedLocale, formatMatchDate, formatMatchTime } from "@/lib/format/date";
 import type { MatchDetail } from "@/server/matches/types";
 import { useLocale, useTranslations } from "next-intl";
@@ -59,9 +60,7 @@ function TeamCol({ team }: { team: MatchDetail["homeTeam"] }) {
   }
   return (
     <div className="flex flex-col items-center gap-1.5">
-      <span className="text-[36px] leading-none" role="img" aria-label={team.name}>
-        {team.flag ?? "🏳️"}
-      </span>
+      <TeamFlag flag={team.flag} name={team.name} size={48} className="text-[36px] leading-none" />
       <div className="text-sm font-extrabold text-foreground">{team.name}</div>
     </div>
   );

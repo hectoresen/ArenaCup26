@@ -1,3 +1,4 @@
+import { TeamFlag } from "@/components/common/team-flag";
 import { Link } from "@/i18n/navigation";
 import { type SupportedLocale, formatMatchDate, formatMatchTime } from "@/lib/format/date";
 import type { MatchListItem } from "@/server/matches/types";
@@ -96,9 +97,12 @@ function TeamSide({
     <div
       className={`flex items-center gap-2 ${side === "away" ? "flex-row-reverse text-right" : ""}`}
     >
-      <span className="text-2xl leading-none" role="img" aria-label={team.name}>
-        {team.flag ?? "🏳️"}
-      </span>
+      <TeamFlag
+        flag={team.flag}
+        name={team.name}
+        size={28}
+        className="text-2xl leading-none"
+      />
       <div className="min-w-0 truncate text-sm font-extrabold text-foreground">{team.name}</div>
     </div>
   );
