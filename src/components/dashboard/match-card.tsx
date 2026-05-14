@@ -57,17 +57,27 @@ export function MatchCard({ match, now }: Props) {
   const home = match.homeTeam;
   const away = match.awayTeam;
 
+  // Si el kickoff ya pasó pero el sync aún no movió el status a `live`
+  // o `prediction-locked`, defendemos en el cliente: no mostramos el
+  // botón "Predecir" y marcamos la card como "Cerrado". El submit del
+  // server también rechazaría con `match_window_closed`, pero el UI
+  // tiene que reflejarlo antes para no confundir al usuario.
+  const nowMs = (now ?? new Date()).getTime();
+  const kickoffPast = match.kickoffAt.getTime() <= nowMs;
+
   return (
     <Link
       href={`/partidos/${match.matchId}` as never}
       aria-label={`${home.name} vs ${away.name} — ${date} ${time}`}
       className="group flex cursor-pointer items-center gap-3.5 rounded-[14px] border-2 border-border bg-card px-4 py-3.5 no-underline transition-[transform,border-color] duration-200 hover:-translate-y-[3px] hover:border-gold/30"
     >
-      <div className="min-w-0 flex-1">
-        <div className="text-sm font-extrabold text-foreground">
-          <TeamFlag flag={home.flag} name={home.name} size={18} fallback={home.code ?? "🏳️"} /> {home.name}
-          <span className="mx-1.5 font-semibold text-muted">{t("versus")}</span>
-          <TeamFlag flag={away.flag} name={away.name} size={18} fallback={away.code ?? "🏳️"} /> {away.name}
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <div className="flex min-w-0 items-center gap-2 text-sm font-extrabold text-foreground">
+          <TeamFlag flag={home.flag} name={home.name} size={20} fallback={home.code ?? "🏳️"} />
+          <span className="truncate">{home.name}</span>
+          <span className="flex-shrink-0 font-semibold text-muted">{t("versus")}</span>
+          <TeamFlag flag={away.flag} name={away.name} size={20} fallback={away.code ?? "🏳️"} />
+          <span className="truncate">{away.name}</span>
         </div>
         <div className="text-[11px] font-bold text-muted">
           <strong className="text-foreground">{date}</strong> · {time} h
@@ -77,6 +87,10 @@ export function MatchCard({ match, now }: Props) {
       <div className="flex-shrink-0 text-right">
         {match.prediction ? (
           <PredictedTrailing prediction={match.prediction} />
+        ) : kickoffPast ? (
+          <span className="inline-flex items-center rounded-[10px] border-2 border-border bg-white/[0.04] px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-muted">
+            {t("closedLabel")}
+          </span>
         ) : (
           <span
             aria-label={t("predictLabel", { home: home.name, away: away.name })}

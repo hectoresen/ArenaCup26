@@ -221,7 +221,8 @@
       "tbdRow": "؟ ضد ؟",
       "versus": "ضد",
       "meta": "{date} · {time}",
-      "predictLabel": "توقّع نتيجة {home} ضد {away}"
+      "predictLabel": "توقّع نتيجة {home} ضد {away}",
+      "closedLabel": "مغلق"
     },
     "progress": {
       "achievementsLabel": "الإنجازات المفتوحة",

@@ -221,7 +221,8 @@
       "tbdRow": "? vs ?",
       "versus": "vs",
       "meta": "{date} · {time}",
-      "predictLabel": "Prédire le résultat de {home} vs {away}"
+      "predictLabel": "Prédire le résultat de {home} vs {away}",
+      "closedLabel": "Fermé"
     },
     "progress": {
       "achievementsLabel": "Succès débloqués",
