@@ -5,19 +5,26 @@ import type { Database } from "@/server/db/client";
 import { userPoints, users } from "@/server/db/schema";
 import type { LeaderboardSnapshot, Player } from "./types";
 
+const TOP_LIMIT = 100;
+
 /**
- * Construye un snapshot del leaderboard a partir de `user_points` +
- * `users`. Devuelve los usuarios ordenados por puntos desc.
+ * Construye un snapshot del leaderboard listando **todos los users**
+ * registrados (ordenados por puntos desc, tope `TOP_LIMIT` = 100).
  *
- * Los 3 usuarios "placeholder" (Carlos / Layla / Tomás) se siembran
- * desde `scripts/bootstrap.ts` (ver `seedLeaderboardPlaceholders`)
- * como filas reales en BD, así que aparecen aquí sin lógica especial
- * y son clicables a `/u/<username>`.
+ * - LEFT JOIN a `user_points`: un user sin fila en `user_points`
+ *   (todavía no ha puntuado) aparece con 0 al final de la lista.
+ *   Cuando reciba puntos, sube automáticamente. Sin esto, los nuevos
+ *   registrados estaban invisibles hasta su primer acierto.
+ * - Los 7 usuarios placeholder se siembran como filas reales en
+ *   `users` + `user_points` desde `scripts/bootstrap.ts`.
+ * - Tie-break por `createdAt` ascendente: usuarios más antiguos
+ *   delante en empate de puntos.
+ * - `previousRank` queda igual a `rank` hasta `add-ranking-history`.
  */
 export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot> {
   const rows = await db
     .select({
-      userId: userPoints.userId,
+      userId: users.id,
       username: users.username,
       name: users.name,
       country: users.country,
@@ -25,9 +32,10 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
       streak: userPoints.streak,
       correctCount: userPoints.correctCount,
     })
-    .from(userPoints)
-    .innerJoin(users, eq(users.id, userPoints.userId))
-    .orderBy(desc(userPoints.totalPoints), asc(userPoints.userId));
+    .from(users)
+    .leftJoin(userPoints, eq(userPoints.userId, users.id))
+    .orderBy(desc(sql`coalesce(${userPoints.totalPoints}, 0)`), asc(users.createdAt))
+    .limit(TOP_LIMIT);
 
   dlog("ranking", "getRealSnapshot", { users: rows.length });
 
@@ -38,9 +46,9 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
     countryCode: row.country ?? "",
     countryName: row.country ?? "",
     flag: countryCodeToFlag(row.country) ?? "🌍",
-    points: row.points,
-    streak: row.streak,
-    correctCount: row.correctCount,
+    points: row.points ?? 0,
+    streak: row.streak ?? 0,
+    correctCount: row.correctCount ?? 0,
     rank: i + 1,
     previousRank: i + 1,
   }));
@@ -53,8 +61,10 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
 
 /**
  * Versión que también devuelve la posición del usuario actual.
- * (Pendiente de uso desde el UI — útil cuando aterrice la fila "Tu
- * posición" sticky en el ranking grande.)
+ * Igual que `getRealSnapshot` + un cálculo extra del rank del user.
+ *
+ * El rank se calcula contando users con puntos estrictamente mayores
+ * (coalesce a 0 para el comparable), igual que el orden del snapshot.
  */
 export async function getRealSnapshotForUser(
   db: Database,
@@ -69,19 +79,17 @@ export async function getRealSnapshotForUser(
     .from(userPoints)
     .where(eq(userPoints.userId, currentUserId))
     .limit(1);
-  const me = row[0];
-  if (!me) {
-    return { snapshot, myRank: null };
-  }
+  const myPoints = row[0]?.total ?? 0;
   const aheadRows = await db
     .select({ ahead: sql<number>`count(*)::int` })
-    .from(userPoints)
-    .where(sql`${userPoints.totalPoints} > ${me.total}`);
+    .from(users)
+    .leftJoin(userPoints, eq(userPoints.userId, users.id))
+    .where(sql`coalesce(${userPoints.totalPoints}, 0) > ${myPoints}`);
   const myRank = (aheadRows[0]?.ahead ?? 0) + 1;
   dlog("ranking", "getRealSnapshotForUser", {
     currentUserId,
     myRank,
-    points: me.total,
+    points: myPoints,
   });
   return { snapshot, myRank };
 }
