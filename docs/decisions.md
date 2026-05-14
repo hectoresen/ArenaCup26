@@ -287,20 +287,19 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
 
 ## 12. Despliegue
 
-### 12.1 Railway como plataforma all-in-one
+### 12.1 Railway como plataforma all-in-one para el entorno de pruebas
 
-- **Contexto**: comparamos Vercel+Neon, Render, Railway, Fly.io y Hetzner+Coolify. Render free hiberna (deal-breaker para Auth.js callbacks); Render Starter cuesta ~$14/mes; Vercel+Neon obliga a dos proveedores y dos facturas; Fly tiene curva.
-- **Decisión (2026-05-14)**: **Railway** para web + Postgres + cron en un único dashboard.
-- **Razón**:
-  1. Single facturable, single panel — el usuario lo prefirió explícitamente sobre Vercel+Neon.
+- **Contexto**: hace falta un entorno accesible desde el móvil para validar el flujo end-to-end (login, predicciones, navegación) sin tener que arrancar local cada vez. **No es producción pública** — es la sandbox personal del autor. La decisión de plataforma para el día del Mundial se tomará cuando se acerque ese momento.
+- **Decisión (2026-05-14)**: **Railway** para web + Postgres en un único dashboard.
+- **Razón** (en este uso):
+  1. Single panel, single factura.
   2. Sin hibernación (Auth.js + Google OAuth no falla por cold start).
-  3. ~$5/mes pay-as-you-go en plan Hobby con $5 de crédito incluido. Bajo tráfico cabe dentro.
-  4. PR environments con BD aislada — útil para staging sin contaminar prod.
-  5. Soporta long-running (cuando aterrice `add-leaderboard-sse` no hay que migrar inmediato).
-- **Revisar cuando**:
-  - Tráfico sostenido > 1000 usuarios concurrentes durante un partido — Railway no autoescala horizontal bien.
-  - Necesidad de multi-región para latencia en Asia/Oceania — Railway tiene region única por servicio.
-  - Si el SSE en pico de Mundial mide saturación, Fly.io shared o Hetzner con autoscaling es Plan B.
+  3. ~$5/mes incluidos en plan Hobby; con un solo usuario probando, cabe sin pagar adicional.
+  4. Github push → deploy automático.
+- **Revisar cuando**: la web salga de fase de pruebas y se vaya a promocionar. Entonces hay que evaluar:
+  - Si Railway escala horizontalmente lo suficiente para los picos del Mundial (alternativa: Fly.io shared multi-región o Hetzner con autoscaling manual).
+  - SSE en producción: cuando aterrice `add-leaderboard-sse` medir saturación real.
+  - Custom domain + SSL, backups automáticos diarios, PR environments para staging.
 - **Documentación operativa**: ver `docs/deployment.md`.
 
 ### 12.2 Cron de sync deshabilitado en producción inicial
