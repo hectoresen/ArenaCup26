@@ -313,7 +313,36 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
   4. Funciona igual en futuros entornos (cualquier copia o nuevo deploy se prepara solo).
 - **Caveat**: no mezclar `db:push` (sin journal) con `db:migrate` (con journal) sobre la misma BD. En Railway usamos exclusivamente `migrate`. En local sigue siendo válido `db:push` durante desarrollo iterativo.
 
-### 12.3 Cron de sync deshabilitado en producción inicial
+### 12.3 Scoring se dispara en transición a finished durante el sync
+
+- **Contexto**: el scoring engine ya existía como pure function. Faltaba el orquestador que lee predictions, las puntúa y persiste resultados. Necesitábamos un sitio donde "engancharlo".
+- **Decisión (2026-05-14)**: el `syncFixtures` acepta un hook opcional `onMatchFinished(matchId)`. El route handler del cron lo cabla con `processFinishedMatch`. El hook se invoca SOLO cuando un match transiciona a `finished` durante el sync.
+- **Razón**:
+  1. El sync es ya el momento donde detectamos cambios canónicos en `matches`. Es coherente lanzar el scoring inmediatamente.
+  2. `processFinishedMatch` es idempotente — si llega a procesarse dos veces no duplica `point_events`. Eso da margen ante retries del sync.
+  3. La interfaz por hook permite que `syncFixtures` siga testeable sin acoplar a Drizzle ni al pipeline en tests offline (los tests del orquestador pasan un stub `onMatchFinished: undefined`).
+- **Caveat**: si un partido finished se inserta directamente en BD sin pasar por el sync (e.g. seed manual), el scoring NO se dispara. Para esos casos hay que llamar `processFinishedMatch(db, matchId)` a mano.
+
+### 12.4 Puntos provisionales calculados al vuelo, no persistidos
+
+- **Contexto**: cuando un partido está en `live`, el usuario quiere ver "vas ganando 30 puntos porque tu predicción coincide hasta ahora".
+- **Decisión (2026-05-14)**: pure helper `computeProvisionalScore(snapshot, prediction, streakBefore)` que invoca el mismo engine con un `MatchOutcome` simulado (`status="finished"` + scores actuales). Se calcula en `getLiveMatchForUser` y se devuelve en el view model. **NO se persiste nada**. La racha no avanza con provisionales (regla cerrada de `docs/scoring.md`).
+- **Razón**:
+  1. El usuario ve el feedback inmediato sin contaminar el estado canónico.
+  2. Un cambio de marcador (ej. gol del rival) cambia el provisional sin tocar BD.
+  3. Cuando aterrice SSE solo hay que empujar el `LiveMatchView` actualizado; el cliente no calcula nada.
+
+### 12.5 Auto-refresh client-side mientras hay live (polling tonto)
+
+- **Contexto**: hasta que aterrice `add-leaderboard-sse`, el usuario tendría que pulsar F5 para ver el nuevo marcador o sus puntos provisionales actualizados.
+- **Decisión (2026-05-14)**: componente client `<LiveAutoRefresh>` que llama `router.refresh()` cada 30s. Solo se monta si `data.live` no es null.
+- **Razón**:
+  1. Trivial de implementar (~20 líneas) y suficiente para validar end-to-end en este sprint.
+  2. `router.refresh()` re-evalúa el SSR sin recargar la página; el usuario mantiene su scroll y estado.
+  3. Si solo hay un user activo en este entorno de pruebas, 1 request cada 30s al server es despreciable.
+- **Revisar cuando**: aterrice `add-leaderboard-sse`. Este componente se sustituye por un EventSource sin cambiar la UI del dashboard.
+
+### 12.6 Cron de sync deshabilitado en producción inicial
 
 - **Decisión**: `vercel.json` sin crons (decisión 7.3). En Railway tampoco activamos cron automático en el primer despliegue. El endpoint `POST /api/cron/sync-fixtures` queda funcional para disparo manual con bearer.
 - **Razón**: hasta que aterrice `add-leaderboard-sse` el cron quema cupo de api-football sin que nadie observe los datos en tiempo real. Activar al mismo tiempo que SSE.

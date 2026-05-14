@@ -1,6 +1,7 @@
 import type { DashboardData } from "@/server/dashboard/types";
 import { useTranslations } from "next-intl";
 import { Hero } from "./hero";
+import { LiveAutoRefresh } from "./live-auto-refresh";
 import { LiveSection } from "./live-section";
 import { MatchCard } from "./match-card";
 import { MiniLeaderboard } from "./mini-leaderboard";
@@ -17,6 +18,11 @@ export function DashboardSections({ data }: { data: DashboardData }) {
   return (
     <>
       <Hero userName={data.userName} stats={data.stats} />
+
+      {/* Si hay live, sondeamos el server cada 30s para refrescar
+          scores + puntos provisionales sin que el user pulse F5.
+          Cuando aterrice add-leaderboard-sse se sustituye por push. */}
+      {data.live && <LiveAutoRefresh />}
 
       <LiveSection live={data.live} nextMatch={data.nextMatch} />
 

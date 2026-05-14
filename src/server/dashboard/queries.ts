@@ -9,6 +9,7 @@ import {
   userPoints,
   users,
 } from "@/server/db/schema";
+import { computeProvisionalScore } from "@/server/scoring/pipeline";
 import type { MatchStage } from "@/server/scoring/types";
 import { and, asc, desc, eq, gt, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -215,6 +216,32 @@ export async function getLiveMatchForUser(
   if (!row) return null;
 
   const predictionMap = await fetchPredictionForMatches(db, userId, [row.id]);
+  const prediction = predictionMap.get(row.id) ?? null;
+
+  // Cálculo de puntos provisionales: si hay predicción + scores
+  // visibles, ejecutamos el engine como si el partido acabara así.
+  // El streak que pasamos es el actual del user (sin avanzar, no es
+  // confirmado todavía).
+  let provisional: LiveMatchView["provisional"] = null;
+  if (prediction && row.homeScore !== null && row.awayScore !== null) {
+    const streakRows = await db
+      .select({ streak: userPoints.streak })
+      .from(userPoints)
+      .where(eq(userPoints.userId, userId))
+      .limit(1);
+    const streakBefore = {
+      current: streakRows[0]?.streak ?? 0,
+      containsDouble: false,
+    };
+    const scored = computeProvisionalScore(
+      { stage: row.stage, homeScore: row.homeScore, awayScore: row.awayScore },
+      prediction,
+      streakBefore,
+    );
+    if (scored) {
+      provisional = { points: scored.points, kind: scored.kind };
+    }
+  }
 
   return {
     matchId: row.id,
@@ -234,7 +261,8 @@ export async function getLiveMatchForUser(
     // El minuto en vivo no está en el schema actual — vendrá con
     // `add-live-scoring` cuando expongamos goles parciales del provider.
     minute: null,
-    prediction: predictionMap.get(row.id) ?? null,
+    prediction,
+    provisional,
   };
 }
 

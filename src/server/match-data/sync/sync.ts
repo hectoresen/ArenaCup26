@@ -7,6 +7,14 @@ export type SyncFixturesInput = {
   repo: MatchRepo;
   leagueId: number;
   season: number;
+  /**
+   * Hook opcional invocado cuando un match transiciona a `finished`
+   * en este sync (no estaba en `finished` antes y el update lo pone).
+   * El caller (cron handler) lo cabla con `processFinishedMatch` para
+   * calcular puntos. Si no se pasa, no se hace nada extra — útil para
+   * tests del orquestador en aislamiento.
+   */
+  onMatchFinished?: (matchId: string) => Promise<void>;
 };
 
 /**
@@ -24,8 +32,9 @@ export type SyncFixturesInput = {
  *   produce un segundo reporte con `inserted: 0, updated: 0`.
  */
 export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport> {
-  const { provider, repo, leagueId, season } = input;
+  const { provider, repo, leagueId, season, onMatchFinished } = input;
   const source = provider.name;
+  const finishedTransitions: string[] = [];
 
   const snapshots = await provider.getFixtures({ leagueId, season });
 
@@ -53,11 +62,25 @@ export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport
           const newId = await repo.insertMatch(result.row, result.externalId, source);
           matchMap.set(result.externalId, newId);
           report.inserted++;
+          // Caso raro pero posible: el provider trae un match ya
+          // finalizado que aún no existía en BD. Lo procesamos también.
+          if (result.row.status === "finished") {
+            finishedTransitions.push(newId);
+          }
           break;
         }
         case "update": {
           await repo.updateMatch(result.matchId, result.patch);
           report.updated++;
+          // Detección de transición a `finished`: el current existía y
+          // NO estaba en finished, y el patch lo pone en finished.
+          if (
+            current &&
+            current.status !== "finished" &&
+            result.patch.status === "finished"
+          ) {
+            finishedTransitions.push(result.matchId);
+          }
           break;
         }
         case "noop": {
@@ -80,6 +103,22 @@ export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport
         reason: "persist_failed",
         detail: err instanceof Error ? err.message : String(err),
       });
+    }
+  }
+
+  // Disparar el hook de finished tras el batch. Fallos aquí se
+  // capturan como `report.errors` para no abortar.
+  if (onMatchFinished && finishedTransitions.length > 0) {
+    for (const matchId of finishedTransitions) {
+      try {
+        await onMatchFinished(matchId);
+      } catch (err) {
+        report.errors.push({
+          externalId: matchId,
+          reason: "finished_hook_failed",
+          detail: err instanceof Error ? err.message : String(err),
+        });
+      }
     }
   }
 

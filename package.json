@@ -22,6 +22,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "fixtures": "tsx --env-file=.env scripts/fixtures.ts",
+    "seed:teams": "tsx --env-file=.env scripts/seed-api-football-teams.ts",
     "dev:set-live": "tsx --env-file=.env scripts/dev-set-live.ts",
     "diagnose:dashboard": "tsx --env-file=.env scripts/diagnose-dashboard.ts"
   },

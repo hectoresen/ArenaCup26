@@ -41,6 +41,15 @@ export type LiveMatchView = {
   /** Minuto en curso si el provider lo entrega; null si solo sabemos que está live. */
   minute: number | null;
   prediction: PredictionView | null;
+  /**
+   * Puntos provisionales si el partido acabara con el marcador
+   * actual. `null` cuando no hay predicción o el engine no puede
+   * inferir nada. Calculado al vuelo, NO persistido.
+   */
+  provisional: {
+    points: number;
+    kind: "simple" | "exact" | "double" | "miss" | "voided";
+  } | null;
 };
 
 export type UpcomingHeroView = {

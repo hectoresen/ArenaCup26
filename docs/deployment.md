@@ -67,38 +67,66 @@ Cada deploy ahora:
 
 > No hagas `db:push` manual contra Railway. `db:push` empuja el schema sin journal y entra en conflicto con `migrate`. Usa solo `migrate` (que es lo que el pre-deploy lanza).
 
-### Datos de prueba (opcional)
+## 7. Seed inicial de teams desde api-football
 
-Una vez las tablas existen, siembra fixtures de demo desde tu máquina local apuntando a la BD pública de Railway:
+Antes del primer sync con datos reales, el reconciler necesita saber a qué `team_id` UUID corresponde cada `team.id` que devuelve api-football. Lo siembras una vez con tu máquina local apuntando a Railway:
 
 ```bash
-DATABASE_URL='<la-url-publica-de-postgres-de-railway>' npm run fixtures
+DATABASE_URL='<la-url-publica-de-postgres-de-railway>' npm run seed:teams
 ```
 
-> La URL pública la sacas en Postgres → tab `Variables` → `DATABASE_PUBLIC_URL`. Si solo ves `DATABASE_URL` con un host interno (`containers-us-west`), activa Public Networking en Postgres → Settings.
->
-> `fixtures` borra y recrea `teams` + `matches`. Si en algún momento conectas el sync real con api-football, los partidos del cron irán a las mismas tablas. No mezcles ambos enfoques en la misma BD.
+> La URL pública la sacas en Postgres → tab `Variables` → `DATABASE_PUBLIC_URL`. Si solo ves la interna (`containers-us-west`), activa Public Networking en Postgres → Settings.
 
-## 7. Verificar
+Esto:
+1. Llama `GET /teams?league={MATCH_DATA_LEAGUE_ID}&season={MATCH_DATA_SEASON}` con tu API key.
+2. Upserta los equipos en `teams` (con su FIFA code).
+3. Crea entries en `team_external_ids` para `source=api-football`.
+
+Si cambias liga/season en Railway, vuelve a lanzar `seed:teams` para sembrar los equipos nuevos.
+
+Opcionalmente, para tener datos de demo "estáticos" del Mundial 2022 mezclados:
+
+```bash
+DATABASE_URL='<la-misma-url>' npm run fixtures
+```
+
+> Cuidado: `fixtures` TRUNCATE `matches` antes de insertar. Si ya hay datos reales del sync, los borra. Úsalo solo en una BD limpia.
+
+## 8. Flujo real end-to-end
+
+Con todo el setup anterior:
+
+1. **Sincronizar fixtures** del provider:
+   ```bash
+   curl -X POST https://<tu-dominio>.up.railway.app/api/cron/sync-fixtures
+   ```
+   El reconciler inserta/actualiza partidos en `matches`. Los matches sin `team_external_ids` mapeados se saltan con razón `team_not_mapped`.
+2. **Predecir**: en la web, `/partidos` → click en un match futuro → form de predicción (Ganador o Marcador exacto).
+3. **Durante el partido** (cuando el sync detecta `status=live` con scores):
+   - `/inicio` muestra la **live card** con puntos provisionales: "💎 +30 pts · Provisional".
+   - Cliente refresca cada 30s automáticamente para mantener marcador y provisionales al día.
+4. **Cuando el sync detecta `status=finished`**:
+   - Disparo automático del scoring pipeline.
+   - Calcula puntos con el engine para todas las predicciones del match.
+   - Actualiza `user_points` (total, racha, correctCount).
+   - Inserta `point_events` (auditoría).
+   - Genera notificación `match_finished` por usuario.
+   - El ranking se recalcula al vuelo en `/ranking` y `/u/<username>`.
+
+> El scoring se dispara SOLO en transiciones a `finished` (live→finished o scheduled→finished). Si ya hay `point_events` para `(userId, matchId)`, se salta. Idempotente.
+
+## 9. Verificar el deploy
 
 1. `https://<tu-dominio>.up.railway.app/` → landing.
 2. Click **Predecir ahora** → Google → te lleva a `/inicio`.
-3. Si lanzaste `fixtures` ves la card de próximo partido y la lista.
+3. Si seedearmaste teams + sync, ves la card de próximo partido y la lista.
 4. Predice algo en `/partidos/<id>`. Confirma y revisa la campana del nav.
 
 > Si OAuth falla con `redirect_uri_mismatch`, espera 5 minutos a que Google propague (paso 5).
 
-## 8. Sincronizar partidos reales (opcional)
-
-Sin cron automático, cuando quieras refrescar contra api-football:
-
-```bash
-curl -X POST https://<tu-dominio>.up.railway.app/api/cron/sync-fixtures
-```
-
 En dev sin `CRON_SECRET` (que no añadimos en el paso 3) el endpoint acepta el POST. Si lo añades, mete el header `Authorization: Bearer <CRON_SECRET>`.
 
-## 9. Operación
+## 10. Operación
 
 Lo único que vas a tocar día a día:
 
@@ -110,7 +138,7 @@ Lo único que vas a tocar día a día:
 | Push de código | `git push origin main` → deploy automático |
 | Resetear la BD | servicio Postgres → tab `Data` → o lanza `db:push` con la URL desde tu máquina |
 
-## 10. Costes
+## 11. Costes
 
 Plan **Hobby** da **$5/mes de uso incluido**. Para un único usuario probando desde móvil consumes muy poco:
 - Web idle: ~200 MB RAM = ~$2/mes.

@@ -66,6 +66,7 @@ export function LiveCard({ live }: Props) {
           home={live.homeTeam.name}
           away={live.awayTeam.name}
           prediction={live.prediction}
+          provisional={live.provisional}
         />
       ) : (
         <div className="mt-3.5 rounded-xl border-[1.5px] border-border bg-white/[0.04] px-3.5 py-3 text-center text-[12px] font-bold text-muted">
@@ -91,10 +92,12 @@ function PredictionBlock({
   home,
   away,
   prediction,
+  provisional,
 }: {
   home: string;
   away: string;
   prediction: NonNullable<LiveMatchView["prediction"]>;
+  provisional: LiveMatchView["provisional"];
 }) {
   const t = useTranslations("dashboard.live");
   const label =
@@ -106,8 +109,16 @@ function PredictionBlock({
           ? `${away}`
           : "—";
 
+  const winning = provisional !== null && provisional.kind !== "miss" && provisional.kind !== "voided";
+  const provEmoji =
+    provisional?.kind === "exact" ? "💎" : provisional?.kind === "simple" ? "🎯" : provisional?.kind === "double" ? "⚡" : "❌";
+
   return (
-    <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2.5 rounded-xl border-[1.5px] border-success/20 bg-success/[0.06] px-3.5 py-3">
+    <div
+      className={`mt-3.5 flex flex-wrap items-center justify-between gap-2.5 rounded-xl border-[1.5px] px-3.5 py-3 ${
+        winning ? "border-success/30 bg-success/[0.08]" : "border-border bg-white/[0.03]"
+      }`}
+    >
       <div>
         <div className="mb-0.5 text-[10px] font-black uppercase tracking-[0.12em] text-muted">
           {t("yourPrediction")}
@@ -115,17 +126,25 @@ function PredictionBlock({
         <div className="font-display text-base text-foreground">{label}</div>
       </div>
       <div className="text-right">
-        <span className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-muted">
-          {t("computedAtEnd")}
-        </span>
-        <div>
-          <span
-            aria-label={t("provisional")}
-            className="mt-0.5 inline-flex items-center gap-1 rounded-md border-[1.5px] border-info/30 bg-info/10 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-[0.1em] text-info"
-          >
-            {t("provisional")}
+        {provisional ? (
+          <>
+            <span
+              className={`block font-display text-xl leading-none ${winning ? "text-success" : "text-muted"}`}
+            >
+              {provEmoji} {winning ? `+${provisional.points}` : "0"} pts
+            </span>
+            <span
+              aria-label={t("provisional")}
+              className="mt-1 inline-flex items-center gap-1 rounded-md border-[1.5px] border-info/30 bg-info/10 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-[0.1em] text-info"
+            >
+              {t("provisional")}
+            </span>
+          </>
+        ) : (
+          <span className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-muted">
+            {t("computedAtEnd")}
           </span>
-        </div>
+        )}
       </div>
     </div>
   );

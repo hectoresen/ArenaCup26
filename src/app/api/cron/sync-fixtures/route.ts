@@ -1,9 +1,10 @@
+import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { db } from "@/server/db/client";
 import { createApiFootballProvider } from "@/server/match-data/providers/api-football";
 import { createMatchRepo } from "@/server/match-data/sync/repo";
 import { syncFixtures } from "@/server/match-data/sync/sync";
-import { NextResponse } from "next/server";
+import { processFinishedMatch } from "@/server/scoring/pipeline";
 import { handleCronRequest } from "./handler";
 
 export async function POST(req: Request) {
@@ -27,6 +28,9 @@ export async function POST(req: Request) {
         repo,
         leagueId: env.MATCH_DATA_LEAGUE_ID,
         season: env.MATCH_DATA_SEASON,
+        onMatchFinished: async (matchId) => {
+          await processFinishedMatch(db, matchId);
+        },
       });
     },
   });

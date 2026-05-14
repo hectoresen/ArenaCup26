@@ -1,7 +1,14 @@
-import { DashboardSections } from "@/components/dashboard/dashboard-sections";
-import type { DashboardData } from "@/server/dashboard/types";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders, screen } from "@/test/render-with-providers";
-import { describe, expect, it } from "vitest";
+import type { DashboardData } from "@/server/dashboard/types";
+
+// LiveAutoRefresh usa `useRouter` de next/navigation que requiere
+// AppRouterProvider — no disponible en jsdom. Lo mockeamos a no-op.
+vi.mock("@/components/dashboard/live-auto-refresh", () => ({
+  LiveAutoRefresh: () => null,
+}));
+
+const { DashboardSections } = await import("@/components/dashboard/dashboard-sections");
 
 const NOW = new Date("2026-06-12T10:00:00Z");
 
@@ -82,6 +89,7 @@ describe("<DashboardSections>", () => {
             awayScore: 1,
             minute: 67,
             prediction: null,
+            provisional: null,
           },
           nextMatch: null,
         })}

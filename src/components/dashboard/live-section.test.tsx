@@ -19,6 +19,7 @@ const liveMatch: LiveMatchView = {
     predictedHomeScore: 2,
     predictedAwayScore: 1,
   },
+  provisional: { points: 30, kind: "exact" },
 };
 
 const nextMatch: UpcomingHeroView = {
@@ -55,10 +56,22 @@ describe("<LiveSection>", () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it("renders 'Provisional' + 'Se calcula al final del partido' inside the live card", () => {
+  it("renders provisional points (+30 pts) with 'Provisional' badge inside the live card", () => {
     renderWithProviders(<LiveSection live={liveMatch} nextMatch={null} now={NOW} />);
     expect(screen.getByText("Provisional")).toBeInTheDocument();
+    expect(screen.getByText(/\+30 pts/)).toBeInTheDocument();
+  });
+
+  it("renders 'Se calcula al final' placeholder when there's no provisional yet", () => {
+    renderWithProviders(
+      <LiveSection
+        live={{ ...liveMatch, provisional: null }}
+        nextMatch={null}
+        now={NOW}
+      />,
+    );
     expect(screen.getByText(/Se calcula al final del partido/)).toBeInTheDocument();
+    expect(screen.queryByText(/\+30 pts/)).not.toBeInTheDocument();
   });
 
   it("renders 'No predijiste este partido' when user has no prediction", () => {
