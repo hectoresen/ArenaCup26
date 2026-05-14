@@ -104,13 +104,32 @@ export function createApiFootballProvider(config: ApiFootballConfig): MatchDataP
 
       // date-window mode: 1 request por día. api-football no admite
       // rango ?from/?to en el plan free, así que iteramos.
+      //
+      // Resiliencia por día: el plan free **también** restringe `?date=`
+      // a una ventana estrecha alrededor de hoy ("try from YYYY-MM-DD
+      // to YYYY-MM-DD"). Si un día concreto cae fuera, lo skippeamos
+      // con un log y seguimos con el resto en vez de abortar todo el
+      // sync. Errores no-plan (auth_failed, network_error) sí abortan
+      // porque indican problema global.
       const days = enumerateDates(opts.from, opts.to);
       const allFixtures: ApiFootballFixture[] = [];
       for (const day of days) {
-        const raw = await callApi<ApiFootballFixture[]>("/fixtures", {
-          date: day,
-        });
-        allFixtures.push(...raw);
+        try {
+          const raw = await callApi<ApiFootballFixture[]>("/fixtures", {
+            date: day,
+          });
+          allFixtures.push(...raw);
+        } catch (err) {
+          if (err instanceof ProviderError && err.code === "plan_limited") {
+            // Día fuera del rango del free tier: log y continúa.
+            // eslint-disable-next-line no-console
+            console.log(
+              `[WM/provider] plan_limited for date=${day}, skipping (free tier covers a narrow window)`,
+            );
+            continue;
+          }
+          throw err;
+        }
       }
       const leagueFilter =
         opts.leagueIds && opts.leagueIds.length > 0 ? new Set(opts.leagueIds) : null;

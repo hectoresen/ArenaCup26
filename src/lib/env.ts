@@ -34,9 +34,14 @@ const schema = z.object({
   //     funciona en el free tier para seasons 2022-2024 o con plan pago.
   //     Pensado para cuando llegue el Mundial 2026 y haya plan Pro.
   MATCH_DATA_MODE: z.enum(["date-window", "season"]).default("date-window"),
-  // date-window mode
+  // date-window mode. El free tier de api-football solo permite ?date=
+  // dentro de una ventana estrecha alrededor de hoy (típicamente hoy ±1
+  // día). Por defecto pedimos esa misma ventana mínima; el provider
+  // tolera plan_limited por día concreto y continúa con el resto.
+  // Con plan Pro se puede subir AFTER_DAYS para tener más predicciones
+  // por adelantado.
   MATCH_DATA_BEFORE_DAYS: z.coerce.number().int().nonnegative().default(1),
-  MATCH_DATA_AFTER_DAYS: z.coerce.number().int().nonnegative().default(7),
+  MATCH_DATA_AFTER_DAYS: z.coerce.number().int().nonnegative().default(1),
   // CSV de IDs de liga para filtrar localmente en date-window mode. Vacío =
   // todas las ligas que aparezcan en el rango. Ej: "140,253,71" para La Liga,
   // MLS y Brasileirão.
