@@ -28,15 +28,29 @@ async function main() {
   const wc = await seedWC2022(db);
   console.log(`✓ Teams: ${wc.teams}. Matches: ${wc.matches}.\n`);
 
-  console.log("→ Shifting kickoffs to future + reset to scheduled…");
-  const result = await db.execute<{ shifted: number }>(sql`
+  // Dos UPDATES separados para que sean idempotentes y robustos a
+  // estados anteriores parciales (e.g. fechas ya shifted pero status
+  // legacy). En orden: shift de fechas → reset de status.
+  console.log("→ Shifting kickoffs to future (solo los que están en el pasado)…");
+  const shifted = await db.execute<{ shifted: number }>(sql`
     WITH base AS (
       SELECT min(kickoff_at) AS oldest FROM matches WHERE kickoff_at < now()
     ),
-    shifted AS (
+    upd AS (
+      UPDATE matches
+      SET kickoff_at = kickoff_at + (now() + interval '6 hours' - (SELECT oldest FROM base))
+      WHERE kickoff_at < now()
+      RETURNING 1
+    )
+    SELECT count(*)::int AS shifted FROM upd;
+  `);
+  console.log(`✓ Shifted ${shifted[0]?.shifted ?? 0} matches.\n`);
+
+  console.log("→ Reseting all matches to status='scheduled' (limpia scores legacy)…");
+  const reset = await db.execute<{ reset: number }>(sql`
+    WITH upd AS (
       UPDATE matches
       SET
-        kickoff_at = kickoff_at + (now() + interval '6 hours' - (SELECT oldest FROM base)),
         status = 'scheduled',
         home_score = NULL,
         away_score = NULL,
@@ -44,12 +58,12 @@ async function main() {
         away_score_extra = NULL,
         penalty_winner_team_id = NULL,
         updated_at = now()
-      WHERE kickoff_at < now()
+      WHERE status <> 'scheduled' OR home_score IS NOT NULL OR away_score IS NOT NULL
       RETURNING 1
     )
-    SELECT count(*)::int AS shifted FROM shifted;
+    SELECT count(*)::int AS reset FROM upd;
   `);
-  console.log(`✓ Shifted ${result[0]?.shifted ?? 0} matches.\n`);
+  console.log(`✓ Reset ${reset[0]?.reset ?? 0} matches to scheduled.\n`);
 
   console.log("Done. Run `npm run dev` and open http://localhost:3000.");
   process.exit(0);

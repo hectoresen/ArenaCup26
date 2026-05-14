@@ -21,7 +21,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "fixtures": "tsx --env-file=.env scripts/fixtures.ts"
+    "fixtures": "tsx --env-file=.env scripts/fixtures.ts",
+    "diagnose:dashboard": "tsx --env-file=.env scripts/diagnose-dashboard.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.4",
