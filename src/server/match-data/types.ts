@@ -79,14 +79,34 @@ export type ProviderMatch = {
 export interface MatchDataProvider {
   /** Nombre legible del provider (para logs). */
   readonly name: string;
-  /** Devuelve todos los fixtures de una liga + temporada. */
+  /** Devuelve fixtures según el modo elegido (season completa o ventana de fechas). */
   getFixtures(opts: GetFixturesOptions): Promise<ProviderMatch[]>;
 }
 
-export type GetFixturesOptions = {
-  leagueId: string | number;
-  season: string | number;
-};
+/**
+ * Dos modos de query soportados:
+ *  - `season`: filtra por liga + temporada (`?league=X&season=Y` en
+ *    api-football). En el free tier solo funciona para seasons
+ *    2022-2024. Útil cuando tengamos plan pago para el Mundial 2026.
+ *  - `date-window`: trae todos los partidos de un rango de fechas
+ *    (`?date=YYYY-MM-DD` por día). Funciona en free tier para
+ *    cualquier season, pero no admite filtro server-side por liga:
+ *    si se quiere acotar a ciertas competiciones, pasar `leagueIds`
+ *    y el provider filtra localmente tras parsear.
+ */
+export type GetFixturesOptions =
+  | {
+      mode: "season";
+      leagueId: string | number;
+      season: string | number;
+    }
+  | {
+      mode: "date-window";
+      from: Date;
+      to: Date;
+      /** Si está set, los snapshots fuera de estas ligas se descartan. */
+      leagueIds?: number[];
+    };
 
 /**
  * Errores tipados del provider. El caller puede inspeccionar `code` o

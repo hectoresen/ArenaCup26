@@ -37,7 +37,7 @@ describe("createApiFootballProvider", () => {
       fetcher: fetcher as unknown as typeof fetch,
     });
 
-    const result = await provider.getFixtures({ leagueId: 1, season: 2022 });
+    const result = await provider.getFixtures({ mode: "season", leagueId: 1, season: 2022 });
     expect(result).toEqual([]);
     expect(fetcher).toHaveBeenCalledOnce();
   });
@@ -52,7 +52,7 @@ describe("createApiFootballProvider", () => {
       baseUrl: "https://example.test/",
       fetcher: fetcher as unknown as typeof fetch,
     });
-    await provider.getFixtures({ leagueId: 1, season: 2022 });
+    await provider.getFixtures({ mode: "season", leagueId: 1, season: 2022 });
   });
 
   it("translates plan limit errors to ProviderError 'plan_limited'", async () => {
@@ -63,7 +63,7 @@ describe("createApiFootballProvider", () => {
       },
     });
     const provider = createApiFootballProvider({ apiKey: "k", fetcher });
-    await expect(provider.getFixtures({ leagueId: 1, season: 2026 })).rejects.toMatchObject({
+    await expect(provider.getFixtures({ mode: "season", leagueId: 1, season: 2026 })).rejects.toMatchObject({
       name: "ProviderError",
       code: "plan_limited",
       source: "api-football",
@@ -75,7 +75,7 @@ describe("createApiFootballProvider", () => {
       body: { ...MIN_ENVELOPE, errors: { rateLimit: "You reached the rate limit" } },
     });
     const provider = createApiFootballProvider({ apiKey: "k", fetcher });
-    await expect(provider.getFixtures({ leagueId: 1, season: 2022 })).rejects.toMatchObject({
+    await expect(provider.getFixtures({ mode: "season", leagueId: 1, season: 2022 })).rejects.toMatchObject({
       code: "rate_limited",
     });
   });
@@ -85,7 +85,7 @@ describe("createApiFootballProvider", () => {
       body: { ...MIN_ENVELOPE, errors: { token: "Missing or invalid API token" } },
     });
     const provider = createApiFootballProvider({ apiKey: "bad", fetcher });
-    await expect(provider.getFixtures({ leagueId: 1, season: 2022 })).rejects.toMatchObject({
+    await expect(provider.getFixtures({ mode: "season", leagueId: 1, season: 2022 })).rejects.toMatchObject({
       code: "auth_failed",
     });
   });
@@ -93,7 +93,7 @@ describe("createApiFootballProvider", () => {
   it("translates HTTP 401 to auth_failed", async () => {
     const fetcher = makeFetcher({ status: 401, body: {} });
     const provider = createApiFootballProvider({ apiKey: "bad", fetcher });
-    await expect(provider.getFixtures({ leagueId: 1, season: 2022 })).rejects.toMatchObject({
+    await expect(provider.getFixtures({ mode: "season", leagueId: 1, season: 2022 })).rejects.toMatchObject({
       code: "auth_failed",
       httpStatus: 401,
     });
@@ -102,7 +102,7 @@ describe("createApiFootballProvider", () => {
   it("translates HTTP 429 to rate_limited", async () => {
     const fetcher = makeFetcher({ status: 429, body: {} });
     const provider = createApiFootballProvider({ apiKey: "k", fetcher });
-    await expect(provider.getFixtures({ leagueId: 1, season: 2022 })).rejects.toMatchObject({
+    await expect(provider.getFixtures({ mode: "season", leagueId: 1, season: 2022 })).rejects.toMatchObject({
       code: "rate_limited",
     });
   });
@@ -112,7 +112,7 @@ describe("createApiFootballProvider", () => {
       throw new Error("ECONNREFUSED");
     }) as unknown as typeof fetch;
     const provider = createApiFootballProvider({ apiKey: "k", fetcher });
-    await expect(provider.getFixtures({ leagueId: 1, season: 2022 })).rejects.toMatchObject({
+    await expect(provider.getFixtures({ mode: "season", leagueId: 1, season: 2022 })).rejects.toMatchObject({
       code: "network_error",
     });
   });
@@ -148,7 +148,7 @@ describe("createApiFootballProvider", () => {
     });
 
     const provider = createApiFootballProvider({ apiKey: "k", fetcher });
-    const result = await provider.getFixtures({ leagueId: 1, season: 2022 });
+    const result = await provider.getFixtures({ mode: "season", leagueId: 1, season: 2022 });
     expect(result).toHaveLength(1);
     expect(result[0]?.externalId).toBe("999");
     expect(result[0]?.scoreAt90).toEqual({ home: 2, away: 1 });

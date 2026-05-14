@@ -78,6 +78,13 @@ function buildInMemoryRepo(
       if (!existing) throw new Error(`update on missing row ${matchId}`);
       matchRows.set(matchId, { ...existing, ...patch });
     },
+    // Repo en memoria: si el sync intenta upsertar un team, lo
+    // metemos en `teamMap` con un UUID derivado del externalId.
+    upsertTeamFromProvider: async (team) => {
+      const id = teamMap.get(team.externalId) ?? `uuid-${team.externalId}`;
+      teamMap.set(team.externalId, id);
+      return id;
+    },
   };
 }
 
@@ -86,7 +93,7 @@ describe("syncFixtures", () => {
     const provider = buildProvider([buildSnapshot(), buildSnapshot({ externalId: "fix-2" })]);
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    const report = await syncFixtures({ provider, repo, leagueId: 1, season: 2022 });
+    const report = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
 
     expect(report).toEqual({
       source: "test-provider",
@@ -103,8 +110,8 @@ describe("syncFixtures", () => {
     const provider = buildProvider([buildSnapshot()]);
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    await syncFixtures({ provider, repo, leagueId: 1, season: 2022 });
-    const second = await syncFixtures({ provider, repo, leagueId: 1, season: 2022 });
+    await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
+    const second = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
 
     expect(second.inserted).toBe(0);
     expect(second.updated).toBe(0);
@@ -129,7 +136,7 @@ describe("syncFixtures", () => {
     });
     const provider = buildProvider([buildSnapshot()]);
 
-    const report = await syncFixtures({ provider, repo, leagueId: 1, season: 2022 });
+    const report = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
 
     expect(report.updated).toBe(1);
     expect(report.inserted).toBe(0);
@@ -148,7 +155,7 @@ describe("syncFixtures", () => {
     ]);
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    const report = await syncFixtures({ provider, repo, leagueId: 1, season: 2022 });
+    const report = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
 
     expect(report.inserted).toBe(2);
     expect(report.skipped).toBe(1);
@@ -157,23 +164,27 @@ describe("syncFixtures", () => {
     ]);
   });
 
-  it("skips a snapshot whose teams aren't mapped", async () => {
+  it("upserts unknown teams on the fly instead of skipping the snapshot", async () => {
+    // Antes esto se skipeaba como `team_not_mapped`. Con date-window
+    // mode no llamamos `/teams` para sembrar previamente, así que el
+    // sync deriva el team del propio snapshot y lo inserta.
     const provider = buildProvider([
       buildSnapshot({
         externalId: "fix-x",
-        homeTeam: { externalId: "999", name: "Unknown", code: null, logo: null },
+        homeTeam: { externalId: "999", name: "Unknown FC", code: null, logo: null },
       }),
     ]);
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    const report = await syncFixtures({ provider, repo, leagueId: 1, season: 2022 });
-
-    expect(report.inserted).toBe(0);
-    expect(report.skipped).toBe(1);
-    expect(report.errors[0]).toMatchObject({
-      externalId: "fix-x",
-      reason: "team_not_mapped",
+    const report = await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 1, season: 2022 },
     });
+
+    expect(report.inserted).toBe(1);
+    expect(report.skipped).toBe(0);
+    expect(report.errors).toEqual([]);
   });
 
   it("propagates ProviderError thrown by getFixtures", async () => {
@@ -185,7 +196,7 @@ describe("syncFixtures", () => {
     };
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    await expect(syncFixtures({ provider, repo, leagueId: 1, season: 2022 })).rejects.toThrow(
+    await expect(syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } })).rejects.toThrow(
       ProviderError,
     );
   });
@@ -204,7 +215,7 @@ describe("syncFixtures", () => {
       return originalInsert(...args);
     };
 
-    const report = await syncFixtures({ provider, repo, leagueId: 1, season: 2022 });
+    const report = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
 
     expect(report.inserted).toBe(1);
     expect(report.errors).toHaveLength(1);
@@ -214,13 +225,21 @@ describe("syncFixtures", () => {
     });
   });
 
-  it("calls provider.getFixtures with the correct league/season", async () => {
+  it("forwards the fetch options to provider.getFixtures verbatim", async () => {
     const provider = buildProvider([]);
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    await syncFixtures({ provider, repo, leagueId: 42, season: 2026 });
+    await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 42, season: 2026 },
+    });
 
-    expect(provider.getFixtures).toHaveBeenCalledWith({ leagueId: 42, season: 2026 });
+    expect(provider.getFixtures).toHaveBeenCalledWith({
+      mode: "season",
+      leagueId: 42,
+      season: 2026,
+    });
   });
 
   it("inserts within the same batch are visible to subsequent snapshots (matchMap copy is mutated)", async () => {
@@ -245,7 +264,7 @@ describe("syncFixtures", () => {
     ]);
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    const report = await syncFixtures({ provider, repo, leagueId: 1, season: 2022 });
+    const report = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
 
     expect(report.inserted).toBe(1);
     expect(report.updated).toBe(1);

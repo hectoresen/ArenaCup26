@@ -92,14 +92,49 @@ export function createApiFootballProvider(config: ApiFootballConfig): MatchDataP
     name: PROVIDER_NAME,
 
     async getFixtures(opts: GetFixturesOptions): Promise<ProviderMatch[]> {
-      const raw = await callApi<ApiFootballFixture[]>("/fixtures", {
-        league: opts.leagueId,
-        season: opts.season,
-      });
       const fetchedAt = new Date();
-      return raw.map((f) => parseApiFootballFixture(f, fetchedAt));
+
+      if (opts.mode === "season") {
+        const raw = await callApi<ApiFootballFixture[]>("/fixtures", {
+          league: opts.leagueId,
+          season: opts.season,
+        });
+        return raw.map((f) => parseApiFootballFixture(f, fetchedAt));
+      }
+
+      // date-window mode: 1 request por día. api-football no admite
+      // rango ?from/?to en el plan free, así que iteramos.
+      const days = enumerateDates(opts.from, opts.to);
+      const allFixtures: ApiFootballFixture[] = [];
+      for (const day of days) {
+        const raw = await callApi<ApiFootballFixture[]>("/fixtures", {
+          date: day,
+        });
+        allFixtures.push(...raw);
+      }
+      const leagueFilter =
+        opts.leagueIds && opts.leagueIds.length > 0 ? new Set(opts.leagueIds) : null;
+      const filtered = leagueFilter
+        ? allFixtures.filter((f) => leagueFilter.has(f.league.id))
+        : allFixtures;
+      return filtered.map((f) => parseApiFootballFixture(f, fetchedAt));
     },
   };
+}
+
+/**
+ * Lista los días entre `from` y `to` (ambos inclusive) en formato
+ * `YYYY-MM-DD` UTC. Si `from > to` devuelve vacío.
+ */
+function enumerateDates(from: Date, to: Date): string[] {
+  const days: string[] = [];
+  const cursor = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()));
+  const end = new Date(Date.UTC(to.getUTCFullYear(), to.getUTCMonth(), to.getUTCDate()));
+  while (cursor.getTime() <= end.getTime()) {
+    days.push(cursor.toISOString().slice(0, 10));
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return days;
 }
 
 function codeFromHttpStatus(status: number): ProviderErrorCode {

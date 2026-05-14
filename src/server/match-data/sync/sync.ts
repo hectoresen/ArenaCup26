@@ -6,8 +6,14 @@ import type { MatchRepo, SyncReport } from "./types";
 export type SyncFixturesInput = {
   provider: MatchDataProvider;
   repo: MatchRepo;
-  leagueId: number;
-  season: number;
+  /**
+   * Cómo pedir fixtures al provider. Forwardeado directamente. Ver
+   * `GetFixturesOptions` en `../types.ts` para los dos modos
+   * soportados (season completa vs ventana de fechas).
+   */
+  fetch:
+    | { mode: "season"; leagueId: number; season: number }
+    | { mode: "date-window"; from: Date; to: Date; leagueIds?: number[] };
   /**
    * Hook opcional invocado cuando un match transiciona a `finished`
    * en este sync (no estaba en `finished` antes y el update lo pone).
@@ -33,17 +39,56 @@ export type SyncFixturesInput = {
  *   produce un segundo reporte con `inserted: 0, updated: 0`.
  */
 export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport> {
-  const { provider, repo, leagueId, season, onMatchFinished } = input;
+  const { provider, repo, fetch, onMatchFinished } = input;
   const source = provider.name;
   const finishedTransitions: string[] = [];
 
-  dlog("sync", "fetching fixtures from provider", { source, leagueId, season });
-  const snapshots = await provider.getFixtures({ leagueId, season });
+  dlog("sync", "fetching fixtures from provider", { source, fetch });
+  const snapshots = await provider.getFixtures(fetch);
   dlog("sync", `provider returned ${snapshots.length} snapshots`);
 
-  const teamMap = await repo.loadTeamMap(source);
+  const teamMapImmutable = await repo.loadTeamMap(source);
+  // Mutable copy: el sync irá descubriendo teams nuevos y los inserta
+  // al vuelo para que el reconciler los encuentre.
+  const teamMap = new Map(teamMapImmutable);
   const matchMap = new Map(await repo.loadMatchMap(source));
   dlog("sync", "repo maps loaded", { teams: teamMap.size, matches: matchMap.size });
+
+  // Primera pasada: upsertar todos los teams desconocidos a partir
+  // de los snapshots. Antes esto lo hacía `ensureTeamsSeeded` con un
+  // /teams call separado; con el modo date-window ese endpoint no
+  // está disponible para seasons en curso en el free tier, así que
+  // derivamos los teams directamente de los fixtures.
+  const seenExternalIds = new Set<string>();
+  let teamsInserted = 0;
+  for (const snap of snapshots) {
+    for (const team of [snap.homeTeam, snap.awayTeam]) {
+      if (teamMap.has(team.externalId) || seenExternalIds.has(team.externalId)) continue;
+      seenExternalIds.add(team.externalId);
+      try {
+        const teamId = await repo.upsertTeamFromProvider(
+          {
+            externalId: team.externalId,
+            name: team.name,
+            code: team.code,
+            flag: team.logo,
+          },
+          source,
+        );
+        teamMap.set(team.externalId, teamId);
+        teamsInserted++;
+      } catch (err) {
+        dlog("sync", "upsertTeamFromProvider failed", {
+          externalId: team.externalId,
+          name: team.name,
+          err: err instanceof Error ? err.message : String(err),
+        });
+      }
+    }
+  }
+  if (teamsInserted > 0) {
+    dlog("sync", `derived ${teamsInserted} new teams from fixtures`);
+  }
 
   const report: SyncReport = {
     source,

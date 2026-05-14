@@ -22,7 +22,11 @@ describe.skipIf(!process.env.API_FOOTBALL_KEY)(
     });
 
     it("fetches Qatar 2022 fixtures (league=1, season=2022)", async () => {
-      const fixtures = await provider.getFixtures({ leagueId: 1, season: 2022 });
+      const fixtures = await provider.getFixtures({
+        mode: "season",
+        leagueId: 1,
+        season: 2022,
+      });
 
       // El Mundial 2022 tuvo 64 partidos. La api debería devolver al menos
       // los 64 oficiales (a veces algún partido extra de calificación).

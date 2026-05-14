@@ -125,14 +125,16 @@ Llama el endpoint del propio servidor para que vaya a traer partidos:
 curl -X POST http://localhost:3000/api/cron/sync-fixtures
 ```
 
-La primera vez:
-1. Detecta que `team_external_ids` está vacío → **siembra automáticamente** los equipos de la liga/season que pongas en `MATCH_DATA_LEAGUE_ID` / `MATCH_DATA_SEASON` (default `140`/`2026` = La Liga 2026 si existe). 1 request al provider.
-2. Llama `GET /fixtures?league=...` para los partidos. Otra request.
-3. Inserta en `matches`, mapeando teams.
+Comportamiento por defecto (`MATCH_DATA_MODE=date-window`):
+1. Calcula la ventana de días: hoy − `MATCH_DATA_BEFORE_DAYS` (default 1) … hoy + `MATCH_DATA_AFTER_DAYS` (default 7).
+2. Hace 1 request `GET /fixtures?date=YYYY-MM-DD` por cada día de la ventana (9 con la config default).
+3. Si `MATCH_DATA_LEAGUE_FILTER` está definido (CSV de IDs de liga), filtra localmente.
+4. Por cada team del provider desconocido, lo upserta sobre la marcha en `teams` + `team_external_ids` derivando el código del nombre.
+5. Mete los fixtures en `matches`. Idempotente: 2ª llamada con la misma BD = 0 inserciones, solo updates.
 
-A partir de la segunda llamada solo trae partidos (1 req). Sin `CRON_SECRET` configurado en local, cualquier POST se acepta.
+Sin `CRON_SECRET` en local, cualquier POST se acepta.
 
-> Plan free de api-football: solo seasons 2022–2024. Si tu `.env` apunta a 2026 verás el error `plan_limited` — cámbialo a `MATCH_DATA_SEASON=2024` para probar localmente.
+> Plan free de api-football: el filtro `?league=X&season=Y` solo cubre seasons 2022-2024. Por eso el default va con `date-window`, que sí funciona en seasons actuales. Si tienes plan Pro y quieres volver al modo histórico, set `MATCH_DATA_MODE=season` + `MATCH_DATA_LEAGUE_ID/SEASON`.
 
 ### 9.2 Forzar un partido en vivo (sin esperar a uno real)
 

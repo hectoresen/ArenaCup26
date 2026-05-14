@@ -26,8 +26,32 @@ const schema = z.object({
   // Cron secret para autenticar invocaciones al endpoint de sync. Required en
   // producción; opcional en dev para invocar el endpoint manualmente sin auth.
   CRON_SECRET: z.string().optional(),
-  // League/season que el cron sincroniza. Por defecto World Cup 2026 en
-  // api-football (league=1, season=2026). Para tests usamos season=2022.
+  // Modo de sincronización:
+  //  - "date-window" (default): trae fixtures de los últimos N días + próximos
+  //     M días vía `?date=YYYY-MM-DD`. Funciona en el free tier para seasons
+  //     en curso. Ver MATCH_DATA_BEFORE_DAYS y MATCH_DATA_AFTER_DAYS.
+  //  - "season": filtra por liga+temporada (`?league=X&season=Y`). Solo
+  //     funciona en el free tier para seasons 2022-2024 o con plan pago.
+  //     Pensado para cuando llegue el Mundial 2026 y haya plan Pro.
+  MATCH_DATA_MODE: z.enum(["date-window", "season"]).default("date-window"),
+  // date-window mode
+  MATCH_DATA_BEFORE_DAYS: z.coerce.number().int().nonnegative().default(1),
+  MATCH_DATA_AFTER_DAYS: z.coerce.number().int().nonnegative().default(7),
+  // CSV de IDs de liga para filtrar localmente en date-window mode. Vacío =
+  // todas las ligas que aparezcan en el rango. Ej: "140,253,71" para La Liga,
+  // MLS y Brasileirão.
+  MATCH_DATA_LEAGUE_FILTER: z
+    .string()
+    .optional()
+    .transform((v) =>
+      v
+        ? v
+            .split(",")
+            .map((s) => Number(s.trim()))
+            .filter((n) => Number.isFinite(n) && n > 0)
+        : [],
+    ),
+  // season mode (también queda como default para "no romper docs")
   MATCH_DATA_LEAGUE_ID: z.coerce.number().int().positive().default(1),
   MATCH_DATA_SEASON: z.coerce.number().int().positive().default(2026),
 

@@ -17,8 +17,7 @@ type Scope =
   | "scoring"
   | "predict"
   | "ranking"
-  | "notify"
-  | "teams-seed";
+  | "notify";
 
 /**
  * Loguea un evento del pipeline. El payload se serializa con JSON.stringify

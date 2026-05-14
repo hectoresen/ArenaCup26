@@ -107,6 +107,22 @@ export type SyncReport = {
 };
 
 /**
+ * Datos mínimos para upsertar un team a partir de un snapshot del
+ * provider. El sync orchestrator construye uno de estos por cada team
+ * (home + away) que no esté ya en `teamMap`.
+ */
+export type ProviderTeamUpsert = {
+  /** ID del team en el provider (e.g. "541" para Real Madrid). */
+  externalId: string;
+  /** Nombre legible. */
+  name: string;
+  /** Código FIFA (3 letras) si lo aporta el provider; null si no. */
+  code: string | null;
+  /** Bandera o emoji asociado; null si no disponible. */
+  flag: string | null;
+};
+
+/**
  * Interfaz mínima que el orquestador necesita de la capa de
  * persistencia. Se mockea trivialmente en tests sin levantar Postgres.
  */
@@ -116,4 +132,15 @@ export type MatchRepo = {
   loadMatchById: (matchId: string) => Promise<CurrentMatchRow | null>;
   insertMatch: (row: MatchInsertRow, externalId: string, source: string) => Promise<string>;
   updateMatch: (matchId: string, patch: MatchUpdatePatch) => Promise<void>;
+  /**
+   * Inserta un team nuevo o reusa uno existente y devuelve su UUID.
+   * Usado por el sync cuando un team del provider no está mapeado:
+   * inserta tanto en `teams` (upsert por code) como en `team_external_ids`.
+   * Si dos teams del provider colisionan en el mismo `code`, genera un
+   * código derivado del nombre para evitar romper la unique constraint.
+   */
+  upsertTeamFromProvider: (
+    team: ProviderTeamUpsert,
+    source: string,
+  ) => Promise<string>;
 };

@@ -30,8 +30,12 @@ En el web service, tab `Variables`. Añade:
 | `NEXT_PUBLIC_APP_URL` | la URL de Railway (paso 4) | |
 | `API_FOOTBALL_KEY` | tu key | Opcional; sin esto el sync responde 500 |
 | `API_FOOTBALL_BASE_URL` | `https://v3.football.api-sports.io` | |
-| `MATCH_DATA_LEAGUE_ID` | `1` | |
-| `MATCH_DATA_SEASON` | `2026` | |
+| `MATCH_DATA_MODE` | `date-window` | Default. Cambia a `season` solo si tienes plan pago en api-football y quieres filtrar por liga/temporada. |
+| `MATCH_DATA_BEFORE_DAYS` | `1` | Días en el pasado a sincronizar (para captar partidos que acaban de terminar). |
+| `MATCH_DATA_AFTER_DAYS` | `7` | Días en el futuro a sincronizar (para que el usuario tenga qué predecir). |
+| `MATCH_DATA_LEAGUE_FILTER` | _(opcional)_ | CSV de IDs de liga para acotar localmente (ej. `140,253,71` = La Liga + MLS + Brasileirão). Vacío = todas las ligas que aparezcan en el rango. |
+| `MATCH_DATA_LEAGUE_ID` | `1` | Solo usado si `MATCH_DATA_MODE=season`. |
+| `MATCH_DATA_SEASON` | `2026` | Solo usado si `MATCH_DATA_MODE=season`. |
 | `NODE_ENV` | `production` | Railway lo pone solo, verifica |
 
 `DATABASE_URL` no la metas a mano — viene de la referencia al servicio Postgres.
@@ -76,11 +80,14 @@ La app está diseñada para que **no toques nada a mano**. La primera llamada al
    ```bash
    curl -X POST https://<tu-dominio>.up.railway.app/api/cron/sync-fixtures
    ```
-   Internamente:
-   - Detecta que `team_external_ids` está vacío → llama `GET /teams?league=X&season=Y` y siembra los equipos con su mapping. (1 request a api-football)
-   - Llama `GET /fixtures?league=X&season=Y` y mete los partidos en `matches`. (1 request)
+   Internamente (modo `date-window`, default):
+   - Calcula la ventana: hoy − `MATCH_DATA_BEFORE_DAYS` … hoy + `MATCH_DATA_AFTER_DAYS`.
+   - Hace 1 request `?date=YYYY-MM-DD` por día (9 req con la config por defecto).
+   - Filtra localmente por `MATCH_DATA_LEAGUE_FILTER` si está definido.
+   - Para cada team del provider que no esté en BD, lo upserta a la marcha (no hay `/teams` call separado — el free tier no lo permite para seasons actuales).
+   - Mete los fixtures en `matches`. Para los partidos que ya vienen `finished` con predicciones, dispara el scoring pipeline.
 
-   A partir de la segunda llamada solo trae fixtures (1 req).
+   Si prefieres usar `MATCH_DATA_MODE=season` (con plan pago de api-football), el sync hace 1 sola request `?league=X&season=Y` y no rellena automáticamente teams nuevos durante un partido del Mundial; ese flujo es ideal cuando el catálogo de teams es fijo.
 
 2. **Predecir** desde la web: `/partidos` → click en un match futuro → "Ganador" o "Marcador exacto".
 
@@ -115,11 +122,14 @@ En el repo hay un workflow de GitHub Actions ya escrito: `.github/workflows/sync
    - `RAILWAY_SYNC_URL` con `https://<tu-dominio>.up.railway.app/api/cron/sync-fixtures`.
    - (Recomendado) `CRON_SECRET` con un valor largo (`openssl rand -base64 32`). Si lo configuras aquí, añade la **misma** variable en Railway → tab `Variables` para que el endpoint exija ese bearer.
 
-2. El workflow ya está activo (cron `*/15 * * * *`). Lo puedes:
-   - Ver corriendo en **Actions** del repo cada 15 min.
+2. El workflow ya está activo (cron `0 */3 * * *` — cada 3 h). Lo puedes:
+   - Ver corriendo en **Actions** del repo cada 3 horas.
    - Disparar manualmente con **Actions → Sync fixtures → Run workflow**.
 
-3. Coste de API: con 1 liga y `*/15`, consumes 96 requests al día. Cabe en el cupo free de api-football (100/día). Si añades más ligas, baja a `*/30` o configura ventanas.
+3. Coste de API (default `date-window`, ventana de 9 días):
+   - 9 días × 1 req/día = 9 req por sync.
+   - 8 syncs/día × 9 req = **72 req/día** (free tier 100/día — cabe con margen).
+   - Si subes la cadencia o la ventana, bajará el margen rápido. Ej. cada 1h con misma ventana = 216 req/día (sobrepasa). En ese caso pagas plan Pro y vuelves a `MATCH_DATA_MODE=season`.
 
 > Cuando aterrice `add-leaderboard-sse`, este cron se mantendrá pero el cliente recibirá los cambios en tiempo real vía push (sin tener que esperar al próximo tick).
 
