@@ -50,6 +50,44 @@
     },
     "backToHome": "العودة إلى لوحة التحكم"
   },
+  "matches": {
+    "title": "المباريات",
+    "empty": "لا توجد مباريات بعد. شغّل `npm run fixtures` أو زامن يدويًا مع API-Football.",
+    "dayLabel": "مباريات اليوم",
+    "matchCount": {
+      "one": "مباراة",
+      "many": "مباراة"
+    },
+    "backToList": "العودة إلى القائمة",
+    "afterExtraTime": "بعد الوقت الإضافي",
+    "penaltyWinner": "فائز بركلات الترجيح",
+    "status": {
+      "live": "مباشر",
+      "finished": "انتهت",
+      "postponed": "مؤجلة",
+      "cancelled": "ملغاة",
+      "predictionLocked": "مقفلة"
+    },
+    "stages": {
+      "group": "دور المجموعات",
+      "round-of-16": "ثمن النهائي",
+      "quarter": "ربع النهائي",
+      "semi": "نصف النهائي",
+      "third-place": "تحديد المركز الثالث",
+      "final": "النهائي"
+    },
+    "card": {
+      "tbdLabel": "الفرق ستُحدَّد لاحقًا",
+      "tbdPending": "معلّق",
+      "predict": "توقع",
+      "predictionSent": "تم إرسال التوقع"
+    },
+    "predictionStub": {
+      "titleNew": "توقع",
+      "titleEdit": "توقعك",
+      "body": "نموذج التوقع (بسيط / دقيق / مزدوج) في الطريق. في هذه الأثناء يمكنك رؤية تفاصيل المباراة هنا."
+    }
+  },
   "publicProfile": {
     "identityLabel": "الملف الشخصي لـ {name}",
     "avatarLabel": "الصورة الرمزية لـ {name}",

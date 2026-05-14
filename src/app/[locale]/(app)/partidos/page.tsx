@@ -1,7 +1,15 @@
-import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
+import { MatchesList } from "@/components/matches/matches-list";
+import { auth } from "@/lib/auth";
+import { db } from "@/server/db/client";
+import { getAllMatches } from "@/server/matches/queries";
 
+/**
+ * Listado de todos los partidos disponibles, agrupados por día.
+ * Click en una card lleva al detalle `/partidos/[id]`.
+ */
 export default async function PartidosPage({
   params,
 }: {
@@ -9,24 +17,38 @@ export default async function PartidosPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ComingSoon section="matches" />;
+
+  const session = await auth();
+  if (!session?.user?.id) redirect(`/${locale}`);
+
+  const matches = await getAllMatches(db, session.user.id);
+
+  return (
+    <PartidosLayout count={matches.length}>
+      <MatchesList matches={matches} />
+    </PartidosLayout>
+  );
 }
 
-function ComingSoon({ section }: { section: "matches" | "achievements" }) {
-  const t = useTranslations("comingSoon");
+function PartidosLayout({
+  count,
+  children,
+}: {
+  count: number;
+  children: React.ReactNode;
+}) {
+  const t = useTranslations("matches");
   return (
-    <section className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-center">
-      <span aria-hidden="true" className="text-5xl">
-        ⚽
-      </span>
-      <h1 className="font-display text-2xl text-gold">{t(`title.${section}`)}</h1>
-      <p className="max-w-xs text-sm font-bold text-muted">{t(`body.${section}`)}</p>
-      <Link
-        href="/inicio"
-        className="mt-2 inline-flex items-center gap-1.5 rounded-full border-2 border-gold/30 bg-card px-4 py-1.5 text-xs font-extrabold text-gold transition-colors hover:border-gold hover:bg-card-hover"
-      >
-        ← {t("backToHome")}
-      </Link>
-    </section>
+    <>
+      <header className="mb-6">
+        <h1 className="mb-1 font-display text-[26px] leading-none text-foreground">
+          {t("title")}
+        </h1>
+        <p className="text-[13px] font-bold text-muted">
+          {count} {count === 1 ? t("matchCount.one") : t("matchCount.many")}
+        </p>
+      </header>
+      {children}
+    </>
   );
 }

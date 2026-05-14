@@ -50,6 +50,44 @@
     },
     "backToHome": "Retour au tableau de bord"
   },
+  "matches": {
+    "title": "Matchs",
+    "empty": "Aucun match pour le moment. Lance `npm run fixtures` ou la synchro manuelle avec API-Football.",
+    "dayLabel": "Matchs du jour",
+    "matchCount": {
+      "one": "match",
+      "many": "matchs"
+    },
+    "backToList": "Retour à la liste",
+    "afterExtraTime": "Après prolongation",
+    "penaltyWinner": "Gagne aux tirs au but",
+    "status": {
+      "live": "En direct",
+      "finished": "Final",
+      "postponed": "Reporté",
+      "cancelled": "Annulé",
+      "predictionLocked": "Verrouillé"
+    },
+    "stages": {
+      "group": "Phase de groupes",
+      "round-of-16": "Huitièmes de finale",
+      "quarter": "Quarts de finale",
+      "semi": "Demi-finales",
+      "third-place": "Match pour la 3e place",
+      "final": "Finale"
+    },
+    "card": {
+      "tbdLabel": "Équipes à déterminer",
+      "tbdPending": "En attente",
+      "predict": "Prédire",
+      "predictionSent": "Prédiction envoyée"
+    },
+    "predictionStub": {
+      "titleNew": "Prédiction",
+      "titleEdit": "Ta prédiction",
+      "body": "Le formulaire pour soumettre des prédictions simple/exacte/double arrive. En attendant, voici le détail du match."
+    }
+  },
   "publicProfile": {
     "identityLabel": "Profil de {name}",
     "avatarLabel": "Avatar de {name}",
