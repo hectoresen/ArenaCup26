@@ -1,5 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
+import { dlog } from "@/lib/debug-log";
 import type { Database } from "@/server/db/client";
 import {
   matches,
@@ -78,16 +79,23 @@ export async function processFinishedMatch(
 
   const match = rows[0];
   if (!match) {
+    dlog("scoring", "match_not_found", { matchId });
     result.errors.push({ userId: "<n/a>", reason: "match_not_found" });
     return result;
   }
 
   if (match.status !== "finished") {
+    dlog("scoring", "match_not_finished, skipping", { matchId, status: match.status });
     result.errors.push({ userId: "<n/a>", reason: `match_status_${match.status}` });
     return result;
   }
 
   const outcome = matchRowToOutcome(match);
+  dlog("scoring", "processing finished match", {
+    matchId,
+    matchup: matchupLabel(match.homeTeamName, match.awayTeamName),
+    outcome,
+  });
 
   const matchPredictions = await db
     .select({
@@ -99,11 +107,13 @@ export async function processFinishedMatch(
     })
     .from(predictions)
     .where(eq(predictions.matchId, matchId));
+  dlog("scoring", `found ${matchPredictions.length} predictions to score`);
 
   for (const p of matchPredictions) {
     try {
       const wasProcessed = await hasPointEventFor(db, p.userId, matchId);
       if (wasProcessed) {
+        dlog("scoring", "already scored, skipping", { userId: p.userId, matchId });
         result.skipped++;
         continue;
       }
@@ -116,6 +126,13 @@ export async function processFinishedMatch(
         predictedAwayScore: p.predictedAwayScore,
       };
       const scored = scoreMatchPrediction(outcome, prediction, streakBefore);
+      dlog("scoring", "scored prediction", {
+        userId: p.userId,
+        kind: scored.kind,
+        points: scored.points,
+        combos: scored.comboBonuses.length,
+        streakAfter: scored.streakAfter.current,
+      });
 
       await persistScore({
         db,
@@ -126,6 +143,10 @@ export async function processFinishedMatch(
       });
       result.processed++;
     } catch (err) {
+      dlog("scoring", "error persisting score", {
+        userId: p.userId,
+        err: err instanceof Error ? err.message : String(err),
+      });
       result.errors.push({
         userId: p.userId,
         reason: err instanceof Error ? err.message : String(err),
@@ -133,6 +154,12 @@ export async function processFinishedMatch(
     }
   }
 
+  dlog("scoring", "processFinishedMatch done", {
+    matchId,
+    processed: result.processed,
+    skipped: result.skipped,
+    errors: result.errors.length,
+  });
   return result;
 }
 

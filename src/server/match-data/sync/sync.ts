@@ -1,3 +1,4 @@
+import { dlog } from "@/lib/debug-log";
 import type { MatchDataProvider } from "../types";
 import { reconcileMatch } from "./reconcile";
 import type { MatchRepo, SyncReport } from "./types";
@@ -36,10 +37,13 @@ export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport
   const source = provider.name;
   const finishedTransitions: string[] = [];
 
+  dlog("sync", "fetching fixtures from provider", { source, leagueId, season });
   const snapshots = await provider.getFixtures({ leagueId, season });
+  dlog("sync", `provider returned ${snapshots.length} snapshots`);
 
   const teamMap = await repo.loadTeamMap(source);
   const matchMap = new Map(await repo.loadMatchMap(source));
+  dlog("sync", "repo maps loaded", { teams: teamMap.size, matches: matchMap.size });
 
   const report: SyncReport = {
     source,
@@ -62,6 +66,12 @@ export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport
           const newId = await repo.insertMatch(result.row, result.externalId, source);
           matchMap.set(result.externalId, newId);
           report.inserted++;
+          dlog("sync", "insert", {
+            extId: result.externalId,
+            newId,
+            status: result.row.status,
+            stage: result.row.stage,
+          });
           // Caso raro pero posible: el provider trae un match ya
           // finalizado que aún no existía en BD. Lo procesamos también.
           if (result.row.status === "finished") {
@@ -72,6 +82,11 @@ export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport
         case "update": {
           await repo.updateMatch(result.matchId, result.patch);
           report.updated++;
+          dlog("sync", "update", {
+            matchId: result.matchId,
+            patch: result.patch,
+            prevStatus: current?.status,
+          });
           // Detección de transición a `finished`: el current existía y
           // NO estaba en finished, y el patch lo pone en finished.
           if (
@@ -89,6 +104,11 @@ export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport
         }
         case "skip": {
           report.skipped++;
+          dlog("sync", "skip", {
+            extId: result.externalId,
+            reason: result.reason,
+            detail: result.detail,
+          });
           report.errors.push({
             externalId: result.externalId,
             reason: result.reason,
@@ -106,9 +126,18 @@ export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport
     }
   }
 
+  dlog("sync", "reconcile loop done", {
+    inserted: report.inserted,
+    updated: report.updated,
+    noop: report.noop,
+    skipped: report.skipped,
+    finishedTransitions: finishedTransitions.length,
+  });
+
   // Disparar el hook de finished tras el batch. Fallos aquí se
   // capturan como `report.errors` para no abortar.
   if (onMatchFinished && finishedTransitions.length > 0) {
+    dlog("sync", `firing onMatchFinished for ${finishedTransitions.length} matches`);
     for (const matchId of finishedTransitions) {
       try {
         await onMatchFinished(matchId);
