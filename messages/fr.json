@@ -52,7 +52,11 @@
   },
   "matches": {
     "title": "Matchs",
-    "empty": "Aucun match pour le moment. Lance `npm run fixtures` ou la synchro manuelle avec API-Football.",
+    "empty": {
+      "title": "Aucun match pour le moment",
+      "body": "Nous attendons le prochain calendrier. Dès qu'il sera publié, tu verras les matchs ici avec leur date et heure de coup d'envoi.",
+      "cta": "Retour au tableau de bord"
+    },
     "dayLabel": "Matchs du jour",
     "matchCount": {
       "one": "match",

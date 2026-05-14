@@ -52,7 +52,11 @@
   },
   "matches": {
     "title": "Partidos",
-    "empty": "Aún no hay partidos. Lanza `npm run fixtures` o el sync manual con API-Football.",
+    "empty": {
+      "title": "Sin partidos por aquí ahora",
+      "body": "Estamos esperando el próximo calendario. En cuanto se publiquen, los verás aquí con su día y hora.",
+      "cta": "Volver al panel"
+    },
     "dayLabel": "Partidos del día",
     "matchCount": {
       "one": "partido",

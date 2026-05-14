@@ -1,7 +1,8 @@
+import { useLocale, useTranslations } from "next-intl";
 import { type SupportedLocale, formatMatchDate } from "@/lib/format/date";
 import { groupMatchesByDay } from "@/server/matches/transforms";
 import type { MatchListItem } from "@/server/matches/types";
-import { useLocale, useTranslations } from "next-intl";
+import { EmptyMatchesState } from "./empty-matches-state";
 import { MatchPanelCard } from "./match-panel-card";
 
 type Props = {
@@ -22,11 +23,7 @@ export function MatchesList({ matches, now }: Props) {
   const locale = useLocale() as SupportedLocale;
 
   if (matches.length === 0) {
-    return (
-      <div className="rounded-2xl border-2 border-border bg-card px-5 py-8 text-center">
-        <p className="text-sm font-bold text-muted">{t("empty")}</p>
-      </div>
-    );
+    return <EmptyMatchesState />;
   }
 
   const groups = groupMatchesByDay(matches);

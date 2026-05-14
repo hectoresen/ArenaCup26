@@ -52,7 +52,11 @@
   },
   "matches": {
     "title": "Matches",
-    "empty": "No matches yet. Run `npm run fixtures` or sync manually with API-Football.",
+    "empty": {
+      "title": "No matches here yet",
+      "body": "We're waiting on the next round of fixtures. As soon as they're announced, you'll see them here with their date and kick-off time.",
+      "cta": "Back to dashboard"
+    },
     "dayLabel": "Matches of the day",
     "matchCount": {
       "one": "match",
