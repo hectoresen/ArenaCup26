@@ -21,7 +21,9 @@ dist/
 !.env.example
 
 # Drizzle / DB
-drizzle/meta/
+# `drizzle/meta/` SÍ se commitea — contiene `_journal.json` y los
+# snapshots que `drizzle-kit migrate` necesita en producción para
+# saber qué migraciones aplicar.
 *.db
 *.db-journal
 
