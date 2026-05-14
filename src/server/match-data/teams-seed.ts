@@ -11,6 +11,15 @@ type ApiFootballTeamsResponse = {
       country: string | null;
     };
   }>;
+  /**
+   * En las respuestas 200 OK, api-football devuelve detalles del
+   * error en este envelope:
+   *   - object (`{ plan: "...", token: "...", rate: "..." }`) cuando
+   *     hay errores
+   *   - array vacío `[]` cuando todo va bien
+   */
+  errors: Record<string, string> | unknown[];
+  results: number;
 };
 
 const COUNTRY_FLAGS: Record<string, string> = {
@@ -90,9 +99,34 @@ export async function ensureTeamsSeeded(input: {
     throw new Error(`api-football GET /teams returned HTTP ${response.status}`);
   }
   const data = (await response.json()) as ApiFootballTeamsResponse;
+
+  // api-football devuelve 200 OK aunque haya errores del envelope.
+  // Detectarlos para dar un mensaje de error útil.
+  if (!Array.isArray(data.errors)) {
+    const planError = data.errors.plan;
+    const rateError = data.errors.rate || data.errors.requests;
+    const tokenError = data.errors.token || data.errors.authentication;
+    if (planError) {
+      throw new Error(
+        `api-football plan_limited (league=${leagueId} season=${season}): ${planError}. ` +
+          `Cambia MATCH_DATA_LEAGUE_ID y/o MATCH_DATA_SEASON a una combinación que tu plan soporte (free = seasons 2022-2024).`,
+      );
+    }
+    if (rateError) {
+      throw new Error(`api-football rate_limited: ${rateError}`);
+    }
+    if (tokenError) {
+      throw new Error(`api-football auth_failed: ${tokenError}`);
+    }
+    // Otros errores tipados que no esperamos
+    throw new Error(
+      `api-football GET /teams returned envelope errors: ${JSON.stringify(data.errors)}`,
+    );
+  }
+
   if (!data.response || data.response.length === 0) {
     throw new Error(
-      `api-football GET /teams returned empty response for league=${leagueId} season=${season}`,
+      `api-football GET /teams returned 0 teams for league=${leagueId} season=${season} (sin errores en envelope, pero sin datos — ¿liga/season correctos?)`,
     );
   }
 
