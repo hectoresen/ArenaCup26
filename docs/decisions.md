@@ -21,7 +21,8 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
 9. [Home dashboard `/inicio`](#9-home-dashboard-inicio)
 10. [Formato de números y fechas](#10-formato-de-números-y-fechas)
 11. [Tests y CI](#11-tests-y-ci)
-12. [Roadmap diferido (no decidido todavía)](#12-roadmap-diferido-no-decidido-todavía)
+12. [Despliegue](#12-despliegue)
+13. [Roadmap diferido (no decidido todavía)](#13-roadmap-diferido-no-decidido-todavía)
 
 ---
 
@@ -284,7 +285,34 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
 
 ---
 
-## 12. Roadmap diferido (no decidido todavía)
+## 12. Despliegue
+
+### 12.1 Railway como plataforma all-in-one
+
+- **Contexto**: comparamos Vercel+Neon, Render, Railway, Fly.io y Hetzner+Coolify. Render free hiberna (deal-breaker para Auth.js callbacks); Render Starter cuesta ~$14/mes; Vercel+Neon obliga a dos proveedores y dos facturas; Fly tiene curva.
+- **Decisión (2026-05-14)**: **Railway** para web + Postgres + cron en un único dashboard.
+- **Razón**:
+  1. Single facturable, single panel — el usuario lo prefirió explícitamente sobre Vercel+Neon.
+  2. Sin hibernación (Auth.js + Google OAuth no falla por cold start).
+  3. ~$5/mes pay-as-you-go en plan Hobby con $5 de crédito incluido. Bajo tráfico cabe dentro.
+  4. PR environments con BD aislada — útil para staging sin contaminar prod.
+  5. Soporta long-running (cuando aterrice `add-leaderboard-sse` no hay que migrar inmediato).
+- **Revisar cuando**:
+  - Tráfico sostenido > 1000 usuarios concurrentes durante un partido — Railway no autoescala horizontal bien.
+  - Necesidad de multi-región para latencia en Asia/Oceania — Railway tiene region única por servicio.
+  - Si el SSE en pico de Mundial mide saturación, Fly.io shared o Hetzner con autoscaling es Plan B.
+- **Documentación operativa**: ver `docs/deployment.md`.
+
+### 12.2 Cron de sync deshabilitado en producción inicial
+
+- **Decisión**: `vercel.json` sin crons (decisión 7.3). En Railway tampoco activamos cron automático en el primer despliegue. El endpoint `POST /api/cron/sync-fixtures` queda funcional para disparo manual con bearer.
+- **Razón**: hasta que aterrice `add-leaderboard-sse` el cron quema cupo de api-football sin que nadie observe los datos en tiempo real. Activar al mismo tiempo que SSE.
+
+---
+
+---
+
+## 13. Roadmap diferido (no decidido todavía)
 
 Estas son capabilities propuestas pero **no abiertas** todavía. Se documenta solo el alcance esperado para que cuando llegue el momento de drafter la propuesta haya un contexto previo.
 

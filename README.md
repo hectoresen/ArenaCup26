@@ -5,6 +5,7 @@ Plataforma social y competitiva alrededor del Mundial de Fútbol 2026, centrada 
 > Estado: **construcción activa**. Panel `/inicio`, auth con Google, modelo de datos, scoring engine, pipeline de partidos y catálogo de logros operativos. Próximas piezas en `openspec/changes/`.
 >
 > **Empezar a hacer rodar el proyecto en local → [`docs/quickstart.md`](docs/quickstart.md).**
+> **Desplegar en producción (Railway) → [`docs/deployment.md`](docs/deployment.md).**
 > **Decisiones técnicas vigentes → [`docs/decisions.md`](docs/decisions.md).**
 
 ## Visión
