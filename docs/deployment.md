@@ -51,80 +51,79 @@ Para entorno de pruebas con esa URL basta. Si más adelante quieres dominio prop
    ```
 3. Save. Cambios tardan unos minutos en propagar en Google.
 
-## 6. Migraciones automáticas en cada deploy
+## 6. Migraciones + bootstrap automáticos en cada deploy
 
-Configura Railway para que aplique las migraciones por ti antes de arrancar el server:
+Configura Railway para que aplique migraciones Y siembre el catálogo de logros antes de arrancar el server:
 
 1. En el servicio web → **Settings** → sección **Deploy** → campo **Pre-Deploy Command**.
-2. Pega: `npm run db:migrate`
+2. Pega: `npm run db:migrate && npm run bootstrap`
 3. Save.
 
 Cada deploy ahora:
 1. Compila el código (`pnpm run build`).
-2. Aplica migraciones pendientes (`drizzle-kit migrate`) — solo las nuevas, las ya aplicadas se saltan automáticamente porque drizzle mantiene una tabla `__drizzle_migrations` con el journal.
-3. Si las migraciones fallan, el deploy se cancela (no arranca un server contra una BD inconsistente).
-4. Arranca `pnpm run start`.
+2. Aplica migraciones pendientes (`drizzle-kit migrate`) — solo las nuevas, las ya aplicadas se saltan.
+3. Ejecuta `bootstrap`: siembra el catálogo de 24 logros (idempotente, `ON CONFLICT DO UPDATE`).
+4. Si algo falla, el deploy se cancela.
+5. Arranca `pnpm run start`.
 
-> No hagas `db:push` manual contra Railway. `db:push` empuja el schema sin journal y entra en conflicto con `migrate`. Usa solo `migrate` (que es lo que el pre-deploy lanza).
+> No hagas `db:push` ni `bootstrap` manual contra Railway. Railway los lanza por ti en cada deploy.
 
-## 7. Seed inicial de teams desde api-football
+## 7. Flujo end-to-end con datos reales
 
-Antes del primer sync con datos reales, el reconciler necesita saber a qué `team_id` UUID corresponde cada `team.id` que devuelve api-football. Lo siembras una vez con tu máquina local apuntando a Railway:
+La app está diseñada para que **no toques nada a mano**. La primera llamada al endpoint de sync lo hace todo solo:
 
-```bash
-DATABASE_URL='<la-url-publica-de-postgres-de-railway>' npm run seed:teams
-```
-
-> La URL pública la sacas en Postgres → tab `Variables` → `DATABASE_PUBLIC_URL`. Si solo ves la interna (`containers-us-west`), activa Public Networking en Postgres → Settings.
-
-Esto:
-1. Llama `GET /teams?league={MATCH_DATA_LEAGUE_ID}&season={MATCH_DATA_SEASON}` con tu API key.
-2. Upserta los equipos en `teams` (con su FIFA code).
-3. Crea entries en `team_external_ids` para `source=api-football`.
-
-Si cambias liga/season en Railway, vuelve a lanzar `seed:teams` para sembrar los equipos nuevos.
-
-Opcionalmente, para tener datos de demo "estáticos" del Mundial 2022 mezclados:
-
-```bash
-DATABASE_URL='<la-misma-url>' npm run fixtures
-```
-
-> Cuidado: `fixtures` TRUNCATE `matches` antes de insertar. Si ya hay datos reales del sync, los borra. Úsalo solo en una BD limpia.
-
-## 8. Flujo real end-to-end
-
-Con todo el setup anterior:
-
-1. **Sincronizar fixtures** del provider:
+1. **Disparar el primer sync**:
    ```bash
    curl -X POST https://<tu-dominio>.up.railway.app/api/cron/sync-fixtures
    ```
-   El reconciler inserta/actualiza partidos en `matches`. Los matches sin `team_external_ids` mapeados se saltan con razón `team_not_mapped`.
-2. **Predecir**: en la web, `/partidos` → click en un match futuro → form de predicción (Ganador o Marcador exacto).
-3. **Durante el partido** (cuando el sync detecta `status=live` con scores):
+   Internamente:
+   - Detecta que `team_external_ids` está vacío → llama `GET /teams?league=X&season=Y` y siembra los equipos con su mapping. (1 request a api-football)
+   - Llama `GET /fixtures?league=X&season=Y` y mete los partidos en `matches`. (1 request)
+
+   A partir de la segunda llamada solo trae fixtures (1 req).
+
+2. **Predecir** desde la web: `/partidos` → click en un match futuro → "Ganador" o "Marcador exacto".
+
+3. **Mientras el partido está vivo** (el sync detecta `status=live` con scores):
    - `/inicio` muestra la **live card** con puntos provisionales: "💎 +30 pts · Provisional".
-   - Cliente refresca cada 30s automáticamente para mantener marcador y provisionales al día.
-4. **Cuando el sync detecta `status=finished`**:
+   - El cliente refresca el SSR cada 30s automáticamente (`<LiveAutoRefresh>`), sin recargar página.
+
+4. **Cuando el partido termina** (el sync detecta transición a `finished`):
    - Disparo automático del scoring pipeline.
    - Calcula puntos con el engine para todas las predicciones del match.
-   - Actualiza `user_points` (total, racha, correctCount).
+   - Actualiza `user_points` (total + racha + correctCount).
    - Inserta `point_events` (auditoría).
    - Genera notificación `match_finished` por usuario.
    - El ranking se recalcula al vuelo en `/ranking` y `/u/<username>`.
 
-> El scoring se dispara SOLO en transiciones a `finished` (live→finished o scheduled→finished). Si ya hay `point_events` para `(userId, matchId)`, se salta. Idempotente.
+> El scoring se dispara SOLO en transiciones a `finished` durante un sync. Si ya hay `point_events` para `(userId, matchId)`, se salta. Idempotente.
 
-## 9. Verificar el deploy
+## 8. Verificar el deploy
 
 1. `https://<tu-dominio>.up.railway.app/` → landing.
 2. Click **Predecir ahora** → Google → te lleva a `/inicio`.
-3. Si seedearmaste teams + sync, ves la card de próximo partido y la lista.
+3. Si ya disparaste el sync (paso 7.1), ves la card de próximo partido y la lista.
 4. Predice algo en `/partidos/<id>`. Confirma y revisa la campana del nav.
 
 > Si OAuth falla con `redirect_uri_mismatch`, espera 5 minutos a que Google propague (paso 5).
 
-En dev sin `CRON_SECRET` (que no añadimos en el paso 3) el endpoint acepta el POST. Si lo añades, mete el header `Authorization: Bearer <CRON_SECRET>`.
+## 9. Automatizar el sync (cron externo, recomendado)
+
+En el repo hay un workflow de GitHub Actions ya escrito: `.github/workflows/sync-fixtures.yml`. Llama el endpoint cada 15 minutos. Para activarlo:
+
+1. En **GitHub → tu repo → Settings → Secrets and variables → Actions → New repository secret**:
+   - `RAILWAY_SYNC_URL` con `https://<tu-dominio>.up.railway.app/api/cron/sync-fixtures`.
+   - (Recomendado) `CRON_SECRET` con un valor largo (`openssl rand -base64 32`). Si lo configuras aquí, añade la **misma** variable en Railway → tab `Variables` para que el endpoint exija ese bearer.
+
+2. El workflow ya está activo (cron `*/15 * * * *`). Lo puedes:
+   - Ver corriendo en **Actions** del repo cada 15 min.
+   - Disparar manualmente con **Actions → Sync fixtures → Run workflow**.
+
+3. Coste de API: con 1 liga y `*/15`, consumes 96 requests al día. Cabe en el cupo free de api-football (100/día). Si añades más ligas, baja a `*/30` o configura ventanas.
+
+> Cuando aterrice `add-leaderboard-sse`, este cron se mantendrá pero el cliente recibirá los cambios en tiempo real vía push (sin tener que esperar al próximo tick).
+
+En dev local sin `CRON_SECRET` el endpoint acepta cualquier POST. En producción, si CRON_SECRET está en Railway, el endpoint exige `Authorization: Bearer <CRON_SECRET>`.
 
 ## 10. Operación
 

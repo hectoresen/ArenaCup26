@@ -1,0 +1,59 @@
+name: Sync fixtures
+
+# Llama a /api/cron/sync-fixtures de la app desplegada en Railway de
+# forma periódica para que partidos, scores y puntos se actualicen
+# sin que el desarrollador tenga que hacer curl a mano.
+#
+# **Setup en GitHub** antes de que esto funcione:
+#   1. Settings → Secrets and variables → Actions → New secret.
+#   2. Crear `RAILWAY_SYNC_URL` con valor:
+#        https://<tu-dominio>.up.railway.app/api/cron/sync-fixtures
+#   3. (Opcional) `CRON_SECRET` con el mismo valor que en Railway, si
+#      lo activaste como variable. En entorno de pruebas se puede dejar
+#      vacío — el endpoint acepta cualquier POST cuando CRON_SECRET no
+#      está configurado en producción … en realidad lo cierra con 401.
+#      Para production-grade: poner CRON_SECRET tanto aquí como en
+#      Railway.
+#
+# Cuando vayas a la fase pre-Mundial con tráfico esperado, cambia la
+# cadencia para que sea más agresiva durante ventanas de partido y
+# off fuera (ej. dos workflows con schedules distintos).
+
+on:
+  # Cada 15 minutos. Coste: 96 req/día contra api-football. Con el
+  # free tier de 100 req/día apenas cabe — si añades más ligas, bájale
+  # a 30 min (`*/30`) o configura un segundo workflow con ventanas.
+  schedule:
+    - cron: "*/15 * * * *"
+  # Para disparar manualmente desde Actions → Run workflow.
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger sync endpoint
+        env:
+          URL: ${{ secrets.RAILWAY_SYNC_URL }}
+          SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$URL" ]; then
+            echo "❌ RAILWAY_SYNC_URL secret not configured."
+            exit 1
+          fi
+          if [ -n "$SECRET" ]; then
+            HEADERS=(-H "Authorization: Bearer $SECRET")
+          else
+            HEADERS=()
+          fi
+          response=$(curl -sS -w "\n%{http_code}" -X POST "${HEADERS[@]}" "$URL")
+          body=$(echo "$response" | head -n -1)
+          status=$(echo "$response" | tail -n 1)
+          echo "Status: $status"
+          echo "Body: $body"
+          if [ "$status" -ge 400 ]; then
+            echo "❌ Sync endpoint returned error status"
+            exit 1
+          fi
+          echo "✓ Sync OK"

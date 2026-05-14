@@ -78,23 +78,15 @@ npm run db:migrate
 
 Ambas dejan la BD lista con las 14 tablas del modelo. En local da igual cuál uses; **en Railway solo `db:migrate`** porque Railway lo lanza solo en el pre-deploy (ver `docs/deployment.md` §6).
 
-## 6. Fixtures de dev
-
-Un único comando deja la BD con todo lo necesario para que el panel se vea con datos:
+## 6. Inicializar referencia estática (achievements)
 
 ```bash
-npm run fixtures
+npm run bootstrap
 ```
 
-Esto ejecuta en orden:
+Solo siembra el catálogo de 24 logros. Idempotente. **No hay datos demo de partidos** — los partidos vienen del sync real con api-football (sección 9.2). En Railway esto pasa solo en el pre-deploy; aquí lo lanzas a mano la primera vez.
 
-1. **Catálogo de 24 logros** (idempotente: `ON CONFLICT DO UPDATE`).
-2. **32 equipos + 24 partidos** del Mundial Qatar 2022 (truncate + insert).
-3. **Shift de fechas**: adelanta todos los kickoffs para que el primero caiga `now() + 6h` (manteniendo el espaciado original) **y los resetea a `status = 'scheduled'`** (el seed los pone como `finished` porque son históricos). Sin este reset, `/inicio` no muestra próximos partidos.
-
-Idempotente: lanzarlo dos veces vuelve a sembrar (la 3ª llamada del script no encuentra matches `< now()` y solo refresca logros).
-
-> **Importante**: esto es solo para validar diseño y navegación. La lógica real de predicciones, rankings y puntuación se probará contra `/api/cron/sync-fixtures` apuntando a `api-football` (sección 9.2) o, más adelante, contra `add-fixture-seed-wc2026` cuando aterrice.
+> Datos dinámicos (teams, matches) los sembraremos llamando al endpoint de sync. Si te falta API_FOOTBALL_KEY, simplemente la app queda con BD vacía: el dashboard mostrará "Empieza tu primera predicción" y `/partidos` estará vacío hasta que sincronices.
 
 ## 7. Arrancar el frontal
 
@@ -123,34 +115,37 @@ npm run dev
 8. Click en cualquier card → `/partidos/<id>` con detalle y formulario de predicción (simple / exacto / doble — el tipo permitido depende de la etapa).
 9. Tras enviar tu primera predicción, abre la campana del top-nav → **dropdown con la notificación "Predicción enviada"** que enlaza al partido. Al abrir el dropdown, todas las pendientes se marcan como leídas y el badge desaparece.
 
-## 9. Trucos para datos más realistas
+## 9. Llenar la BD con partidos reales
 
-Los `fixtures` cubren la fase de "ver cómo se ve el diseño". Para probar la **lógica real** (predicciones, ranking, puntuación) hay que sincronizar contra una API real:
+### 9.1 Sincronizar con api-football
 
-### 9.1 Forzar un partido en vivo
+Llama el endpoint del propio servidor para que vaya a traer partidos:
+
+```bash
+curl -X POST http://localhost:3000/api/cron/sync-fixtures
+```
+
+La primera vez:
+1. Detecta que `team_external_ids` está vacío → **siembra automáticamente** los equipos de la liga/season que pongas en `MATCH_DATA_LEAGUE_ID` / `MATCH_DATA_SEASON` (default `140`/`2026` = La Liga 2026 si existe). 1 request al provider.
+2. Llama `GET /fixtures?league=...` para los partidos. Otra request.
+3. Inserta en `matches`, mapeando teams.
+
+A partir de la segunda llamada solo trae partidos (1 req). Sin `CRON_SECRET` configurado en local, cualquier POST se acepta.
+
+> Plan free de api-football: solo seasons 2022–2024. Si tu `.env` apunta a 2026 verás el error `plan_limited` — cámbialo a `MATCH_DATA_SEASON=2024` para probar localmente.
+
+### 9.2 Forzar un partido en vivo (sin esperar a uno real)
 
 ```bash
 npm run dev:set-live                       # 1-0 al primer match futuro
 HOME_SCORE=2 AWAY_SCORE=1 npm run dev:set-live   # marcador custom
 ```
 
-Tras esto, `/inicio` muestra la sección **En vivo ahora** con el marcador en lugar de **Próximo partido**.
+Tras esto, `/inicio` muestra la sección **En vivo ahora** con el marcador + puntos provisionales en lugar de **Próximo partido**.
 
-### 9.2 Sincronizar manualmente con API-Football real
+### 9.3 Automatizar el sync (opcional, recomendado para Railway)
 
-> **No hay cron automático**. El backend NO sondea a la API en bucle. Cuando quieras refrescar partidos con datos reales, dispara el endpoint manualmente:
-
-```bash
-curl -X POST http://localhost:3000/api/cron/sync-fixtures | jq
-```
-
-En dev sin `CRON_SECRET` configurado se acepta cualquier POST a localhost. Sin `API_FOOTBALL_KEY` responde `500 provider_not_configured`. Con la key sincroniza la temporada configurada en `.env` (`MATCH_DATA_LEAGUE_ID`/`MATCH_DATA_SEASON`). Cada llamada consume 1 request del cupo diario (100 en el free tier).
-
-> El plan free de api-football solo permite seasons 2022–2024. Para testear, pon `MATCH_DATA_SEASON=2022`.
-
-**Arquitectura real cuando aterrice `add-leaderboard-sse`**:
-- Backend ↔ API-Football: pull manual o cron a medida (no Vercel Cron automático).
-- Backend ↔ navegador: push vía Server-Sent Events. El usuario nunca espera datos.
+En producción no haces curl a mano: configura el workflow de GitHub Actions que ya está en `.github/workflows/sync-fixtures.yml`. Detalles en `docs/deployment.md` §10.
 
 ## 10. Tests y validaciones
 
@@ -181,7 +176,7 @@ npm run db:studio
 | Síntoma | Causa probable | Fix |
 | --- | --- | --- |
 | `Invalid environment variables` al arrancar | Falta una key obligatoria en `.env`. | Revisa que `AUTH_SECRET`, `GOOGLE_CLIENT_*`, `DATABASE_URL` están rellenos. |
-| `Invalid environment variables` al correr `npm run fixtures` | `.env` no se está leyendo desde el script. | El script ya pasa `--env-file=.env` a `tsx`. Si lo ves, asegúrate de estar en la raíz del repo (donde vive `.env`) cuando lances el comando. |
+| `Invalid environment variables` al correr `npm run bootstrap` | `.env` no se está leyendo desde el script. | El script pasa `--env-file-if-exists=.env` a `tsx`. Si lo ves, asegúrate de estar en la raíz del repo (donde vive `.env`) y de que el archivo no está vacío. |
 | `redirect_uri_mismatch` en Google | La URL del callback no está autorizada. | Añade `http://localhost:3000/api/auth/callback/google` en Google Cloud Console → OAuth client → Authorized redirect URIs. |
 | `ECONNREFUSED 5432` | Postgres no está levantado. | `docker compose up -d`. |
 | `UntrustedHost` de Auth.js | Auth no confía en `localhost`. | En dev se confía automáticamente; si te aparece en prod, exporta `AUTH_TRUST_HOST=true`. |
@@ -196,8 +191,16 @@ npm run db:studio
 docker compose down -v   # borra el volumen → BD vacía
 docker compose up -d
 npm run db:push
-npm run fixtures
+npm run bootstrap
 ```
+
+Tras esto la BD tiene schema + achievements. Para llenarla con partidos reales, dispara el sync:
+
+```bash
+curl -X POST http://localhost:3000/api/cron/sync-fixtures
+```
+
+Si no quieres datos reales, en su lugar `npm run dev:set-live` después de tener al menos un partido en BD para validar la live card.
 
 ## 14. Qué sigue funcionando hoy / qué no
 

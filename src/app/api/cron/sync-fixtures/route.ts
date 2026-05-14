@@ -4,6 +4,7 @@ import { db } from "@/server/db/client";
 import { createApiFootballProvider } from "@/server/match-data/providers/api-football";
 import { createMatchRepo } from "@/server/match-data/sync/repo";
 import { syncFixtures } from "@/server/match-data/sync/sync";
+import { ensureTeamsSeeded } from "@/server/match-data/teams-seed";
 import { processFinishedMatch } from "@/server/scoring/pipeline";
 import { handleCronRequest } from "./handler";
 
@@ -18,6 +19,18 @@ export async function POST(req: Request) {
       // No instanciamos el provider hasta superar la auth; así en
       // requests no autorizadas no construimos clientes con la API key.
       if (!env.API_FOOTBALL_KEY) throw new Error("unreachable");
+
+      // Primer sync: si no hay teams mapeados a api-football, los
+      // sembramos automáticamente. Idempotente: a partir del segundo
+      // sync este paso es un count(*) trivial y se salta.
+      await ensureTeamsSeeded({
+        db,
+        leagueId: env.MATCH_DATA_LEAGUE_ID,
+        season: env.MATCH_DATA_SEASON,
+        apiKey: env.API_FOOTBALL_KEY,
+        baseUrl: env.API_FOOTBALL_BASE_URL,
+      });
+
       const provider = createApiFootballProvider({
         apiKey: env.API_FOOTBALL_KEY,
         baseUrl: env.API_FOOTBALL_BASE_URL,
