@@ -19,6 +19,7 @@ export function BottomNav() {
           <Link
             key={tab.href as string}
             href={tab.href}
+            prefetch
             aria-current={active ? "page" : undefined}
             aria-label={tTabs(tab.labelKey)}
             className={`flex min-w-[52px] flex-col items-center gap-1 rounded-[10px] px-2.5 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.04em] no-underline transition-colors ${

@@ -53,6 +53,7 @@ export function TopNav({ trailing }: Props) {
             <Link
               key={tab.href as string}
               href={tab.href}
+              prefetch
               aria-current={active ? "page" : undefined}
               className={`flex items-center gap-1.5 whitespace-nowrap rounded-[10px] border-[1.5px] px-3.5 py-1.5 text-[13px] font-extrabold no-underline transition-colors ${
                 active

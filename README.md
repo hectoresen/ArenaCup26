@@ -69,90 +69,71 @@ Justificaciones y trade-offs en [`openspec/project.md`](openspec/project.md).
 
 ## Roadmap
 
-Snapshot 2026-05-10. Detalle de cada propuesta en `openspec/changes/<nombre>/`.
+Snapshot 2026-05-14. Detalle de cada propuesta en `openspec/changes/<nombre>/`.
 
-### Cerradas (mergeadas en main)
+### Capabilities cerradas (ver `docs/decisions.md` para detalle)
 
-- ✅ `add-data-model` — schema Drizzle + migración inicial.
-- ✅ `add-leaderboard-public` — home `/` con snapshot del top 10.
-- ✅ `add-join-cta` — CTA "Predecir ahora" + modal stub.
-- ✅ `add-auth-google` — Google OAuth real vía Auth.js v5 + Drizzle adapter.
-- ✅ `add-account-menu` — hamburguesa con avatar al estar logueado, "Cerrar sesión".
-- ✅ `add-i18n` — es/en/fr/ar con RTL, switcher en top-start.
-- ✅ `add-error-pages` — 404 + error.tsx + global-error.tsx i18n-aware.
-- ✅ `add-faq` — `/faq` con tabla de scoring + 9 Q&A.
-- ✅ `add-testing-tooling` — RTL + jsdom + helper de providers + sample tests.
+- ✅ `add-data-model` — schema Drizzle de 14 tablas con enums Postgres.
+- ✅ `add-scoring-engine` — motor de puntuación puro + edge cases.
+- ✅ `add-achievements-seed` — catálogo de 24 logros.
+- ✅ `add-fixture-seed-wc2022` — 32 equipos + 24 partidos.
+- ✅ `add-i18n` — es/en/fr/ar con RTL.
+- ✅ `add-auth-google` — login con Google + Auth.js v5.
+- ✅ `add-leaderboard-public` — landing pública con podio + ranking.
+- ✅ `add-faq` — preguntas frecuentes con `<details>` nativos.
+- ✅ `add-error-pages` — 404 + runtime error con CTA.
+- ✅ `add-account-menu` — dropdown con trigger customizable.
+- ✅ `add-testing-tooling` — Vitest + RTL + helpers.
+- ✅ `add-match-data-providers` — ApiFootballProvider + adapter (round a).
+- ✅ `add-match-data-pipeline` — cron + reconciler + endpoint protegido.
+- ✅ `add-app-shell` — nav fijo + bottom-nav + avatar para área logada.
+- ✅ `add-home-dashboard` — `/inicio` con hero, live/next, próximos, progreso, mini-leaderboard.
+- ✅ `add-public-profile-page` — `/u/<username>` con auto-gen de username.
 
-### Bloqueadas por **diseño / mockup**
+### Pendientes (no bloquean, en orden razonable)
 
-- ⏸ `add-prediction-flow` — UI selector simple/exacto/doble.
-- ⏸ `add-public-profile` — página `/u/<username>`.
-- ⏸ `add-achievements` — vistas privada y pública del catálogo.
-- ⏸ `add-auth-onboarding` — form username + país tras primer login.
-- ⏸ `add-dashboard` — área privada principal.
-
-### Bloqueadas por **integración API**
-
-- ⏸ `add-match-data-providers` — adapters de API-Football + Live-Score-API (necesita claves reales para validar end-to-end).
-- ⏸ `add-leaderboard-sse` — push en vivo del ranking (depende de match-data).
-- ⏸ `add-notifications-inapp` — depende de eventos del scoring engine y match-data.
-
-### **Disponibles ya** (no dependen de diseño ni de claves API)
-
-- 🟢 `add-scoring-engine` — función pura del motor de puntuación. Tests con fixtures.
-- 🟢 `add-edge-case-fixtures` — 8 escenarios sintéticos (prórroga, penaltis, pospuesto, cancelado, etc.) con tests del scoring engine.
-- 🟢 `add-fixture-seed-wc2022` — dataset histórico del Mundial 2022 para replay end-to-end.
-- 🟢 `add-achievements-seed` — script que siembra los 24 logros del catálogo.
-- 🟢 `add-rate-limiting` — middleware simple (token bucket) sobre `/api/auth/*` y futuras APIs.
-- 🟢 `add-security-headers` — CSP, HSTS, etc. vía middleware o `next.config`.
-- 🟢 `add-ci-pipeline` — GitHub Actions con `npm test`, `npm run typecheck`, `npm run check`.
-- 🟢 Más tests de componentes existentes (`<JoinCta />`, `<AccountMenu />`, `<LanguageSwitcher />`, `<ErrorScreen />`, `<ScoringTable />`).
+- `add-prediction-flow` — submit/edit de predicción desde el detalle del partido.
+- `add-fixture-seed-wc2026` — equipos + entries de `team_external_ids` para los 48 del Mundial 2026.
+- `add-matches-page` — listado y detalle (los CTA del nav y de las cards apuntan ya aquí).
+- `add-onboarding` — pantalla para editar username + país tras el primer login.
+- `add-leaderboard-sse` — refresco en tiempo real del panel y ranking.
+- `add-scoring-pipeline` — recálculo de puntos cuando un match cambia.
+- `add-ranking-history` — snapshot semanal para sparkline + delta.
+- `add-live-scoring` — goles parciales del provider durante el live.
+- `add-match-data-providers-livescore` — failover con Live-Score-API.
+- `add-notifications`, `add-achievements-page`, `add-rate-limiting`, `add-security-headers`, `add-ci-pipeline`.
 
 Estrategia de validación pre-Mundial en [`docs/pre-launch-testing.md`](docs/pre-launch-testing.md).
 
 ## Desarrollo local
 
-Requisitos: **Node 22+**, **pnpm 9+** y **Docker** (o un Postgres 16 propio en `localhost:5432`).
+Guía paso-a-paso completa con OAuth, troubleshooting y trucos para datos reales:
+**[`docs/quickstart.md`](docs/quickstart.md)**.
+
+TL;DR:
 
 ```bash
-# 1. Variables de entorno
-cp .env.example .env
-# Rellena AUTH_SECRET (`openssl rand -base64 48`), GOOGLE_CLIENT_ID y
-# GOOGLE_CLIENT_SECRET (Google Cloud Console → OAuth 2.0 Client).
-
-# 2. Instalar dependencias
-pnpm install
-
-# 3. Levantar Postgres con Docker Compose
+cp .env.example .env       # rellenar AUTH_SECRET + GOOGLE_CLIENT_*
+npm install
 docker compose up -d
-# Usuario / pass / base: wmundial / wmundial / wmundial — coinciden con
-# el DATABASE_URL del .env.example.
-
-# 4. Generar y aplicar la migración inicial
-pnpm db:generate
-pnpm db:migrate
-
-# 5. Configurar OAuth en Google Cloud Console
-# Credentials → tu OAuth 2.0 Client ID → Authorized redirect URIs:
-#   http://localhost:3000/api/auth/callback/google
-
-# 6. Arrancar Next.js
-pnpm dev
-# → http://localhost:3000
+npm run db:push
+npm run fixtures           # logros + WC22 con fechas adelantadas
+npm run dev                # http://localhost:3000
 ```
 
 ### Comandos útiles
 
-| Comando                   | Qué hace                                            |
-| ------------------------- | --------------------------------------------------- |
-| `pnpm dev`                | Next.js en `http://localhost:3000`                  |
-| `pnpm typecheck`          | `tsc --noEmit`                                      |
-| `pnpm test`               | Vitest (unit)                                       |
-| `pnpm e2e`                | Playwright (E2E)                                    |
-| `pnpm check`              | Biome formato + lint                                |
-| `pnpm db:studio`          | UI web de Drizzle para inspeccionar la BD           |
-| `docker compose down`     | Parar Postgres (los datos se conservan)             |
-| `docker compose down -v`  | Parar + **borrar** el volumen de datos              |
+| Comando                   | Qué hace                                                  |
+| ------------------------- | --------------------------------------------------------- |
+| `npm run dev`             | Next.js en `http://localhost:3000`                        |
+| `npm run fixtures`        | Logros + WC22 + shift de fechas (idempotente)             |
+| `npm run typecheck`       | `tsc --noEmit`                                            |
+| `npm test`                | Vitest                                                    |
+| `npm run check`           | Biome lint + format                                       |
+| `npm run db:push`         | Aplica el schema actual sin migraciones versionadas       |
+| `npm run db:studio`       | UI web de Drizzle (`https://local.drizzle.studio`)        |
+| `docker compose down`     | Parar Postgres (los datos se conservan)                   |
+| `docker compose down -v`  | Parar + **borrar** el volumen de datos                    |
 
 ## Licencia
 

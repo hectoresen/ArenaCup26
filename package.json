@@ -21,9 +21,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "seed:achievements": "tsx --env-file=.env scripts/seed-achievements.ts",
-    "seed:wc2022": "tsx --env-file=.env scripts/seed-wc2022.ts",
-    "dev:shift-matches": "tsx --env-file=.env scripts/dev-shift-matches.ts"
+    "fixtures": "tsx --env-file=.env scripts/fixtures.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.4",
