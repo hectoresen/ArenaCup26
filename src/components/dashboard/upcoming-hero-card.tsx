@@ -2,6 +2,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { formatMatchDate, formatMatchTime, type SupportedLocale } from "@/lib/format/date";
 import { Link } from "@/i18n/navigation";
 import type { PredictionView, UpcomingHeroView } from "@/server/dashboard/types";
+import { basePointsForKind } from "@/server/predictions/rules";
+import { POINTS } from "@/server/scoring/rules";
 
 type Props = {
   next: UpcomingHeroView;
@@ -67,11 +69,16 @@ function PredictionRow({
 
   if (prediction === null) {
     return (
-      <div className="mt-4 text-center text-[12px] font-extrabold text-gold">
-        {t("predictCta")} →
+      <div className="mt-4 flex flex-col items-center gap-1.5">
+        <span className="text-[12px] font-extrabold text-gold">{t("predictCta")} →</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted">
+          {t("upToPoints", { points: POINTS.exact })}
+        </span>
       </div>
     );
   }
+
+  const potentialPoints = basePointsForKind(prediction.kind);
 
   const summary = (() => {
     switch (prediction.kind) {
@@ -97,11 +104,14 @@ function PredictionRow({
   })();
 
   return (
-    <div className="mt-4 flex flex-wrap items-center justify-center gap-2 rounded-xl border-[1.5px] border-success/30 bg-success/10 px-3 py-2">
-      <span className="text-[10px] font-black uppercase tracking-[0.1em] text-success">
+    <div className="mt-4 flex flex-col items-center gap-1 rounded-xl border-[1.5px] border-success/30 bg-success/10 px-3 py-2.5">
+      <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.1em] text-success">
         ✓ {t("predictionSent")}
       </span>
-      <span className="text-[12px] font-bold text-foreground">{summary}</span>
+      <span className="text-center text-[13px] font-extrabold text-foreground">{summary}</span>
+      <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted">
+        {t("ifCorrect", { points: potentialPoints })}
+      </span>
     </div>
   );
 }

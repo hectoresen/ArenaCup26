@@ -99,13 +99,23 @@
   "predictions": {
     "titleNew": "Haz tu predicción",
     "titleEdit": "Edita tu predicción",
-    "subtitle": "Elige una opción. Si arriesgas con el marcador exacto, ganas más puntos.",
+    "subtitle": "Cuanto más arriesgues, más puntos te llevas.",
     "optionsLabel": "Opciones de predicción",
-    "submitNew": "Enviar predicción",
+    "changeType": "Cambiar tipo",
+    "submitNew": "Confirmar predicción",
     "submitEdit": "Guardar cambios",
     "submitting": "Guardando…",
     "savedOk": "Predicción guardada",
     "draw": "Empate",
+    "type": {
+      "title": "¿Cómo quieres apostar?",
+      "winner": "Ganador",
+      "winnerHint": "Acierta quién gana o empata.",
+      "winnerBonus": "Hasta +{points} pts",
+      "exact": "Marcador exacto",
+      "exactHint": "Arriésgate con el resultado y multiplica tus puntos.",
+      "exactBonus": "+{points} pts si aciertas"
+    },
     "option": {
       "teamWins": "Gana {team}",
       "draw": "Empate",
@@ -113,11 +123,15 @@
       "exact": "Marcador exacto"
     },
     "bonus": {
-      "simple": "+10 pts si aciertas",
-      "exact": "+30 pts si aciertas",
-      "double": "+5 pts si aciertas"
+      "simple": "🎯 Apuesta segura · +10 pts",
+      "exact": "💎 Premio gordo · +30 pts si aciertas",
+      "double": "⚡ Riesgo mínimo · +5 pts"
     },
     "summary": {
+      "saved": "Predicción enviada",
+      "edit": "Editar",
+      "potential": "Si aciertas, te llevas +{points} puntos.",
+      "potentialMax": "Hasta {points} puntos en juego",
       "teamWins": "Gana {team}",
       "draw": "Empate",
       "teamOrDraw": "{team} o empate",
@@ -196,7 +210,9 @@
       "kickoffIn": "Kick-off en {countdown}",
       "kickoffAt": "{date} · {time} h",
       "predictCta": "Predecir",
-      "predictionSent": "Tu predicción"
+      "predictionSent": "Tu predicción",
+      "upToPoints": "Hasta {points} pts en juego 🎯",
+      "ifCorrect": "Si aciertas, +{points} pts"
     },
     "upcoming": {
       "predictBadge": "Enviada",

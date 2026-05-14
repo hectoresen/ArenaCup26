@@ -99,13 +99,23 @@
   "predictions": {
     "titleNew": "Make your prediction",
     "titleEdit": "Edit your prediction",
-    "subtitle": "Pick one option. Going for the exact score earns more points.",
+    "subtitle": "The more you risk, the more points you take home.",
     "optionsLabel": "Prediction options",
-    "submitNew": "Submit prediction",
+    "changeType": "Change type",
+    "submitNew": "Confirm prediction",
     "submitEdit": "Save changes",
     "submitting": "Saving…",
     "savedOk": "Prediction saved",
     "draw": "Draw",
+    "type": {
+      "title": "How do you want to bet?",
+      "winner": "Winner",
+      "winnerHint": "Pick who wins, or call a draw.",
+      "winnerBonus": "Up to +{points} pts",
+      "exact": "Exact score",
+      "exactHint": "Go for the exact score and multiply your points.",
+      "exactBonus": "+{points} pts if correct"
+    },
     "option": {
       "teamWins": "{team} wins",
       "draw": "Draw",
@@ -113,11 +123,15 @@
       "exact": "Exact score"
     },
     "bonus": {
-      "simple": "+10 pts if correct",
-      "exact": "+30 pts if correct",
-      "double": "+5 pts if correct"
+      "simple": "🎯 Safe bet · +10 pts",
+      "exact": "💎 Big win · +30 pts if correct",
+      "double": "⚡ Low risk · +5 pts"
     },
     "summary": {
+      "saved": "Prediction sent",
+      "edit": "Edit",
+      "potential": "If you're right, you score +{points} points.",
+      "potentialMax": "Up to {points} points on the line",
       "teamWins": "{team} wins",
       "draw": "Draw",
       "teamOrDraw": "{team} or draw",
@@ -196,7 +210,9 @@
       "kickoffIn": "Kick-off in {countdown}",
       "kickoffAt": "{date} · {time}",
       "predictCta": "Predict",
-      "predictionSent": "Your prediction"
+      "predictionSent": "Your prediction",
+      "upToPoints": "Up to {points} pts at stake 🎯",
+      "ifCorrect": "If correct, +{points} pts"
     },
     "upcoming": {
       "predictBadge": "Sent",

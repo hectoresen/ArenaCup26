@@ -1,4 +1,5 @@
 import type { PredictionKind, PredictionWinner } from "@/server/dashboard/types";
+import { POINTS } from "@/server/scoring/rules";
 import type { MatchStage } from "@/server/scoring/types";
 
 export type PredictionInput = {
@@ -7,6 +8,16 @@ export type PredictionInput = {
   predictedHomeScore: number | null;
   predictedAwayScore: number | null;
 };
+
+/**
+ * Puntos base que otorga acertar este tipo de predicción, sin contar
+ * combos ni bonus de racha. Pure function.
+ */
+export function basePointsForKind(kind: PredictionKind): number {
+  if (kind === "exact") return POINTS.exact;
+  if (kind === "simple") return POINTS.simple;
+  return POINTS.double;
+}
 
 const KNOCKOUT_STAGES = new Set<MatchStage>([
   "round-of-16",

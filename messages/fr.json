@@ -99,13 +99,23 @@
   "predictions": {
     "titleNew": "Fais ta prédiction",
     "titleEdit": "Modifie ta prédiction",
-    "subtitle": "Choisis une option. Le score exact rapporte plus de points.",
+    "subtitle": "Plus tu prends de risques, plus tu marques de points.",
     "optionsLabel": "Options de prédiction",
-    "submitNew": "Envoyer la prédiction",
+    "changeType": "Changer le type",
+    "submitNew": "Confirmer la prédiction",
     "submitEdit": "Enregistrer les modifs",
     "submitting": "Enregistrement…",
     "savedOk": "Prédiction enregistrée",
     "draw": "Match nul",
+    "type": {
+      "title": "Comment veux-tu parier ?",
+      "winner": "Vainqueur",
+      "winnerHint": "Devine qui gagne ou s'il y aura match nul.",
+      "winnerBonus": "Jusqu'à +{points} pts",
+      "exact": "Score exact",
+      "exactHint": "Ose le score exact et multiplie tes points.",
+      "exactBonus": "+{points} pts si correct"
+    },
     "option": {
       "teamWins": "{team} gagne",
       "draw": "Match nul",
@@ -113,11 +123,15 @@
       "exact": "Score exact"
     },
     "bonus": {
-      "simple": "+10 pts si correct",
-      "exact": "+30 pts si correct",
-      "double": "+5 pts si correct"
+      "simple": "🎯 Pari sûr · +10 pts",
+      "exact": "💎 Gros lot · +30 pts si correct",
+      "double": "⚡ Risque minime · +5 pts"
     },
     "summary": {
+      "saved": "Prédiction envoyée",
+      "edit": "Modifier",
+      "potential": "Si tu as raison, +{points} points pour toi.",
+      "potentialMax": "Jusqu'à {points} points en jeu",
       "teamWins": "{team} gagne",
       "draw": "Match nul",
       "teamOrDraw": "{team} ou nul",
@@ -196,7 +210,9 @@
       "kickoffIn": "Coup d'envoi dans {countdown}",
       "kickoffAt": "{date} · {time}",
       "predictCta": "Prédire",
-      "predictionSent": "Ta prédiction"
+      "predictionSent": "Ta prédiction",
+      "upToPoints": "Jusqu'à {points} pts en jeu 🎯",
+      "ifCorrect": "Si correct, +{points} pts"
     },
     "upcoming": {
       "predictBadge": "Envoyée",

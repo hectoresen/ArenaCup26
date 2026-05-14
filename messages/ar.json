@@ -99,13 +99,23 @@
   "predictions": {
     "titleNew": "ضع توقعك",
     "titleEdit": "عدّل توقعك",
-    "subtitle": "اختر خيارًا. النتيجة الدقيقة تمنحك نقاطًا أكثر.",
+    "subtitle": "كلما خاطرت أكثر، حصلت على نقاط أكثر.",
     "optionsLabel": "خيارات التوقع",
-    "submitNew": "إرسال التوقع",
+    "changeType": "تغيير النوع",
+    "submitNew": "تأكيد التوقع",
     "submitEdit": "حفظ التغييرات",
     "submitting": "جاري الحفظ…",
     "savedOk": "تم حفظ التوقع",
     "draw": "تعادل",
+    "type": {
+      "title": "كيف تريد المراهنة؟",
+      "winner": "الفائز",
+      "winnerHint": "خمّن من يفوز أو إن كان هناك تعادل.",
+      "winnerBonus": "حتى +{points} نقطة",
+      "exact": "نتيجة دقيقة",
+      "exactHint": "غامر بالنتيجة الدقيقة وضاعف نقاطك.",
+      "exactBonus": "+{points} نقطة إن أصبت"
+    },
     "option": {
       "teamWins": "فوز {team}",
       "draw": "تعادل",
@@ -113,11 +123,15 @@
       "exact": "نتيجة دقيقة"
     },
     "bonus": {
-      "simple": "+10 نقاط إن أصبت",
-      "exact": "+30 نقطة إن أصبت",
-      "double": "+5 نقاط إن أصبت"
+      "simple": "🎯 رهان آمن · +10 نقاط",
+      "exact": "💎 الجائزة الكبرى · +30 نقطة إن أصبت",
+      "double": "⚡ مخاطرة بسيطة · +5 نقاط"
     },
     "summary": {
+      "saved": "تم إرسال التوقع",
+      "edit": "تعديل",
+      "potential": "إن أصبت، تكسب +{points} نقطة.",
+      "potentialMax": "حتى {points} نقطة في اللعب",
       "teamWins": "فوز {team}",
       "draw": "تعادل",
       "teamOrDraw": "{team} أو تعادل",
@@ -196,7 +210,9 @@
       "kickoffIn": "ضربة البداية بعد {countdown}",
       "kickoffAt": "{date} · {time}",
       "predictCta": "توقّع",
-      "predictionSent": "توقعك"
+      "predictionSent": "توقعك",
+      "upToPoints": "حتى {points} نقطة على المحك 🎯",
+      "ifCorrect": "إن أصبت، +{points} نقطة"
     },
     "upcoming": {
       "predictBadge": "أُرسل",
