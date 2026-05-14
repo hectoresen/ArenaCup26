@@ -93,10 +93,12 @@ const STATUS_MAP: Record<ApiFootballStatusCode, ProviderMatchStatus> = {
  *   - "Semi-finals" → semi
  *   - "3rd Place Final" → third-place
  *   - "Final" → final
+ *   - "Regular Season - 12" (formato de ligas: La Liga, Premier, etc.) → regular-season
  */
 export function parseStage(round: string | null | undefined): MatchStage | null {
   if (!round) return null;
   const lower = round.toLowerCase().trim();
+  if (lower.startsWith("regular season")) return "regular-season";
   if (lower.startsWith("group")) return "group";
   if (lower.includes("round of 16") || lower.includes("1/8")) return "round-of-16";
   if (lower.includes("quarter")) return "quarter";

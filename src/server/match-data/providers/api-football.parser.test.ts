@@ -14,6 +14,8 @@ describe("parseStage", () => {
   it.each([
     ["Group A - 1", "group"],
     ["Group F - 3", "group"],
+    ["Regular Season - 1", "regular-season"],
+    ["Regular Season - 38", "regular-season"],
     ["Round of 16", "round-of-16"],
     ["1/8 Finals", "round-of-16"],
     ["Quarter-finals", "quarter"],

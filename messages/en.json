@@ -78,7 +78,8 @@
       "quarter": "Quarter-finals",
       "semi": "Semi-finals",
       "third-place": "Third place",
-      "final": "Final"
+      "final": "Final",
+      "regular-season": "League"
     },
     "card": {
       "tbdLabel": "Teams TBD",

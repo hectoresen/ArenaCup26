@@ -78,7 +78,8 @@
       "quarter": "Cuartos de final",
       "semi": "Semifinales",
       "third-place": "Tercer puesto",
-      "final": "Final"
+      "final": "Final",
+      "regular-season": "Liga"
     },
     "card": {
       "tbdLabel": "Equipos por determinar",

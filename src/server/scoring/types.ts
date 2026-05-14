@@ -1,6 +1,13 @@
 import type { ComboMilestone } from "./rules";
 
-export type MatchStage = "group" | "round-of-16" | "quarter" | "semi" | "final" | "third-place";
+export type MatchStage =
+  | "group"
+  | "round-of-16"
+  | "quarter"
+  | "semi"
+  | "final"
+  | "third-place"
+  | "regular-season";
 
 export type MatchStatus =
   | "scheduled-tbd"

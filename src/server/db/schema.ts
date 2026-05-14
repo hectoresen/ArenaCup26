@@ -32,6 +32,7 @@ export const matchStageEnum = pgEnum("match_stage", [
   "semi",
   "final",
   "third-place",
+  "regular-season",
 ]);
 
 export const predictionKindEnum = pgEnum("prediction_kind", [
