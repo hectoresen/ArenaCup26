@@ -47,10 +47,12 @@ export function MatchCard({ match, now }: Props) {
             {t("tbdPending")}
           </span>
         </div>
-        <div className="grid flex-1 grid-cols-[1fr_auto_1fr] content-center items-center gap-3 py-2">
-          <span className="text-end font-display text-[17px] tracking-wider text-muted">?</span>
-          <span className="text-center text-[13px] font-bold text-muted">{t("versus")}</span>
-          <span className="text-start font-display text-[17px] tracking-wider text-muted">?</span>
+        <div className="flex flex-1 items-center py-2">
+          <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3">
+            <span className="text-end font-display text-[17px] tracking-wider text-muted">?</span>
+            <span className="text-center text-[13px] font-bold text-muted">{t("versus")}</span>
+            <span className="text-start font-display text-[17px] tracking-wider text-muted">?</span>
+          </div>
         </div>
         <div className="text-[12px] font-bold text-muted">{t("tbdLabel")}</div>
       </article>
@@ -94,10 +96,12 @@ export function MatchCard({ match, now }: Props) {
         ) : null}
       </div>
 
-      <div className="grid flex-1 grid-cols-[1fr_auto_1fr] content-center items-center gap-3 py-2">
-        <TeamSide team={home} side="home" />
-        <span className="text-center text-[13px] font-bold text-muted">{t("versus")}</span>
-        <TeamSide team={away} side="away" />
+      <div className="flex flex-1 items-center py-2">
+        <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3">
+          <TeamSide team={home} side="home" />
+          <span className="text-center text-[13px] font-bold text-muted">{t("versus")}</span>
+          <TeamSide team={away} side="away" />
+        </div>
       </div>
 
       <FooterRow
