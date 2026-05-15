@@ -37,9 +37,9 @@ export function MatchCard({ match, now }: Props) {
       <article
         aria-disabled="true"
         aria-label={t("tbdLabel")}
-        className="rounded-2xl border-2 border-border bg-card px-4 py-4 opacity-60 [filter:grayscale(0.5)]"
+        className="flex min-h-[124px] flex-col rounded-2xl border-2 border-border bg-card px-4 py-4 opacity-60 [filter:grayscale(0.5)]"
       >
-        <div className="mb-2 flex items-center justify-between text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted">
+        <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted">
           <span>
             {date} · <LocalTime date={match.kickoffAt} />
           </span>
@@ -47,12 +47,12 @@ export function MatchCard({ match, now }: Props) {
             {t("tbdPending")}
           </span>
         </div>
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-          <span className="text-end font-display text-base tracking-wider text-muted">?</span>
-          <span className="text-center text-xs font-bold text-muted">{t("versus")}</span>
-          <span className="text-start font-display text-base tracking-wider text-muted">?</span>
+        <div className="grid flex-1 grid-cols-[1fr_auto_1fr] items-center gap-3 py-2">
+          <span className="text-end font-display text-[17px] tracking-wider text-muted">?</span>
+          <span className="text-center text-[13px] font-bold text-muted">{t("versus")}</span>
+          <span className="text-start font-display text-[17px] tracking-wider text-muted">?</span>
         </div>
-        <div className="mt-3 text-[11px] font-bold text-muted">{t("tbdLabel")}</div>
+        <div className="text-[12px] font-bold text-muted">{t("tbdLabel")}</div>
       </article>
     );
   }
@@ -76,9 +76,9 @@ export function MatchCard({ match, now }: Props) {
     <Link
       href={`/partidos/${match.matchId}` as never}
       aria-label={`${home.name} vs ${away.name} — ${date}`}
-      className="group block cursor-pointer rounded-2xl border-2 border-border bg-card px-4 py-4 no-underline transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-[2px] hover:border-gold/30 hover:shadow-[0_8px_24px_rgba(245,200,66,0.1)]"
+      className="group flex min-h-[124px] cursor-pointer flex-col rounded-2xl border-2 border-border bg-card px-4 py-4 no-underline transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-[2px] hover:border-gold/30 hover:shadow-[0_8px_24px_rgba(245,200,66,0.1)]"
     >
-      <div className="mb-2 flex items-center justify-between gap-2 text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted">
+      <div className="flex items-center justify-between gap-2 text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted">
         <span>
           <strong className="font-extrabold text-foreground">{date}</strong> ·{" "}
           <LocalTime date={match.kickoffAt} />
@@ -94,9 +94,9 @@ export function MatchCard({ match, now }: Props) {
         ) : null}
       </div>
 
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+      <div className="grid flex-1 grid-cols-[1fr_auto_1fr] items-center gap-3 py-2">
         <TeamSide team={home} side="home" />
-        <span className="text-center text-xs font-bold text-muted">{t("versus")}</span>
+        <span className="text-center text-[13px] font-bold text-muted">{t("versus")}</span>
         <TeamSide team={away} side="away" />
       </div>
 
@@ -126,11 +126,13 @@ function TeamSide({
       <TeamFlag
         flag={team.flag}
         name={team.name}
-        size={24}
+        size={26}
         fallback={team.code ?? "🏳️"}
         className="flex-shrink-0 rounded-sm"
       />
-      <span className="min-w-0 truncate text-sm font-extrabold text-foreground">{team.name}</span>
+      <span className="min-w-0 truncate text-[15px] font-extrabold text-foreground">
+        {team.name}
+      </span>
     </div>
   );
 }
@@ -149,17 +151,17 @@ function FooterRow({
   const t = useTranslations("dashboard.upcoming");
   if (prediction) {
     return (
-      <div className="mt-3 text-end text-[11px] font-bold text-muted">
+      <div className="text-end text-[12px] font-bold text-muted">
         {formatPredictionShort(prediction)} · {t("predictEditable")}
       </div>
     );
   }
   if (kickoffPast) return null;
   return (
-    <div className="mt-3 text-end">
+    <div className="text-end">
       <span
         aria-label={t("predictLabel", { home: homeName, away: awayName })}
-        className="inline-flex items-center gap-1 text-[12px] font-extrabold text-gold transition-[gap] group-hover:gap-2"
+        className="inline-flex items-center gap-1 text-[13px] font-extrabold text-gold transition-[gap] group-hover:gap-2"
       >
         {t("predictButton")} <span aria-hidden="true">→</span>
       </span>
