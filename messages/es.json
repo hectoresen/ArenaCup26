@@ -634,6 +634,26 @@
       "removeConfirm": "¿Eliminar de tus amigos?"
     }
   },
+  "status": {
+    "title": "Estado del sistema",
+    "overall": {
+      "ok": "Todos los servicios operativos",
+      "degraded": "Servicio degradado",
+      "down": "Servicio caído"
+    },
+    "services": {
+      "database": "Base de datos",
+      "auth": "Autenticación",
+      "match_data": "Datos de partidos"
+    },
+    "status": {
+      "ok": "Operativo",
+      "degraded": "Degradado",
+      "down": "Caído"
+    },
+    "checkedAt": "Comprobado: {time}",
+    "backHome": "Volver al inicio"
+  },
   "legal": {
     "privacy": {
       "title": "Política de privacidad",

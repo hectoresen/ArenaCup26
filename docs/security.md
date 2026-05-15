@@ -335,6 +335,30 @@ Plausible es privacy-friendly (sin cookies, sin PII, sin fingerprinting) y bajo 
 
 Lo que tracking: page views + outbound link clicks. NO se envía ni email, ni nombre, ni IP completa (Plausible la trunca antes de procesar).
 
+### 9.4 Backups y status page
+
+**Backup diario** (`.github/workflows/db-backup.yml`):
+
+1. Crear bucket S3-compatible (sugerido: Backblaze B2 — 10 GB free, S3 API). Setear lifecycle: borrar objetos con prefijo `daily/` tras 30 días.
+2. Generar Application Key con scope solo-este-bucket.
+3. En GitHub Secrets:
+   - `DATABASE_URL` (Railway connection string completa)
+   - `BACKUP_S3_ENDPOINT` (p.ej. `https://s3.eu-central-003.backblazeb2.com`)
+   - `BACKUP_S3_BUCKET`, `BACKUP_S3_ACCESS_KEY`, `BACKUP_S3_SECRET_KEY`
+   - `BACKUP_S3_REGION` (opcional, `auto` para R2 / región para B2)
+4. El workflow corre cada día a las 03:00 UTC. `pg_dump | gzip → aws s3 cp`. Hace verificación post-upload (gzip integrity + grep de `^(SET|CREATE)`).
+5. Probar restore manual al menos una vez tras setup:
+   ```bash
+   aws s3 cp s3://bucket/daily/wmundial-XXXX.sql.gz . --endpoint-url $ENDPOINT
+   gunzip < wmundial-XXXX.sql.gz | psql $TEST_DATABASE_URL
+   ```
+
+**Status page** (`/status`):
+
+- Endpoint público `/api/status` devuelve JSON `{status, checkedAt, services}` con health de DB, auth y match_data provider.
+- Página `/status` (server-rendered) muestra los mismos datos en UI legible. Útil tanto para usuarios como para conectar a uptime monitors externos (Better Uptime, Hetrix).
+- Sin polling client-side ni websocket — refrescar = recargar página. Cero overhead JS.
+
 ---
 
 ## 9. TODOs (pendientes en propuestas abiertas)

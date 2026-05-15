@@ -231,7 +231,11 @@ Sin solapamiento con el análisis de producto, siguen activos:
   (2026-05-15: viewport con `viewport-fit=cover`, safe-area-inset
   en body, theme-color, manifest.webmanifest + icon.svg, skip link
   WCAG 2.4.1, focus-visible, `prefers-reduced-motion`).
-- **add-data-resilience** (pg_dump → R2 + status page + PR envs).
+- ~~**add-data-resilience** (pg_dump → R2 + status page + PR envs).~~ ✓
+  (2026-05-15: GitHub Action `db-backup.yml` diaria 03:00 UTC con
+  pg_dump → S3-compatible bucket + verificación gzip. Endpoint
+  `/api/status` + página `/status`. PR envs aparcadas — Railway lo
+  hace via "PR environments" si quieres activarlo manualmente).
 - **add-e2e-tests** (Playwright golden paths).
 - **add-web-push-notifications** (retención fuera de app).
 

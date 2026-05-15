@@ -634,6 +634,26 @@
       "removeConfirm": "Retirer de tes amis ?"
     }
   },
+  "status": {
+    "title": "État du système",
+    "overall": {
+      "ok": "Tous les services opérationnels",
+      "degraded": "Service dégradé",
+      "down": "Service hors ligne"
+    },
+    "services": {
+      "database": "Base de données",
+      "auth": "Authentification",
+      "match_data": "Données des matchs"
+    },
+    "status": {
+      "ok": "Opérationnel",
+      "degraded": "Dégradé",
+      "down": "Hors ligne"
+    },
+    "checkedAt": "Vérifié : {time}",
+    "backHome": "Retour à l'accueil"
+  },
   "legal": {
     "privacy": {
       "title": "Politique de confidentialité",

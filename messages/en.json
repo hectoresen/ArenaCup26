@@ -634,6 +634,26 @@
       "removeConfirm": "Remove from friends?"
     }
   },
+  "status": {
+    "title": "System status",
+    "overall": {
+      "ok": "All systems operational",
+      "degraded": "Degraded service",
+      "down": "Major outage"
+    },
+    "services": {
+      "database": "Database",
+      "auth": "Authentication",
+      "match_data": "Match data"
+    },
+    "status": {
+      "ok": "Operational",
+      "degraded": "Degraded",
+      "down": "Down"
+    },
+    "checkedAt": "Checked: {time}",
+    "backHome": "Back to home"
+  },
   "legal": {
     "privacy": {
       "title": "Privacy policy",
