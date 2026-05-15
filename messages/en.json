@@ -349,7 +349,8 @@
       "historyStarting": "We start tracking on June 11",
       "rankDeltaUp": "▲ +{delta} positions this week",
       "rankDeltaDown": "▼ {delta} positions this week",
-      "rankDeltaFlat": "No change this week"
+      "rankDeltaFlat": "No change this week",
+      "sparklineAria": "Your position trend over the last days"
     },
     "miniLeaderboard": {
       "viewFullRanking": "View full ranking",

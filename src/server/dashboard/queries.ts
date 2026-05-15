@@ -9,6 +9,7 @@ import {
   userPoints,
   users,
 } from "@/server/db/schema";
+import { getRankHistory } from "@/server/ranking-history/queries";
 import { computeProvisionalScore } from "@/server/scoring/pipeline";
 import type { MatchStage } from "@/server/scoring/types";
 import { and, asc, desc, eq, gt, inArray, sql } from "drizzle-orm";
@@ -370,8 +371,23 @@ export async function getProgress(db: Database, userId: string): Promise<Progres
     .where(sql`${userPoints.totalPoints} > ${userTotal}`);
   const rank: number = (aheadRows[0]?.ahead ?? 0) + 1;
 
+  // Histórico de los últimos 7 snapshots para sparkline + delta. Si
+  // todavía no hay snapshots (cron no ejecutado o user nuevo),
+  // `weekAgoRank` y `sparkline` quedan en null y la UI muestra el
+  // placeholder "El histórico empieza pronto".
+  const history = await getRankHistory(db, userId);
+  // rankDelta positivo significa que has SUBIDO posiciones (rank
+  // numéricamente menor). Convención: ▲ +N para "has subido N",
+  // ▼ -N para "has bajado N". Sin histórico → null.
+  const rankDelta =
+    history.weekAgoRank === null ? null : history.weekAgoRank - rank;
+  // Sparkline: incluimos el snapshot del momento al final para que la
+  // gráfica refleje el rank actual sin esperar al cron de mañana.
+  const sparkline =
+    history.sparkline === null ? null : [...history.sparkline, rank];
+
   return {
-    rank: { rank, rankDelta: null, sparkline: null },
+    rank: { rank, rankDelta, sparkline },
     achievements: {
       unlocked,
       total,

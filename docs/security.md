@@ -290,7 +290,7 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 
 - [ ] CRIT-1: rotar API_FOOTBALL_KEY + GOOGLE_CLIENT_SECRET (operativa manual del owner; ver §9.1 abajo).
 - [x] ~~CRIT-2: actualizar drizzle-orm a ≥0.45.2 + verificar suite verde.~~ (2026-05-15)
-- [ ] CRIT-3: validar CRON_SECRET sincronizado en Railway + GitHub.
+- [ ] CRIT-3: validar CRON_SECRET sincronizado en Railway + GitHub (sirve para `sync-fixtures` + `snapshot-ranking`).
 - [x] ~~CRIT-4: implementar `add-profile-privacy` con default sensato (público es OK si comunicamos claramente).~~ (2026-05-15)
 - [x] ~~CRIT-5: terminar wiring de `add-rate-limiting` (publicRead + signup).~~ (2026-05-15)
 - [ ] Configurar UPSTASH_REDIS_REST_URL/TOKEN en Railway (sin esto el rate limit es noop).

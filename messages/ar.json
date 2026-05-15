@@ -349,7 +349,8 @@
       "historyStarting": "نبدأ التسجيل في 11 يونيو",
       "rankDeltaUp": "▲ +{delta} مركز هذا الأسبوع",
       "rankDeltaDown": "▼ {delta} مركز هذا الأسبوع",
-      "rankDeltaFlat": "بدون تغيير هذا الأسبوع"
+      "rankDeltaFlat": "بدون تغيير هذا الأسبوع",
+      "sparklineAria": "تطوّر مرتبتك خلال الأيام الأخيرة"
     },
     "miniLeaderboard": {
       "viewFullRanking": "عرض الترتيب الكامل",

@@ -71,6 +71,13 @@
       "when": 1778869220703,
       "tag": "0009_add_friendships",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1778879979451,
+      "tag": "0010_add_ranking_snapshots",
+      "breakpoints": true
     }
   ]
 }

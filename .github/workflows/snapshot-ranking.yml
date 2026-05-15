@@ -1,0 +1,50 @@
+name: Snapshot ranking
+
+# Llama a /api/cron/snapshot-ranking de la app desplegada en Railway
+# una vez al día para persistir el rank de cada user en
+# `ranking_snapshots`. Estos snapshots se usan para calcular el delta
+# semanal (▲/▼) y la sparkline de la card "Tu posición" en /inicio.
+#
+# **Setup en GitHub** antes de que esto funcione:
+#   1. Settings → Secrets and variables → Actions.
+#   2. Reusar `RAILWAY_SNAPSHOT_URL` (https://<dominio>/api/cron/snapshot-ranking).
+#   3. Reusar `CRON_SECRET` (mismo valor que en Railway).
+
+on:
+  # 00:05 UTC todos los días. Hace falta que sea después de medianoche
+  # UTC para que `snapshot_date = utcMidnight(now)` sea el día que
+  # acaba de cerrar. Si se ejecutara a las 23:55 el snapshot quedaría
+  # "del día anterior" cuando la última hora aún está activa.
+  schedule:
+    - cron: "5 0 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger snapshot endpoint
+        env:
+          URL: ${{ secrets.RAILWAY_SNAPSHOT_URL }}
+          SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$URL" ]; then
+            echo "❌ RAILWAY_SNAPSHOT_URL secret not configured."
+            exit 1
+          fi
+          if [ -n "$SECRET" ]; then
+            HEADERS=(-H "Authorization: Bearer $SECRET")
+          else
+            HEADERS=()
+          fi
+          response=$(curl -sS -w "\n%{http_code}" -X POST "${HEADERS[@]}" "$URL")
+          body=$(echo "$response" | head -n -1)
+          status=$(echo "$response" | tail -n 1)
+          echo "Status: $status"
+          echo "Body: $body"
+          if [ "$status" -ge 400 ]; then
+            echo "❌ Snapshot endpoint returned error status"
+            exit 1
+          fi
+          echo "✓ Snapshot OK"

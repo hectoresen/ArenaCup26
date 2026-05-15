@@ -84,13 +84,60 @@ function RankProgressCard({ progress }: { progress: Progress }) {
       </div>
 
       {hasHistory ? (
-        <RankDeltaLine delta={rankDelta} />
+        <>
+          <RankDeltaLine delta={rankDelta} />
+          {sparkline && sparkline.length >= 2 && (
+            <Sparkline points={sparkline} ariaLabel={t("sparklineAria")} />
+          )}
+        </>
       ) : (
         <div className="mb-2.5 text-[11px] font-bold leading-[1.4] text-muted">
           {t("historyStarting")}
         </div>
       )}
     </article>
+  );
+}
+
+/**
+ * Mini-gráfica del rank en el tiempo. Eje Y invertido: rank 1 va
+ * arriba del SVG (porque numéricamente menor = mejor). Polyline
+ * gold, dos puntos en los extremos para anclar la lectura.
+ */
+function Sparkline({ points, ariaLabel }: { points: number[]; ariaLabel: string }) {
+  const width = 120;
+  const height = 28;
+  const pad = 3;
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const span = Math.max(max - min, 1);
+  const step = points.length > 1 ? (width - pad * 2) / (points.length - 1) : 0;
+  const coords = points.map((p, i) => ({
+    x: pad + i * step,
+    y: pad + ((p - min) / span) * (height - pad * 2),
+  }));
+  const d = coords.map((c, i) => `${i === 0 ? "M" : "L"}${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(" ");
+  const first = coords[0];
+  const last = coords[coords.length - 1];
+  if (!first || !last) return null;
+  return (
+    <svg
+      role="img"
+      aria-label={ariaLabel}
+      viewBox={`0 0 ${width} ${height}`}
+      className="mt-1 h-7 w-full"
+    >
+      <path
+        d={d}
+        fill="none"
+        stroke="var(--color-gold)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx={first.x} cy={first.y} r="2" fill="var(--color-gold)" opacity="0.5" />
+      <circle cx={last.x} cy={last.y} r="2.5" fill="var(--color-gold)" />
+    </svg>
   );
 }
 

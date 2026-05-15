@@ -403,6 +403,47 @@ export const userAchievements = pgTable(
 );
 
 /**
+ * Snapshot diario del ranking por user. Una fila por (`user_id`,
+ * `snapshot_date`). El cron `/api/cron/snapshot-ranking` corre a las
+ * 00:05 UTC y graba el rank + puntos actuales de cada user.
+ *
+ * Se usa para:
+ *  - Calcular `rankDelta` (variación 7 días) en la card "Tu posición"
+ *    del dashboard.
+ *  - Renderizar la sparkline (últimos 7 puntos del rank histórico).
+ *
+ * Como cada user tiene una fila al día, una temporada de Mundial (~30
+ * días) deja ~30 filas/user. Con 1k users activos = 30k filas/mes,
+ * totalmente manejable. Para limpieza más adelante (>90 días),
+ * añadir un job de pruning.
+ */
+export const rankingSnapshots = pgTable(
+  "ranking_snapshots",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /**
+     * Rank 1-based al cierre del día. Se calcula con el mismo
+     * tie-break que `getRealSnapshot` (points → streakMax →
+     * simpleHits → predictionsCount → createdAt).
+     */
+    rank: integer("rank").notNull(),
+    totalPoints: integer("total_points").notNull(),
+    /** UTC date (no timezone) — la clave de unicidad de un snapshot. */
+    snapshotDate: timestamp("snapshot_date", { mode: "date", withTimezone: false })
+      .notNull(),
+    /** Timestamp exacto de inserción. Solo para debugging. */
+    snapshotAt: timestamp("snapshot_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    uniqueDay: uniqueIndex("ranking_snapshots_unique_day").on(table.userId, table.snapshotDate),
+    dateIdx: index("ranking_snapshots_date_idx").on(table.snapshotDate),
+  }),
+);
+
+/**
  * Relación de amistad asimétrica. `requester_id` envía la solicitud,
  * `addressee_id` la recibe. La aplicación normaliza la dirección al
  * consultar (la amistad lógica es bidireccional cuando `status =

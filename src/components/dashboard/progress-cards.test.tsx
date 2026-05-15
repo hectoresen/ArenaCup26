@@ -100,4 +100,28 @@ describe("<ProgressCards>", () => {
     );
     expect(screen.getByText("#12480")).toBeInTheDocument();
   });
+
+  it("renders an SVG sparkline when history has ≥2 points", () => {
+    const { container } = renderWithProviders(
+      <ProgressCards
+        progress={buildProgress({
+          rank: { rank: 38, rankDelta: 4, sparkline: [42, 41, 40, 39, 38, 38, 38] },
+        })}
+        now={NOW}
+      />,
+    );
+    const svg = container.querySelector("svg[aria-label]");
+    expect(svg).not.toBeNull();
+    expect(svg?.querySelector("path")).not.toBeNull();
+  });
+
+  it("does not render sparkline when history has only one snapshot", () => {
+    const { container } = renderWithProviders(
+      <ProgressCards
+        progress={buildProgress({ rank: { rank: 38, rankDelta: 0, sparkline: [38] } })}
+        now={NOW}
+      />,
+    );
+    expect(container.querySelector("svg[aria-label]")).toBeNull();
+  });
 });

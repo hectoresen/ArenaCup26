@@ -211,7 +211,10 @@ Sin solapamiento con el análisis de producto, siguen activos:
   `/amigos` con bandeja + lista + buscador, CTA contextual en
   `/u/<username>`, `canViewProfile` resuelve `friends_only`).
 - **add-leaderboard-sse** (push real). Reemplaza polling 30s.
-- **add-ranking-history** (delta ▲/▼ + sparkline reales).
+- ~~**add-ranking-history** (delta ▲/▼ + sparkline reales).~~ ✓
+  (2026-05-15: tabla `ranking_snapshots`, cron diario
+  `/api/cron/snapshot-ranking` a las 00:05 UTC, `getRankHistory`
+  alimenta la card "Tu posición" con sparkline SVG + rankDelta).
 - **add-matches-filters** (filtros sobre `/partidos`).
 - **add-live-scoring** (workflow `*/2` durante partidos en curso).
 - **add-product-analytics** (Plausible).

@@ -349,7 +349,8 @@
       "historyStarting": "Suivi à partir du 11 juin",
       "rankDeltaUp": "▲ +{delta} places cette semaine",
       "rankDeltaDown": "▼ {delta} places cette semaine",
-      "rankDeltaFlat": "Aucun changement cette semaine"
+      "rankDeltaFlat": "Aucun changement cette semaine",
+      "sparklineAria": "Évolution de ta position ces derniers jours"
     },
     "miniLeaderboard": {
       "viewFullRanking": "Voir le classement complet",
