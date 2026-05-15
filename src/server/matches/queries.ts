@@ -4,7 +4,15 @@ import { matches, predictions, teams } from "@/server/db/schema";
 import type { MatchStage, MatchStatus } from "@/server/scoring/types";
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import type { MatchDetail, MatchListItem } from "./types";
+import type { BracketData, BracketRound, MatchDetail, MatchListItem } from "./types";
+
+const BRACKET_ROUNDS: BracketRound[] = [
+  "round-of-16",
+  "quarter",
+  "semi",
+  "third-place",
+  "final",
+];
 
 function teamView(row: {
   name: string | null;
@@ -160,6 +168,79 @@ export async function getMatchById(
     awayScoreExtra: row.awayScoreExtra,
     penaltyWinnerTeamId: row.penaltyWinnerTeamId,
     prediction: predictionMap.get(row.id) ?? null,
+  };
+}
+
+/**
+ * Carga los partidos de eliminatoria agrupados por ronda para la
+ * vista Bracket de `/partidos`. Las rondas siempre se devuelven en
+ * el orden `R16 → QF → SF → 3º → Final`, incluso si todavía no hay
+ * partidos en alguna de ellas (la vista renderiza placeholders).
+ */
+export async function getBracketMatches(db: Database, userId: string): Promise<BracketData> {
+  const homeTeam = alias(teams, "home_team");
+  const awayTeam = alias(teams, "away_team");
+  const rows = await db
+    .select({
+      id: matches.id,
+      stage: matches.stage,
+      kickoffAt: matches.kickoffAt,
+      status: matches.status,
+      homeScore: matches.homeScore,
+      awayScore: matches.awayScore,
+      homeTeamName: homeTeam.name,
+      homeTeamCode: homeTeam.code,
+      homeTeamFlag: homeTeam.flag,
+      awayTeamName: awayTeam.name,
+      awayTeamCode: awayTeam.code,
+      awayTeamFlag: awayTeam.flag,
+    })
+    .from(matches)
+    .leftJoin(homeTeam, eq(homeTeam.id, matches.homeTeamId))
+    .leftJoin(awayTeam, eq(awayTeam.id, matches.awayTeamId))
+    .where(inArray(matches.stage, BRACKET_ROUNDS))
+    .orderBy(asc(matches.kickoffAt));
+
+  const predictionMap =
+    rows.length === 0
+      ? new Map()
+      : await fetchPredictionMap(
+          db,
+          userId,
+          rows.map((r) => r.id),
+        );
+
+  const byRound = new Map<BracketRound, MatchListItem[]>();
+  for (const round of BRACKET_ROUNDS) byRound.set(round, []);
+
+  for (const row of rows) {
+    const item: MatchListItem = {
+      matchId: row.id,
+      stage: row.stage as MatchStage,
+      kickoffAt: row.kickoffAt,
+      status: row.status as MatchStatus,
+      homeTeam: teamView({
+        name: row.homeTeamName,
+        code: row.homeTeamCode,
+        flag: row.homeTeamFlag,
+      }),
+      awayTeam: teamView({
+        name: row.awayTeamName,
+        code: row.awayTeamCode,
+        flag: row.awayTeamFlag,
+      }),
+      homeScore: row.homeScore,
+      awayScore: row.awayScore,
+      prediction: predictionMap.get(row.id) ?? null,
+    };
+    byRound.get(row.stage as BracketRound)?.push(item);
+  }
+
+  return {
+    rounds: BRACKET_ROUNDS.map((round) => ({
+      round,
+      matches: byRound.get(round) ?? [],
+    })),
   };
 }
 

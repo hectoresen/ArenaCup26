@@ -169,7 +169,23 @@
       "tbdLabel": "Équipes à déterminer",
       "tbdPending": "En attente",
       "predict": "Prédire",
-      "predictionSent": "Prédiction envoyée"
+      "predictionSent": "Prédiction envoyée",
+      "versus": "vs"
+    },
+    "tabs": {
+      "ariaLabel": "Vues des matchs",
+      "todos": "Tous",
+      "bracket": "Tableau"
+    },
+    "bracket": {
+      "rounds": {
+        "round-of-16": "Huitièmes",
+        "quarter": "Quarts",
+        "semi": "Demies",
+        "third-place": "3e place",
+        "final": "Finale"
+      },
+      "emptyRound": "{round} — pas encore de matchs"
     },
     "predictionStub": {
       "titleNew": "Prédiction",

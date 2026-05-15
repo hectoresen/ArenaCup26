@@ -28,3 +28,19 @@ export type MatchDetail = MatchListItem & {
   /** UUID del equipo que ganó por penales. `null` si no fue a penales. */
   penaltyWinnerTeamId: string | null;
 };
+
+/**
+ * Ronda eliminatoria del bracket. Reusamos los valores del enum
+ * `match_stage` salvo `group`/`regular-season` que no entran en el
+ * bracket. El orden de las claves marca el orden visual en la vista.
+ */
+export type BracketRound = "round-of-16" | "quarter" | "semi" | "third-place" | "final";
+
+export type BracketRoundGroup = {
+  round: BracketRound;
+  matches: MatchListItem[];
+};
+
+export type BracketData = {
+  rounds: BracketRoundGroup[];
+};

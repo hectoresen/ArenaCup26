@@ -127,21 +127,22 @@ Editar nombre + avatar desde el perfil propio.
     width si la card es pequeña, depende de viewport).
   - Mantener "Cerrado" cuando kickoffPast.
 
-## Bloque E — Partidos: dos sub-pestañas + bracket
+## Bloque E — Partidos: dos sub-pestañas + bracket ✓ (2026-05-15)
 
-- **E1 · Tabs internas** en `/partidos`:
+- **E1 · Tabs internas** en `/partidos`: ✓
   - "Todos" (vista actual).
-  - "Bracket" (nuevo).
-- **E2 · Vista bracket** (`4.1`). Diagrama de eliminatorias del
-  Mundial 2026: octavos → cuartos → semis → final + 3er puesto.
-  Cajas vacías para partidos sin equipos resueltos todavía. Cada
-  caja muestra:
-    - Partido jugado → marcador + tu predicción + puntos.
-    - Partido futuro → tu predicción o CTA "Predecir".
-    - Partido TBD → sombreado, sin acciones.
-  Se conecta con `matches` filtrado por `stage IN ('round-of-16',
-  'quarter', 'semi', 'third-place', 'final')`. Requiere componente
-  visual nuevo (no es trivial).
+  - "Bracket" (nuevo). Tabs server-side via `?vista=bracket`
+    (`MatchesTabs` component, mantiene back/forward).
+- **E2 · Vista bracket** (`4.1`): ✓
+  - 5 secciones verticales apiladas: Octavos · Cuartos · Semis ·
+    3er puesto · Final.
+  - Cada sección con grid 2-cols (1-col en viewport <420px) de
+    `<BracketCard>` compactas — código FIFA del equipo, marcador
+    grande si jugado, chip "Enviada"/"Predecir →" según estado.
+  - Rondas vacías muestran placeholder dashed "ronda — aún sin
+    partidos confirmados".
+  - Query `getBracketMatches` filtra `matches` por
+    `stage IN ('round-of-16','quarter','semi','third-place','final')`.
 
 ## Bloque F — Invitaciones (fase análisis, no implementación)
 

@@ -169,7 +169,23 @@
       "tbdLabel": "الفرق ستُحدَّد لاحقًا",
       "tbdPending": "معلّق",
       "predict": "توقع",
-      "predictionSent": "تم إرسال التوقع"
+      "predictionSent": "تم إرسال التوقع",
+      "versus": "ضد"
+    },
+    "tabs": {
+      "ariaLabel": "عرض المباريات",
+      "todos": "الكل",
+      "bracket": "جدول الأدوار"
+    },
+    "bracket": {
+      "rounds": {
+        "round-of-16": "ثمن النهائي",
+        "quarter": "ربع النهائي",
+        "semi": "نصف النهائي",
+        "third-place": "المركز الثالث",
+        "final": "النهائي"
+      },
+      "emptyRound": "{round} — لا مباريات بعد"
     },
     "predictionStub": {
       "titleNew": "توقع",
