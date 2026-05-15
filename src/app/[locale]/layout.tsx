@@ -1,9 +1,11 @@
+import { env } from "@/lib/env";
 import { isValidLocale, routing } from "@/i18n/routing";
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Fredoka, Nunito } from "next/font/google";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import "../globals.css";
 
 /**
@@ -91,6 +93,21 @@ export default async function LocaleLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap"
         />
+        {/*
+          Plausible analytics (privacy-friendly, sin cookies, sin PII).
+          Solo se inyecta si NEXT_PUBLIC_PLAUSIBLE_DOMAIN está set —
+          en dev local queda en noop. No requiere banner de consent
+          bajo RGPD/ePrivacy porque no almacena identificadores en
+          el navegador.
+        */}
+        {env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
+          <Script
+            strategy="afterInteractive"
+            defer
+            data-domain={env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+            src={env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL}
+          />
+        )}
       </head>
       <body className="antialiased">
         {/* Skip link — solo visible al hacer focus con Tab. WCAG 2.4.1. */}

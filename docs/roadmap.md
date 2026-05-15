@@ -223,7 +223,10 @@ Sin solapamiento con el análisis de producto, siguen activos:
   (2026-05-15: cron `/api/cron/live-scoring` cada 2 min con check
   `shouldSyncLive` previo — solo gasta requests a api-football
   cuando hay partidos `live` o un kickoff en ±15-30 min).
-- **add-product-analytics** (Plausible).
+- ~~**add-product-analytics** (Plausible).~~ ✓
+  (2026-05-15: Script `<head>` condicional a `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`.
+  Privacy-friendly, sin cookies → no banner. Setup en
+  `docs/security.md §9.3`).
 - ~~**add-mobile-polish** (PWA + safe-area iOS + a11y audit).~~ ✓
   (2026-05-15: viewport con `viewport-fit=cover`, safe-area-inset
   en body, theme-color, manifest.webmanifest + icon.svg, skip link

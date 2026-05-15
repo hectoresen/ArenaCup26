@@ -324,6 +324,17 @@ Pasos operativos cuando se filtran secrets en git o se requiere rotación progra
 
 Sin `SENTRY_DSN`, el módulo `@sentry/nextjs` funciona en modo noop — no rompe nada, simplemente no envía nada.
 
+### 9.3 Activar Plausible analytics (opcional)
+
+Plausible es privacy-friendly (sin cookies, sin PII, sin fingerprinting) y bajo GDPR/ePrivacy no requiere banner de consent.
+
+1. Crear cuenta en [plausible.io](https://plausible.io) (o self-host) y añadir el dominio.
+2. Railway → Variables → añadir `NEXT_PUBLIC_PLAUSIBLE_DOMAIN=<tu-dominio>` (p.ej. `wmundial.app`).
+3. (Opcional) `NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL=<url>` si usas un self-host con script propio.
+4. Redeploy. El script se inyecta en `<head>` solo si `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` está set; sin esta variable, no se hace ninguna request a Plausible (noop completo).
+
+Lo que tracking: page views + outbound link clicks. NO se envía ni email, ni nombre, ni IP completa (Plausible la trunca antes de procesar).
+
 ---
 
 ## 9. TODOs (pendientes en propuestas abiertas)

@@ -74,6 +74,17 @@ const baseSchema = z.object({
   SENTRY_ENVIRONMENT: z.string().optional(),
   SENTRY_AUTH_TOKEN: z.string().optional(),
 
+  // Plausible (add-product-analytics, 2026-05-15). Opcional. Si no
+  // está set, el script no se inyecta — analytics queda en noop.
+  // Plausible es privacy-friendly (sin cookies, sin PII), por eso
+  // no requiere banner de consentimiento bajo RGPD/ePrivacy. Doc:
+  // `docs/security.md §9.3`.
+  NEXT_PUBLIC_PLAUSIBLE_DOMAIN: z.string().optional(),
+  NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL: z
+    .string()
+    .url()
+    .default("https://plausible.io/js/script.outbound-links.js"),
+
   // Runtime
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
