@@ -1,0 +1,60 @@
+name: Live scoring
+
+# Cron de alta frecuencia que llama a /api/cron/live-scoring cada 2
+# minutos. El endpoint hace un check rápido en BD: si NO hay partidos
+# `live` y NO hay kickoffs en ±15-30 min, devuelve 204 sin tocar
+# api-football. Así no consumimos requests del free-tier cuando no
+# hay nada que sincronizar.
+#
+# Trade-off vs sync-fixtures (cada 3h, 9 días de ventana):
+#  - sync-fixtures: visibilidad amplia, baja frecuencia. Detecta
+#    partidos nuevos en la temporada + cambios de calendario.
+#  - live-scoring: ventana solo del día actual, alta frecuencia.
+#    Marcadores en vivo cerca de tiempo real (max 2 min de delay).
+#
+# **Setup en GitHub** (una vez):
+#   1. Settings → Secrets → New secret `RAILWAY_LIVE_URL` =
+#      https://<dominio>/api/cron/live-scoring
+#   2. Reusar el `CRON_SECRET` ya configurado.
+
+on:
+  # Cada 2 minutos. El check de shouldSyncLive() es muy barato (2
+  # queries a Postgres ~5ms cada una) así que el coste de iteraciones
+  # vacías es despreciable. Durante el Mundial, con 4-6 horas de
+  # partidos al día, gastaremos: 6h × 30 calls/h × 1 fetch = 180
+  # requests al provider en ventanas activas. Manejable.
+  schedule:
+    - cron: "*/2 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Trigger live-scoring endpoint
+        env:
+          URL: ${{ secrets.RAILWAY_LIVE_URL }}
+          SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$URL" ]; then
+            echo "❌ RAILWAY_LIVE_URL secret not configured."
+            exit 1
+          fi
+          if [ -n "$SECRET" ]; then
+            HEADERS=(-H "Authorization: Bearer $SECRET")
+          else
+            HEADERS=()
+          fi
+          response=$(curl -sS -w "\n%{http_code}" -X POST "${HEADERS[@]}" "$URL")
+          body=$(echo "$response" | head -n -1)
+          status=$(echo "$response" | tail -n 1)
+          echo "Status: $status"
+          echo "Body: $body"
+          # 204 (sin partidos relevantes) es estado normal, NO error.
+          # >= 400 sí lo es.
+          if [ "$status" -ge 400 ]; then
+            echo "❌ Live-scoring endpoint returned error status"
+            exit 1
+          fi
+          echo "✓ Live-scoring OK"

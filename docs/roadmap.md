@@ -219,7 +219,10 @@ Sin solapamiento con el análisis de producto, siguen activos:
   (2026-05-15: chips por estado [todos/live/scheduled/finished],
   fase [grupos/eliminatoria] y "solo mis predicciones".
   Server-side via search params, URL compartible).
-- **add-live-scoring** (workflow `*/2` durante partidos en curso).
+- ~~**add-live-scoring** (workflow `*/2` durante partidos en curso).~~ ✓
+  (2026-05-15: cron `/api/cron/live-scoring` cada 2 min con check
+  `shouldSyncLive` previo — solo gasta requests a api-football
+  cuando hay partidos `live` o un kickoff en ±15-30 min).
 - **add-product-analytics** (Plausible).
 - **add-mobile-polish** (PWA + safe-area iOS + a11y audit).
 - **add-data-resilience** (pg_dump → R2 + status page + PR envs).
