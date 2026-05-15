@@ -32,9 +32,6 @@ vi.mock("@/server/notifications/queries", () => ({
   getNotificationsForUser: async () => ({ items: [], unreadCount: 0 }),
 }));
 vi.mock("./_actions", () => ({ markAllReadAction: async () => {} }));
-vi.mock("next/headers", () => ({
-  headers: async () => ({ get: () => "" }),
-}));
 
 const { default: AppGroupLayout } = await import("./layout");
 

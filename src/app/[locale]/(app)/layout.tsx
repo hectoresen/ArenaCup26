@@ -4,7 +4,6 @@ import { db } from "@/server/db/client";
 import { users } from "@/server/db/schema";
 import { getNotificationsForUser } from "@/server/notifications/queries";
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
@@ -34,19 +33,18 @@ export default async function AppGroupLayout({
     redirect(`/${locale}`);
   }
 
-  // Onboarding guard: si el user no ha completado el wizard (`onboarded_at
-  // IS NULL`) Y la ruta actual NO es `/bienvenido`, redirigir. Sin esto,
-  // el user nuevo aterriza en `/inicio` con username auto-generado y país
-  // vacío. Excluimos la propia ruta del wizard para no entrar en loop.
-  const h = await headers();
-  const currentPath = h.get("x-nextjs-pathname") ?? h.get("x-pathname") ?? "";
+  // Onboarding guard: si el user no ha completado el wizard
+  // (`onboarded_at IS NULL`), redirige a `/bienvenido` antes de
+  // renderizar el shell. La página `/bienvenido` vive FUERA de este
+  // route group `(app)` para que este layout no se aplique sobre
+  // ella — eso garantiza que no haya bucle de redirect.
   const onboardingRow = await db
     .select({ onboardedAt: users.onboardedAt })
     .from(users)
     .where(eq(users.id, session.user.id))
     .limit(1);
   const isOnboarded = Boolean(onboardingRow[0]?.onboardedAt);
-  if (!isOnboarded && !currentPath.endsWith("/bienvenido")) {
+  if (!isOnboarded) {
     redirect(`/${locale}/bienvenido`);
   }
 
