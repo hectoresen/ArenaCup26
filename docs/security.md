@@ -182,12 +182,11 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 - **Impacto**: agotar cupo gratuito de api-football (denegación de servicio funcional) o impersonar la app contra Google OAuth.
 - **Mitigación**: rotar siguiendo §3.1 y §3.2 antes de cualquier promoción pública.
 
-#### CRIT-2 · Vulnerabilidad SQL injection en drizzle-orm <0.45.2
+#### CRIT-2 · ✅ Resuelto: drizzle-orm actualizado a 0.45.2 (2026-05-15)
 
-- **Riesgo**: `npm audit` 2026-05-15 reporta HIGH severity en drizzle-orm < 0.45.2 (`GHSA-gpj5-g38j-94v9`): identificadores SQL escapados incorrectamente.
-- **Impacto**: si en algún momento se construye una query dinámica con identificadores de usuario, RCE en BD.
-- **Estado actual**: todas nuestras queries usan column refs del schema (no strings dinámicos), así que no tenemos superficie expuesta hoy. Aún así, **actualizar** antes de que alguien añada una query dinámica.
-- **Mitigación**: `npm install drizzle-orm@^0.45.2` + testar build + tests + un sync end-to-end. Es semver-breaking, hay que revisar el changelog.
+- **Riesgo**: `npm audit` reportaba HIGH severity en drizzle-orm <0.45.2 (`GHSA-gpj5-g38j-94v9`): identificadores SQL escapados incorrectamente.
+- **Estado**: actualizado `drizzle-orm 0.38.4 → 0.45.2` + `drizzle-kit 0.30.6 → 0.31.10`. Typecheck, 477 tests, build y `db:generate` (sin schema changes) verifican que nada se rompió. `npm audit` ya no reporta HIGH severities — solo quedan las 13 moderate de esbuild/vite en dev deps (WEAK-1, no producción).
+- **Verificación post-deploy**: el primer cron sync tras pushear debe completar sin errores nuevos. Si falla, revertir con `npm install drizzle-orm@0.38.4 drizzle-kit@0.30.6`.
 
 #### CRIT-3 · CRON_SECRET dual config
 
@@ -278,7 +277,7 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 ### 8.4 Checklist antes de "Open beta"
 
 - [ ] CRIT-1: rotar API_FOOTBALL_KEY + GOOGLE_CLIENT_SECRET.
-- [ ] CRIT-2: actualizar drizzle-orm a ≥0.45.2 + verificar suite verde.
+- [x] ~~CRIT-2: actualizar drizzle-orm a ≥0.45.2 + verificar suite verde.~~ (2026-05-15)
 - [ ] CRIT-3: validar CRON_SECRET sincronizado en Railway + GitHub.
 - [ ] CRIT-4: implementar `add-profile-privacy` con default sensato (público es OK si comunicamos claramente).
 - [ ] CRIT-5: terminar wiring de `add-rate-limiting` (publicRead + signup).
