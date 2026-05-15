@@ -48,7 +48,6 @@ export default async function BienvenidoPage({
   return (
     <OnboardingWizard
       initial={{
-        name: row[0]?.name ?? "",
         username: fallbackUsername,
         country: row[0]?.country ?? null,
       }}

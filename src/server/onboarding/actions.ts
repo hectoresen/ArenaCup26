@@ -28,8 +28,13 @@ const countrySchema = z
   .max(3)
   .regex(/^[A-Z]{2,3}$/, "Country must be a 2-3 letter ISO code");
 
+/**
+ * Schema del wizard. NO incluye `name` — el nombre real viene de
+ * Google y se conserva tal cual (el user puede cambiarlo después en
+ * ajustes si quiere). El wizard solo confirma username (que ya
+ * tiene un valor auto-generado editable) y país.
+ */
 const completeSchema = z.object({
-  name: z.string().trim().min(1).max(60),
   username: z
     .string()
     .trim()
@@ -101,7 +106,6 @@ export async function completeOnboarding(
   await db
     .update(users)
     .set({
-      name: data.name,
       username: data.username,
       country: data.country,
       onboardedAt: new Date(),

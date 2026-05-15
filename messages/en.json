@@ -45,17 +45,16 @@
   },
   "onboarding": {
     "title": "Welcome",
-    "subtitle": "Three quick steps and you're in.",
+    "subtitle": "Confirm your public name and country. 30 seconds and you're in.",
     "stepIndicator": "Current step",
     "next": "Next →",
     "back": "← Back",
     "finish": "Start predicting",
     "finishing": "Saving…",
     "step1": {
-      "heading": "Your identity",
-      "nameLabel": "What's your name?",
-      "usernameLabel": "Your username",
-      "usernameHint": "3-20 chars, lowercase. Letters, digits and hyphens only.",
+      "heading": "Your public name",
+      "usernameLabel": "Username",
+      "usernameHint": "This is how others see you on your profile, the ranking and achievements. Keep the generated one or change it (3-20 chars, lowercase, digits and hyphens).",
       "countryLabel": "Your country"
     },
     "step2": {
@@ -72,7 +71,6 @@
       "body": "Your account is configured. Let's predict."
     },
     "error": {
-      "nameRequired": "We need a display name.",
       "usernameInvalid": "Invalid username: 3-20 chars, lowercase letters, digits and hyphens.",
       "usernameTaken": "That username is taken. Try another.",
       "invalidInput": "Some field is invalid. Check the form.",

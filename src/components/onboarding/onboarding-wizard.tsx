@@ -9,7 +9,6 @@ import { completeOnboarding } from "@/server/onboarding/actions";
 
 type Props = {
   initial: {
-    name: string;
     username: string;
     country: string | null;
   };
@@ -19,7 +18,9 @@ type Step = 1 | 2 | 3;
 
 /**
  * Wizard de bienvenida en 3 pasos:
- *   1. Identidad: nombre + username + país.
+ *   1. Identidad: username (pre-rellenado, editable) + país.
+ *      El nombre real viene de Google y no se pide aquí — el user
+ *      puede cambiarlo después en ajustes si quiere.
  *   2. Cómo funciona: 3 cards de scoring (simple/exacto/rachas).
  *   3. Listo: CTA que dispara `completeOnboarding` y redirige.
  */
@@ -27,7 +28,6 @@ export function OnboardingWizard({ initial }: Props) {
   const t = useTranslations("onboarding");
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
-  const [name, setName] = useState(initial.name);
   const [username, setUsername] = useState(initial.username);
   const [country, setCountry] = useState(initial.country ?? "ES");
   const [error, setError] = useState<string | null>(null);
@@ -36,10 +36,6 @@ export function OnboardingWizard({ initial }: Props) {
   function next() {
     setError(null);
     if (step === 1) {
-      if (name.trim().length < 1) {
-        setError(t("error.nameRequired"));
-        return;
-      }
       if (!/^[a-z0-9](?:[a-z0-9-]{1,18}[a-z0-9])?$/.test(username)) {
         setError(t("error.usernameInvalid"));
         return;
@@ -63,7 +59,6 @@ export function OnboardingWizard({ initial }: Props) {
     setError(null);
     startTransition(async () => {
       const result = await completeOnboarding({
-        name: name.trim(),
         username: username.trim().toLowerCase(),
         country: country.trim().toUpperCase(),
       });
@@ -100,19 +95,6 @@ export function OnboardingWizard({ initial }: Props) {
           <h2 className="font-display text-[15px] uppercase tracking-[0.12em] text-foreground">
             {t("step1.heading")}
           </h2>
-
-          <label className="block">
-            <span className="block text-[11px] font-extrabold uppercase tracking-[0.1em] text-muted">
-              {t("step1.nameLabel")}
-            </span>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={60}
-              className="mt-1 w-full rounded-xl border-2 border-border bg-card-hover px-3 py-2 text-sm font-bold text-foreground focus:border-gold focus:outline-none"
-            />
-          </label>
 
           <label className="block">
             <span className="block text-[11px] font-extrabold uppercase tracking-[0.1em] text-muted">

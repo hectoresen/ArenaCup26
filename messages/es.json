@@ -45,17 +45,16 @@
   },
   "onboarding": {
     "title": "Te damos la bienvenida",
-    "subtitle": "Tres pasos rápidos y estás dentro.",
+    "subtitle": "Confirma tu nombre público y país. En 30 segundos estás dentro.",
     "stepIndicator": "Paso actual",
     "next": "Siguiente →",
     "back": "← Atrás",
     "finish": "Empezar a predecir",
     "finishing": "Guardando…",
     "step1": {
-      "heading": "Tu identidad",
-      "nameLabel": "¿Cómo te llamas?",
-      "usernameLabel": "Tu username",
-      "usernameHint": "3-20 caracteres, minúsculas. Solo letras, números y guiones.",
+      "heading": "Tu nombre público",
+      "usernameLabel": "Username",
+      "usernameHint": "Así te verán los demás en tu perfil, el ranking y los logros. Puedes dejar el que te hemos generado o cambiarlo (3-20 caracteres, minúsculas, números y guiones).",
       "countryLabel": "Tu país"
     },
     "step2": {
@@ -72,7 +71,6 @@
       "body": "Tu cuenta está configurada. Vamos a empezar a predecir."
     },
     "error": {
-      "nameRequired": "Necesitamos un nombre para mostrar.",
       "usernameInvalid": "Username inválido: 3-20 caracteres, letras minúsculas, números y guiones.",
       "usernameTaken": "Ese username ya lo lleva alguien. Prueba con otro.",
       "invalidInput": "Algún dato es inválido. Revisa el formulario.",
