@@ -219,10 +219,13 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 - `npm audit` marca esbuild <=0.24.2 con `GHSA-67mh-4wv8-2f99` (cualquier web puede leer la respuesta del dev server). Solo afecta `npm run dev`, NO producción.
 - Upgrade a drizzle-kit@0.31.10 + vitest 3.x es breaking. Apuntado, no urgente.
 
-#### WEAK-2 · Sin error monitoring persistente
+#### WEAK-2 · ✅ Resuelto: error monitoring con Sentry (2026-05-15)
 
-- Los `[WM/...]` van a stdout de Railway con retention ~30 días. Un crash a las 3am pasa desapercibido.
-- **Mitigación**: implementar `add-error-monitoring` (Sentry).
+- **Estado**: `@sentry/nextjs` configurado con server/edge/client init separados. `src/instrumentation.ts` carga el runtime correcto.
+- **PII scrubbing** (`src/lib/sentry-scrub.ts`): el `beforeSend` redacta headers `authorization`/`cookie`, drop emails/usernames/IPs del `event.user`, y filtra `extra` con keys que contengan `prediction`/`token`/`secret`/`password`.
+- **Modo noop**: si `SENTRY_DSN` no está set, `init()` no envía nada. `derr()` en `debug-log.ts` solo invoca Sentry cuando `NODE_ENV=production` Y `SENTRY_DSN` está set.
+- **Configuración Railway**: añadir `SENTRY_DSN` (y opcional `SENTRY_AUTH_TOKEN` para sourcemap upload + `SENTRY_ENVIRONMENT`).
+- **Wired**: `derr` reemplaza `dlog(..., {err})` en los catches críticos del scoring pipeline. `onRequestError` exportado desde instrumentation.ts cubre Server Components y route handlers automáticamente.
 
 #### WEAK-3 · Sin auditoría de accesos
 
@@ -288,7 +291,7 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 - [ ] CRIT-4: implementar `add-profile-privacy` con default sensato (público es OK si comunicamos claramente).
 - [x] ~~CRIT-5: terminar wiring de `add-rate-limiting` (publicRead + signup).~~ (2026-05-15)
 - [ ] Configurar UPSTASH_REDIS_REST_URL/TOKEN en Railway (sin esto el rate limit es noop).
-- [ ] WEAK-2: implementar `add-error-monitoring` (Sentry) + alertas Slack.
+- [x] ~~WEAK-2: implementar `add-error-monitoring` (Sentry) + alertas Slack.~~ (2026-05-15; alertas Slack pendiente — configurar webhook tras crear proyecto en Sentry.)
 - [ ] Política de privacidad pública en `/privacy` o `/legal`.
 - [ ] Términos de uso en `/terms`.
 - [ ] Cookie banner (si añadimos analytics que use cookies).

@@ -9,6 +9,7 @@ import {
   teams,
   userPoints,
 } from "@/server/db/schema";
+import { derr } from "@/lib/debug-log";
 import { evaluateAndUnlock } from "@/server/achievements/unlock";
 import { createNotification } from "@/server/notifications/create";
 import { scoreMatchPrediction } from "./engine";
@@ -150,18 +151,12 @@ export async function processFinishedMatch(
       try {
         await evaluateAndUnlock(db, p.userId);
       } catch (err) {
-        dlog("scoring", "evaluateAndUnlock threw", {
-          userId: p.userId,
-          err: err instanceof Error ? err.message : String(err),
-        });
+        derr("scoring", `evaluateAndUnlock threw for user ${p.userId}`, err);
       }
 
       result.processed++;
     } catch (err) {
-      dlog("scoring", "error persisting score", {
-        userId: p.userId,
-        err: err instanceof Error ? err.message : String(err),
-      });
+      derr("scoring", `persistScore failed for user ${p.userId} match ${matchId}`, err);
       result.errors.push({
         userId: p.userId,
         reason: err instanceof Error ? err.message : String(err),

@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
@@ -95,4 +96,34 @@ const config: NextConfig = {
   },
 };
 
-export default withNextIntl(config);
+/**
+ * Composición de wrappers:
+ *   next-intl (i18n) → Sentry (instrumentation + sourcemaps).
+ *
+ * Sentry solo se activa cuando `SENTRY_DSN` y `SENTRY_AUTH_TOKEN`
+ * están configurados. Sin las env vars, `withSentryConfig` deja
+ * pasar la config sin tocar nada (no requiere upload de sourcemaps).
+ *
+ * `org` y `project` son slugs públicos de Sentry — no son secrets.
+ * Quedan hardcoded para evitar otra env var; cuando alguien forkee
+ * el repo, los cambia o configura los suyos.
+ */
+const SENTRY_ORG = "webmundial-26";
+const SENTRY_PROJECT = "webmundial";
+
+const nextIntlConfig = withNextIntl(config);
+
+export default withSentryConfig(nextIntlConfig, {
+  org: SENTRY_ORG,
+  project: SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  // Mantén silencioso el build cuando no haya auth token o no
+  // queramos sourcemap upload (e.g. local).
+  silent: !process.env.SENTRY_AUTH_TOKEN,
+  // No subir sourcemaps si no hay auth token — evita ruido en CI.
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
+  // No expone Sentry como dep del cliente bundle si no se usa.
+  disableLogger: true,
+});

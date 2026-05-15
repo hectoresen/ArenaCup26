@@ -66,6 +66,14 @@ const baseSchema = z.object({
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
 
+  // Sentry (add-error-monitoring, 2026-05-15). Todos opcionales:
+  // sin DSN, Sentry queda en modo noop. AUTH_TOKEN solo se usa
+  // durante build para subir sourcemaps (si no está, build sigue
+  // sin error pero los stack traces de producción no se traducen).
+  SENTRY_DSN: z.string().url().optional(),
+  SENTRY_ENVIRONMENT: z.string().optional(),
+  SENTRY_AUTH_TOKEN: z.string().optional(),
+
   // Runtime
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
