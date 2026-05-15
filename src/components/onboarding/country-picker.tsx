@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { countryCodeToFlag } from "@/lib/format/country";
+import { CountryFlag } from "@/components/common/country-flag";
 import { COUNTRIES } from "@/lib/format/countries";
 
 type Props = {
@@ -98,9 +98,7 @@ export function CountryPicker({ value, onChange, label }: Props) {
         className="mt-1 flex w-full cursor-pointer items-center justify-between rounded-xl border-2 border-border bg-card-hover px-3 py-2 text-sm font-bold text-foreground transition-colors hover:border-gold/40 focus:border-gold focus:outline-none"
       >
         <span className="flex items-center gap-2">
-          <span aria-hidden="true" className="text-lg leading-none">
-            {countryCodeToFlag(selected.code)}
-          </span>
+          <CountryFlag code={selected.code} name={selected.name} size={22} className="rounded-sm" />
           <span>{selected.name}</span>
         </span>
         <span aria-hidden="true" className="text-xs text-muted">
@@ -135,9 +133,7 @@ export function CountryPicker({ value, onChange, label }: Props) {
                       i === highlight ? "bg-gold/15" : "hover:bg-card-hover"
                     } ${c.code === value ? "text-gold" : ""}`}
                   >
-                    <span aria-hidden="true" className="text-lg leading-none">
-                      {countryCodeToFlag(c.code)}
-                    </span>
+                    <CountryFlag code={c.code} name={c.name} size={20} className="rounded-sm" />
                     <span className="flex-1">{c.name}</span>
                     <span className="text-[10px] font-extrabold text-muted">{c.code}</span>
                   </button>

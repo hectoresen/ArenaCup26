@@ -50,6 +50,7 @@ function buildCsp(): string {
       "blob:",
       "https://media.api-sports.io",
       "https://*.googleusercontent.com",
+      "https://flagcdn.com",
     ],
     "font-src": ["'self'", "data:"],
     "connect-src": ["'self'", "https://v3.football.api-sports.io"],
