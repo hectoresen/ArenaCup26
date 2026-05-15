@@ -35,6 +35,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Google({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          // Forzar el selector de cuentas en cada login. Sin esto,
+          // Google re-autentica silenciosamente con la última cuenta
+          // usada → el user no puede elegir otra sin cerrar sesión
+          // en accounts.google.com manualmente. Coste UX: 1 click
+          // extra; beneficio: control claro en máquinas compartidas
+          // y testing multi-cuenta. Decisión 2026-05-15.
+          prompt: "select_account",
+        },
+      },
     }),
   ],
   session: { strategy: "database" },
