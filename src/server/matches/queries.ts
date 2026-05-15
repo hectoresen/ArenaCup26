@@ -4,7 +4,13 @@ import { matches, predictions, teams } from "@/server/db/schema";
 import type { MatchStage, MatchStatus } from "@/server/scoring/types";
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import type { BracketData, BracketRound, MatchDetail, MatchListItem } from "./types";
+import type {
+  BracketData,
+  BracketRound,
+  MatchDetail,
+  MatchListItem,
+  MatchesFilters,
+} from "./types";
 
 const BRACKET_ROUNDS: BracketRound[] = [
   "round-of-16",
@@ -13,6 +19,17 @@ const BRACKET_ROUNDS: BracketRound[] = [
   "third-place",
   "final",
 ];
+
+/**
+ * Status "scheduled" en la UI agrupa los 3 estados que comparten
+ * semántica "partido futuro, todavía no jugado":
+ *  - `scheduled`: kickoff conocido + equipos resueltos.
+ *  - `scheduled-tbd`: kickoff conocido, equipos sin resolver (semi
+ *    pre-bracket).
+ *  - `prediction-locked`: ventana de predicción cerrada pero partido
+ *    aún no empezado.
+ */
+const SCHEDULED_STATUSES: MatchStatus[] = ["scheduled", "scheduled-tbd", "prediction-locked"];
 
 function teamView(row: {
   name: string | null;
@@ -50,6 +67,104 @@ async function fetchPredictionMap(
       },
     ]),
   );
+}
+
+/**
+ * Lista filtrable de partidos. Aplica filtros en SQL (no en memoria).
+ * Si los 3 filtros están "off" equivale a `getAllMatches`.
+ *
+ *  - `status: "live"` → solo `status = 'live'`.
+ *  - `status: "scheduled"` → 3 valores agrupados (scheduled, tbd,
+ *    prediction-locked) — ver `SCHEDULED_STATUSES`.
+ *  - `status: "finished"` → solo `status = 'finished'`.
+ *  - `stage: "group"` → solo fase de grupos.
+ *  - `stage: "knockout"` → R16 + QF + SF + 3rd + Final.
+ *  - `predictedOnly: true` → INNER JOIN con `predictions` del user.
+ */
+export async function getFilteredMatches(
+  db: Database,
+  userId: string,
+  filters: MatchesFilters,
+): Promise<MatchListItem[]> {
+  const homeTeam = alias(teams, "home_team");
+  const awayTeam = alias(teams, "away_team");
+
+  const whereConds: ReturnType<typeof eq>[] = [];
+
+  if (filters.status === "live") {
+    whereConds.push(eq(matches.status, "live"));
+  } else if (filters.status === "scheduled") {
+    whereConds.push(inArray(matches.status, SCHEDULED_STATUSES));
+  } else if (filters.status === "finished") {
+    whereConds.push(eq(matches.status, "finished"));
+  }
+
+  if (filters.stage === "group") {
+    whereConds.push(eq(matches.stage, "group"));
+  } else if (filters.stage === "knockout") {
+    whereConds.push(inArray(matches.stage, BRACKET_ROUNDS));
+  }
+
+  // predictedOnly se resuelve con un subselect EXISTS para evitar
+  // duplicar filas si por alguna razón hubiera ≥2 predicciones por
+  // user+match (constraint actual lo impide, pero defensivo).
+  if (filters.predictedOnly) {
+    whereConds.push(
+      sql`EXISTS (
+        SELECT 1 FROM ${predictions}
+        WHERE ${predictions.matchId} = ${matches.id}
+          AND ${predictions.userId} = ${userId}
+      )`,
+    );
+  }
+
+  const rows = await db
+    .select({
+      id: matches.id,
+      stage: matches.stage,
+      kickoffAt: matches.kickoffAt,
+      status: matches.status,
+      homeScore: matches.homeScore,
+      awayScore: matches.awayScore,
+      homeTeamName: homeTeam.name,
+      homeTeamCode: homeTeam.code,
+      homeTeamFlag: homeTeam.flag,
+      awayTeamName: awayTeam.name,
+      awayTeamCode: awayTeam.code,
+      awayTeamFlag: awayTeam.flag,
+    })
+    .from(matches)
+    .leftJoin(homeTeam, eq(homeTeam.id, matches.homeTeamId))
+    .leftJoin(awayTeam, eq(awayTeam.id, matches.awayTeamId))
+    .where(whereConds.length > 0 ? and(...whereConds) : undefined)
+    .orderBy(asc(matches.kickoffAt));
+
+  if (rows.length === 0) return [];
+  const predictionMap = await fetchPredictionMap(
+    db,
+    userId,
+    rows.map((r) => r.id),
+  );
+
+  return rows.map((row) => ({
+    matchId: row.id,
+    stage: row.stage as MatchStage,
+    kickoffAt: row.kickoffAt,
+    status: row.status as MatchStatus,
+    homeTeam: teamView({
+      name: row.homeTeamName,
+      code: row.homeTeamCode,
+      flag: row.homeTeamFlag,
+    }),
+    awayTeam: teamView({
+      name: row.awayTeamName,
+      code: row.awayTeamCode,
+      flag: row.awayTeamFlag,
+    }),
+    homeScore: row.homeScore,
+    awayScore: row.awayScore,
+    prediction: predictionMap.get(row.id) ?? null,
+  }));
 }
 
 /**

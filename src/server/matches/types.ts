@@ -44,3 +44,21 @@ export type BracketRoundGroup = {
 export type BracketData = {
   rounds: BracketRoundGroup[];
 };
+
+/**
+ * Filtros aplicables a la vista "Todos" de `/partidos`. Cada uno
+ * tiene un valor `"all"` que lo desactiva — la combinación de los 3
+ * en `"all"`/`false` es equivalente a la query sin filtros.
+ */
+export type MatchesFilters = {
+  status: "all" | "live" | "scheduled" | "finished";
+  stage: "all" | "group" | "knockout";
+  /** Si `true`, solo partidos donde el user ya envió predicción. */
+  predictedOnly: boolean;
+};
+
+export const DEFAULT_MATCHES_FILTERS: MatchesFilters = {
+  status: "all",
+  stage: "all",
+  predictedOnly: false,
+};

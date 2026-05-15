@@ -1,30 +1,41 @@
 import { BracketView } from "@/components/matches/bracket-view";
+import { MatchesFiltersBar } from "@/components/matches/matches-filters";
 import { MatchesList } from "@/components/matches/matches-list";
 import { MatchesTabs, type MatchesView } from "@/components/matches/matches-tabs";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
-import { getAllMatches, getBracketMatches } from "@/server/matches/queries";
+import { getBracketMatches, getFilteredMatches } from "@/server/matches/queries";
+import type { MatchesFilters } from "@/server/matches/types";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 /**
  * Listado de partidos con dos vistas controladas por `?vista=`:
- *  - **todos** (default): cards agrupadas por día, vista actual.
+ *  - **todos** (default): cards agrupadas por día, filtrables por
+ *    estado / fase / "solo mis predicciones" via `?status=`, `?stage=`,
+ *    `?mias=`.
  *  - **bracket**: eliminatorias agrupadas por ronda (R16 → Final).
+ *    No acepta filtros (la estructura del bracket es la propia
+ *    semántica).
  *
- * Tabs server-side via search param — no JS state, back/forward del
- * navegador funcionan, y se puede compartir un link directo al bracket.
+ * Tabs y filtros server-side via search params — no JS state,
+ * back/forward del navegador funcionan, URL compartible.
  */
 export default async function PartidosPage({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ vista?: string }>;
+  searchParams: Promise<{
+    vista?: string;
+    status?: string;
+    stage?: string;
+    mias?: string;
+  }>;
 }) {
   const { locale } = await params;
-  const { vista } = await searchParams;
+  const { vista, status, stage, mias } = await searchParams;
   setRequestLocale(locale);
 
   const session = await auth();
@@ -42,12 +53,31 @@ export default async function PartidosPage({
     );
   }
 
-  const matches = await getAllMatches(db, session.user.id);
+  const filters = parseFilters({ status, stage, mias });
+  const matches = await getFilteredMatches(db, session.user.id, filters);
+
   return (
     <PartidosLayout count={matches.length} view={view}>
+      <MatchesFiltersBar active={filters} count={matches.length} />
       <MatchesList matches={matches} />
     </PartidosLayout>
   );
+}
+
+function parseFilters(raw: {
+  status?: string;
+  stage?: string;
+  mias?: string;
+}): MatchesFilters {
+  return {
+    status:
+      raw.status === "live" || raw.status === "scheduled" || raw.status === "finished"
+        ? raw.status
+        : "all",
+    stage:
+      raw.stage === "group" || raw.stage === "knockout" ? raw.stage : "all",
+    predictedOnly: raw.mias === "true",
+  };
 }
 
 function PartidosLayout({

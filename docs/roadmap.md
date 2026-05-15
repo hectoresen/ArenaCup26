@@ -215,7 +215,10 @@ Sin solapamiento con el análisis de producto, siguen activos:
   (2026-05-15: tabla `ranking_snapshots`, cron diario
   `/api/cron/snapshot-ranking` a las 00:05 UTC, `getRankHistory`
   alimenta la card "Tu posición" con sparkline SVG + rankDelta).
-- **add-matches-filters** (filtros sobre `/partidos`).
+- ~~**add-matches-filters** (filtros sobre `/partidos`).~~ ✓
+  (2026-05-15: chips por estado [todos/live/scheduled/finished],
+  fase [grupos/eliminatoria] y "solo mis predicciones".
+  Server-side via search params, URL compartible).
 - **add-live-scoring** (workflow `*/2` durante partidos en curso).
 - **add-product-analytics** (Plausible).
 - **add-mobile-polish** (PWA + safe-area iOS + a11y audit).

@@ -187,6 +187,27 @@
       },
       "emptyRound": "{round} — لا مباريات بعد"
     },
+    "filters": {
+      "statusLegend": "الحالة",
+      "stageLegend": "المرحلة",
+      "predictedLegend": "توقعاتك",
+      "status": {
+        "all": "الكل",
+        "live": "مباشر",
+        "scheduled": "قادمة",
+        "finished": "منتهية"
+      },
+      "stage": {
+        "all": "الكل",
+        "group": "دور المجموعات",
+        "knockout": "خروج المغلوب"
+      },
+      "predicted": {
+        "all": "الكل",
+        "yes": "ما توقعتُه فقط"
+      },
+      "resultCount": "{count, plural, =0 {لا نتائج} =1 {نتيجة واحدة} other {# نتائج}}"
+    },
     "predictionStub": {
       "titleNew": "توقع",
       "titleEdit": "توقعك",
