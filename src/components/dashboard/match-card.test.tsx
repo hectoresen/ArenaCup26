@@ -55,7 +55,8 @@ describe("<MatchCard>", () => {
         now={NOW}
       />,
     );
-    expect(screen.getByText("? vs ?")).toBeInTheDocument();
+    // Layout vertical: dos placeholders `?` separados por `vs`.
+    expect(screen.getAllByText("?").length).toBe(2);
     expect(screen.getByText(/Pendiente/)).toBeInTheDocument();
     // Sin botón "Predecir" cuando es TBD
     expect(screen.queryByRole("button")).not.toBeInTheDocument();

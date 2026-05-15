@@ -13,14 +13,18 @@ type Props = {
 };
 
 /**
- * Card de la lista "Próximos partidos" con tres variantes:
+ * Card de la lista "Próximos partidos" en `/inicio`. Layout vertical
+ * en tres bandas: header con fecha + chip de estado, cuerpo con grid
+ * `equipo · VS · equipo`, y footer con CTA o resumen de la predicción.
  *
- * - **predicted** — el user ya envió predicción. Badge verde
- *   "Enviada" + literal "<resultado> · Editable".
- * - **pending** — partido programado sin predicción del user.
- *   Botón gold "Predecir".
- * - **tbd** — partido cuyos teams aún no se conocen (semifinal sin
- *   bracket). Gris, no clickable.
+ * Variantes:
+ *
+ *  - **predicted** — badge verde "Enviada" en el header y resumen
+ *    "Local · Editable" / "2-1 · Editable" en el footer.
+ *  - **pending** — CTA "Predecir →" gold en el footer.
+ *  - **kickoff-past** — chip "Cerrado" en el footer (defensa cliente
+ *    mientras el sync mueve el status a `live`/`prediction-locked`).
+ *  - **tbd** — `? vs ?` en gris con chip "Pendiente", no clickable.
  */
 export function MatchCard({ match, now }: Props) {
   const t = useTranslations("dashboard.upcoming");
@@ -33,19 +37,22 @@ export function MatchCard({ match, now }: Props) {
       <article
         aria-disabled="true"
         aria-label={t("tbdLabel")}
-        className="flex cursor-not-allowed items-center gap-3.5 rounded-[14px] border-2 border-border bg-card px-4 py-3.5 opacity-45 [filter:grayscale(0.65)]"
+        className="rounded-2xl border-2 border-border bg-card px-4 py-4 opacity-60 [filter:grayscale(0.5)]"
       >
-        <div className="min-w-0 flex-1">
-          <div className="text-base font-bold tracking-[2px] text-muted">{t("tbdRow")}</div>
-          <div className="text-[11px] font-bold text-muted">
-            {date} · <LocalTime date={match.kickoffAt} /> · {t("tbdLabel")}
-          </div>
-        </div>
-        <div className="flex-shrink-0 text-right">
-          <span className="inline-flex items-center rounded-lg border-[1.5px] border-border bg-white/[0.06] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.1em] text-muted">
+        <div className="mb-2 flex items-center justify-between text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted">
+          <span>
+            {date} · <LocalTime date={match.kickoffAt} />
+          </span>
+          <span className="rounded-full border-[1.5px] border-border bg-card-hover px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-muted">
             {t("tbdPending")}
           </span>
         </div>
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+          <span className="text-end font-display text-base tracking-wider text-muted">?</span>
+          <span className="text-center text-xs font-bold text-muted">{t("versus")}</span>
+          <span className="text-start font-display text-base tracking-wider text-muted">?</span>
+        </div>
+        <div className="mt-3 text-[11px] font-bold text-muted">{t("tbdLabel")}</div>
       </article>
     );
   }
@@ -69,53 +76,94 @@ export function MatchCard({ match, now }: Props) {
     <Link
       href={`/partidos/${match.matchId}` as never}
       aria-label={`${home.name} vs ${away.name} — ${date}`}
-      className="group flex cursor-pointer items-center gap-3.5 rounded-[14px] border-2 border-border bg-card px-4 py-3.5 no-underline transition-[transform,border-color] duration-200 hover:-translate-y-[3px] hover:border-gold/30"
+      className="group block cursor-pointer rounded-2xl border-2 border-border bg-card px-4 py-4 no-underline transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-[2px] hover:border-gold/30 hover:shadow-[0_8px_24px_rgba(245,200,66,0.1)]"
     >
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <div className="flex min-w-0 items-center gap-2 text-sm font-extrabold text-foreground">
-          <TeamFlag flag={home.flag} name={home.name} size={20} fallback={home.code ?? "🏳️"} />
-          <span className="truncate">{home.name}</span>
-          <span className="flex-shrink-0 font-semibold text-muted">{t("versus")}</span>
-          <TeamFlag flag={away.flag} name={away.name} size={20} fallback={away.code ?? "🏳️"} />
-          <span className="truncate">{away.name}</span>
-        </div>
-        <div className="text-[11px] font-bold text-muted">
-          <strong className="text-foreground">{date}</strong> · <LocalTime date={match.kickoffAt} />
-        </div>
-      </div>
-
-      <div className="flex-shrink-0 text-right">
+      <div className="mb-2 flex items-center justify-between gap-2 text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted">
+        <span>
+          <strong className="font-extrabold text-foreground">{date}</strong> ·{" "}
+          <LocalTime date={match.kickoffAt} />
+        </span>
         {match.prediction ? (
-          <PredictedTrailing prediction={match.prediction} />
+          <span className="inline-flex items-center gap-1 rounded-full border-[1.5px] border-success/30 bg-success/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-success">
+            ✓ {t("predictBadge")}
+          </span>
         ) : kickoffPast ? (
-          <span className="inline-flex items-center rounded-[10px] border-2 border-border bg-white/[0.04] px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-muted">
+          <span className="rounded-full border-[1.5px] border-border bg-card-hover px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-muted">
             {t("closedLabel")}
           </span>
-        ) : (
-          <span
-            aria-label={t("predictLabel", { home: home.name, away: away.name })}
-            className="inline-flex cursor-pointer items-center rounded-[10px] border-2 border-gold/40 px-4 py-1.5 text-[13px] font-extrabold text-gold transition-colors group-hover:border-gold group-hover:bg-gold/10"
-          >
-            {t("predictButton")}
-          </span>
-        )}
+        ) : null}
       </div>
+
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <TeamSide team={home} side="home" />
+        <span className="text-center text-xs font-bold text-muted">{t("versus")}</span>
+        <TeamSide team={away} side="away" />
+      </div>
+
+      <FooterRow
+        prediction={match.prediction}
+        kickoffPast={kickoffPast}
+        homeName={home.name}
+        awayName={away.name}
+      />
     </Link>
   );
 }
 
-function PredictedTrailing({ prediction }: { prediction: PredictionView }) {
-  const t = useTranslations("dashboard.upcoming");
-  const label = formatPredictionShort(prediction);
+function TeamSide({
+  team,
+  side,
+}: {
+  team: { name: string; flag: string | null; code: string | null };
+  side: "home" | "away";
+}) {
   return (
-    <>
-      <div className="mb-1 inline-flex items-center gap-1 rounded-lg border-[1.5px] border-success/30 bg-success/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.1em] text-success">
-        ✓ {t("predictBadge")}
+    <div
+      className={`flex min-w-0 items-center gap-2 ${
+        side === "away" ? "flex-row-reverse text-right" : ""
+      }`}
+    >
+      <TeamFlag
+        flag={team.flag}
+        name={team.name}
+        size={24}
+        fallback={team.code ?? "🏳️"}
+        className="flex-shrink-0 rounded-sm"
+      />
+      <span className="min-w-0 truncate text-sm font-extrabold text-foreground">{team.name}</span>
+    </div>
+  );
+}
+
+function FooterRow({
+  prediction,
+  kickoffPast,
+  homeName,
+  awayName,
+}: {
+  prediction: PredictionView | null;
+  kickoffPast: boolean;
+  homeName: string;
+  awayName: string;
+}) {
+  const t = useTranslations("dashboard.upcoming");
+  if (prediction) {
+    return (
+      <div className="mt-3 text-end text-[11px] font-bold text-muted">
+        {formatPredictionShort(prediction)} · {t("predictEditable")}
       </div>
-      <div className="text-[11px] font-bold text-muted">
-        {label} · {t("predictEditable")}
-      </div>
-    </>
+    );
+  }
+  if (kickoffPast) return null;
+  return (
+    <div className="mt-3 text-end">
+      <span
+        aria-label={t("predictLabel", { home: homeName, away: awayName })}
+        className="inline-flex items-center gap-1 text-[12px] font-extrabold text-gold transition-[gap] group-hover:gap-2"
+      >
+        {t("predictButton")} <span aria-hidden="true">→</span>
+      </span>
+    </div>
   );
 }
 
