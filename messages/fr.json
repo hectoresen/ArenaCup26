@@ -43,6 +43,42 @@
     "title": "Tes succès",
     "subtitle": "{unlocked} sur {total} débloqués"
   },
+  "onboarding": {
+    "title": "Bienvenue",
+    "subtitle": "Trois étapes rapides et c'est parti.",
+    "stepIndicator": "Current step",
+    "next": "Suivant →",
+    "back": "← Retour",
+    "finish": "Commencer à prédire",
+    "finishing": "Enregistrement…",
+    "step1": {
+      "heading": "Your identity",
+      "nameLabel": "Quel est ton prénom ?",
+      "usernameLabel": "Ton username",
+      "usernameHint": "3-20 caractères, minuscules. Lettres, chiffres et tirets.",
+      "countryLabel": "Ton pays"
+    },
+    "step2": {
+      "heading": "How scoring works",
+      "simpleTitle": "Prédiction simple · +10 pts",
+      "simpleDesc": "Devine qui gagne (ou match nul). Le plus simple.",
+      "exactTitle": "Score exact · +30 pts",
+      "exactDesc": "Ose le score exact et triple tes points.",
+      "streakTitle": "Séries · bonus extra",
+      "streakDesc": "3, 5 ou 10 réussies de suite ajoutent un bonus à tes points."
+    },
+    "step3": {
+      "heading": "C'est prêt !",
+      "body": "Ton compte est configuré. Allons prédire."
+    },
+    "error": {
+      "nameRequired": "Il nous faut un nom d'affichage.",
+      "usernameInvalid": "Username invalide : 3-20 caractères, lettres minuscules, chiffres et tirets.",
+      "usernameTaken": "Cet username est pris. Essaie un autre.",
+      "invalidInput": "Un champ est invalide. Vérifie le formulaire.",
+      "unauthorized": "Ta session a expiré. Reconnecte-toi."
+    }
+  },
   "privacy": {
     "title": "Confidentialité",
     "subtitle": "Choisis ce que les autres voient de ton profil. Les changements sont appliqués instantanément.",

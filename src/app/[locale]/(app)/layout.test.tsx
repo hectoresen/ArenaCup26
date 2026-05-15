@@ -13,11 +13,28 @@ vi.mock("@/components/app-shell/app-shell", () => ({
     <div data-testid="app-shell">{children}</div>
   ),
 }));
-vi.mock("@/server/db/client", () => ({ db: {} }));
+// Mock que simula el chain drizzle: select().from().where().limit() →
+// devuelve un row con `onboardedAt` para que el guard del layout pase
+// al render. Cada test puede sobreescribir con `onboardingRowMock`.
+const onboardingRowMock = vi.fn(async () => [{ onboardedAt: new Date() }]);
+vi.mock("@/server/db/client", () => ({
+  db: {
+    select: () => ({
+      from: () => ({
+        where: () => ({
+          limit: () => onboardingRowMock(),
+        }),
+      }),
+    }),
+  },
+}));
 vi.mock("@/server/notifications/queries", () => ({
   getNotificationsForUser: async () => ({ items: [], unreadCount: 0 }),
 }));
 vi.mock("./_actions", () => ({ markAllReadAction: async () => {} }));
+vi.mock("next/headers", () => ({
+  headers: async () => ({ get: () => "" }),
+}));
 
 const { default: AppGroupLayout } = await import("./layout");
 

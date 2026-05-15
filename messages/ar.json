@@ -43,6 +43,42 @@
     "title": "إنجازاتك",
     "subtitle": "{unlocked} من {total} مفتوحة"
   },
+  "onboarding": {
+    "title": "مرحبًا بك",
+    "subtitle": "ثلاث خطوات سريعة وستدخل.",
+    "stepIndicator": "Current step",
+    "next": "التالي →",
+    "back": "← السابق",
+    "finish": "ابدأ التوقّع",
+    "finishing": "جارٍ الحفظ…",
+    "step1": {
+      "heading": "Your identity",
+      "nameLabel": "ما اسمك؟",
+      "usernameLabel": "اسم المستخدم",
+      "usernameHint": "3-20 حرفًا، أحرف صغيرة. حروف وأرقام وشُرَط فقط.",
+      "countryLabel": "بلدك"
+    },
+    "step2": {
+      "heading": "How scoring works",
+      "simpleTitle": "توقع بسيط · +10 نقاط",
+      "simpleDesc": "اختر من يفوز (أو التعادل). الأكثر أمانًا.",
+      "exactTitle": "نتيجة دقيقة · +30 نقطة",
+      "exactDesc": "جازف بالنتيجة الدقيقة وضاعف نقاطك ثلاثًا.",
+      "streakTitle": "السلسلات · مكافأة إضافية",
+      "streakDesc": "3 أو 5 أو 10 إصابات متتالية تضيف نقاطًا فوق ما حصلت عليه."
+    },
+    "step3": {
+      "heading": "كل شيء جاهز!",
+      "body": "حسابك جاهز. لنبدأ بالتوقّع."
+    },
+    "error": {
+      "nameRequired": "نحتاج إلى اسم للعرض.",
+      "usernameInvalid": "اسم المستخدم غير صالح: 3-20 حرفًا، أحرف صغيرة وأرقام وشُرَط.",
+      "usernameTaken": "اسم المستخدم محجوز. جرّب اسمًا آخر.",
+      "invalidInput": "حقل غير صالح. راجع النموذج.",
+      "unauthorized": "انتهت جلستك. سجّل الدخول مرة أخرى."
+    }
+  },
   "privacy": {
     "title": "الخصوصية",
     "subtitle": "اختر ما يراه الآخرون في ملفك. التغييرات تُطبَّق فورًا.",

@@ -126,6 +126,11 @@ export const users = pgTable(
       .$type<UserPrivacy>()
       .notNull()
       .default(sql`'{"visibility":"public","showName":true,"showCountry":true,"showImage":true,"showPoints":true,"showAchievements":true}'::jsonb`),
+    // Marca temporal del completado del wizard /bienvenido. Si es
+    // null, el layout `(app)` redirige al usuario al wizard antes
+    // de entrar al panel. Idempotente: re-renderizar /bienvenido no
+    // resetea el valor existente.
+    onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
     lastActiveAt: timestamp("last_active_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },

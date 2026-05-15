@@ -43,6 +43,42 @@
     "title": "Your achievements",
     "subtitle": "{unlocked} of {total} unlocked"
   },
+  "onboarding": {
+    "title": "Welcome",
+    "subtitle": "Three quick steps and you're in.",
+    "stepIndicator": "Current step",
+    "next": "Next →",
+    "back": "← Back",
+    "finish": "Start predicting",
+    "finishing": "Saving…",
+    "step1": {
+      "heading": "Your identity",
+      "nameLabel": "What's your name?",
+      "usernameLabel": "Your username",
+      "usernameHint": "3-20 chars, lowercase. Letters, digits and hyphens only.",
+      "countryLabel": "Your country"
+    },
+    "step2": {
+      "heading": "How scoring works",
+      "simpleTitle": "Simple prediction · +10 pts",
+      "simpleDesc": "Pick who wins (or a draw). The safe one.",
+      "exactTitle": "Exact score · +30 pts",
+      "exactDesc": "Nail the exact result and triple the points.",
+      "streakTitle": "Streaks · extra bonus",
+      "streakDesc": "3, 5 or 10 in a row add bonus points on top of what you scored."
+    },
+    "step3": {
+      "heading": "All set!",
+      "body": "Your account is configured. Let's predict."
+    },
+    "error": {
+      "nameRequired": "We need a display name.",
+      "usernameInvalid": "Invalid username: 3-20 chars, lowercase letters, digits and hyphens.",
+      "usernameTaken": "That username is taken. Try another.",
+      "invalidInput": "Some field is invalid. Check the form.",
+      "unauthorized": "Your session expired. Sign in again."
+    }
+  },
   "privacy": {
     "title": "Privacy",
     "subtitle": "Choose what others see on your profile. Changes apply instantly.",
