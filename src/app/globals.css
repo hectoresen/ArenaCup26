@@ -48,6 +48,33 @@
     font-family: var(--font-nunito), system-ui, sans-serif, var(--font-emoji);
     min-height: 100vh;
     overflow-x: hidden;
+    /* Safe-area iOS (notch + barra inferior con home indicator). Con
+       `viewport-fit=cover` el contenido podría dibujarse bajo la notch;
+       este padding lo evita sin desperdiciar espacio en pantallas sin
+       notch (env() devuelve 0). Combinable con utilidades Tailwind
+       arbitrarias en componentes que lo necesiten. */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Focus visible accesible: anillo dorado fino. Cumple WCAG 2.1
+     (visible para teclado/screen-reader, sin afectar al ratón). */
+  *:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Respeta el "Reduce motion" del SO: desactiva animaciones de
+     entrada cuando el user lo pide. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   body::before {

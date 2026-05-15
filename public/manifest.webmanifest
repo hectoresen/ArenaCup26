@@ -1,0 +1,21 @@
+{
+  "name": "WebMundial 26",
+  "short_name": "WebMundial",
+  "description": "Predice los partidos del Mundial 2026 y compite con tus amigos.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "lang": "es",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

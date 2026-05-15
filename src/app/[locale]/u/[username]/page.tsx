@@ -78,7 +78,10 @@ export default async function PublicProfilePage({
     return (
       <>
         <TopChrome user={session?.user ?? null} />
-        <main className="relative z-10 mx-auto max-w-[560px] px-5 py-9 pt-16">
+        <main
+          id="main-content"
+          className="relative z-10 mx-auto max-w-[560px] px-5 py-9 pt-16"
+        >
           <PrivateProfile identity={result.identity} />
         </main>
       </>

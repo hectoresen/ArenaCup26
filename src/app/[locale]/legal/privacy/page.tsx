@@ -57,7 +57,10 @@ function LegalPageContent({
 }) {
   const t = useTranslations("legal.privacy");
   return (
-    <main className="relative z-10 flex min-h-screen items-start justify-center px-5 pb-16 pt-20 sm:pt-24">
+    <main
+      id="main-content"
+      className="relative z-10 flex min-h-screen items-start justify-center px-5 pb-16 pt-20 sm:pt-24"
+    >
       <TopChrome user={user} />
 
       <article className="relative z-10 w-full max-w-[640px]">

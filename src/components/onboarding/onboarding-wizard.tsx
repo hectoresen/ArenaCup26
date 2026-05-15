@@ -73,7 +73,7 @@ export function OnboardingWizard({ initial }: Props) {
   }
 
   return (
-    <main className="relative z-10 mx-auto max-w-md px-5 py-9">
+    <main id="main-content" className="relative z-10 mx-auto max-w-md px-5 py-9">
       <header className="mb-6 text-center">
         <h1 className="font-display text-3xl text-gold">{t("title")}</h1>
         <p className="mt-2 text-sm font-bold text-muted">{t("subtitle")}</p>

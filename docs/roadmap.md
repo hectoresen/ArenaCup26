@@ -224,7 +224,10 @@ Sin solapamiento con el análisis de producto, siguen activos:
   `shouldSyncLive` previo — solo gasta requests a api-football
   cuando hay partidos `live` o un kickoff en ±15-30 min).
 - **add-product-analytics** (Plausible).
-- **add-mobile-polish** (PWA + safe-area iOS + a11y audit).
+- ~~**add-mobile-polish** (PWA + safe-area iOS + a11y audit).~~ ✓
+  (2026-05-15: viewport con `viewport-fit=cover`, safe-area-inset
+  en body, theme-color, manifest.webmanifest + icon.svg, skip link
+  WCAG 2.4.1, focus-visible, `prefers-reduced-motion`).
 - **add-data-resilience** (pg_dump → R2 + status page + PR envs).
 - **add-e2e-tests** (Playwright golden paths).
 - **add-web-push-notifications** (retención fuera de app).

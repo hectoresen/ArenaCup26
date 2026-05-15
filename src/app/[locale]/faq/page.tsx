@@ -37,7 +37,10 @@ function FaqPageContent({
 }) {
   const t = useTranslations("faq");
   return (
-    <main className="relative z-10 flex min-h-screen items-start justify-center px-5 pb-16 pt-20 sm:pt-24">
+    <main
+      id="main-content"
+      className="relative z-10 flex min-h-screen items-start justify-center px-5 pb-16 pt-20 sm:pt-24"
+    >
       <FloatingBalls count={5} />
       <TopChrome user={user} />
 

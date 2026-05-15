@@ -38,7 +38,10 @@ export default async function HomePage({
 
   const snapshot = await getRealSnapshot(db);
   return (
-    <main className="relative z-10 flex min-h-screen items-center justify-center px-5 py-9">
+    <main
+      id="main-content"
+      className="relative z-10 flex min-h-screen items-center justify-center px-5 py-9"
+    >
       <LeaderboardView snapshot={snapshot} user={null} />
     </main>
   );
