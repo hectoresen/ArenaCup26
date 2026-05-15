@@ -1,6 +1,7 @@
 "use client";
 
 import { TopChrome } from "@/components/layout/top-chrome";
+import { useLiveSnapshot } from "@/hooks/use-live-snapshot";
 import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/types";
 import { useTranslations } from "next-intl";
 import { FloatingBalls } from "./floating-balls";
@@ -16,7 +17,7 @@ type SessionUser = {
 };
 
 export function LeaderboardView({
-  snapshot,
+  snapshot: initialSnapshot,
   user,
   events: _events,
   /**
@@ -32,6 +33,15 @@ export function LeaderboardView({
   withChrome?: boolean;
 }) {
   const t = useTranslations("leaderboard");
+  // SSE: el snapshot inicial viene de SSR; tras montar, nos suscribimos a
+  // `/api/leaderboard/stream` para recibir actualizaciones cada 15s sin
+  // recargar la página. Si el browser no soporta EventSource o la
+  // conexión falla, simplemente seguimos con el snapshot inicial.
+  const snapshot = useLiveSnapshot<LeaderboardSnapshot>(
+    "/api/leaderboard/stream",
+    "snapshot",
+    initialSnapshot,
+  );
   const [first, second, third, ...rest] = snapshot.players;
 
   return (

@@ -210,7 +210,12 @@ Sin solapamiento con el análisis de producto, siguen activos:
   (2026-05-15: tabla `friendships`, server actions, página
   `/amigos` con bandeja + lista + buscador, CTA contextual en
   `/u/<username>`, `canViewProfile` resuelve `friends_only`).
-- **add-leaderboard-sse** (push real). Reemplaza polling 30s.
+- ~~**add-leaderboard-sse** (push real).~~ ✓
+  (2026-05-15: endpoint `/api/leaderboard/stream` SSE periódico
+  (15s tick + 30s heartbeat + 5min max duration). Hook
+  `useLiveSnapshot` cliente sustituye el state inicial SSR.
+  Mejora futura: pasar de tick periódico a event-driven cuando
+  aterrice un bus pub/sub).
 - ~~**add-ranking-history** (delta ▲/▼ + sparkline reales).~~ ✓
   (2026-05-15: tabla `ranking_snapshots`, cron diario
   `/api/cron/snapshot-ranking` a las 00:05 UTC, `getRankHistory`
