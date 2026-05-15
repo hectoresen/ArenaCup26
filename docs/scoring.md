@@ -104,6 +104,26 @@ El **login diario** y otras conductas habituales (rachas de días, primera predi
 - Los valores anteriores deben vivir en un único módulo `src/server/scoring/rules.ts` consumido por el motor de puntuación. **Nunca duplicar** valores en componentes ni queries.
 - El skill `scoring-rules` (en `.claude/skills/scoring-rules/SKILL.md`) audita la coherencia entre este documento y el código.
 
+## Sistema de desempate del ranking
+
+El orden del ranking (ver `src/lib/leaderboard/real.ts`) sigue **5 criterios** en cascada. Cada criterio solo aplica si los anteriores son iguales:
+
+1. **`totalPoints` desc** — líder absoluto. Quien tenga más puntos manda, punto.
+2. **`streakMax` desc** — mejor racha alcanzada históricamente. Premia al user que ha conseguido encadenar más aciertos seguidos.
+3. **`simpleHits` desc** — cantidad de hits con `kind = "simple"` o `"exact"`. Las predicciones dobles (cubrir varios resultados) pesan menos en esta categoría porque tienen menos riesgo.
+4. **`predictionsTotal` desc** — participación total. A más predicciones hechas, mejor posición en el empate.
+5. **`createdAt` asc** — fecha de registro. El usuario más antiguo sale delante.
+
+### Empate a 0 puntos
+
+No hay tie-break "real" porque nadie a 0 gana logros relevantes. El ordenamiento es por `createdAt asc` (los más antiguos arriba). Se documenta para que un user nuevo a 0 puntos entienda por qué aparece después de Aïcha (placeholder a 10 pts) — está acordado.
+
+### Columnas que mantenemos para el desempate
+
+- `user_points.streak_max`: máximo histórico de `streak`. Se actualiza en `processFinishedMatch` con `greatest(streak_max, current_streak)`. No se resetea al perder una racha.
+- `user_points.simple_hits`: counter que crece en 1 SOLO cuando un hit es de tipo `simple` o `exact` (no `double-*`).
+- `count(predictions)`: derivable por subquery, no se cachea. Si llega a ser caro (cientos de miles de predictions × miles de users), evaluar `user_points.predictions_total` cacheado.
+
 ## Cambios futuros
 
 Cualquier ajuste se registra como propuesta `update-scoring-<motivo>` en `openspec/changes/`. Si afecta partidos ya resueltos, debe especificar política de recálculo histórico.
