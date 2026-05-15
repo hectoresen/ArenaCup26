@@ -403,6 +403,37 @@ export const userAchievements = pgTable(
 );
 
 /**
+ * Suscripción web push del user a un device/browser concreto. Un
+ * user puede tener N filas (móvil + desktop + tablet…). El
+ * `endpoint` es único globalmente — si el browser regenera la
+ * subscripción, la nueva sustituye a la anterior (ON CONFLICT).
+ *
+ * Se elimina al perder permiso (`unsubscribePush`) o al fallar el
+ * envío con 410 Gone (subscription invalidated por el provider).
+ */
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** Endpoint URL del push service (FCM/Mozilla/Apple). Único global. */
+    endpoint: text("endpoint").notNull(),
+    /** P-256 ECDH public key del browser, base64url. */
+    p256dh: text("p256dh").notNull(),
+    /** Auth secret del browser, base64url. */
+    auth: text("auth").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+  },
+  (table) => ({
+    uniqueEndpoint: uniqueIndex("push_subscriptions_unique_endpoint").on(table.endpoint),
+    userIdIdx: index("push_subscriptions_user_id_idx").on(table.userId),
+  }),
+);
+
+/**
  * Snapshot diario del ranking por user. Una fila por (`user_id`,
  * `snapshot_date`). El cron `/api/cron/snapshot-ranking` corre a las
  * 00:05 UTC y graba el rank + puntos actuales de cada user.

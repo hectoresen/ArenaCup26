@@ -634,6 +634,17 @@
       "removeConfirm": "Retirer de tes amis ?"
     }
   },
+  "push": {
+    "optIn": {
+      "title": "Notifications push",
+      "body": "Reçois un signal quand un ami t'envoie une demande, quand un match est publié et quand tes prédictions sont évaluées. Pas de spam.",
+      "activate": "Activer les notifications",
+      "activating": "Activation…",
+      "active": "Notifications actives",
+      "deactivate": "Désactiver",
+      "denied": "Tu as bloqué les notifications dans ce navigateur. Pour les réactiver, va dans les paramètres du navigateur et autorise les notifications pour ce site."
+    }
+  },
   "status": {
     "title": "État du système",
     "overall": {

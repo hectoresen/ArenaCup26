@@ -634,6 +634,17 @@
       "removeConfirm": "Remove from friends?"
     }
   },
+  "push": {
+    "optIn": {
+      "title": "Push notifications",
+      "body": "Get pinged when a friend sends a request, when a match is published, and when your predictions are scored. No spam.",
+      "activate": "Turn on notifications",
+      "activating": "Activating…",
+      "active": "Notifications on",
+      "deactivate": "Turn off",
+      "denied": "You've blocked notifications in this browser. To re-enable, go to your browser settings and allow notifications for this site."
+    }
+  },
   "status": {
     "title": "System status",
     "overall": {

@@ -85,6 +85,14 @@ const baseSchema = z.object({
     .url()
     .default("https://plausible.io/js/script.outbound-links.js"),
 
+  // Web Push (add-web-push-notifications, 2026-05-15). Opcionales.
+  // Sin VAPID keys, los endpoints de suscripción devuelven
+  // `not_configured` y el banner no se muestra. Pasos para generar
+  // en `docs/security.md §9.5`.
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().default("mailto:hector.escolante@clouddistrict.com"),
+
   // Runtime
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });

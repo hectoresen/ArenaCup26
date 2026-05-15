@@ -245,7 +245,12 @@ Sin solapamiento con el análisis de producto, siguen activos:
   (2026-05-15: 6 specs sobre páginas públicas + skip-link + manifest
   + /api/status. CI workflow `e2e.yml` con Postgres service y
   drizzle-kit migrate antes de los tests).
-- **add-web-push-notifications** (retención fuera de app).
+- ~~**add-web-push-notifications** (retención fuera de app).~~ ✓
+  (2026-05-15: tabla `push_subscriptions`, service worker `/sw.js`,
+  server actions subscribe/unsubscribe + `sendPushTo` helper, opt-in
+  UI en `/ajustes/privacidad` con flujo permission + register.
+  Noop si `NEXT_PUBLIC_VAPID_PUBLIC_KEY` no está set. Pasos en
+  `docs/security.md §9.5`).
 
 ## Orden de ataque sugerido
 

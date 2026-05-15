@@ -359,9 +359,28 @@ Lo que tracking: page views + outbound link clicks. NO se envía ni email, ni no
 - Página `/status` (server-rendered) muestra los mismos datos en UI legible. Útil tanto para usuarios como para conectar a uptime monitors externos (Better Uptime, Hetrix).
 - Sin polling client-side ni websocket — refrescar = recargar página. Cero overhead JS.
 
+### 9.5 Activar Web Push notifications (opcional)
+
+Para que los usuarios reciban notificaciones push (friend requests, partidos finalizados, etc.) cuando la app no está abierta:
+
+1. Generar VAPID keys (una vez):
+   ```bash
+   npx web-push generate-vapid-keys
+   ```
+2. Railway → Variables:
+   - `NEXT_PUBLIC_VAPID_PUBLIC_KEY=<public-key>` (visible al browser).
+   - `VAPID_PRIVATE_KEY=<private-key>` (server-only, firma los pushes).
+   - `VAPID_SUBJECT=mailto:<email-de-contacto>` (default: `mailto:hector.escolante@clouddistrict.com`).
+3. Redeploy.
+4. Verificación: ir a `/ajustes/privacidad` con sesión iniciada → debe aparecer el bloque "Notificaciones push" con botón "Activar".
+
+Sin las dos primeras variables, el bloque no se monta (UX limpia para entornos sin push). El service worker `public/sw.js` se registra dinámicamente al activar.
+
+PII / data flow: la subscripción del browser (endpoint + 2 keys) se guarda en la tabla `push_subscriptions` ligada al `user_id`. El payload de cada push es `{title, body, url}` — sin email, sin password tokens. Si el provider devuelve 410 Gone, la fila se borra automáticamente.
+
 ---
 
-## 9. TODOs (pendientes en propuestas abiertas)
+## 10. TODOs (pendientes en propuestas abiertas)
 
 - `add-rate-limiting` — Upstash en submit, cron, signup, reads.
 - `add-error-monitoring` — Sentry con `beforeSend` que scrubea PII.

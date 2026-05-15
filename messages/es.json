@@ -634,6 +634,17 @@
       "removeConfirm": "¿Eliminar de tus amigos?"
     }
   },
+  "push": {
+    "optIn": {
+      "title": "Notificaciones push",
+      "body": "Recibe avisos cuando un amigo te envíe solicitud, cuando se publique un partido y cuando se finalicen tus predicciones. Sin spam.",
+      "activate": "Activar notificaciones",
+      "activating": "Activando…",
+      "active": "Notificaciones activas",
+      "deactivate": "Desactivar",
+      "denied": "Has bloqueado las notificaciones en este navegador. Para reactivarlas, ve a la configuración del navegador y permítelas para este sitio."
+    }
+  },
   "status": {
     "title": "Estado del sistema",
     "overall": {

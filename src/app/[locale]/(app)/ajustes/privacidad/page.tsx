@@ -2,7 +2,9 @@ import { eq } from "drizzle-orm";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { PrivacyForm } from "@/components/settings/privacy-form";
+import { PushOptIn } from "@/components/push/push-opt-in";
 import { auth } from "@/lib/auth";
+import { env } from "@/lib/env";
 import { db } from "@/server/db/client";
 import { users } from "@/server/db/schema";
 import { normalizePrivacy } from "@/server/privacy/apply";
@@ -40,6 +42,11 @@ export default async function PrivacySettingsPage({
         <p className="mt-2 text-sm font-bold text-muted">{t("subtitle")}</p>
       </header>
       <PrivacyForm initial={initial} />
+      {env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && (
+        <div className="mt-6">
+          <PushOptIn vapidPublicKey={env.NEXT_PUBLIC_VAPID_PUBLIC_KEY} />
+        </div>
+      )}
     </section>
   );
 }
