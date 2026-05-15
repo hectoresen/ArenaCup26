@@ -354,9 +354,34 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
 
 ---
 
+## 14. Security hardening
+
+### 14.1 CRON_SECRET obligatorio en producción
+
+- **Decisión (2026-05-15)**: `src/lib/env.ts` añade un `superRefine` que exige `CRON_SECRET ≥ 32 chars` cuando `NODE_ENV === "production"` y NO estamos en `NEXT_PHASE === "phase-production-build"`. En dev/test sigue opcional para no romper `curl` manual.
+- **Razón**: antes era opcional en runtime, y el guard de `handleCronRequest` solo aceptaba auth ausente fuera de producción. Si alguien levantaba el server sin `CRON_SECRET` por descuido, el endpoint público quedaba abierto. Ahora el deploy falla al arrancar con un mensaje explícito.
+- **Build vs runtime**: Railway inyecta env vars solo en runtime; `next build` corre con `NODE_ENV=production` pero sin las vars cargadas. Detectamos esa fase con `NEXT_PHASE` para no fallar el build local ni el de CI.
+
+### 14.2 Security headers en `next.config.ts`
+
+- **Decisión (2026-05-15)**: `next.config.ts` define un `async headers()` con CSP (enforcing), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (denegando geo/mic/cam/payment) y `Strict-Transport-Security` (solo en prod).
+- **CSP enforcing desde el principio**: la app es pequeña; cualquier rotura por una directive demasiado estricta se detecta rápido. Si fuese una migración con tráfico real, empezaríamos en `Report-Only`.
+- **`script-src`**: en dev incluye `'unsafe-inline'` y `'unsafe-eval'` por hot-reload + React DevTools. En prod queda solo `'self'`.
+- **Allowlist conocidas**: `media.api-sports.io` (logos teams), `*.googleusercontent.com` (avatars Google), `v3.football.api-sports.io` (connect-src para llamadas futuras desde cliente).
+
+### 14.3 Gitleaks en CI
+
+- **Decisión (2026-05-15)**: workflow `.github/workflows/gitleaks.yml` corre en cada PR y push a `main` con `gitleaks/gitleaks-action@v2`. Si detecta un patrón de secret en el diff, falla el build.
+- **Motivación concreta**: 2026-05-14 se filtraron `API_FOOTBALL_KEY` y `GOOGLE_CLIENT_SECRET` durante debugging en chat. Con Gitleaks el commit habría sido bloqueado si esas keys hubieran llegado a un fichero.
+- **`.gitleaks.toml`**: allowlist con paths de `.env.example`, tests con fixtures, docs/openspec, y regex de strings tipo `<placeholder>`. Si Gitleaks da falso positivo, se añade ahí.
+
+### 14.4 Runbook de rotación
+
+- `docs/security.md` con pasos exactos para rotar cada secret (`AUTH_SECRET`, `GOOGLE_CLIENT_SECRET`, `API_FOOTBALL_KEY`, `CRON_SECRET`, `DATABASE_URL`). Pensado para usarse en pánico — paso a paso, qué pasa con las sesiones existentes, dónde se propaga.
+
 ---
 
-## 13. Roadmap diferido (no decidido todavía)
+## 15. Roadmap diferido (no decidido todavía)
 
 Estas son capabilities propuestas pero **no abiertas** todavía. Se documenta solo el alcance esperado para que cuando llegue el momento de drafter la propuesta haya un contexto previo.
 

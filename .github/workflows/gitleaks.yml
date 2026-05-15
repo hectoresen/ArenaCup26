@@ -1,0 +1,35 @@
+name: Gitleaks
+
+# Detecta credenciales filtradas (API keys, tokens, DB URLs) en PRs y
+# pushes a main. Falla el build si encuentra algo, evitando que un
+# secret llegue al historial de git. Pensado para no repetir el caso
+# 2026-05-14 (API_FOOTBALL_KEY + GOOGLE_CLIENT_SECRET filtradas en
+# chat durante debugging).
+#
+# Config en `.gitleaks.toml` (allowlist mínima para .env.example).
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  scan:
+    name: Scan for leaked secrets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Fetch completo para escanear todos los commits del PR, no
+          # solo el head.
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # No requiere GITLEAKS_LICENSE para repos públicos. Si el
+          # repo se vuelve privado, configurar el secret (gratis para
+          # individuos en https://gitleaks.io).

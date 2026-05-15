@@ -1,0 +1,25 @@
+# Gitleaks config — reglas custom + allowlist para WebMundial 26.
+#
+# Por defecto Gitleaks ya trae los detectores estándar (AWS, GitHub,
+# Stripe, etc.). Aquí solo añadimos allowlist para falsos positivos
+# que se repiten en este repo.
+
+[allowlist]
+description = "Paths que no deben fallar pese a contener tokens-like"
+paths = [
+  '''\.env\.example$''',     # ejemplo con placeholders, no secretos
+  '''docs/.*\.md$''',        # snippets de docs (curl headers, etc.)
+  '''.*\.test\.ts$''',       # fixtures con tokens de mentira
+  '''.*\.test\.tsx$''',
+  '''openspec/.*\.md$''',    # propuestas pueden citar nombres de vars
+]
+
+# Regex de strings que aparecen en tests/docs y no son secretos
+# reales. Cada entry es "este string es OK aunque parezca un token".
+regexTarget = "match"
+regexes = [
+  '''test-key''',
+  '''bad''',                 # ApiKey "bad" en tests de auth_failed
+  '''<48\+ chars>''',
+  '''<.*>''',                # placeholders genéricos
+]

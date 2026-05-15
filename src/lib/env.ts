@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const schema = z.object({
+const baseSchema = z.object({
   // Auth.js v5
   AUTH_SECRET: z.string().min(32, "AUTH_SECRET must be at least 32 chars"),
   GOOGLE_CLIENT_ID: z.string().min(1),
@@ -64,6 +64,36 @@ const schema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
 
+/**
+ * Refinements adicionales que solo aplican en producción **runtime**.
+ *
+ * En dev/test dejamos `CRON_SECRET` opcional para poder lanzar el
+ * endpoint a mano con curl sin auth. En runtime de producción
+ * exigimos que esté set y con longitud mínima — sin esto,
+ * `handleCronRequest` aceptaría cualquier POST.
+ *
+ * Importante: `next build` corre con `NODE_ENV=production` pero
+ * **sin** las env vars de producción cargadas (Railway las inyecta
+ * solo en runtime, no en build). Si validáramos ahí, el build
+ * local falla espuriosamente. Detectamos build phase con
+ * `NEXT_PHASE === "phase-production-build"` y skipeamos.
+ */
+const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
+
+const schema = baseSchema.superRefine((data, ctx) => {
+  if (data.NODE_ENV === "production" && !isBuildPhase) {
+    if (!data.CRON_SECRET || data.CRON_SECRET.length < 32) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["CRON_SECRET"],
+        message:
+          "CRON_SECRET is required in production and must be ≥32 chars. " +
+          "Generate one with `openssl rand -base64 32`.",
+      });
+    }
+  }
+});
+
 const parsed = schema.safeParse(process.env);
 
 if (!parsed.success) {
@@ -73,4 +103,4 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
-export type Env = z.infer<typeof schema>;
+export type Env = z.infer<typeof baseSchema>;
