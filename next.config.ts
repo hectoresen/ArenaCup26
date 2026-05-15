@@ -9,29 +9,40 @@ const isProd = process.env.NODE_ENV === "production";
  * Content-Security-Policy.
  *
  * - `default-src 'self'` cierra todo y abrimos solo lo necesario.
- * - `script-src` con `'unsafe-inline'` y `'unsafe-eval'` solo en dev
- *   porque Next inyecta hot-reload + React DevTools por esa vía. En
- *   prod queda solo `'self'`, y los scripts de Next (chunks) entran
- *   por el mismo origen.
- * - `img-src`: `data:` para SVG inline + el bucket de api-football
- *   para logos de teams + Google avatars (`*.googleusercontent.com`).
- * - `connect-src`: api-football se ataca server-side, no desde el
- *   cliente, pero lo dejamos por si el cliente lo llama directo más
- *   adelante.
- * - `frame-ancestors 'none'` impide que la app se embeba en iframes
- *   externos (clickjacking).
+ * - `script-src` necesita `'unsafe-inline'` mientras no migremos a
+ *   CSP con nonces. Next 15 inyecta scripts inline (hidratación
+ *   de RSC, streaming, intl bootstrap, etc.) que se rompen sin
+ *   `'unsafe-inline'` y dejan la web en negro. Para volver a una
+ *   CSP estricta (`'strict-dynamic'` + nonce por request), ver
+ *   TODO en `docs/security.md` §8.2 WEAK-6.
+ * - `style-src` también admite inline porque Tailwind 4 lo emite.
+ *   `style-src-elem` se especifica explícito para evitar el
+ *   fallback ambiguo de Chrome.
+ * - `img-src`: `data:` para SVG inline + media.api-sports.io
+ *   (logos de teams) + Google avatars.
+ * - `connect-src`: api-football se ataca server-side pero lo
+ *   permitimos por si el cliente lo llama directo más adelante.
+ * - `frame-ancestors 'none'` impide embebido en iframes externos.
  *
- * Empezamos en **enforcing** desde el principio porque la app aún
- * es pequeña; si rompe algo, se itera. Si fuese una migración de
- * app con tráfico real, empezaríamos en `Report-Only`.
+ * Empezamos en enforcing desde el primer deploy. Si rompe algo,
+ * se itera: el 2026-05-15 tuvimos que añadir `'unsafe-inline'` a
+ * `script-src` en prod porque Next 15 lo necesita.
  */
 function buildCsp(): string {
+  // Mientras no haya soporte de nonce en next-intl + Tailwind 4,
+  // `'unsafe-inline'` es obligatorio en script-src y style-src. La
+  // protección XSS recae principalmente en el escaping de React
+  // (que sigue activo) y en `frame-ancestors 'none'` que evita
+  // clickjacking. La deuda está registrada como WEAK-6 en el audit.
+  const inlineScript = ["'self'", "'unsafe-inline'"];
+  const inlineStyle = ["'self'", "'unsafe-inline'"];
+
   const directives: Record<string, string[]> = {
     "default-src": ["'self'"],
-    "script-src": isProd
-      ? ["'self'"]
-      : ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-    "style-src": ["'self'", "'unsafe-inline'"],
+    "script-src": isProd ? inlineScript : [...inlineScript, "'unsafe-eval'"],
+    "script-src-elem": inlineScript,
+    "style-src": inlineStyle,
+    "style-src-elem": inlineStyle,
     "img-src": [
       "'self'",
       "data:",
