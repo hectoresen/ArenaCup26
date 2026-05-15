@@ -3,6 +3,7 @@ import { dlog } from "@/lib/debug-log";
 import { countryCodeToFlag } from "@/lib/format/country";
 import type { Database } from "@/server/db/client";
 import { userPoints, users } from "@/server/db/schema";
+import { maskName, normalizePrivacy } from "@/server/privacy/apply";
 import type { LeaderboardSnapshot, Player } from "./types";
 
 const TOP_LIMIT = 100;
@@ -28,30 +29,44 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
       username: users.username,
       name: users.name,
       country: users.country,
+      privacy: users.privacy,
       points: userPoints.totalPoints,
       streak: userPoints.streak,
       correctCount: userPoints.correctCount,
     })
     .from(users)
     .leftJoin(userPoints, eq(userPoints.userId, users.id))
+    // Excluimos perfiles `private` del leaderboard global. Los
+    // `friends_only` también quedan fuera del ranking público hasta
+    // que aterrice `add-social-friends` con un toggle dedicado.
+    .where(sql`coalesce(${users.privacy}->>'visibility', 'public') = 'public'`)
     .orderBy(desc(sql`coalesce(${userPoints.totalPoints}, 0)`), asc(users.createdAt))
     .limit(TOP_LIMIT);
 
   dlog("ranking", "getRealSnapshot", { users: rows.length });
 
-  const players: Player[] = rows.map((row, i) => ({
-    id: row.userId,
-    username: row.username,
-    name: row.name ?? "Jugador",
-    countryCode: row.country ?? "",
-    countryName: row.country ?? "",
-    flag: countryCodeToFlag(row.country) ?? "🌍",
-    points: row.points ?? 0,
-    streak: row.streak ?? 0,
-    correctCount: row.correctCount ?? 0,
-    rank: i + 1,
-    previousRank: i + 1,
-  }));
+  const players: Player[] = rows.map((row, i) => {
+    const privacy = normalizePrivacy(row.privacy);
+    // Si el user oculta puntos, sale en el ranking pero como
+    // "Anónimo" sin score visible. Igual su rank se mantiene
+    // (no le saltamos a otros).
+    const visiblePoints = privacy.showPoints ? row.points ?? 0 : 0;
+    return {
+      id: row.userId,
+      // Si oculta el username (porque tiene visibilidad limitada en
+      // perfil), tampoco lo exponemos en el row → no clicable.
+      username: privacy.visibility === "public" ? row.username : null,
+      name: maskName(row.name, privacy),
+      countryCode: privacy.showCountry ? row.country ?? "" : "",
+      countryName: privacy.showCountry ? row.country ?? "" : "",
+      flag: privacy.showCountry ? countryCodeToFlag(row.country) ?? "🌍" : "🌍",
+      points: visiblePoints,
+      streak: row.streak ?? 0,
+      correctCount: row.correctCount ?? 0,
+      rank: i + 1,
+      previousRank: i + 1,
+    };
+  });
 
   return {
     generatedAt: new Date().toISOString(),

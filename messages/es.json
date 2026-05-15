@@ -43,6 +43,57 @@
     "title": "Tus logros",
     "subtitle": "{unlocked} de {total} desbloqueados"
   },
+  "privacy": {
+    "title": "Privacidad",
+    "subtitle": "Decide qué ven los demás de tu perfil. Los cambios se aplican al instante.",
+    "visibility": {
+      "legend": "¿Quién puede ver tu perfil?",
+      "public": {
+        "title": "Público",
+        "desc": "Cualquiera con tu URL ve tu perfil. Recomendado si quieres competir abiertamente."
+      },
+      "friends_only": {
+        "title": "Solo amigos",
+        "desc": "Solo tus amigos. Por ahora se comporta como privado mientras llega la capability de amigos."
+      },
+      "private": {
+        "title": "Privado",
+        "desc": "Solo tú. El perfil no aparece en el ranking ni en búsquedas; nadie más lo ve."
+      }
+    },
+    "fields": {
+      "legend": "¿Qué se ve de ti?",
+      "showName": {
+        "label": "Mostrar mi nombre",
+        "desc": "Si lo apagas, sales como \"Jugador X\" con la inicial."
+      },
+      "showCountry": {
+        "label": "Mostrar mi país y bandera",
+        "desc": "Si lo apagas, no se ve país en perfil ni en el ranking."
+      },
+      "showImage": {
+        "label": "Mostrar mi foto de Google",
+        "desc": "Si lo apagas, se usa el avatar dorado con tus iniciales."
+      },
+      "showPoints": {
+        "label": "Mostrar mis puntos",
+        "desc": "Si lo apagas, en el ranking sales como \"Anónimo\" sin score visible."
+      },
+      "showAchievements": {
+        "label": "Mostrar mis logros",
+        "desc": "Si lo apagas, el catálogo aparece vacío para visitantes."
+      }
+    },
+    "status": {
+      "idle": "Listo.",
+      "saving": "Guardando…",
+      "saved": "Guardado."
+    },
+    "error": {
+      "unauthorized": "Sesión expirada. Vuelve a iniciar sesión.",
+      "invalid_input": "Valor inválido. Revisa los campos."
+    }
+  },
   "history": {
     "title": "Tu historial",
     "subtitle": "{total} predicciones · {correct} aciertos · {points} pts ganados",
@@ -312,6 +363,7 @@
     "fallbackName": "Usuario",
     "profile": "Mi perfil",
     "history": "Mi historial",
+    "privacy": "Privacidad",
     "faq": "Preguntas frecuentes",
     "signOut": "Cerrar sesión",
     "signingOut": "Cerrando sesión…"

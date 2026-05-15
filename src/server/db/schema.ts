@@ -1,8 +1,9 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -12,6 +13,37 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
+/**
+ * Privacy preferences que vive en `users.privacy` (JSONB). Defaults:
+ * todo público; tiempo de aterrizaje 2026-05-15 con `add-profile-privacy`.
+ *
+ *  - `visibility`: `'public'` (cualquiera ve el perfil),
+ *    `'friends_only'` (solo amigos — espera a `add-social-friends`),
+ *    `'private'` (solo el dueño).
+ *  - `showName`: si `false`, el nombre se sustituye por "Jugador {inicial}".
+ *  - `showCountry`: si `false`, la bandera/país no aparece.
+ *  - `showImage`: si `false`, se sirve fallback en lugar de la foto.
+ *  - `showPoints`: si `false`, en el ranking aparece como "Anónimo".
+ *  - `showAchievements`: si `false`, el acordeón queda vacío.
+ */
+export type UserPrivacy = {
+  visibility: "public" | "friends_only" | "private";
+  showName: boolean;
+  showCountry: boolean;
+  showImage: boolean;
+  showPoints: boolean;
+  showAchievements: boolean;
+};
+
+export const DEFAULT_USER_PRIVACY: UserPrivacy = {
+  visibility: "public",
+  showName: true,
+  showCountry: true,
+  showImage: true,
+  showPoints: true,
+  showAchievements: true,
+};
 
 // ─── ENUMS ─────────────────────────────────────────────────
 
@@ -87,6 +119,13 @@ export const users = pgTable(
     // Campos propios del dominio (no requeridos por Auth.js).
     country: varchar("country", { length: 3 }),
     username: varchar("username", { length: 20 }).unique(),
+    // Preferencias de privacidad por usuario. JSONB para que crezcan
+    // sin migraciones futuras. Default: público con todos los toggles
+    // a true. Tipado en `UserPrivacy` arriba.
+    privacy: jsonb("privacy")
+      .$type<UserPrivacy>()
+      .notNull()
+      .default(sql`'{"visibility":"public","showName":true,"showCountry":true,"showImage":true,"showPoints":true,"showAchievements":true}'::jsonb`),
     lastActiveAt: timestamp("last_active_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },

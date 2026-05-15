@@ -1,27 +1,26 @@
 import { countryCodeToFlag } from "@/lib/format/country";
 import type { Database } from "@/server/db/client";
 import { userAchievements, userPoints, users } from "@/server/db/schema";
+import { canViewProfile, maskName, normalizePrivacy } from "@/server/privacy/apply";
 import { eq, sql } from "drizzle-orm";
 import { buildProfileAchievements } from "./transforms";
 import type { PublicProfile } from "./types";
 
 /**
  * Carga el perfil público de un usuario por su username. Devuelve
- * `null` si el username no existe; el caller (route handler) decide
- * llamar `notFound()`.
+ * `null` si:
+ *  - el username no existe, o
+ *  - el owner ha puesto `privacy.visibility = 'private'` y el viewer
+ *    no es él mismo (ni amigo, cuando aterrice `add-social-friends`).
  *
- * Hace 4 queries en paralelo:
- *  1. `users` por username (necesario para validar existencia y para
- *     hidratar el resto con su userId).
- *  2. `userPoints` del user.
- *  3. `count(*)` de `userPoints` para totalPlayers.
- *  4. `userAchievements` del user.
- *
- * El "rank" se calcula con `count(... where totalPoints > X)`.
+ * Los toggles individuales (`showName`, `showCountry`, etc.) NO
+ * devuelven `null` — el perfil sigue accesible, pero los campos
+ * sensibles se redactan/ocultan según preferencias.
  */
 export async function getPublicProfile(
   db: Database,
   username: string,
+  viewerId: string | null = null,
 ): Promise<PublicProfile | null> {
   const userRows = await db
     .select({
@@ -30,6 +29,7 @@ export async function getPublicProfile(
       username: users.username,
       country: users.country,
       image: users.image,
+      privacy: users.privacy,
     })
     .from(users)
     .where(eq(users.username, username))
@@ -37,6 +37,9 @@ export async function getPublicProfile(
 
   const user = userRows[0];
   if (!user || !user.username) return null;
+
+  const privacy = normalizePrivacy(user.privacy);
+  if (!canViewProfile(privacy, user.id, viewerId)) return null;
 
   const [pointsRows, totalRows, achievementRows] = await Promise.all([
     db
@@ -70,21 +73,27 @@ export async function getPublicProfile(
 
   const unlockedMap = new Map(achievementRows.map((r) => [r.achievementId, r.unlockedAt]));
 
+  // Aplicamos los toggles individuales a la respuesta. El country/
+  // image/points/achievements se "redactan" pero el perfil queda
+  // visible. El username siempre se devuelve porque ya está en la
+  // URL — esconderlo no aportaría nada.
   return {
     identity: {
-      name: user.name ?? user.username,
+      name: maskName(user.name, privacy),
       username: user.username,
-      country: user.country,
-      flag: countryCodeToFlag(user.country),
-      image: user.image,
+      country: privacy.showCountry ? user.country : null,
+      flag: privacy.showCountry ? countryCodeToFlag(user.country) : null,
+      image: privacy.showImage ? user.image : null,
     },
     stats: {
-      rank,
+      rank: privacy.showPoints ? rank : null,
       totalPlayers,
-      points,
+      points: privacy.showPoints ? points : 0,
       // pointsDelta queda null hasta `add-ranking-history`.
       pointsDelta: null,
     },
-    achievements: buildProfileAchievements(unlockedMap),
+    achievements: privacy.showAchievements
+      ? buildProfileAchievements(unlockedMap)
+      : buildProfileAchievements(new Map()),
   };
 }

@@ -193,11 +193,14 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 - **Riesgo**: el secret vive en dos sitios (Railway + GitHub Secrets). Si están desincronizados, el cron deja de funcionar silenciosamente (401).
 - **Mitigación**: §3.4 + revisar tras cada rotación que ambos coinciden con `curl` manual al endpoint con el bearer.
 
-#### CRIT-4 · Privacidad de perfil público por defecto
+#### CRIT-4 · ✅ Resuelto: privacy controls granulares (2026-05-15)
 
-- **Riesgo**: hoy `/u/<username>` es público para cualquier visitante. Nombre real, país, foto Google, puntos, logros. Un user que no entendió esto puede sentir su privacidad invadida.
-- **Impacto**: queja legal posible (RGPD: minimization, transparencia), reputacional.
-- **Mitigación**: implementar `add-profile-privacy` (opt-out granular) antes de lanzamiento. Mientras tanto, ningún dato realmente sensible (email, dirección, teléfono) está expuesto.
+- **Estado**: `users.privacy` JSONB con shape `UserPrivacy` (visibility + 5 toggles). Default público (cero impacto en users existentes).
+- **Toggles**: `showName` (sustituye nombre por "Jugador X"), `showCountry`, `showImage`, `showPoints` (oculta del ranking visualmente, mantiene rank), `showAchievements`.
+- **Visibility**: `public` / `friends_only` / `private`. `private` y `friends_only` ocultan el perfil de `/u/<username>` y del leaderboard global (filtro SQL). `friends_only` se comporta como private hasta que aterrice `add-social-friends`.
+- **UI**: `/ajustes/privacidad` con optimistic UI, server action `updatePrivacy` valida con zod y revalida las paths afectadas (`/`, `/ranking`, `/u/<username>`).
+- **Helpers**: `normalizePrivacy(raw)`, `canViewProfile(privacy, ownerId, viewerId)`, `maskName(name, privacy)` en `src/server/privacy/apply.ts`.
+- **Entry point**: nuevo link "Privacidad" en el AccountMenu del shell, entre "Mi historial" y "FAQ".
 
 #### CRIT-5 · ✅ Resuelto: rate-limit wireado en publicRead + signup (2026-05-15)
 
@@ -288,7 +291,7 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 - [ ] CRIT-1: rotar API_FOOTBALL_KEY + GOOGLE_CLIENT_SECRET.
 - [x] ~~CRIT-2: actualizar drizzle-orm a ≥0.45.2 + verificar suite verde.~~ (2026-05-15)
 - [ ] CRIT-3: validar CRON_SECRET sincronizado en Railway + GitHub.
-- [ ] CRIT-4: implementar `add-profile-privacy` con default sensato (público es OK si comunicamos claramente).
+- [x] ~~CRIT-4: implementar `add-profile-privacy` con default sensato (público es OK si comunicamos claramente).~~ (2026-05-15)
 - [x] ~~CRIT-5: terminar wiring de `add-rate-limiting` (publicRead + signup).~~ (2026-05-15)
 - [ ] Configurar UPSTASH_REDIS_REST_URL/TOKEN en Railway (sin esto el rate limit es noop).
 - [x] ~~WEAK-2: implementar `add-error-monitoring` (Sentry) + alertas Slack.~~ (2026-05-15; alertas Slack pendiente — configurar webhook tras crear proyecto en Sentry.)

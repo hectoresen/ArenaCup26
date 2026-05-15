@@ -56,10 +56,10 @@ export default async function PublicProfilePage({
     return <ThrottledState />;
   }
 
-  const profile = await getPublicProfile(db, username);
-  if (!profile) notFound();
-
   const session = await auth();
+  const viewerId = session?.user?.id ?? null;
+  const profile = await getPublicProfile(db, username, viewerId);
+  if (!profile) notFound();
 
   return (
     <>

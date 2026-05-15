@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "privacy" jsonb DEFAULT '{"visibility":"public","showName":true,"showCountry":true,"showImage":true,"showPoints":true,"showAchievements":true}'::jsonb NOT NULL;

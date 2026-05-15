@@ -43,6 +43,57 @@
     "title": "Your achievements",
     "subtitle": "{unlocked} of {total} unlocked"
   },
+  "privacy": {
+    "title": "Privacy",
+    "subtitle": "Choose what others see on your profile. Changes apply instantly.",
+    "visibility": {
+      "legend": "Who can see your profile?",
+      "public": {
+        "title": "Public",
+        "desc": "Anyone with the URL sees your profile. Recommended for open competition."
+      },
+      "friends_only": {
+        "title": "Friends only",
+        "desc": "Only your friends. Behaves like private until the friends capability lands."
+      },
+      "private": {
+        "title": "Private",
+        "desc": "Only you. Hidden from ranking, search and any visitor."
+      }
+    },
+    "fields": {
+      "legend": "What's visible about you?",
+      "showName": {
+        "label": "Show my name",
+        "desc": "If off, you appear as \"Player X\" with your initial."
+      },
+      "showCountry": {
+        "label": "Show my country and flag",
+        "desc": "If off, no country in profile or ranking."
+      },
+      "showImage": {
+        "label": "Show my Google picture",
+        "desc": "If off, fallback to the gold avatar with your initials."
+      },
+      "showPoints": {
+        "label": "Show my points",
+        "desc": "If off, in the ranking you appear as \"Anonymous\" with no visible score."
+      },
+      "showAchievements": {
+        "label": "Show my achievements",
+        "desc": "If off, the catalog appears empty to visitors."
+      }
+    },
+    "status": {
+      "idle": "Ready.",
+      "saving": "Saving…",
+      "saved": "Saved."
+    },
+    "error": {
+      "unauthorized": "Session expired. Sign in again.",
+      "invalid_input": "Invalid value. Check the fields."
+    }
+  },
   "history": {
     "title": "Your history",
     "subtitle": "{total} predictions · {correct} correct · {points} pts earned",
@@ -312,6 +363,7 @@
     "fallbackName": "User",
     "profile": "My profile",
     "history": "My history",
+    "privacy": "Privacy",
     "faq": "Frequently asked questions",
     "signOut": "Sign out",
     "signingOut": "Signing out…"

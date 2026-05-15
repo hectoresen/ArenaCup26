@@ -43,6 +43,57 @@
     "title": "Tes succès",
     "subtitle": "{unlocked} sur {total} débloqués"
   },
+  "privacy": {
+    "title": "Confidentialité",
+    "subtitle": "Choisis ce que les autres voient de ton profil. Les changements sont appliqués instantanément.",
+    "visibility": {
+      "legend": "Qui peut voir ton profil ?",
+      "public": {
+        "title": "Public",
+        "desc": "Toute personne ayant l'URL voit ton profil. Recommandé pour une compétition ouverte."
+      },
+      "friends_only": {
+        "title": "Amis seulement",
+        "desc": "Seulement tes amis. Se comporte comme privé jusqu'à l'arrivée de la fonctionnalité Amis."
+      },
+      "private": {
+        "title": "Privé",
+        "desc": "Seulement toi. Masqué dans le classement, la recherche et pour tout visiteur."
+      }
+    },
+    "fields": {
+      "legend": "Qu'est-ce qui est visible ?",
+      "showName": {
+        "label": "Afficher mon nom",
+        "desc": "Si désactivé, tu apparais comme « Joueur X » avec ton initiale."
+      },
+      "showCountry": {
+        "label": "Afficher mon pays et mon drapeau",
+        "desc": "Si désactivé, pas de pays dans le profil ni dans le classement."
+      },
+      "showImage": {
+        "label": "Afficher ma photo Google",
+        "desc": "Si désactivé, on utilise l'avatar doré avec tes initiales."
+      },
+      "showPoints": {
+        "label": "Afficher mes points",
+        "desc": "Si désactivé, tu apparais comme « Anonyme » dans le classement sans score visible."
+      },
+      "showAchievements": {
+        "label": "Afficher mes succès",
+        "desc": "Si désactivé, le catalogue apparaît vide pour les visiteurs."
+      }
+    },
+    "status": {
+      "idle": "Prêt.",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré."
+    },
+    "error": {
+      "unauthorized": "Session expirée. Reconnecte-toi.",
+      "invalid_input": "Valeur invalide. Vérifie les champs."
+    }
+  },
   "history": {
     "title": "Ton historique",
     "subtitle": "{total} prédictions · {correct} correctes · {points} pts gagnés",
@@ -312,6 +363,7 @@
     "fallbackName": "Utilisateur",
     "profile": "Mon profil",
     "history": "Mon historique",
+    "privacy": "Confidentialité",
     "faq": "Questions fréquentes",
     "signOut": "Se déconnecter",
     "signingOut": "Déconnexion…"
