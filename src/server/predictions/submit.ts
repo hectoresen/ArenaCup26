@@ -1,4 +1,5 @@
 import { dlog } from "@/lib/debug-log";
+import { checkSubmitLimit } from "@/lib/rate-limit";
 import type { Database } from "@/server/db/client";
 import { matches, predictions, teams } from "@/server/db/schema";
 import { createNotification } from "@/server/notifications/create";
@@ -24,6 +25,7 @@ export type SubmitPredictionResult =
         | "match_not_found"
         | "match_window_closed"
         | "match_already_started"
+        | "rate_limited"
         | "kind_not_allowed_for_stage"
         | "simple_missing_winner"
         | "simple_draw_in_knockout"
@@ -62,6 +64,17 @@ export async function submitPrediction(
         ? `${prediction.predictedHomeScore}-${prediction.predictedAwayScore}`
         : null,
   });
+
+  // Primero rate limit — antes de cualquier query. Identificamos por
+  // userId, no por IP, porque el user ya está autenticado y queremos
+  // contar contra su cupo personal sin depender de cabeceras
+  // forwardeadas (X-Forwarded-For). 10 submits/60s es generoso para
+  // uso humano legítimo y suficientemente apretado para bots.
+  const rl = await checkSubmitLimit(userId);
+  if (!rl.ok) {
+    dlog("predict", "rate_limited", { userId, reset: rl.reset });
+    return { ok: false, code: "rate_limited" };
+  }
 
   const homeTeam = alias(teams, "home_team");
   const awayTeam = alias(teams, "away_team");

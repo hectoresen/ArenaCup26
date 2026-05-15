@@ -60,6 +60,12 @@ const baseSchema = z.object({
   MATCH_DATA_LEAGUE_ID: z.coerce.number().int().positive().default(1),
   MATCH_DATA_SEASON: z.coerce.number().int().positive().default(2026),
 
+  // Rate limiting (add-rate-limiting, 2026-05-15). Opcionales: si
+  // no están, los limiters son noop. En producción el módulo emite
+  // warning al arrancar para que no pase desapercibido.
+  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+
   // Runtime
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });

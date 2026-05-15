@@ -135,7 +135,162 @@ Si un secret real se cuela en un commit:
 4. Anotar en `docs/incidents.md` (crear cuando ocurra el primero):
    fecha, qué se filtró, alcance, remediation, lecciones aprendidas.
 
-## 7. TODOs (pendientes en propuestas abiertas)
+## 7. Rate limiting (add-rate-limiting, 2026-05-15)
+
+`src/lib/rate-limit.ts` implementa cuatro limiters basados en
+Upstash Redis (sliding window):
+
+| Limiter        | Límite          | Identificador | Dónde se aplica                                  |
+| -------------- | --------------- | ------------- | ------------------------------------------------ |
+| `submit`       | 10 / 60 s       | userId        | `submitPrediction` (server action).              |
+| `cron`         | 6 / 60 s        | IP            | `handleCronRequest` tras pasar bearer.           |
+| `publicRead`   | 60 / 60 s       | IP            | Pendiente de wirear (landing + /u/<username>).   |
+| `signup`       | 5 / 3600 s      | IP            | Pendiente de wirear (Auth.js callback).          |
+
+### Configuración
+
+Env vars en Railway:
+
+```
+UPSTASH_REDIS_REST_URL=https://...upstash.io
+UPSTASH_REDIS_REST_TOKEN=...
+```
+
+Si no están set, los limiters quedan en **noop mode** (siempre
+permiten). En producción el deploy emite warning:
+
+```
+[WM/ratelimit] UPSTASH_REDIS_REST_URL / TOKEN not set in production — rate limiting is DISABLED
+```
+
+### Política fail-open
+
+Si Redis no responde (timeout, down), el limiter **permite** la
+request en lugar de bloquear. Mejor sufrir un poco de abuso
+temporal que cortar a usuarios legítimos por un fallo de Upstash.
+Cuando tengamos métricas reales de abuso, evaluar invertir.
+
+---
+
+## 8. Audit pre-launch — qué hace falta antes de abrir al público
+
+### 8.1 Puntos críticos (bloquean lanzamiento público)
+
+#### CRIT-1 · Credenciales filtradas en historial de chat
+
+- **Riesgo**: `API_FOOTBALL_KEY` y `GOOGLE_CLIENT_SECRET` se compartieron en chat durante debugging (2026-05-14). Aunque el repo nunca los tuvo, alguien con acceso al historial puede usarlos.
+- **Impacto**: agotar cupo gratuito de api-football (denegación de servicio funcional) o impersonar la app contra Google OAuth.
+- **Mitigación**: rotar siguiendo §3.1 y §3.2 antes de cualquier promoción pública.
+
+#### CRIT-2 · Vulnerabilidad SQL injection en drizzle-orm <0.45.2
+
+- **Riesgo**: `npm audit` 2026-05-15 reporta HIGH severity en drizzle-orm < 0.45.2 (`GHSA-gpj5-g38j-94v9`): identificadores SQL escapados incorrectamente.
+- **Impacto**: si en algún momento se construye una query dinámica con identificadores de usuario, RCE en BD.
+- **Estado actual**: todas nuestras queries usan column refs del schema (no strings dinámicos), así que no tenemos superficie expuesta hoy. Aún así, **actualizar** antes de que alguien añada una query dinámica.
+- **Mitigación**: `npm install drizzle-orm@^0.45.2` + testar build + tests + un sync end-to-end. Es semver-breaking, hay que revisar el changelog.
+
+#### CRIT-3 · CRON_SECRET dual config
+
+- **Riesgo**: el secret vive en dos sitios (Railway + GitHub Secrets). Si están desincronizados, el cron deja de funcionar silenciosamente (401).
+- **Mitigación**: §3.4 + revisar tras cada rotación que ambos coinciden con `curl` manual al endpoint con el bearer.
+
+#### CRIT-4 · Privacidad de perfil público por defecto
+
+- **Riesgo**: hoy `/u/<username>` es público para cualquier visitante. Nombre real, país, foto Google, puntos, logros. Un user que no entendió esto puede sentir su privacidad invadida.
+- **Impacto**: queja legal posible (RGPD: minimization, transparencia), reputacional.
+- **Mitigación**: implementar `add-profile-privacy` (opt-out granular) antes de lanzamiento. Mientras tanto, ningún dato realmente sensible (email, dirección, teléfono) está expuesto.
+
+#### CRIT-5 · Sin rate-limit en publicRead + signup todavía
+
+- **Riesgo**: aunque el módulo existe, falta wirear los limiters en landing/perfil público y signup callback de Auth.js. Un atacante puede:
+  - Scrappear el ranking + perfiles públicos masivamente (DoS sobre BD).
+  - Crear miles de cuentas con cuentas Google deshechables.
+- **Mitigación**: completar tasks §7 de `add-rate-limiting` (las 2 pendientes).
+
+### 8.2 Puntos débiles (mejorables, no bloqueantes)
+
+#### WEAK-1 · `vite/esbuild` con CVE moderate en dev deps
+
+- `npm audit` marca esbuild <=0.24.2 con `GHSA-67mh-4wv8-2f99` (cualquier web puede leer la respuesta del dev server). Solo afecta `npm run dev`, NO producción.
+- Upgrade a drizzle-kit@0.31.10 + vitest 3.x es breaking. Apuntado, no urgente.
+
+#### WEAK-2 · Sin error monitoring persistente
+
+- Los `[WM/...]` van a stdout de Railway con retention ~30 días. Un crash a las 3am pasa desapercibido.
+- **Mitigación**: implementar `add-error-monitoring` (Sentry).
+
+#### WEAK-3 · Sin auditoría de accesos
+
+- No registramos quién entra, desde dónde, ni qué predice. Un compromiso de cuenta no se detecta hasta que el dueño se da cuenta.
+- **Mitigación**: tabla `audit_log` con `user_id, action, ip, ua, at`. Apuntado para cuando aterrice `add-error-monitoring`.
+
+#### WEAK-4 · `Permissions-Policy` minimal
+
+- Hoy denegamos geo/mic/cam/payment. Falta denegar `interest-cohort`, `browsing-topics`, `unload`, `usb`, `bluetooth`, `gyroscope`, `accelerometer`, `serial`, `magnetometer`, `display-capture`, `screen-wake-lock`.
+- **Mitigación**: ampliar lista en `next.config.ts`.
+
+#### WEAK-5 · Sin Subresource Integrity (SRI)
+
+- No hay hashes de integridad en los scripts. Si Next CDN se compromete, el navegador no detecta tampering.
+- **Mitigación**: Next 15 no lo hace nativamente todavía. Aceptamos riesgo hasta que llegue soporte oficial.
+
+#### WEAK-6 · CSP `'unsafe-inline'` en styles
+
+- Tailwind 4 inyecta CSS inline. Inevitable hoy sin nonce. Acotado en `style-src` solo.
+- **Mitigación**: cuando aterrice nonce support en next-intl + Tailwind, migrar.
+
+#### WEAK-7 · Sin 2FA propio
+
+- Confiamos 100% en Google OAuth. Si Google MFA está mal configurado en la cuenta del user, no hay segunda capa.
+- **Mitigación**: futuro — propuesta `add-2fa-totp` cuando justifique el coste UX.
+
+#### WEAK-8 · Hardcoded user IDs en seeds
+
+- Los seed users de placeholders tienen UUIDs predecibles (`00000000-0000-4000-a000-000000000001..7`). No es secreto, pero da pistas si alguien intenta enumerar.
+- **Mitigación**: regenerar UUIDs aleatorios. Bajo riesgo, baja prioridad.
+
+#### WEAK-9 · Falta política de retención de datos
+
+- No tenemos política escrita sobre cuánto tiempo conservamos `point_events`, `notifications`, `username_history`. RGPD pide transparencia.
+- **Mitigación**: añadir a `docs/privacy.md` (crear cuando exista la propuesta `add-profile-privacy`).
+
+#### WEAK-10 · Sin pentest externo
+
+- Solo self-review hasta ahora. Una segunda mirada profesional encuentra cosas que el equipo no ve.
+- **Mitigación**: cuando la app entre en beta cerrada, contratar pentest (~500-2000€).
+
+### 8.3 Lo que ya está sólido
+
+- ✅ Auth.js v5 con JWT firmado + AUTH_SECRET >32 chars.
+- ✅ CSRF: Auth.js lo gestiona automáticamente en POST a `/api/auth/*`.
+- ✅ Server actions de Next 15 con encryption automática.
+- ✅ Drizzle prepared statements en todas las queries (sin string concat).
+- ✅ CSP enforcing desde el primer deploy.
+- ✅ HSTS + X-Frame-Options + nosniff + Referrer-Policy + Permissions-Policy.
+- ✅ CRON_SECRET obligatorio en producción runtime.
+- ✅ Gitleaks bloqueando filtraciones futuras en PRs.
+- ✅ Rate limiting en submit + cron (con Upstash configurable).
+- ✅ Idempotencia en scoring pipeline (no duplica puntos).
+- ✅ Notification kind enum cerrado (no se puede inyectar tipo arbitrario).
+- ✅ Username validation (regex + uniqueness + backfill).
+- ✅ Logs `[WM/...]` con truncado de IPs/userIds (no exponen completo).
+
+### 8.4 Checklist antes de "Open beta"
+
+- [ ] CRIT-1: rotar API_FOOTBALL_KEY + GOOGLE_CLIENT_SECRET.
+- [ ] CRIT-2: actualizar drizzle-orm a ≥0.45.2 + verificar suite verde.
+- [ ] CRIT-3: validar CRON_SECRET sincronizado en Railway + GitHub.
+- [ ] CRIT-4: implementar `add-profile-privacy` con default sensato (público es OK si comunicamos claramente).
+- [ ] CRIT-5: terminar wiring de `add-rate-limiting` (publicRead + signup).
+- [ ] Configurar UPSTASH_REDIS_REST_URL/TOKEN en Railway (sin esto el rate limit es noop).
+- [ ] WEAK-2: implementar `add-error-monitoring` (Sentry) + alertas Slack.
+- [ ] Política de privacidad pública en `/privacy` o `/legal`.
+- [ ] Términos de uso en `/terms`.
+- [ ] Cookie banner (si añadimos analytics que use cookies).
+
+---
+
+## 9. TODOs (pendientes en propuestas abiertas)
 
 - `add-rate-limiting` — Upstash en submit, cron, signup, reads.
 - `add-error-monitoring` — Sentry con `beforeSend` que scrubea PII.

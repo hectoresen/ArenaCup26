@@ -1,3 +1,4 @@
+import { checkCronLimit } from "@/lib/rate-limit";
 import type { SyncReport } from "@/server/match-data/sync/types";
 import { ProviderError } from "@/server/match-data/types";
 
@@ -16,6 +17,7 @@ export type CronResponse =
   | { status: 200; body: SyncReport }
   | { status: 401; body: { error: "unauthorized" } }
   | { status: 405; body: { error: "method_not_allowed" } }
+  | { status: 429; body: { error: "rate_limited" } }
   | {
       status: 500;
       body:
@@ -39,6 +41,17 @@ export async function handleCronRequest(
 
   if (!isAuthorized(req, deps.env)) {
     return { status: 401, body: { error: "unauthorized" } };
+  }
+
+  // Rate limit por IP tras pasar auth. El bearer es la primera línea
+  // de defensa; si un atacante consigue el secret y empieza a spamear,
+  // este límite (6 req/60s) le frena. La IP viene del proxy de
+  // Railway en `x-forwarded-for`; fallback a placeholder para que el
+  // rate-limit no se rompa cuando no hay header (e.g. tests).
+  const ip = (req.headers.get("x-forwarded-for") ?? "unknown").split(",")[0]?.trim() ?? "unknown";
+  const rl = await checkCronLimit(ip);
+  if (!rl.ok) {
+    return { status: 429, body: { error: "rate_limited" } };
   }
 
   if (!deps.env.API_FOOTBALL_KEY) {
