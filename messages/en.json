@@ -55,7 +55,8 @@
       "heading": "Your public name",
       "usernameLabel": "Username",
       "usernameHint": "This is how others see you on your profile, the ranking and achievements. Keep the generated one or change it (3-20 chars, lowercase, digits and hyphens).",
-      "countryLabel": "Your country"
+      "countryLabel": "Your country",
+      "privacyNote": "Your country is only used to show your flag on the ranking and your profile. We don't share it with anyone and you can hide it any time from Settings › Privacy."
     },
     "step2": {
       "heading": "How scoring works",

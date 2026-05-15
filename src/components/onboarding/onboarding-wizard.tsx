@@ -3,9 +3,8 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { countryCodeToFlag } from "@/lib/format/country";
-import { COUNTRIES } from "@/lib/format/countries";
 import { completeOnboarding } from "@/server/onboarding/actions";
+import { CountryPicker } from "./country-picker";
 
 type Props = {
   initial: {
@@ -115,22 +114,15 @@ export function OnboardingWizard({ initial }: Props) {
             </span>
           </label>
 
-          <label className="block">
-            <span className="block text-[11px] font-extrabold uppercase tracking-[0.1em] text-muted">
-              {t("step1.countryLabel")}
-            </span>
-            <select
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              className="mt-1 w-full rounded-xl border-2 border-border bg-card-hover px-3 py-2 text-sm font-bold text-foreground focus:border-gold focus:outline-none"
-            >
-              {COUNTRIES.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {countryCodeToFlag(c.code)} {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <CountryPicker
+            value={country}
+            onChange={setCountry}
+            label={t("step1.countryLabel")}
+          />
+
+          <p className="rounded-xl border-[1.5px] border-info/25 bg-info/[0.06] px-3 py-2 text-[11px] font-bold leading-relaxed text-muted">
+            🔒 {t("step1.privacyNote")}
+          </p>
         </section>
       )}
 

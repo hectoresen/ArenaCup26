@@ -55,7 +55,8 @@
       "heading": "Ton nom public",
       "usernameLabel": "Username",
       "usernameHint": "C'est ce que les autres verront sur ton profil, le classement et les succès. Garde celui généré ou change-le (3-20 caractères, minuscules, chiffres et tirets).",
-      "countryLabel": "Ton pays"
+      "countryLabel": "Ton pays",
+      "privacyNote": "Ton pays sert seulement à afficher ton drapeau dans le classement et sur ton profil. Nous ne le partageons avec personne et tu peux le masquer à tout moment depuis Réglages › Confidentialité."
     },
     "step2": {
       "heading": "How scoring works",

@@ -55,7 +55,8 @@
       "heading": "Tu nombre público",
       "usernameLabel": "Username",
       "usernameHint": "Así te verán los demás en tu perfil, el ranking y los logros. Puedes dejar el que te hemos generado o cambiarlo (3-20 caracteres, minúsculas, números y guiones).",
-      "countryLabel": "Tu país"
+      "countryLabel": "Tu país",
+      "privacyNote": "Tu país solo se usa para mostrar tu bandera en el ranking y en tu perfil. No lo cedemos a nadie y puedes ocultarlo cuando quieras desde Ajustes › Privacidad."
     },
     "step2": {
       "heading": "Cómo se puntúa",
