@@ -13,6 +13,11 @@ type Props = {
  * Form cliente para ajustar privacidad. Optimistic UI: actualiza el
  * state local de inmediato y dispara la server action en background.
  * Si la action falla, se revierte y muestra error.
+ *
+ * Solo hay un control: `visibility` (public / friends_only / private).
+ * Los antiguos toggles individuales se eliminaron — el ranking
+ * siempre muestra la información básica, así que la decisión se
+ * reduce a "perfil visitable o no".
  */
 export function PrivacyForm({ initial }: Props) {
   const t = useTranslations("privacy");
@@ -42,6 +47,9 @@ export function PrivacyForm({ initial }: Props) {
         <legend className="mb-3 font-display text-[13px] uppercase tracking-[0.12em] text-gold">
           {t("visibility.legend")}
         </legend>
+        <p className="mb-3 text-[12px] font-bold leading-snug text-muted">
+          {t("visibility.intro")}
+        </p>
         <div className="space-y-2">
           {(["public", "friends_only", "private"] as const).map((option) => (
             <label
@@ -73,31 +81,6 @@ export function PrivacyForm({ initial }: Props) {
         </div>
       </fieldset>
 
-      <fieldset>
-        <legend className="mb-3 font-display text-[13px] uppercase tracking-[0.12em] text-gold">
-          {t("fields.legend")}
-        </legend>
-        <div className="space-y-2">
-          {(
-            [
-              "showName",
-              "showCountry",
-              "showImage",
-              "showPoints",
-              "showAchievements",
-            ] as const
-          ).map((key) => (
-            <ToggleRow
-              key={key}
-              label={t(`fields.${key}.label`)}
-              desc={t(`fields.${key}.desc`)}
-              checked={state[key]}
-              onChange={(v) => update(key, v)}
-            />
-          ))}
-        </div>
-      </fieldset>
-
       <footer className="flex items-center justify-between rounded-xl border-2 border-border bg-card px-4 py-3 text-[11px] font-bold">
         {error ? (
           <span className="text-danger">{error}</span>
@@ -110,32 +93,5 @@ export function PrivacyForm({ initial }: Props) {
         )}
       </footer>
     </form>
-  );
-}
-
-function ToggleRow({
-  label,
-  desc,
-  checked,
-  onChange,
-}: {
-  label: string;
-  desc: string;
-  checked: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-2xl border-2 border-border bg-card px-4 py-3 transition-colors hover:border-gold/30">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="mt-1 accent-gold"
-      />
-      <div className="flex-1">
-        <div className="text-sm font-extrabold text-foreground">{label}</div>
-        <div className="mt-0.5 text-[11px] font-bold text-muted">{desc}</div>
-      </div>
-    </label>
   );
 }

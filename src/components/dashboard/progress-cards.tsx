@@ -80,7 +80,7 @@ function RankProgressCard({ progress }: { progress: Progress }) {
         </div>
       </div>
       <div className="mb-2 font-display text-[28px] leading-none tracking-[-0.5px] text-gold">
-        {rank === null ? "—" : `#${rank}`}
+        {`#${rank}`}
       </div>
 
       {hasHistory ? (

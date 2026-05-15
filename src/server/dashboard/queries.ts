@@ -104,22 +104,20 @@ export async function getUserStats(
     .limit(1);
   const row = rows[0] ?? { totalPoints: 0, streak: 0, correctCount: 0 };
 
-  // Total jugadores: count(*) de users con al menos 1 punto. Mantiene
-  // el "12 480 jugadores" honesto (los registrados sin actividad no
-  // cuentan como rivales).
-  const totalRows = await db.select({ total: sql<number>`count(*)::int` }).from(userPoints);
+  // Total jugadores: count(*) sobre `users`. Todos los registrados
+  // forman parte del ranking (incluso con 0 puntos) — la cifra
+  // refleja la comunidad real, no solo los que han marcado puntos.
+  const totalRows = await db.select({ total: sql<number>`count(*)::int` }).from(users);
   const total = totalRows[0]?.total ?? 0;
 
-  // Rank: número de filas con más puntos + 1. Si el user no tiene
-  // userPoints (no ha jugado), rank queda null.
-  let rank: number | null = null;
-  if (rows.length > 0) {
-    const aheadRows = await db
-      .select({ ahead: sql<number>`count(*)::int` })
-      .from(userPoints)
-      .where(sql`${userPoints.totalPoints} > ${row.totalPoints}`);
-    rank = (aheadRows[0]?.ahead ?? 0) + 1;
-  }
+  // Rank: número de filas con más puntos + 1. Como el ranking es
+  // inamovible (todos visibles), un user sin `user_points` se trata
+  // como 0 puntos y recibe el rank de la cola.
+  const aheadRows = await db
+    .select({ ahead: sql<number>`count(*)::int` })
+    .from(userPoints)
+    .where(sql`${userPoints.totalPoints} > ${row.totalPoints}`);
+  const rank: number = (aheadRows[0]?.ahead ?? 0) + 1;
 
   const unlockedRows = await db
     .select({ unlocked: sql<number>`count(*)::int` })
@@ -355,22 +353,22 @@ export async function getProgress(db: Database, userId: string): Promise<Progres
     .from(achievementDefinitions);
   const total = progressTotalRows[0]?.total ?? 0;
 
-  // Rank actual; delta/sparkline quedan null hasta `add-ranking-history`.
+  // Rank actual. Todos los users tienen un rank — incluso los que
+  // aún no han ganado puntos (su totalPoints efectivo es 0). Por eso
+  // contamos contra `userPoints` con `> 0`, garantizando que
+  // cualquiera "sin fila en user_points" reciba rank = (cantidad de
+  // users con puntos) + 1.
   const userRow = await db
     .select({ totalPoints: userPoints.totalPoints })
     .from(userPoints)
     .where(eq(userPoints.userId, userId))
     .limit(1);
-
-  let rank: number | null = null;
-  if (userRow[0]) {
-    const userTotal = userRow[0].totalPoints;
-    const aheadRows = await db
-      .select({ ahead: sql<number>`count(*)::int` })
-      .from(userPoints)
-      .where(sql`${userPoints.totalPoints} > ${userTotal}`);
-    rank = (aheadRows[0]?.ahead ?? 0) + 1;
-  }
+  const userTotal = userRow[0]?.totalPoints ?? 0;
+  const aheadRows = await db
+    .select({ ahead: sql<number>`count(*)::int` })
+    .from(userPoints)
+    .where(sql`${userPoints.totalPoints} > ${userTotal}`);
+  const rank: number = (aheadRows[0]?.ahead ?? 0) + 1;
 
   return {
     rank: { rank, rankDelta: null, sparkline: null },

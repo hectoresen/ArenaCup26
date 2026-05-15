@@ -81,43 +81,21 @@
   },
   "privacy": {
     "title": "Privacy",
-    "subtitle": "Choose what others see on your profile. Changes apply instantly.",
+    "subtitle": "Choose who can open your profile. Changes apply instantly.",
     "visibility": {
       "legend": "Who can see your profile?",
+      "intro": "The ranking always shows your basic info (name, flag, points). This only controls whether someone can open your full profile.",
       "public": {
         "title": "Public",
-        "desc": "Anyone with the URL sees your profile. Recommended for open competition."
+        "desc": "Anyone with the URL sees your full profile. Recommended for open competition."
       },
       "friends_only": {
         "title": "Friends only",
-        "desc": "Only your friends. Behaves like private until the friends capability lands."
+        "desc": "Only your friends. Behaves like private until the friends system lands."
       },
       "private": {
         "title": "Private",
-        "desc": "Only you. Hidden from ranking, search and any visitor."
-      }
-    },
-    "fields": {
-      "legend": "What's visible about you?",
-      "showName": {
-        "label": "Show my name",
-        "desc": "If off, you appear as \"Player X\" with your initial."
-      },
-      "showCountry": {
-        "label": "Show my country and flag",
-        "desc": "If off, no country in profile or ranking."
-      },
-      "showImage": {
-        "label": "Show my Google picture",
-        "desc": "If off, fallback to the gold avatar with your initials."
-      },
-      "showPoints": {
-        "label": "Show my points",
-        "desc": "If off, in the ranking you appear as \"Anonymous\" with no visible score."
-      },
-      "showAchievements": {
-        "label": "Show my achievements",
-        "desc": "If off, the catalog appears empty to visitors."
+        "desc": "Only you. Anyone trying to open your profile sees the \"Private profile\" card."
       }
     },
     "status": {
@@ -289,7 +267,12 @@
       "mythic": "Mythic",
       "goat": "GOAT"
     },
-    "backToHome": "Back to dashboard"
+    "backToHome": "Back to dashboard",
+    "private": {
+      "badge": "Private profile",
+      "title": "This profile is closed",
+      "body": "This player chose not to share their profile. They still appear in the ranking, but you can't see the details."
+    }
   },
   "dashboard": {
     "greeting": "Hi, <em>{name}</em> 👋",

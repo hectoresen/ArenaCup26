@@ -91,13 +91,13 @@ describe("<ProgressCards>", () => {
     expect(screen.getByText(/Sin cambios esta semana/)).toBeInTheDocument();
   });
 
-  it("renders '—' as the rank when null (user without points)", () => {
+  it("renders the tail rank for a user without points (ranking is inamovible)", () => {
     renderWithProviders(
       <ProgressCards
-        progress={buildProgress({ rank: { rank: null, rankDelta: null, sparkline: null } })}
+        progress={buildProgress({ rank: { rank: 12480, rankDelta: null, sparkline: null } })}
         now={NOW}
       />,
     );
-    expect(screen.getByText("—")).toBeInTheDocument();
+    expect(screen.getByText("#12480")).toBeInTheDocument();
   });
 });

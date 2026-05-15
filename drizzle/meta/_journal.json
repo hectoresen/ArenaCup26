@@ -57,6 +57,13 @@
       "when": 1778843559998,
       "tag": "0007_conscious_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1778846365070,
+      "tag": "0008_simplify_privacy",
+      "breakpoints": true
     }
   ]
 }

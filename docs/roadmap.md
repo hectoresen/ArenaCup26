@@ -5,6 +5,32 @@ técnico existente (cyber-audit + propuestas OpenSpec abiertas).
 Orden por **bloques** de valor/esfuerzo, no estricto secuencial:
 dentro de un bloque las tareas son independientes y pueden moverse.
 
+## Decisiones de producto
+
+### Ranking inamovible + privacy simplificada (2026-05-15)
+
+Tras QA de los bloques A-C, Héctor detectó que el filtro
+`WHERE visibility = 'public'` excluía del ranking global a usuarios
+con `friends_only` (caso real: cuenta "krawer", con puntos y racha,
+desaparecida del ranking público).
+
+**Decisión**: el ranking global es **inamovible**. Todos los users
+registrados aparecen siempre con su información básica (nombre,
+bandera, puntos, avatar), sea cual sea su `visibility`. La privacy
+controla únicamente qué ve un visitante al hacer click en una fila:
+
+- `public` → perfil completo en `/u/<username>`.
+- `friends_only` o `private` → cartel "Perfil privado" en la misma
+  URL (no `notFound()`). `friends_only` se comporta como `private`
+  hasta que aterrice `add-social-friends`.
+
+**Toggles eliminados**: los 5 booleanos antiguos (`showName`,
+`showCountry`, `showImage`, `showPoints`, `showAchievements`) se han
+retirado del schema y del UI. La decisión se reduce a "perfil
+visitable o no" — los toggles solo añadían fricción y emitían señales
+contradictorias (¿"sin foto" pero sí "con puntos"?). Migración
+`drizzle/0008_simplify_privacy.sql` compacta cada fila al nuevo shape.
+
 ---
 
 ## Bloque A — Quick wins (1 sesión)

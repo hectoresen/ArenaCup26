@@ -25,15 +25,15 @@ describe("<StatsRow>", () => {
     expect(screen.getByText(/de 12\.480 jugadores/)).toBeInTheDocument();
   });
 
-  it("shows '—' for rank when null (user with no points)", () => {
+  it("shows the real tail rank for a user with no points (ranking is inamovible)", () => {
     renderWithProviders(
-      <StatsRow stats={buildStats({ rank: null, totalPlayers: 12480, points: 0 })} />,
+      <StatsRow stats={buildStats({ rank: 12480, totalPlayers: 12480, points: 0 })} />,
     );
-    expect(screen.getByText("—")).toBeInTheDocument();
+    expect(screen.getByText("#12480")).toBeInTheDocument();
   });
 
   it("shows '0' as points when user has none", () => {
-    renderWithProviders(<StatsRow stats={buildStats({ points: 0, rank: null })} />);
+    renderWithProviders(<StatsRow stats={buildStats({ points: 0, rank: 12480 })} />);
     expect(screen.getByText("0")).toBeInTheDocument();
   });
 

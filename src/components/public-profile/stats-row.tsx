@@ -8,8 +8,9 @@ type Props = {
 
 /**
  * Dos stat cards lado a lado: rank global (gold) y puntos (blue/green).
- * Si el usuario no tiene puntos, rank se renderiza como "—" y points
- * como "0".
+ * El ranking es inamovible (todos los users registrados aparecen),
+ * así que `stats.rank` siempre es un número — incluso usuarios sin
+ * puntos tienen una posición real (al final de la cola).
  */
 export function StatsRow({ stats }: Props) {
   const t = useTranslations("publicProfile");
@@ -19,13 +20,9 @@ export function StatsRow({ stats }: Props) {
     <div className="mt-4 grid grid-cols-2 gap-2.5">
       <StatCard
         tone="rank"
-        value={stats.rank === null ? "—" : `#${stats.rank}`}
+        value={`#${stats.rank}`}
         label={t("rankLabel")}
-        sub={
-          stats.rank === null
-            ? t("rankNone")
-            : t("rankOfTotal", { total: formatPoints(stats.totalPlayers, locale) })
-        }
+        sub={t("rankOfTotal", { total: formatPoints(stats.totalPlayers, locale) })}
       />
       <StatCard
         tone="pts"

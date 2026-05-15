@@ -15,34 +15,32 @@ import {
 } from "drizzle-orm/pg-core";
 
 /**
- * Privacy preferences que vive en `users.privacy` (JSONB). Defaults:
- * todo público; tiempo de aterrizaje 2026-05-15 con `add-profile-privacy`.
+ * Privacy preferences que vive en `users.privacy` (JSONB). Default:
+ * `visibility = 'public'` (cualquiera ve el perfil en `/u/<username>`).
  *
- *  - `visibility`: `'public'` (cualquiera ve el perfil),
- *    `'friends_only'` (solo amigos — espera a `add-social-friends`),
- *    `'private'` (solo el dueño).
- *  - `showName`: si `false`, el nombre se sustituye por "Jugador {inicial}".
- *  - `showCountry`: si `false`, la bandera/país no aparece.
- *  - `showImage`: si `false`, se sirve fallback en lugar de la foto.
- *  - `showPoints`: si `false`, en el ranking aparece como "Anónimo".
- *  - `showAchievements`: si `false`, el acordeón queda vacío.
+ * El ranking global es **inamovible** — no se ve afectado por este
+ * setting. La información básica (nombre, bandera, puntos, avatar)
+ * siempre aparece en el ranking, sea cual sea el `visibility`. La
+ * privacy únicamente decide si la página `/u/<username>` muestra el
+ * perfil completo o el cartel "Perfil privado".
+ *
+ *  - `public`: cualquiera ve el perfil.
+ *  - `friends_only`: solo amigos. Hasta que aterrice
+ *    `add-social-friends`, se comporta como `private` (solo el dueño).
+ *  - `private`: solo el dueño.
+ *
+ * Los antiguos toggles individuales (`showName`, `showCountry`,
+ * `showImage`, `showPoints`, `showAchievements`) se eliminaron en
+ * 2026-05-15: o muestras todo o no muestras nada — los toggles solo
+ * añadían fricción a una decisión que se reduce a "perfil visitable
+ * o no".
  */
 export type UserPrivacy = {
   visibility: "public" | "friends_only" | "private";
-  showName: boolean;
-  showCountry: boolean;
-  showImage: boolean;
-  showPoints: boolean;
-  showAchievements: boolean;
 };
 
 export const DEFAULT_USER_PRIVACY: UserPrivacy = {
   visibility: "public",
-  showName: true,
-  showCountry: true,
-  showImage: true,
-  showPoints: true,
-  showAchievements: true,
 };
 
 // ─── ENUMS ─────────────────────────────────────────────────
@@ -119,13 +117,13 @@ export const users = pgTable(
     // Campos propios del dominio (no requeridos por Auth.js).
     country: varchar("country", { length: 3 }),
     username: varchar("username", { length: 20 }).unique(),
-    // Preferencias de privacidad por usuario. JSONB para que crezcan
-    // sin migraciones futuras. Default: público con todos los toggles
-    // a true. Tipado en `UserPrivacy` arriba.
+    // Preferencias de privacidad por usuario. JSONB para futura
+    // extensibilidad sin migraciones. Default: público. Tipado en
+    // `UserPrivacy` arriba — actualmente solo `visibility`.
     privacy: jsonb("privacy")
       .$type<UserPrivacy>()
       .notNull()
-      .default(sql`'{"visibility":"public","showName":true,"showCountry":true,"showImage":true,"showPoints":true,"showAchievements":true}'::jsonb`),
+      .default(sql`'{"visibility":"public"}'::jsonb`),
     // Marca temporal del completado del wizard /bienvenido. Si es
     // null, el layout `(app)` redirige al usuario al wizard antes
     // de entrar al panel. Idempotente: re-renderizar /bienvenido no

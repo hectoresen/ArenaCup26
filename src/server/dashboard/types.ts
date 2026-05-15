@@ -25,8 +25,12 @@ export type UserStats = {
   correctCount: number;
   achievementsUnlocked: number;
   achievementsTotal: number;
-  /** Posición global o `null` si el usuario aún no tiene puntos. */
-  rank: number | null;
+  /**
+   * Posición global. **Siempre** un número — incluso los usuarios
+   * sin puntos forman parte del ranking (su rank queda al final,
+   * empatados a 0 con tie-break por createdAt asc).
+   */
+  rank: number;
   totalPlayers: number;
 };
 
@@ -72,7 +76,7 @@ export type UpcomingMatch = {
 };
 
 export type RankProgress = {
-  rank: number | null;
+  rank: number;
   /** Cambio respecto a la semana pasada. `null` mientras no tengamos histórico. */
   rankDelta: number | null;
   /** Serie de posiciones para la sparkline. `null` mientras no tengamos histórico. */

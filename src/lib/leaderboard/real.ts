@@ -3,7 +3,6 @@ import { dlog } from "@/lib/debug-log";
 import { countryCodeToFlag } from "@/lib/format/country";
 import type { Database } from "@/server/db/client";
 import { predictions, userPoints, users } from "@/server/db/schema";
-import { maskName, normalizePrivacy } from "@/server/privacy/apply";
 import type { LeaderboardSnapshot, Player } from "./types";
 
 const TOP_LIMIT = 100;
@@ -18,6 +17,12 @@ const ONLINE_WINDOW_MS = 24 * 60 * 60 * 1000;
 /**
  * Construye un snapshot del leaderboard listando **todos los users**
  * registrados (ordenados por puntos desc, tope `TOP_LIMIT` = 100).
+ *
+ * El ranking es **inamovible**: independientemente del `privacy.visibility`
+ * del user, su información básica (nombre, bandera, puntos, avatar)
+ * siempre aparece aquí. La privacy solo afecta a la página
+ * `/u/<username>`, no al ranking global — la posición y los puntos
+ * son información pública del juego.
  *
  * - LEFT JOIN a `user_points`: un user sin fila en `user_points`
  *   (todavía no ha puntuado) aparece con 0 al final de la lista.
@@ -47,7 +52,6 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
       username: users.username,
       name: users.name,
       country: users.country,
-      privacy: users.privacy,
       lastActiveAt: users.lastActiveAt,
       points: userPoints.totalPoints,
       streak: userPoints.streak,
@@ -59,8 +63,6 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
     .from(users)
     .leftJoin(userPoints, eq(userPoints.userId, users.id))
     .leftJoin(predictionCountSubq, eq(predictionCountSubq.userId, users.id))
-    // Excluimos `private` y `friends_only` del leaderboard global.
-    .where(sql`coalesce(${users.privacy}->>'visibility', 'public') = 'public'`)
     // Tie-break: points → streakMax → simpleHits → predictionsTotal
     //          → createdAt. Documentado en docs/scoring.md §X.
     .orderBy(
@@ -76,19 +78,21 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
 
   const now = Date.now();
   const players: Player[] = rows.map((row, i) => {
-    const privacy = normalizePrivacy(row.privacy);
-    const visiblePoints = privacy.showPoints ? row.points ?? 0 : 0;
     const isOnline = row.lastActiveAt
       ? now - row.lastActiveAt.getTime() <= ONLINE_WINDOW_MS
       : false;
+    // Username siempre se entrega: la fila del ranking siempre lleva
+    // a `/u/<username>`. Si el owner tiene `private` o `friends_only`
+    // (sin amigos todavía), esa página renderiza el cartel "Perfil
+    // privado" en lugar del perfil completo.
     return {
       id: row.userId,
-      username: privacy.visibility === "public" ? row.username : null,
-      name: maskName(row.name, privacy),
-      countryCode: privacy.showCountry ? row.country ?? "" : "",
-      countryName: privacy.showCountry ? row.country ?? "" : "",
-      flag: privacy.showCountry ? countryCodeToFlag(row.country) ?? "🌍" : "🌍",
-      points: visiblePoints,
+      username: row.username,
+      name: row.name?.trim() || "Jugador",
+      countryCode: row.country ?? "",
+      countryName: row.country ?? "",
+      flag: countryCodeToFlag(row.country) ?? "🌍",
+      points: row.points ?? 0,
       streak: row.streak ?? 0,
       correctCount: row.correctCount ?? 0,
       rank: i + 1,

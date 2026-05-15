@@ -31,12 +31,16 @@ describe("<Hero>", () => {
     expect(screen.getByText(/#42 de 12.480 jugadores/)).toBeInTheDocument();
   });
 
-  it("uses 'Empieza tu primera predicción' when rank is null (new user)", () => {
+  it("uses 'Empieza tu primera predicción' for a new user (totalPoints=0) but still shows real rank", () => {
     renderWithProviders(
-      <Hero userName="Carlos Mendoza" stats={{ ...baseStats, rank: null, totalPoints: 0 }} />,
+      <Hero
+        userName="Carlos Mendoza"
+        stats={{ ...baseStats, rank: 12480, totalPoints: 0 }}
+      />,
     );
     expect(screen.getByText(/Empieza tu primera predicción/)).toBeInTheDocument();
     expect(screen.queryByText(/de 12.480 jugadores/)).not.toBeInTheDocument();
+    expect(screen.getByText("#12480")).toBeInTheDocument();
   });
 
   it("formats points with es-ES separator (4820 → 4.820)", () => {

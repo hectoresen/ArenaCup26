@@ -5,9 +5,9 @@ export type { UserPrivacy };
 
 /**
  * Normaliza una fila de BD a un objeto `UserPrivacy` válido. Defensa
- * frente a usuarios pre-existentes sin la columna `privacy` rellena,
- * o filas con shape parcial: cualquier campo ausente se rellena con
- * el default público.
+ * frente a usuarios pre-existentes con `privacy` ausente o con shape
+ * antiguo (los toggles individuales `showName/showCountry/...` que se
+ * eliminaron en 2026-05-15) — cualquier campo desconocido se ignora.
  */
 export function normalizePrivacy(raw: unknown): UserPrivacy {
   if (!raw || typeof raw !== "object") return DEFAULT_USER_PRIVACY;
@@ -17,11 +17,6 @@ export function normalizePrivacy(raw: unknown): UserPrivacy {
       r.visibility === "private" || r.visibility === "friends_only"
         ? r.visibility
         : "public",
-    showName: r.showName !== false,
-    showCountry: r.showCountry !== false,
-    showImage: r.showImage !== false,
-    showPoints: r.showPoints !== false,
-    showAchievements: r.showAchievements !== false,
   };
 }
 
@@ -31,8 +26,14 @@ export function normalizePrivacy(raw: unknown): UserPrivacy {
  *
  *  - `public`: siempre.
  *  - `private`: solo el propio dueño.
- *  - `friends_only`: solo el dueño hoy. Cuando aterrice
- *    `add-social-friends`, hará un check en `friendships`.
+ *  - `friends_only`: solo el dueño hoy — se comporta como `private`
+ *    hasta que aterrice `add-social-friends`. Entonces hará un check
+ *    en la tabla `friendships`.
+ *
+ * Cuando devuelve `false`, la página `/u/<username>` debe mostrar el
+ * cartel "Perfil privado" (no `notFound()`): el ranking sigue
+ * enlazando a este path para todos los users, sea cual sea su
+ * visibility.
  */
 export function canViewProfile(
   privacy: UserPrivacy,
@@ -42,18 +43,7 @@ export function canViewProfile(
   if (privacy.visibility === "public") return true;
   if (viewerId === null) return false;
   if (viewerId === ownerId) return true;
-  // friends_only: TODO check tabla friendships cuando exista.
+  // friends_only: hasta que exista la tabla `friendships`, se comporta
+  // como `private`.
   return false;
-}
-
-/**
- * Decide cómo mostrar un nombre dado los toggles del owner. Si
- * `showName` es false, devolvemos "Jugador {primera inicial}" para
- * mantener identidad mínima sin exponer nombre real.
- */
-export function maskName(name: string | null | undefined, privacy: UserPrivacy): string {
-  const safe = name?.trim() || "Jugador";
-  if (privacy.showName) return safe;
-  const initial = safe.charAt(0).toUpperCase();
-  return `Jugador ${initial}`;
 }

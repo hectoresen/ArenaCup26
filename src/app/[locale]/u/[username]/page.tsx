@@ -4,6 +4,7 @@ import { InvitationsPlaceholderCard } from "@/components/profile/invitations-pla
 import { RecentPredictionsCard } from "@/components/profile/recent-predictions-card";
 import { StreakStatsCard } from "@/components/profile/streak-stats-card";
 import { AchievementsAccordion } from "@/components/public-profile/achievements-accordion";
+import { PrivateProfile } from "@/components/public-profile/private-profile";
 import { ProfileHero } from "@/components/public-profile/profile-hero";
 import { StatsRow } from "@/components/public-profile/stats-row";
 import { Link } from "@/i18n/navigation";
@@ -21,12 +22,14 @@ import { notFound } from "next/navigation";
 /**
  * Perfil público accesible sin sesión. Patrón de URL: `/u/<username>`.
  *
- * - `username` viene del segmento dinámico.
- * - Si no existe el usuario, `notFound()` (Next sirve la 404 estándar).
- * - Cuando el viewer es el dueño (`isOwner`), añadimos tres cajas
- *   extra solo visibles para él: stats de rachas, últimas 5
- *   predicciones, y placeholder de invitaciones. También se habilita
- *   el editor de avatar/nombre en el hero.
+ * - `username` no existe → `notFound()`.
+ * - El owner ha cerrado el perfil (`visibility` ≠ `'public'` y el
+ *   viewer no es él) → renderizamos `<PrivateProfile>`. Importante:
+ *   no `notFound()` — el ranking enlaza aquí para todos los users.
+ * - Owner viendo su propio perfil o perfil público → perfil completo.
+ *   Cuando el viewer es el dueño (`isOwner`), añadimos tres cajas
+ *   extra solo visibles para él (rachas, predicciones, invitaciones)
+ *   y se habilita el editor de avatar/nombre en el hero.
  */
 export async function generateMetadata({
   params,
@@ -34,13 +37,19 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-  const profile = await getPublicProfile(db, username);
-  if (!profile) {
+  const result = await getPublicProfile(db, username);
+  if (result.kind === "not_found") {
     return { title: "Perfil no encontrado · WebMundial 26" };
   }
+  if (result.kind === "private") {
+    return {
+      title: `${result.identity.name} · WebMundial 26`,
+      description: "Perfil privado en WebMundial 26.",
+    };
+  }
   return {
-    title: `${profile.identity.name} · WebMundial 26`,
-    description: `Perfil de ${profile.identity.name} (@${profile.identity.username}) en WebMundial 26.`,
+    title: `${result.profile.identity.name} · WebMundial 26`,
+    description: `Perfil de ${result.profile.identity.name} (@${result.profile.identity.username}) en WebMundial 26.`,
   };
 }
 
@@ -60,9 +69,21 @@ export default async function PublicProfilePage({
 
   const session = await auth();
   const viewerId = session?.user?.id ?? null;
-  const profile = await getPublicProfile(db, username, viewerId);
-  if (!profile) notFound();
+  const result = await getPublicProfile(db, username, viewerId);
+  if (result.kind === "not_found") notFound();
 
+  if (result.kind === "private") {
+    return (
+      <>
+        <TopChrome user={session?.user ?? null} />
+        <main className="relative z-10 mx-auto max-w-[560px] px-5 py-9 pt-16">
+          <PrivateProfile identity={result.identity} />
+        </main>
+      </>
+    );
+  }
+
+  const profile = result.profile;
   const isOwner = Boolean(
     viewerId && session?.user?.username === profile.identity.username,
   );

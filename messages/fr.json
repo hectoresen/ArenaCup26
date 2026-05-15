@@ -81,43 +81,21 @@
   },
   "privacy": {
     "title": "Confidentialité",
-    "subtitle": "Choisis ce que les autres voient de ton profil. Les changements sont appliqués instantanément.",
+    "subtitle": "Choisis qui peut ouvrir ton profil. Les changements sont appliqués instantanément.",
     "visibility": {
       "legend": "Qui peut voir ton profil ?",
+      "intro": "Le classement affiche toujours tes infos basiques (nom, drapeau, points). Ce paramètre contrôle uniquement si quelqu'un peut ouvrir ton profil complet.",
       "public": {
         "title": "Public",
-        "desc": "Toute personne ayant l'URL voit ton profil. Recommandé pour une compétition ouverte."
+        "desc": "Toute personne ayant l'URL voit ton profil complet. Recommandé pour une compétition ouverte."
       },
       "friends_only": {
         "title": "Amis seulement",
-        "desc": "Seulement tes amis. Se comporte comme privé jusqu'à l'arrivée de la fonctionnalité Amis."
+        "desc": "Seulement tes amis. Se comporte comme privé jusqu'à l'arrivée du système d'amis."
       },
       "private": {
         "title": "Privé",
-        "desc": "Seulement toi. Masqué dans le classement, la recherche et pour tout visiteur."
-      }
-    },
-    "fields": {
-      "legend": "Qu'est-ce qui est visible ?",
-      "showName": {
-        "label": "Afficher mon nom",
-        "desc": "Si désactivé, tu apparais comme « Joueur X » avec ton initiale."
-      },
-      "showCountry": {
-        "label": "Afficher mon pays et mon drapeau",
-        "desc": "Si désactivé, pas de pays dans le profil ni dans le classement."
-      },
-      "showImage": {
-        "label": "Afficher ma photo Google",
-        "desc": "Si désactivé, on utilise l'avatar doré avec tes initiales."
-      },
-      "showPoints": {
-        "label": "Afficher mes points",
-        "desc": "Si désactivé, tu apparais comme « Anonyme » dans le classement sans score visible."
-      },
-      "showAchievements": {
-        "label": "Afficher mes succès",
-        "desc": "Si désactivé, le catalogue apparaît vide pour les visiteurs."
+        "desc": "Seulement toi. Tout visiteur qui essaie d'ouvrir ton profil voit la carte « Profil privé »."
       }
     },
     "status": {
@@ -289,7 +267,12 @@
       "mythic": "Mythique",
       "goat": "GOAT"
     },
-    "backToHome": "Retour au tableau"
+    "backToHome": "Retour au tableau",
+    "private": {
+      "badge": "Profil privé",
+      "title": "Ce profil est fermé",
+      "body": "Ce joueur a choisi de ne pas partager son profil. Il reste dans le classement, mais tu ne peux pas voir le détail."
+    }
   },
   "dashboard": {
     "greeting": "Salut, <em>{name}</em> 👋",

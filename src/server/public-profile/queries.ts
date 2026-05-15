@@ -1,27 +1,35 @@
 import { countryCodeToFlag } from "@/lib/format/country";
 import type { Database } from "@/server/db/client";
 import { userAchievements, userPoints, users } from "@/server/db/schema";
-import { canViewProfile, maskName, normalizePrivacy } from "@/server/privacy/apply";
+import { canViewProfile, normalizePrivacy } from "@/server/privacy/apply";
 import { eq, sql } from "drizzle-orm";
 import { buildProfileAchievements } from "./transforms";
 import type { PublicProfile } from "./types";
 
+export type PublicProfileResult =
+  | { kind: "found"; profile: PublicProfile }
+  | { kind: "private"; identity: { name: string; flag: string | null; avatarId: string | null; image: string | null } }
+  | { kind: "not_found" };
+
 /**
- * Carga el perfil público de un usuario por su username. Devuelve
- * `null` si:
- *  - el username no existe, o
- *  - el owner ha puesto `privacy.visibility = 'private'` y el viewer
- *    no es él mismo (ni amigo, cuando aterrice `add-social-friends`).
+ * Carga el perfil público de un usuario por su username.
  *
- * Los toggles individuales (`showName`, `showCountry`, etc.) NO
- * devuelven `null` — el perfil sigue accesible, pero los campos
- * sensibles se redactan/ocultan según preferencias.
+ * - `kind: "not_found"` cuando el username no existe (404).
+ * - `kind: "private"` cuando el owner ha cerrado el perfil
+ *   (`visibility` ≠ `'public'`) y el viewer no es él mismo. La página
+ *   muestra el cartel "Perfil privado" con identidad mínima.
+ * - `kind: "found"` para todos los demás: perfil completo. El ranking
+ *   global siempre lleva aquí — la privacidad solo decide qué
+ *   componente renderiza la página, no si la página existe.
+ *
+ * Cuando aterrice `add-social-friends`, la rama `friends_only` se
+ * resolverá contra la tabla `friendships`.
  */
 export async function getPublicProfile(
   db: Database,
   username: string,
   viewerId: string | null = null,
-): Promise<PublicProfile | null> {
+): Promise<PublicProfileResult> {
   const userRows = await db
     .select({
       id: users.id,
@@ -37,10 +45,23 @@ export async function getPublicProfile(
     .limit(1);
 
   const user = userRows[0];
-  if (!user || !user.username) return null;
+  if (!user || !user.username) return { kind: "not_found" };
 
   const privacy = normalizePrivacy(user.privacy);
-  if (!canViewProfile(privacy, user.id, viewerId)) return null;
+  const visibleName = user.name?.trim() || "Jugador";
+  const flag = countryCodeToFlag(user.country);
+
+  if (!canViewProfile(privacy, user.id, viewerId)) {
+    return {
+      kind: "private",
+      identity: {
+        name: visibleName,
+        flag,
+        avatarId: user.avatarId,
+        image: user.image,
+      },
+    };
+  }
 
   const [pointsRows, totalRows, achievementRows] = await Promise.all([
     db
@@ -50,7 +71,7 @@ export async function getPublicProfile(
       .from(userPoints)
       .where(eq(userPoints.userId, user.id))
       .limit(1),
-    db.select({ total: sql<number>`count(*)::int` }).from(userPoints),
+    db.select({ total: sql<number>`count(*)::int` }).from(users),
     db
       .select({
         achievementId: userAchievements.achievementId,
@@ -63,41 +84,36 @@ export async function getPublicProfile(
   const points = pointsRows[0]?.totalPoints ?? 0;
   const totalPlayers = totalRows[0]?.total ?? 0;
 
-  let rank: number | null = null;
-  if (pointsRows[0]) {
-    const aheadRows = await db
-      .select({ ahead: sql<number>`count(*)::int` })
-      .from(userPoints)
-      .where(sql`${userPoints.totalPoints} > ${points}`);
-    rank = (aheadRows[0]?.ahead ?? 0) + 1;
-  }
+  // Ranking inamovible: todos los users tienen rank. Si el user aún
+  // no tiene fila en `user_points`, lo tratamos como 0 puntos y
+  // recibe el rank de la cola.
+  const aheadRows = await db
+    .select({ ahead: sql<number>`count(*)::int` })
+    .from(userPoints)
+    .where(sql`${userPoints.totalPoints} > ${points}`);
+  const rank: number = (aheadRows[0]?.ahead ?? 0) + 1;
 
   const unlockedMap = new Map(achievementRows.map((r) => [r.achievementId, r.unlockedAt]));
 
-  // Aplicamos los toggles individuales a la respuesta. El country/
-  // image/points/achievements se "redactan" pero el perfil queda
-  // visible. El username siempre se devuelve porque ya está en la
-  // URL — esconderlo no aportaría nada.
   return {
-    identity: {
-      name: maskName(user.name, privacy),
-      username: user.username,
-      country: privacy.showCountry ? user.country : null,
-      flag: privacy.showCountry ? countryCodeToFlag(user.country) : null,
-      image: privacy.showImage ? user.image : null,
-      // El avatar de la galería respeta también `showImage`: si el
-      // user oculta su imagen, ocultamos también el avatar elegido.
-      avatarId: privacy.showImage ? user.avatarId : null,
+    kind: "found",
+    profile: {
+      identity: {
+        name: visibleName,
+        username: user.username,
+        country: user.country,
+        flag,
+        image: user.image,
+        avatarId: user.avatarId,
+      },
+      stats: {
+        rank,
+        totalPlayers,
+        points,
+        // pointsDelta queda null hasta `add-ranking-history`.
+        pointsDelta: null,
+      },
+      achievements: buildProfileAchievements(unlockedMap),
     },
-    stats: {
-      rank: privacy.showPoints ? rank : null,
-      totalPlayers,
-      points: privacy.showPoints ? points : 0,
-      // pointsDelta queda null hasta `add-ranking-history`.
-      pointsDelta: null,
-    },
-    achievements: privacy.showAchievements
-      ? buildProfileAchievements(unlockedMap)
-      : buildProfileAchievements(new Map()),
   };
 }

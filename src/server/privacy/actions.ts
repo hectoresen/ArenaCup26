@@ -11,11 +11,6 @@ import type { UserPrivacy } from "./apply";
 
 const privacySchema = z.object({
   visibility: z.enum(["public", "friends_only", "private"]),
-  showName: z.boolean(),
-  showCountry: z.boolean(),
-  showImage: z.boolean(),
-  showPoints: z.boolean(),
-  showAchievements: z.boolean(),
 });
 
 export type UpdatePrivacyResult =

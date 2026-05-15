@@ -193,14 +193,14 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 - **Riesgo**: el secret vive en dos sitios (Railway + GitHub Secrets). Si están desincronizados, el cron deja de funcionar silenciosamente (401).
 - **Mitigación**: §3.4 + revisar tras cada rotación que ambos coinciden con `curl` manual al endpoint con el bearer.
 
-#### CRIT-4 · ✅ Resuelto: privacy controls granulares (2026-05-15)
+#### CRIT-4 · ✅ Resuelto: privacy controls (2026-05-15)
 
-- **Estado**: `users.privacy` JSONB con shape `UserPrivacy` (visibility + 5 toggles). Default público (cero impacto en users existentes).
-- **Toggles**: `showName` (sustituye nombre por "Jugador X"), `showCountry`, `showImage`, `showPoints` (oculta del ranking visualmente, mantiene rank), `showAchievements`.
-- **Visibility**: `public` / `friends_only` / `private`. `private` y `friends_only` ocultan el perfil de `/u/<username>` y del leaderboard global (filtro SQL). `friends_only` se comporta como private hasta que aterrice `add-social-friends`.
-- **UI**: `/ajustes/privacidad` con optimistic UI, server action `updatePrivacy` valida con zod y revalida las paths afectadas (`/`, `/ranking`, `/u/<username>`).
-- **Helpers**: `normalizePrivacy(raw)`, `canViewProfile(privacy, ownerId, viewerId)`, `maskName(name, privacy)` en `src/server/privacy/apply.ts`.
-- **Entry point**: nuevo link "Privacidad" en el AccountMenu del shell, entre "Mi historial" y "FAQ".
+- **Estado**: `users.privacy` JSONB con shape `UserPrivacy = { visibility }`. Default `'public'` (cero impacto en users existentes). Los antiguos toggles individuales (`showName`/`showCountry`/`showImage`/`showPoints`/`showAchievements`) se eliminaron el 2026-05-15 — ver §8.4.
+- **Visibility**: `public` / `friends_only` / `private`. La visibility solo afecta a la página `/u/<username>` — el ranking global es **inamovible** (todos los users registrados aparecen siempre con nombre, bandera, puntos y avatar). `friends_only` se comporta como `private` (solo el dueño puede entrar) hasta que aterrice `add-social-friends`; entonces hará un check contra `friendships`.
+- **Fallback**: cuando `canViewProfile` devuelve `false`, la página `/u/<username>` renderiza `<PrivateProfile>` (cartel "Perfil privado" con identidad mínima — nombre, avatar, bandera). **No** se hace `notFound()`: el ranking enlaza aquí para todos los users, sea cual sea su visibility, así que un 404 sería incoherente.
+- **UI**: `/ajustes/privacidad` con un único radio group (3 opciones). Optimistic UI; server action `updatePrivacy` valida con zod (`{ visibility: enum }`) y revalida las paths afectadas (`/`, `/ranking`, `/u/<username>`).
+- **Helpers**: `normalizePrivacy(raw)`, `canViewProfile(privacy, ownerId, viewerId)` en `src/server/privacy/apply.ts`. `maskName` se eliminó al desaparecer el masking de nombre.
+- **Entry point**: link "Privacidad" en el AccountMenu del shell.
 
 #### CRIT-5 · ✅ Resuelto: rate-limit wireado en publicRead + signup (2026-05-15)
 

@@ -13,15 +13,17 @@ type Props = {
  * Bloque superior del panel: saludo personal + subtítulo con ranking
  * + tres mini-stats (puntos, racha, logros).
  *
- * Si `stats.rank === null` (usuario nuevo, aún sin actividad) el
- * subtítulo cambia a "Empieza tu primera predicción" en lugar del
- * "Vas el #X de Y jugadores".
+ * El ranking es inamovible: todos los users registrados aparecen en
+ * él, así que `stats.rank` siempre es un número. Para users "nuevos"
+ * (sin puntos) cambiamos el subtítulo a "Empieza tu primera
+ * predicción" en lugar del "Vas el #X de Y jugadores", pero seguimos
+ * mostrando su posición real (#N) en la mini-stat.
  */
 export function Hero({ userName, stats }: Props) {
   const t = useTranslations("dashboard");
   const locale = useLocale() as PointsLocale;
   const first = firstName(userName);
-  const isNew = stats.rank === null;
+  const isNew = stats.totalPoints === 0;
 
   // Mostrar el chip de racha al lado del saludo solo cuando hay
   // racha activa (≥1). Cero → no se muestra (no aporta nada). La
@@ -31,7 +33,7 @@ export function Hero({ userName, stats }: Props) {
 
   return (
     <section
-      aria-label={t("subtitle", { rank: stats.rank ?? 0, total: stats.totalPlayers })}
+      aria-label={t("subtitle", { rank: stats.rank, total: stats.totalPlayers })}
       className="mb-1 [animation:fadeUp_0.55s_ease_0.06s_forwards] opacity-0"
     >
       <div className="mb-1 flex items-start justify-between gap-3">
@@ -62,7 +64,7 @@ export function Hero({ userName, stats }: Props) {
         {isNew
           ? t("subtitleNew")
           : t("subtitle", {
-              rank: stats.rank ?? 0,
+              rank: stats.rank,
               // Pre-formateamos el total como string para evitar que
               // next-intl lo pase por Intl.NumberFormat (small-icu cae
               // a en-US y produce "12480" en vez de "12.480").
@@ -78,14 +80,10 @@ export function Hero({ userName, stats }: Props) {
           ariaLabel={`${stats.totalPoints} ${t("miniStats.points")}`}
         />
         <MiniStat
-          value={stats.rank !== null ? `#${stats.rank}` : "—"}
+          value={`#${stats.rank}`}
           label={t("miniStats.rank")}
           tone="gold"
-          ariaLabel={
-            stats.rank !== null
-              ? `${t("miniStats.rank")} ${stats.rank}`
-              : t("miniStats.rankNone")
-          }
+          ariaLabel={`${t("miniStats.rank")} ${stats.rank}`}
         />
         <MiniStat
           value={`${stats.achievementsUnlocked}/${stats.achievementsTotal}`}

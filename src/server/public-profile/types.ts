@@ -17,8 +17,12 @@ export type ProfileIdentity = {
 };
 
 export type ProfileStats = {
-  /** Posición en el ranking global. `null` si el user no tiene puntos. */
-  rank: number | null;
+  /**
+   * Posición en el ranking global. **Siempre** un número — el ranking
+   * es inamovible y todos los users registrados aparecen, incluso los
+   * que aún no tienen puntos.
+   */
+  rank: number;
   totalPlayers: number;
   points: number;
   /** Variación semanal. `null` hasta que aterrice `add-ranking-history`. */
