@@ -236,7 +236,10 @@ Sin solapamiento con el análisis de producto, siguen activos:
   pg_dump → S3-compatible bucket + verificación gzip. Endpoint
   `/api/status` + página `/status`. PR envs aparcadas — Railway lo
   hace via "PR environments" si quieres activarlo manualmente).
-- **add-e2e-tests** (Playwright golden paths).
+- ~~**add-e2e-tests** (Playwright golden paths).~~ ✓
+  (2026-05-15: 6 specs sobre páginas públicas + skip-link + manifest
+  + /api/status. CI workflow `e2e.yml` con Postgres service y
+  drizzle-kit migrate antes de los tests).
 - **add-web-push-notifications** (retención fuera de app).
 
 ## Orden de ataque sugerido

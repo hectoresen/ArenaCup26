@@ -18,8 +18,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm dev",
+    // En CI levantamos el build de producción (más representativo, sin
+    // HMR ni overhead de dev server). Localmente conectamos al `next
+    // dev` que ya esté corriendo, o lo arrancamos si no lo está.
+    command: process.env.CI ? "npm run build && npm run start" : "npm run dev",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
+    timeout: process.env.CI ? 180_000 : 60_000,
   },
 });
