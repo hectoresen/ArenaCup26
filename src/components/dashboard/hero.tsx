@@ -1,3 +1,4 @@
+import { EditableName } from "@/components/profile/editable-name";
 import { type PointsLocale, formatPoints } from "@/lib/format/number";
 import { firstName } from "@/server/dashboard/transforms";
 import type { UserStats } from "@/server/dashboard/types";
@@ -35,12 +36,18 @@ export function Hero({ userName, stats }: Props) {
     >
       <div className="mb-1 flex items-start justify-between gap-3">
         <div className="font-display text-[30px] leading-[1.1] tracking-[0.02em]">
-          {first
-            ? t.rich("greeting", {
-                name: first,
-                em: (chunks) => <em className="not-italic text-gold">{chunks}</em>,
-              })
-            : t("greetingNew")}
+          {first ? (
+            t.rich("greeting", {
+              name: first,
+              em: () => (
+                <em className="not-italic text-gold">
+                  <EditableName initial={userName} display={first} />
+                </em>
+              ),
+            })
+          ) : (
+            t("greetingNew")
+          )}
         </div>
         {streakActive && (
           <span

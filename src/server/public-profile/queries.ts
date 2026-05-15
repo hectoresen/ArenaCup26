@@ -29,6 +29,7 @@ export async function getPublicProfile(
       username: users.username,
       country: users.country,
       image: users.image,
+      avatarId: users.avatarId,
       privacy: users.privacy,
     })
     .from(users)
@@ -84,6 +85,9 @@ export async function getPublicProfile(
       country: privacy.showCountry ? user.country : null,
       flag: privacy.showCountry ? countryCodeToFlag(user.country) : null,
       image: privacy.showImage ? user.image : null,
+      // El avatar de la galería respeta también `showImage`: si el
+      // user oculta su imagen, ocultamos también el avatar elegido.
+      avatarId: privacy.showImage ? user.avatarId : null,
     },
     stats: {
       rank: privacy.showPoints ? rank : null,

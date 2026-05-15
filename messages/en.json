@@ -535,5 +535,32 @@
         }
       }
     }
+  },
+  "profileEditor": {
+    "editAria": "Edit name {name}",
+    "cooldownToast": "You can only change this every 48h ({hours}h left).",
+    "genericError": "Couldn't save. Try again.",
+    "changeAvatarAria": "Change avatar",
+    "avatarPickerTitle": "Pick your avatar",
+    "close": "Close",
+    "backToGoogle": "Back to Google avatar",
+    "usingGoogle": "Using Google avatar",
+    "streakCard": {
+      "title": "Your streaks",
+      "current": "Current",
+      "max": "Best",
+      "milestones": "Milestones ≥3"
+    },
+    "recentPredictions": {
+      "title": "Your latest predictions",
+      "seeMore": "See full history"
+    },
+    "invitations": {
+      "title": "My invitations",
+      "comingSoon": "Coming soon",
+      "emptyBody": "You haven't invited anyone yet. Soon you'll be able to share a link so your friends can play with you.",
+      "countBody": "{count} friends invited.",
+      "inviteCta": "Invite a friend (soon)"
+    }
   }
 }

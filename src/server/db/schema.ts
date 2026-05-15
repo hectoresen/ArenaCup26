@@ -131,6 +131,16 @@ export const users = pgTable(
     // de entrar al panel. Idempotente: re-renderizar /bienvenido no
     // resetea el valor existente.
     onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
+    // Identificador del avatar elegido de la galería pre-curada
+    // (ver `src/server/profile/avatars.ts`). Si es `null`, fallback
+    // a `image` (Google). Editable desde el perfil con cooldown 48h.
+    avatarId: varchar("avatar_id", { length: 32 }),
+    // Última vez que el user cambió su nombre. Cooldown de 48h para
+    // evitar spam de cambios. `null` = nunca lo ha cambiado.
+    nameChangedAt: timestamp("name_changed_at", { withTimezone: true }),
+    // Última vez que el user cambió su avatar (galería o vuelta al
+    // de Google). Mismo cooldown 48h.
+    avatarChangedAt: timestamp("avatar_changed_at", { withTimezone: true }),
     lastActiveAt: timestamp("last_active_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },

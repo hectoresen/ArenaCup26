@@ -7,7 +7,13 @@ export type ProfileIdentity = {
   country: string | null;
   /** Emoji bandera derivado del country (lo calcula la capa de query). */
   flag: string | null;
+  /** Foto del provider (Google) si está y el user no la ha ocultado. */
   image: string | null;
+  /**
+   * ID del avatar elegido en la galería (`src/server/profile/avatars.ts`).
+   * Si está set, prevalece sobre `image` en el render del avatar.
+   */
+  avatarId: string | null;
 };
 
 export type ProfileStats = {

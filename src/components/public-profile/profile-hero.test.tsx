@@ -10,6 +10,7 @@ function buildIdentity(overrides: Partial<ProfileIdentity> = {}): ProfileIdentit
     country: "MX",
     flag: "🇲🇽",
     image: null,
+    avatarId: null,
     ...overrides,
   };
 }

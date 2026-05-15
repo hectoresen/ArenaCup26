@@ -535,5 +535,32 @@
         }
       }
     }
+  },
+  "profileEditor": {
+    "editAria": "Editar nombre {name}",
+    "cooldownToast": "Solo puedes cambiarlo cada 48h ({hours}h restantes).",
+    "genericError": "No se pudo guardar. Inténtalo otra vez.",
+    "changeAvatarAria": "Cambiar avatar",
+    "avatarPickerTitle": "Elige tu avatar",
+    "close": "Cerrar",
+    "backToGoogle": "Volver al avatar de Google",
+    "usingGoogle": "Estás usando el de Google",
+    "streakCard": {
+      "title": "Tus rachas",
+      "current": "Actual",
+      "max": "Mejor",
+      "milestones": "Hitos ≥3"
+    },
+    "recentPredictions": {
+      "title": "Tus últimas predicciones",
+      "seeMore": "Ver historial completo"
+    },
+    "invitations": {
+      "title": "Mis invitaciones",
+      "comingSoon": "Próximamente",
+      "emptyBody": "Aún no has invitado a nadie. Pronto podrás compartir un link para que tus amigos jueguen contigo.",
+      "countBody": "{count} amigos invitados.",
+      "inviteCta": "Invitar a un amigo (próximamente)"
+    }
   }
 }

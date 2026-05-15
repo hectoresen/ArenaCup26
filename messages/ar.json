@@ -535,5 +535,32 @@
         }
       }
     }
+  },
+  "profileEditor": {
+    "editAria": "تعديل الاسم {name}",
+    "cooldownToast": "يمكنك تغييره فقط كل 48 ساعة ({hours} ساعة متبقية).",
+    "genericError": "تعذّر الحفظ. أعد المحاولة.",
+    "changeAvatarAria": "تغيير الأفاتار",
+    "avatarPickerTitle": "اختر أفاتارك",
+    "close": "إغلاق",
+    "backToGoogle": "العودة إلى أفاتار Google",
+    "usingGoogle": "تستخدم أفاتار Google",
+    "streakCard": {
+      "title": "سلاسلك",
+      "current": "الحالية",
+      "max": "الأفضل",
+      "milestones": "الإنجازات ≥3"
+    },
+    "recentPredictions": {
+      "title": "آخر توقعاتك",
+      "seeMore": "عرض السجل الكامل"
+    },
+    "invitations": {
+      "title": "دعواتي",
+      "comingSoon": "قريبًا",
+      "emptyBody": "لم تدعُ أحدًا بعد. قريبًا ستتمكن من مشاركة رابط ليلعب معك أصدقاؤك.",
+      "countBody": "{count} أصدقاء مدعوون.",
+      "inviteCta": "ادعُ صديقًا (قريبًا)"
+    }
   }
 }

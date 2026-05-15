@@ -1,5 +1,8 @@
 import { TopChrome } from "@/components/layout/top-chrome";
 import { ThrottledState } from "@/components/common/throttled-state";
+import { InvitationsPlaceholderCard } from "@/components/profile/invitations-placeholder-card";
+import { RecentPredictionsCard } from "@/components/profile/recent-predictions-card";
+import { StreakStatsCard } from "@/components/profile/streak-stats-card";
 import { AchievementsAccordion } from "@/components/public-profile/achievements-accordion";
 import { ProfileHero } from "@/components/public-profile/profile-hero";
 import { StatsRow } from "@/components/public-profile/stats-row";
@@ -8,6 +11,7 @@ import { auth } from "@/lib/auth";
 import { checkPublicReadLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { db } from "@/server/db/client";
+import { getOwnerExtras } from "@/server/profile/owner-extras";
 import { getPublicProfile } from "@/server/public-profile/queries";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
@@ -19,10 +23,10 @@ import { notFound } from "next/navigation";
  *
  * - `username` viene del segmento dinámico.
  * - Si no existe el usuario, `notFound()` (Next sirve la 404 estándar).
- * - El layout NO usa el `<AppShell>` privado; en su lugar mantiene el
- *   `<TopChrome>` (LanguageSwitcher + AccountMenu o JoinCta) que ya
- *   usa el resto del área pública. Así un visitante anónimo puede ver
- *   el perfil y el dueño tiene su menú de cuenta arriba a la derecha.
+ * - Cuando el viewer es el dueño (`isOwner`), añadimos tres cajas
+ *   extra solo visibles para él: stats de rachas, últimas 5
+ *   predicciones, y placeholder de invitaciones. También se habilita
+ *   el editor de avatar/nombre en el hero.
  */
 export async function generateMetadata({
   params,
@@ -48,9 +52,6 @@ export default async function PublicProfilePage({
   const { locale, username } = await params;
   setRequestLocale(locale);
 
-  // Rate limit antes de cualquier query. Mismo cupo que la landing
-  // (60 req/60s) — un scraper que recorra `/u/<username>` no debe
-  // consumir nuestra BD.
   const ip = getRequestIp(await headers());
   const rl = await checkPublicReadLimit(ip);
   if (!rl.ok) {
@@ -67,6 +68,10 @@ export default async function PublicProfilePage({
   );
   const t = await getTranslations({ locale, namespace: "publicProfile" });
 
+  // Cajas extra solo para el dueño. Lazy: anon/visitantes no
+  // pagan estas queries.
+  const ownerExtras = isOwner && viewerId ? await getOwnerExtras(db, viewerId) : null;
+
   return (
     <>
       <TopChrome user={session?.user ?? null} />
@@ -79,8 +84,15 @@ export default async function PublicProfilePage({
             <span aria-hidden="true">←</span> {t("backToHome")}
           </Link>
         )}
-        <ProfileHero identity={profile.identity} />
+        <ProfileHero identity={profile.identity} isOwner={isOwner} />
         <StatsRow stats={profile.stats} />
+        {ownerExtras && (
+          <>
+            <StreakStatsCard stats={ownerExtras.streakStats} />
+            <RecentPredictionsCard entries={ownerExtras.recentPredictions} />
+            <InvitationsPlaceholderCard count={ownerExtras.invitationsCount} />
+          </>
+        )}
         <AchievementsAccordion
           achievements={profile.achievements}
           ownerUsername={profile.identity.username}
