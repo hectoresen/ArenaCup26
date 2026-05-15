@@ -64,6 +64,13 @@
       "when": 1778846365070,
       "tag": "0008_simplify_privacy",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1778869220703,
+      "tag": "0009_add_friendships",
+      "breakpoints": true
     }
   ]
 }

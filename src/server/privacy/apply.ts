@@ -26,9 +26,9 @@ export function normalizePrivacy(raw: unknown): UserPrivacy {
  *
  *  - `public`: siempre.
  *  - `private`: solo el propio dueño.
- *  - `friends_only`: solo el dueño hoy — se comporta como `private`
- *    hasta que aterrice `add-social-friends`. Entonces hará un check
- *    en la tabla `friendships`.
+ *  - `friends_only`: el dueño o un amigo aceptado. El caller pasa el
+ *    flag `isFriend` después de consultar la tabla `friendships`
+ *    (`src/server/friends/queries.ts::areFriends`).
  *
  * Cuando devuelve `false`, la página `/u/<username>` debe mostrar el
  * cartel "Perfil privado" (no `notFound()`): el ranking sigue
@@ -39,11 +39,12 @@ export function canViewProfile(
   privacy: UserPrivacy,
   ownerId: string,
   viewerId: string | null,
+  isFriend = false,
 ): boolean {
   if (privacy.visibility === "public") return true;
   if (viewerId === null) return false;
   if (viewerId === ownerId) return true;
-  // friends_only: hasta que exista la tabla `friendships`, se comporta
-  // como `private`.
+  if (privacy.visibility === "friends_only") return isFriend;
+  // private: solo el dueño (cubierto arriba).
   return false;
 }

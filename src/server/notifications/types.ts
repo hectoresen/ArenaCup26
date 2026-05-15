@@ -3,7 +3,9 @@ export type NotificationKind =
   | "prediction_locked"
   | "match_finished"
   | "achievement_unlocked"
-  | "system";
+  | "system"
+  | "friend_request"
+  | "friend_accepted";
 
 export type NotificationItem = {
   id: string;

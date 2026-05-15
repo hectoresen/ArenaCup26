@@ -21,6 +21,12 @@ vi.mock("@/server/privacy/actions", () => ({
   updatePrivacy: vi.fn(async () => ({ ok: true })),
   privacyOrDefault: (raw: unknown) => raw,
 }));
+vi.mock("@/server/friends/actions", () => ({
+  sendFriendRequest: vi.fn(async () => ({ ok: true })),
+  acceptFriendRequest: vi.fn(async () => ({ ok: true })),
+  rejectFriendRequest: vi.fn(async () => ({ ok: true })),
+  removeFriend: vi.fn(async () => ({ ok: true })),
+}));
 
 /**
  * Env vars mínimas para que cualquier test que importe (directa o

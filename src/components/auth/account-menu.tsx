@@ -173,6 +173,29 @@ export function AccountMenu({
           </Link>
 
           <Link
+            href="/amigos"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05]"
+          >
+            <svg
+              className="h-4 w-4 text-muted"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="5.5" cy="6" r="2.5" />
+              <circle cx="11" cy="6" r="2" />
+              <path d="M1.5 13.5 a4 4 0 0 1 8 0 M9 13.5 a3 3 0 0 1 5.5 0" />
+            </svg>
+            {t("friends")}
+          </Link>
+
+          <Link
             href="/ajustes/privacidad"
             role="menuitem"
             onClick={() => setOpen(false)}
@@ -197,7 +220,7 @@ export function AccountMenu({
             href="/faq"
             role="menuitem"
             onClick={() => setOpen(false)}
-            className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05]"
+            className="flex w-full cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05]"
           >
             <svg
               className="h-4 w-4 text-muted"
@@ -213,6 +236,26 @@ export function AccountMenu({
               <path d="M6 6.5 a2 2 0 1 1 2.5 1.9 V10 M8 12.5 v0.5" />
             </svg>
             {t("faq")}
+          </Link>
+
+          <Link
+            href="/legal/privacy"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-start text-[12px] font-bold text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
+          >
+            <span aria-hidden="true" className="ms-7 inline-block">·</span>
+            {t("legalPrivacy")}
+          </Link>
+
+          <Link
+            href="/legal/terms"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full cursor-pointer items-center gap-3 border-b border-border px-4 py-2.5 text-start text-[12px] font-bold text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
+          >
+            <span aria-hidden="true" className="ms-7 inline-block">·</span>
+            {t("legalTerms")}
           </Link>
 
           <button

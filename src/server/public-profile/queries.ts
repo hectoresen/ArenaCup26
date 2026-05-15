@@ -1,6 +1,7 @@
 import { countryCodeToFlag } from "@/lib/format/country";
 import type { Database } from "@/server/db/client";
 import { userAchievements, userPoints, users } from "@/server/db/schema";
+import { areFriends } from "@/server/friends/queries";
 import { canViewProfile, normalizePrivacy } from "@/server/privacy/apply";
 import { eq, sql } from "drizzle-orm";
 import { buildProfileAchievements } from "./transforms";
@@ -51,7 +52,14 @@ export async function getPublicProfile(
   const visibleName = user.name?.trim() || "Jugador";
   const flag = countryCodeToFlag(user.country);
 
-  if (!canViewProfile(privacy, user.id, viewerId)) {
+  // Solo necesitamos resolver amistad si el visibility es
+  // `friends_only` Y hay viewer Y no es el dueño. En cualquier otro
+  // caso `canViewProfile` decide sin tocar la BD.
+  const needsFriendCheck =
+    privacy.visibility === "friends_only" && viewerId !== null && viewerId !== user.id;
+  const isFriend = needsFriendCheck ? await areFriends(db, viewerId, user.id) : false;
+
+  if (!canViewProfile(privacy, user.id, viewerId, isFriend)) {
     return {
       kind: "private",
       identity: {
@@ -99,6 +107,7 @@ export async function getPublicProfile(
     kind: "found",
     profile: {
       identity: {
+        userId: user.id,
         name: visibleName,
         username: user.username,
         country: user.country,

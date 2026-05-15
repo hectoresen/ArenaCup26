@@ -5,6 +5,7 @@ import { ProfileHero } from "./profile-hero";
 
 function buildIdentity(overrides: Partial<ProfileIdentity> = {}): ProfileIdentity {
   return {
+    userId: "00000000-0000-0000-0000-000000000001",
     name: "Carlos Mendoza",
     username: "carlos-mendoza",
     country: "MX",

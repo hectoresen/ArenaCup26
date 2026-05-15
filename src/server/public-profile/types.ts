@@ -1,6 +1,8 @@
 import type { AchievementDefinition, AchievementTier } from "@/server/achievements/catalog";
 
 export type ProfileIdentity = {
+  /** UUID interno del owner. Necesario para acciones tipo `removeFriend`. */
+  userId: string;
   name: string;
   username: string;
   /** ISO 3166-1 alpha-2 si se guardó en onboarding; null si no. */

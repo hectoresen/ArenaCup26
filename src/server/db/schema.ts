@@ -99,6 +99,14 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "match_finished",
   "achievement_unlocked",
   "system",
+  "friend_request",
+  "friend_accepted",
+]);
+
+export const friendshipStatusEnum = pgEnum("friendship_status", [
+  "pending",
+  "accepted",
+  "blocked",
 ]);
 
 // ─── USERS & AUTH (Auth.js compatible) ─────────────────────
@@ -391,6 +399,44 @@ export const userAchievements = pgTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.userId, table.achievementId] }),
+  }),
+);
+
+/**
+ * Relación de amistad asimétrica. `requester_id` envía la solicitud,
+ * `addressee_id` la recibe. La aplicación normaliza la dirección al
+ * consultar (la amistad lógica es bidireccional cuando `status =
+ * 'accepted'`).
+ *
+ * - **pending**: solicitud abierta. Solo `addressee` puede aceptar.
+ * - **accepted**: ambos son amigos. Filtros como `friends_only`
+ *   resuelven contra esta fila en cualquier dirección.
+ * - **blocked**: cualquiera de los dos bloquea al otro. Si se inserta
+ *   con `requester=A, addressee=B`, B no puede ver el perfil de A ni
+ *   enviarle solicitudes, y viceversa.
+ *
+ * Constraint único en `(requester_id, addressee_id)` evita duplicar
+ * solicitudes pendientes en la misma dirección. La pareja inversa se
+ * comprueba en la server action antes de insertar.
+ */
+export const friendships = pgTable(
+  "friendships",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    requesterId: uuid("requester_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    addresseeId: uuid("addressee_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: friendshipStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+  },
+  (table) => ({
+    uniquePair: uniqueIndex("friendships_unique_pair").on(table.requesterId, table.addresseeId),
+    addresseeIdx: index("friendships_addressee_idx").on(table.addresseeId),
+    requesterIdx: index("friendships_requester_idx").on(table.requesterId),
   }),
 );
 

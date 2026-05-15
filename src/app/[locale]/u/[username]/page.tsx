@@ -1,5 +1,6 @@
 import { TopChrome } from "@/components/layout/top-chrome";
 import { ThrottledState } from "@/components/common/throttled-state";
+import { FriendActionButton } from "@/components/friends/friend-action-button";
 import { InvitationsPlaceholderCard } from "@/components/profile/invitations-placeholder-card";
 import { RecentPredictionsCard } from "@/components/profile/recent-predictions-card";
 import { StreakStatsCard } from "@/components/profile/streak-stats-card";
@@ -12,6 +13,7 @@ import { auth } from "@/lib/auth";
 import { checkPublicReadLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { db } from "@/server/db/client";
+import { getViewerRelationWithId } from "@/server/friends/queries";
 import { getOwnerExtras } from "@/server/profile/owner-extras";
 import { getPublicProfile } from "@/server/public-profile/queries";
 import type { Metadata } from "next";
@@ -93,6 +95,13 @@ export default async function PublicProfilePage({
   // pagan estas queries.
   const ownerExtras = isOwner && viewerId ? await getOwnerExtras(db, viewerId) : null;
 
+  // Relación de amistad para el CTA. Solo se computa si hay viewer y
+  // no es el dueño — el resto de visitantes no ven el botón.
+  const friendInfo =
+    viewerId && !isOwner
+      ? await getViewerRelationWithId(db, viewerId, profile.identity.userId)
+      : null;
+
   return (
     <>
       <TopChrome user={session?.user ?? null} />
@@ -106,6 +115,16 @@ export default async function PublicProfilePage({
           </Link>
         )}
         <ProfileHero identity={profile.identity} isOwner={isOwner} />
+        {friendInfo && (
+          <div className="mt-3 flex justify-center">
+            <FriendActionButton
+              initialRelation={friendInfo.relation}
+              targetUsername={profile.identity.username}
+              targetUserId={profile.identity.userId}
+              pendingFriendshipId={friendInfo.friendshipId}
+            />
+          </div>
+        )}
         <StatsRow stats={profile.stats} />
         {ownerExtras && (
           <>

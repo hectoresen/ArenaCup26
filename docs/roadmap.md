@@ -199,14 +199,17 @@ Sin solapamiento con el análisis de producto, siguen activos:
 
 - **CRIT-1 · Rotar credenciales filtradas**
   (`API_FOOTBALL_KEY`, `GOOGLE_CLIENT_SECRET`). Tarea operativa
-  manual, al final del sprint.
+  manual; pasos detallados en `docs/security.md §9.1`.
 - **Activar Sentry**: crear cuenta + `SENTRY_DSN` en Railway.
-  Sin esto, el monitoring sigue en noop.
-- **Páginas legales** (`/privacy`, `/terms`). Necesarias antes
-  de abrir signups públicos en EU.
-- **add-social-friends** (relaciones bidireccionales). Tras
-  bloques A-F arriba, este es el siguiente gran salto del
-  producto. La caja `5.6` "Mis invitaciones" es el preámbulo.
+  Sin esto, el monitoring sigue en noop. Pasos en
+  `docs/security.md §9.2`.
+- ~~**Páginas legales** (`/privacy`, `/terms`).~~ ✓ (2026-05-15:
+  `/legal/privacy` y `/legal/terms` en 4 locales, link desde
+  AccountMenu).
+- ~~**add-social-friends** (relaciones bidireccionales).~~ ✓
+  (2026-05-15: tabla `friendships`, server actions, página
+  `/amigos` con bandeja + lista + buscador, CTA contextual en
+  `/u/<username>`, `canViewProfile` resuelve `friends_only`).
 - **add-leaderboard-sse** (push real). Reemplaza polling 30s.
 - **add-ranking-history** (delta ▲/▼ + sparkline reales).
 - **add-matches-filters** (filtros sobre `/partidos`).

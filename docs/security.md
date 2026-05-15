@@ -288,16 +288,41 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 
 ### 8.4 Checklist antes de "Open beta"
 
-- [ ] CRIT-1: rotar API_FOOTBALL_KEY + GOOGLE_CLIENT_SECRET.
+- [ ] CRIT-1: rotar API_FOOTBALL_KEY + GOOGLE_CLIENT_SECRET (operativa manual del owner; ver §9.1 abajo).
 - [x] ~~CRIT-2: actualizar drizzle-orm a ≥0.45.2 + verificar suite verde.~~ (2026-05-15)
 - [ ] CRIT-3: validar CRON_SECRET sincronizado en Railway + GitHub.
 - [x] ~~CRIT-4: implementar `add-profile-privacy` con default sensato (público es OK si comunicamos claramente).~~ (2026-05-15)
 - [x] ~~CRIT-5: terminar wiring de `add-rate-limiting` (publicRead + signup).~~ (2026-05-15)
 - [ ] Configurar UPSTASH_REDIS_REST_URL/TOKEN en Railway (sin esto el rate limit es noop).
-- [x] ~~WEAK-2: implementar `add-error-monitoring` (Sentry) + alertas Slack.~~ (2026-05-15; alertas Slack pendiente — configurar webhook tras crear proyecto en Sentry.)
-- [ ] Política de privacidad pública en `/privacy` o `/legal`.
-- [ ] Términos de uso en `/terms`.
-- [ ] Cookie banner (si añadimos analytics que use cookies).
+- [x] ~~WEAK-2: implementar `add-error-monitoring` (Sentry) + alertas Slack.~~ (2026-05-15; código listo, alertas Slack pendiente — configurar webhook tras crear proyecto en Sentry y setear `SENTRY_DSN` en Railway).
+- [x] ~~Política de privacidad pública en `/privacy` o `/legal`.~~ (2026-05-15: `/legal/privacy` en es/en/fr/ar, link desde AccountMenu)
+- [x] ~~Términos de uso en `/terms`.~~ (2026-05-15: `/legal/terms` en es/en/fr/ar, link desde AccountMenu)
+- [ ] Cookie banner (si añadimos analytics que use cookies — hoy no aplica, solo cookies técnicas).
+
+---
+
+## 9. Operativa manual del owner
+
+### 9.1 Rotación de credenciales (CRIT-1)
+
+Pasos operativos cuando se filtran secrets en git o se requiere rotación programada:
+
+1. **GOOGLE_CLIENT_SECRET**: ir a [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) → seleccionar OAuth Client → "Reset Secret". Copiar el nuevo secret.
+2. **API_FOOTBALL_KEY**: ir a [api-football dashboard](https://dashboard.api-football.com/) → API Keys → Regenerate. Copiar el nuevo key.
+3. **Railway**: ir al servicio `wmundial` → Variables → actualizar `GOOGLE_CLIENT_SECRET` y `API_FOOTBALL_KEY`. El redeploy es automático.
+4. **GitHub Secrets** (si CRON usa el mismo secret): Settings → Secrets → Actions → actualizar.
+5. **Verificación**: forzar login con Google (debe funcionar) y disparar manualmente el cron `/api/cron/sync-matches` con `Authorization: Bearer <CRON_SECRET>` (debe devolver 200).
+6. **Auditoría**: si la rotación fue por leak, revisar `git log` y/o GitHub Audit Log para identificar el commit/PR donde se filtró y considerar `git filter-repo` para limpiar la historia.
+
+### 9.2 Activar Sentry (WEAK-2 final step)
+
+1. Crear proyecto en [sentry.io](https://sentry.io/) tipo "Next.js".
+2. Copiar el DSN.
+3. Railway → Variables → añadir `SENTRY_DSN=<dsn>`. Opcionalmente `SENTRY_ENVIRONMENT=production`.
+4. Redeploy. El primer error en prod debería aparecer en el dashboard en <5 min.
+5. (Opcional) configurar Slack webhook desde Sentry → Settings → Integrations.
+
+Sin `SENTRY_DSN`, el módulo `@sentry/nextjs` funciona en modo noop — no rompe nada, simplemente no envía nada.
 
 ---
 
