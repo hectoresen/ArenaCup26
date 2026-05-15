@@ -153,21 +153,29 @@ export async function seedLeaderboardPlaceholders(db: Database): Promise<number>
         },
       });
 
-    // 2) Upsert de sus puntos.
+    // 2) Upsert de sus puntos. `streakMax` y `simpleHits` no los
+    //    declaramos en el seed (no tenemos datos históricos de los
+    //    placeholders); los inicializamos derivados: streakMax =
+    //    streak actual, simpleHits = correctCount (asumimos todos
+    //    sus aciertos fueron simple/exact, no doubles).
     await db
       .insert(userPoints)
       .values({
         userId: seed.id,
         totalPoints: seed.totalPoints,
         streak: seed.streak,
+        streakMax: seed.streak,
         correctCount: seed.correctCount,
+        simpleHits: seed.correctCount,
       })
       .onConflictDoUpdate({
         target: userPoints.userId,
         set: {
           totalPoints: seed.totalPoints,
           streak: seed.streak,
+          streakMax: seed.streak,
           correctCount: seed.correctCount,
+          simpleHits: seed.correctCount,
         },
       });
 

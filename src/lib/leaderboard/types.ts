@@ -15,6 +15,13 @@ export type Player = {
   correctCount: number;
   rank: number;
   previousRank: number;
+  /**
+   * `true` si el user ha hecho cualquier request server-side en
+   * las últimas 24h (campo `users.last_active_at`). El layout
+   * `(app)` lo actualiza con throttle de 5 min cada visita.
+   * Usado para el "puntito verde" en `<RankRow>`.
+   */
+  isOnline: boolean;
 };
 
 export type LeaderboardSnapshot = {

@@ -16,7 +16,9 @@ vi.mock("@/components/app-shell/app-shell", () => ({
 // Mock que simula el chain drizzle: select().from().where().limit() →
 // devuelve un row con `onboardedAt` para que el guard del layout pase
 // al render. Cada test puede sobreescribir con `onboardingRowMock`.
-const onboardingRowMock = vi.fn(async () => [{ onboardedAt: new Date() }]);
+const onboardingRowMock = vi.fn(async () => [
+  { onboardedAt: new Date(), lastActiveAt: new Date() },
+]);
 vi.mock("@/server/db/client", () => ({
   db: {
     select: () => ({
@@ -24,6 +26,11 @@ vi.mock("@/server/db/client", () => ({
         where: () => ({
           limit: () => onboardingRowMock(),
         }),
+      }),
+    }),
+    update: () => ({
+      set: () => ({
+        where: async () => undefined,
       }),
     }),
   },

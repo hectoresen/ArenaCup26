@@ -15,6 +15,7 @@ const basePlayer: Player = {
   correctCount: 34,
   rank: 4,
   previousRank: 4,
+  isOnline: false,
 };
 
 describe("RankRow", () => {

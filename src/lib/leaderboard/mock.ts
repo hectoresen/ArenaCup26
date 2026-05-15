@@ -1,6 +1,9 @@
 import type { LeaderboardSnapshot, Player } from "./types";
 
-type Seed = Omit<Player, "rank" | "previousRank" | "username"> & { username?: string | null };
+type Seed = Omit<Player, "rank" | "previousRank" | "username" | "isOnline"> & {
+  username?: string | null;
+  isOnline?: boolean;
+};
 
 const seed: Seed[] = [
   {
@@ -120,6 +123,7 @@ export async function getInitialSnapshot(): Promise<LeaderboardSnapshot> {
     username: p.username ?? null,
     rank: i + 1,
     previousRank: i + 1,
+    isOnline: p.isOnline ?? false,
   }));
   return {
     generatedAt: new Date().toISOString(),

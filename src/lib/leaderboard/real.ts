@@ -2,11 +2,18 @@ import { asc, desc, eq, sql } from "drizzle-orm";
 import { dlog } from "@/lib/debug-log";
 import { countryCodeToFlag } from "@/lib/format/country";
 import type { Database } from "@/server/db/client";
-import { userPoints, users } from "@/server/db/schema";
+import { predictions, userPoints, users } from "@/server/db/schema";
 import { maskName, normalizePrivacy } from "@/server/privacy/apply";
 import type { LeaderboardSnapshot, Player } from "./types";
 
 const TOP_LIMIT = 100;
+
+/**
+ * Threshold para considerar un user "online" en el ranking. Si su
+ * `last_active_at` está dentro de este margen, mostramos el puntito
+ * verde. 24h es la regla acordada (docs/roadmap.md §1.1).
+ */
+const ONLINE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Construye un snapshot del leaderboard listando **todos los users**
@@ -23,6 +30,17 @@ const TOP_LIMIT = 100;
  * - `previousRank` queda igual a `rank` hasta `add-ranking-history`.
  */
 export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot> {
+  // Subselect: count de predictions por user, para tie-break por
+  // participación (4º criterio del desempate).
+  const predictionCountSubq = db
+    .select({
+      userId: predictions.userId,
+      total: sql<number>`count(*)::int`.as("pred_total"),
+    })
+    .from(predictions)
+    .groupBy(predictions.userId)
+    .as("pred_counts");
+
   const rows = await db
     .select({
       userId: users.id,
@@ -30,31 +48,41 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
       name: users.name,
       country: users.country,
       privacy: users.privacy,
+      lastActiveAt: users.lastActiveAt,
       points: userPoints.totalPoints,
       streak: userPoints.streak,
+      streakMax: userPoints.streakMax,
+      simpleHits: userPoints.simpleHits,
       correctCount: userPoints.correctCount,
+      predictionsTotal: predictionCountSubq.total,
     })
     .from(users)
     .leftJoin(userPoints, eq(userPoints.userId, users.id))
-    // Excluimos perfiles `private` del leaderboard global. Los
-    // `friends_only` también quedan fuera del ranking público hasta
-    // que aterrice `add-social-friends` con un toggle dedicado.
+    .leftJoin(predictionCountSubq, eq(predictionCountSubq.userId, users.id))
+    // Excluimos `private` y `friends_only` del leaderboard global.
     .where(sql`coalesce(${users.privacy}->>'visibility', 'public') = 'public'`)
-    .orderBy(desc(sql`coalesce(${userPoints.totalPoints}, 0)`), asc(users.createdAt))
+    // Tie-break: points → streakMax → simpleHits → predictionsTotal
+    //          → createdAt. Documentado en docs/scoring.md §X.
+    .orderBy(
+      desc(sql`coalesce(${userPoints.totalPoints}, 0)`),
+      desc(sql`coalesce(${userPoints.streakMax}, 0)`),
+      desc(sql`coalesce(${userPoints.simpleHits}, 0)`),
+      desc(sql`coalesce(${predictionCountSubq.total}, 0)`),
+      asc(users.createdAt),
+    )
     .limit(TOP_LIMIT);
 
   dlog("ranking", "getRealSnapshot", { users: rows.length });
 
+  const now = Date.now();
   const players: Player[] = rows.map((row, i) => {
     const privacy = normalizePrivacy(row.privacy);
-    // Si el user oculta puntos, sale en el ranking pero como
-    // "Anónimo" sin score visible. Igual su rank se mantiene
-    // (no le saltamos a otros).
     const visiblePoints = privacy.showPoints ? row.points ?? 0 : 0;
+    const isOnline = row.lastActiveAt
+      ? now - row.lastActiveAt.getTime() <= ONLINE_WINDOW_MS
+      : false;
     return {
       id: row.userId,
-      // Si oculta el username (porque tiene visibilidad limitada en
-      // perfil), tampoco lo exponemos en el row → no clicable.
       username: privacy.visibility === "public" ? row.username : null,
       name: maskName(row.name, privacy),
       countryCode: privacy.showCountry ? row.country ?? "" : "",
@@ -65,6 +93,7 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
       correctCount: row.correctCount ?? 0,
       rank: i + 1,
       previousRank: i + 1,
+      isOnline,
     };
   });
 

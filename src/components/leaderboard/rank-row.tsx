@@ -51,12 +51,21 @@ export function RankRow({ player, index = 0 }: { player: Player; index?: number 
       </div>
       <div className="min-w-0">
         <div className="flex items-center gap-1.5 truncate text-sm font-extrabold text-foreground">
-          <CountryFlag
-            code={player.countryCode}
-            name={player.countryName}
-            size={18}
-            className="flex-shrink-0 rounded-sm"
-          />
+          <span className="relative flex-shrink-0">
+            <CountryFlag
+              code={player.countryCode}
+              name={player.countryName}
+              size={18}
+              className="rounded-sm"
+            />
+            {player.isOnline && (
+              <span
+                aria-label="Online"
+                title="Online"
+                className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-card bg-success"
+              />
+            )}
+          </span>
           <span className="truncate">{player.name}</span>
         </div>
         <div className="mt-0.5 flex items-center gap-2">

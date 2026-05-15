@@ -275,7 +275,15 @@ async function persistScore({
     });
   }
 
-  // 2) user_points: upsert. `correctCount` solo crece si fue hit.
+  // 2) user_points: upsert.
+  //    - `correctCount` solo crece si fue hit.
+  //    - `streakMax` siempre se queda en el máximo histórico (no se
+  //      resetea cuando la racha cae).
+  //    - `simpleHits` se incrementa SOLO cuando el hit fue de tipo
+  //      `simple` o `exact` (no con `double-*`). Es el 3er criterio
+  //      del desempate del ranking.
+  const isHighQualityHit = scored.kind === "simple" || scored.kind === "exact";
+  const newStreakMaxSql = sql`greatest(${userPoints.streakMax}, ${scored.streakAfter.current})`;
   await db
     .insert(userPoints)
     .values({
@@ -283,6 +291,8 @@ async function persistScore({
       totalPoints: scored.points,
       correctCount: isHit ? 1 : 0,
       streak: scored.streakAfter.current,
+      streakMax: scored.streakAfter.current,
+      simpleHits: isHighQualityHit ? 1 : 0,
     })
     .onConflictDoUpdate({
       target: userPoints.userId,
@@ -290,6 +300,8 @@ async function persistScore({
         totalPoints: sql`${userPoints.totalPoints} + ${scored.points}`,
         correctCount: sql`${userPoints.correctCount} + ${isHit ? 1 : 0}`,
         streak: scored.streakAfter.current,
+        streakMax: newStreakMaxSql,
+        simpleHits: sql`${userPoints.simpleHits} + ${isHighQualityHit ? 1 : 0}`,
         updatedAt: sql`now()`,
       },
     });
