@@ -62,9 +62,11 @@ describe("<MiniLeaderboard>", () => {
     expect(screen.getByRole("listitem", { name: /Tu posición.*42/ })).toBeInTheDocument();
   });
 
-  it("renders 'Ver ranking completo' CTA", () => {
+  it("renders 'Ver ranking completo' CTA linking to /ranking", () => {
     const view: MiniLeaderboardView = { top, me: null };
     renderWithProviders(<MiniLeaderboard mini={view} />);
-    expect(screen.getByRole("button", { name: /Ver ranking completo/ })).toBeInTheDocument();
+    const link = screen.getByRole("link", { name: /Ver ranking completo/ });
+    expect(link).toBeInTheDocument();
+    expect(link.getAttribute("href")).toMatch(/\/ranking$/);
   });
 });

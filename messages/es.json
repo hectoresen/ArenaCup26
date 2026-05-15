@@ -25,7 +25,8 @@
     "podium": {
       "pointsLabel": "puntos",
       "ariaPosition": "Posición {place}: {name}, {country}, {points} puntos"
-    }
+    },
+    "marketingCopy": "Predice los partidos del Mundial 2026 gratis. Compite con amigos o con gente de todo el mundo, sube en el ranking y desbloquea logros."
   },
   "joinCta": {
     "button": "Predecir ahora",
@@ -287,7 +288,8 @@
       "legendary": "Legendario",
       "mythic": "Mítico",
       "goat": "GOAT"
-    }
+    },
+    "backToHome": "Volver al panel"
   },
   "dashboard": {
     "greeting": "Hola, <em>{name}</em> 👋",
@@ -298,7 +300,9 @@
       "points": "Puntos",
       "streak": "En racha",
       "streakNone": "Sin racha",
-      "achievements": "Logros"
+      "achievements": "Logros",
+      "rank": "Mi posición",
+      "rankNone": "Sin posición"
     },
     "sections": {
       "live": "En vivo ahora",
@@ -353,7 +357,8 @@
       "youTag": "(tú)",
       "ariaMyRow": "Tu posición: número {rank}, {name}, {points} puntos",
       "ariaRow": "Posición {rank}: {name}, {points} puntos"
-    }
+    },
+    "streakChip": "Racha {count}"
   },
   "appShell": {
     "brand": {

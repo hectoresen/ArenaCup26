@@ -25,7 +25,8 @@
     "podium": {
       "pointsLabel": "نقاط",
       "ariaPosition": "المركز {place}: {name}، {country}، {points} نقطة"
-    }
+    },
+    "marketingCopy": "توقّع مباريات كأس العالم 2026 مجانًا. نافس أصدقاءك أو لاعبين من جميع أنحاء العالم، تقدّم في التصنيف وافتح الإنجازات."
   },
   "joinCta": {
     "button": "توقّع الآن",
@@ -287,7 +288,8 @@
       "legendary": "أسطوري",
       "mythic": "أسطوري نادر",
       "goat": "الأعظم"
-    }
+    },
+    "backToHome": "العودة إلى اللوحة"
   },
   "dashboard": {
     "greeting": "مرحبًا، <em>{name}</em> 👋",
@@ -298,7 +300,9 @@
       "points": "النقاط",
       "streak": "في سلسلة",
       "streakNone": "بدون سلسلة",
-      "achievements": "الإنجازات"
+      "achievements": "الإنجازات",
+      "rank": "موقعي",
+      "rankNone": "بدون موقع"
     },
     "sections": {
       "live": "مباشر الآن",
@@ -353,7 +357,8 @@
       "youTag": "(أنت)",
       "ariaMyRow": "ترتيبك: رقم {rank}، {name}، {points} نقطة",
       "ariaRow": "الترتيب {rank}: {name}، {points} نقطة"
-    }
+    },
+    "streakChip": "سلسلة {count}"
   },
   "appShell": {
     "brand": {

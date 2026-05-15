@@ -25,7 +25,8 @@
     "podium": {
       "pointsLabel": "points",
       "ariaPosition": "Position {place}: {name}, {country}, {points} points"
-    }
+    },
+    "marketingCopy": "Predict 2026 World Cup matches for free. Compete with friends or anyone in the world, climb the ranking and unlock achievements."
   },
   "joinCta": {
     "button": "Predict now",
@@ -287,7 +288,8 @@
       "legendary": "Legendary",
       "mythic": "Mythic",
       "goat": "GOAT"
-    }
+    },
+    "backToHome": "Back to dashboard"
   },
   "dashboard": {
     "greeting": "Hi, <em>{name}</em> 👋",
@@ -298,7 +300,9 @@
       "points": "Points",
       "streak": "On fire",
       "streakNone": "No streak",
-      "achievements": "Achievements"
+      "achievements": "Achievements",
+      "rank": "My rank",
+      "rankNone": "Unranked"
     },
     "sections": {
       "live": "Live now",
@@ -353,7 +357,8 @@
       "youTag": "(you)",
       "ariaMyRow": "Your position: number {rank}, {name}, {points} points",
       "ariaRow": "Position {rank}: {name}, {points} points"
-    }
+    },
+    "streakChip": "Streak {count}"
   },
   "appShell": {
     "brand": {

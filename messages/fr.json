@@ -25,7 +25,8 @@
     "podium": {
       "pointsLabel": "points",
       "ariaPosition": "Position {place} : {name}, {country}, {points} points"
-    }
+    },
+    "marketingCopy": "Prédis les matchs de la Coupe du Monde 2026 gratuitement. Affronte tes amis ou des joueurs du monde entier, grimpe au classement et débloque des succès."
   },
   "joinCta": {
     "button": "Prédire maintenant",
@@ -287,7 +288,8 @@
       "legendary": "Légendaire",
       "mythic": "Mythique",
       "goat": "GOAT"
-    }
+    },
+    "backToHome": "Retour au tableau"
   },
   "dashboard": {
     "greeting": "Salut, <em>{name}</em> 👋",
@@ -298,7 +300,9 @@
       "points": "Points",
       "streak": "En série",
       "streakNone": "Sans série",
-      "achievements": "Succès"
+      "achievements": "Succès",
+      "rank": "Ma position",
+      "rankNone": "Sans position"
     },
     "sections": {
       "live": "En direct",
@@ -353,7 +357,8 @@
       "youTag": "(toi)",
       "ariaMyRow": "Ta position : numéro {rank}, {name}, {points} points",
       "ariaRow": "Position {rank} : {name}, {points} points"
-    }
+    },
+    "streakChip": "Série {count}"
   },
   "appShell": {
     "brand": {

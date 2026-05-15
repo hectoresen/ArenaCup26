@@ -22,18 +22,34 @@ export function Hero({ userName, stats }: Props) {
   const first = firstName(userName);
   const isNew = stats.rank === null;
 
+  // Mostrar el chip de racha al lado del saludo solo cuando hay
+  // racha activa (≥1). Cero → no se muestra (no aporta nada). La
+  // antigua card central de "streak" se sustituye por "posición"
+  // que es mucho más accionable para el user.
+  const streakActive = stats.streak >= 1;
+
   return (
     <section
       aria-label={t("subtitle", { rank: stats.rank ?? 0, total: stats.totalPlayers })}
       className="mb-1 [animation:fadeUp_0.55s_ease_0.06s_forwards] opacity-0"
     >
-      <div className="mb-1 font-display text-[30px] leading-[1.1] tracking-[0.02em]">
-        {first
-          ? t.rich("greeting", {
-              name: first,
-              em: (chunks) => <em className="not-italic text-gold">{chunks}</em>,
-            })
-          : t("greetingNew")}
+      <div className="mb-1 flex items-start justify-between gap-3">
+        <div className="font-display text-[30px] leading-[1.1] tracking-[0.02em]">
+          {first
+            ? t.rich("greeting", {
+                name: first,
+                em: (chunks) => <em className="not-italic text-gold">{chunks}</em>,
+              })
+            : t("greetingNew")}
+        </div>
+        {streakActive && (
+          <span
+            aria-label={t("miniStats.streak") + ` ${stats.streak}`}
+            className="mt-1 flex-shrink-0 rounded-full border-[1.5px] border-warm/40 bg-warm/[0.08] px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.08em] text-warm"
+          >
+            🔥 {t("streakChip", { count: stats.streak })}
+          </span>
+        )}
       </div>
       <div className="mb-[18px] text-[13px] font-bold text-muted">
         {isNew
@@ -55,13 +71,13 @@ export function Hero({ userName, stats }: Props) {
           ariaLabel={`${stats.totalPoints} ${t("miniStats.points")}`}
         />
         <MiniStat
-          value={stats.streak >= 3 ? `🔥 ${stats.streak}` : `${stats.streak}`}
-          label={stats.streak >= 3 ? t("miniStats.streak") : t("miniStats.streakNone")}
-          tone="amber"
+          value={stats.rank !== null ? `#${stats.rank}` : "—"}
+          label={t("miniStats.rank")}
+          tone="gold"
           ariaLabel={
-            stats.streak >= 3
-              ? `${t("miniStats.streak")} ${stats.streak}`
-              : t("miniStats.streakNone")
+            stats.rank !== null
+              ? `${t("miniStats.rank")} ${stats.rank}`
+              : t("miniStats.rankNone")
           }
         />
         <MiniStat

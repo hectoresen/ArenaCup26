@@ -1,4 +1,5 @@
 import { CountryFlag } from "@/components/common/country-flag";
+import { Link } from "@/i18n/navigation";
 import { type PointsLocale, formatPoints } from "@/lib/format/number";
 import type { LeaderboardEntry, MiniLeaderboardView } from "@/server/dashboard/types";
 import { useLocale, useTranslations } from "next-intl";
@@ -32,12 +33,12 @@ export function MiniLeaderboard({ mini }: Props) {
         )}
       </ul>
       <div className="mt-2 pr-1 text-right">
-        <button
-          type="button"
-          className="inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-xs font-extrabold text-gold transition-[gap] hover:gap-2"
+        <Link
+          href="/ranking"
+          className="inline-flex cursor-pointer items-center gap-1 text-xs font-extrabold text-gold no-underline transition-[gap] hover:gap-2"
         >
           {t("viewFullRanking")} <span aria-hidden="true">→</span>
-        </button>
+        </Link>
       </div>
     </>
   );

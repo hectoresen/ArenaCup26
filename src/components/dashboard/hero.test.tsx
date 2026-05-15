@@ -44,15 +44,20 @@ describe("<Hero>", () => {
     expect(screen.getByText("1.840")).toBeInTheDocument();
   });
 
-  it("shows '🔥 5' when streak ≥ 3", () => {
+  it("shows streak chip 🔥 next to greeting when streak ≥ 1", () => {
     renderWithProviders(<Hero userName="Carlos Mendoza" stats={baseStats} />);
-    expect(screen.getByText(/🔥 5/)).toBeInTheDocument();
-    expect(screen.getByText("En racha")).toBeInTheDocument();
+    expect(screen.getByText(/🔥/)).toBeInTheDocument();
+    expect(screen.getByText(/Racha 5/)).toBeInTheDocument();
   });
 
-  it("shows 'Sin racha' label when streak < 3", () => {
-    renderWithProviders(<Hero userName="Carlos Mendoza" stats={{ ...baseStats, streak: 1 }} />);
-    expect(screen.getByText("Sin racha")).toBeInTheDocument();
+  it("does not show streak chip when streak is 0", () => {
+    renderWithProviders(<Hero userName="Carlos Mendoza" stats={{ ...baseStats, streak: 0 }} />);
+    expect(screen.queryByText(/🔥/)).not.toBeInTheDocument();
+  });
+
+  it("shows rank '#N' in the middle mini-stat when ranked", () => {
+    renderWithProviders(<Hero userName="Carlos Mendoza" stats={baseStats} />);
+    expect(screen.getByText("#42")).toBeInTheDocument();
   });
 
   it("shows achievements fraction X/Y", () => {

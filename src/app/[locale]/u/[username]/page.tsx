@@ -3,6 +3,7 @@ import { ThrottledState } from "@/components/common/throttled-state";
 import { AchievementsAccordion } from "@/components/public-profile/achievements-accordion";
 import { ProfileHero } from "@/components/public-profile/profile-hero";
 import { StatsRow } from "@/components/public-profile/stats-row";
+import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { checkPublicReadLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
@@ -10,7 +11,7 @@ import { db } from "@/server/db/client";
 import { getPublicProfile } from "@/server/public-profile/queries";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 /**
@@ -61,10 +62,23 @@ export default async function PublicProfilePage({
   const profile = await getPublicProfile(db, username, viewerId);
   if (!profile) notFound();
 
+  const isOwner = Boolean(
+    viewerId && session?.user?.username === profile.identity.username,
+  );
+  const t = await getTranslations({ locale, namespace: "publicProfile" });
+
   return (
     <>
       <TopChrome user={session?.user ?? null} />
       <main className="relative z-10 mx-auto max-w-[560px] px-5 py-9 pt-16">
+        {isOwner && (
+          <Link
+            href="/inicio"
+            className="mb-4 inline-flex cursor-pointer items-center gap-1.5 text-xs font-extrabold text-gold no-underline transition-[gap] hover:gap-2.5"
+          >
+            <span aria-hidden="true">←</span> {t("backToHome")}
+          </Link>
+        )}
         <ProfileHero identity={profile.identity} />
         <StatsRow stats={profile.stats} />
         <AchievementsAccordion

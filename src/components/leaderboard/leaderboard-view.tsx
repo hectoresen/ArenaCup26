@@ -63,6 +63,11 @@ export function LeaderboardView({
             <span aria-label={t("hostFlags.usa")}>🇺🇸</span>
           </div>
           <LiveBadge>{t("liveBadge")}</LiveBadge>
+          {!user && (
+            <p className="mx-auto mt-4 max-w-[480px] text-[12px] font-bold leading-relaxed text-muted">
+              {t("marketingCopy")}
+            </p>
+          )}
         </header>
 
         {first && second && third && (
