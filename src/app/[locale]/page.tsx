@@ -1,8 +1,12 @@
+import { headers } from "next/headers";
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { LeaderboardView } from "@/components/leaderboard/leaderboard-view";
+import { ThrottledState } from "@/components/common/throttled-state";
 import { auth } from "@/lib/auth";
 import { getRealSnapshot } from "@/lib/leaderboard/real";
+import { checkPublicReadLimit } from "@/lib/rate-limit";
+import { getRequestIp } from "@/lib/request-ip";
 import { db } from "@/server/db/client";
 
 export default async function HomePage({
@@ -12,6 +16,16 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  // Rate limit por IP. Antes que cualquier I/O caro (query a BD,
+  // resolución de sesión) para que un scraper no nos cueste recursos
+  // antes de ser bloqueado. 60 req/60s permite ráfagas humanas
+  // normales (recarga + click + recarga rápida) sin penalizar.
+  const ip = getRequestIp(await headers());
+  const rl = await checkPublicReadLimit(ip);
+  if (!rl.ok) {
+    return <ThrottledState />;
+  }
 
   // Si el visitante ya está autenticado, la landing pública no le
   // aporta nada — lo llevamos directo al panel. Cubre cualquier flujo

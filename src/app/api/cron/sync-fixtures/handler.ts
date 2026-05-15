@@ -1,4 +1,5 @@
 import { checkCronLimit } from "@/lib/rate-limit";
+import { getRequestIp } from "@/lib/request-ip";
 import type { SyncReport } from "@/server/match-data/sync/types";
 import { ProviderError } from "@/server/match-data/types";
 
@@ -45,10 +46,8 @@ export async function handleCronRequest(
 
   // Rate limit por IP tras pasar auth. El bearer es la primera línea
   // de defensa; si un atacante consigue el secret y empieza a spamear,
-  // este límite (6 req/60s) le frena. La IP viene del proxy de
-  // Railway en `x-forwarded-for`; fallback a placeholder para que el
-  // rate-limit no se rompa cuando no hay header (e.g. tests).
-  const ip = (req.headers.get("x-forwarded-for") ?? "unknown").split(",")[0]?.trim() ?? "unknown";
+  // este límite (6 req/60s) le frena.
+  const ip = getRequestIp(req.headers);
   const rl = await checkCronLimit(ip);
   if (!rl.ok) {
     return { status: 429, body: { error: "rate_limited" } };

@@ -1,9 +1,13 @@
+import { dlog } from "@/lib/debug-log";
 import { env } from "@/lib/env";
+import { checkSignupLimit } from "@/lib/rate-limit";
+import { getRequestIp } from "@/lib/request-ip";
 import { db } from "@/server/db/client";
 import { accounts, sessions, users, verificationTokens } from "@/server/db/schema";
 import { resolveAvailableUsername, slugifyName } from "@/server/users/username";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 
@@ -52,6 +56,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   callbacks: {
+    async signIn({ user }) {
+      // Solo aplica rate-limit al PRIMER login de un user (cuando el
+      // adapter aún no le ha asignado id porque va a crearlo). Logins
+      // sucesivos de un user existente no crean fila nueva en `users`
+      // y por tanto no son interesantes para el limiter de signup.
+      const isFirstLogin = !user.id;
+      if (!isFirstLogin) return true;
+
+      try {
+        const ip = getRequestIp(await headers());
+        const rl = await checkSignupLimit(ip);
+        if (!rl.ok) {
+          dlog("ranking", "signup rate-limited", { ip: ip.slice(0, 8) });
+          return false; // bloquea el flow de OAuth con error genérico
+        }
+      } catch (err) {
+        // Si el rate-limit falla por cualquier motivo, permitimos —
+        // mejor un signup de más que cortar a un usuario legítimo
+        // por un problema de infra interna.
+        dlog("ranking", "signup limit check failed", {
+          err: err instanceof Error ? err.message : String(err),
+        });
+      }
+      return true;
+    },
     async session({ session, user }) {
       if (!session.user) return session;
       session.user.id = user.id;

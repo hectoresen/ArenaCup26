@@ -199,12 +199,18 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 - **Impacto**: queja legal posible (RGPD: minimization, transparencia), reputacional.
 - **Mitigación**: implementar `add-profile-privacy` (opt-out granular) antes de lanzamiento. Mientras tanto, ningún dato realmente sensible (email, dirección, teléfono) está expuesto.
 
-#### CRIT-5 · Sin rate-limit en publicRead + signup todavía
+#### CRIT-5 · ✅ Resuelto: rate-limit wireado en publicRead + signup (2026-05-15)
 
-- **Riesgo**: aunque el módulo existe, falta wirear los limiters en landing/perfil público y signup callback de Auth.js. Un atacante puede:
-  - Scrappear el ranking + perfiles públicos masivamente (DoS sobre BD).
-  - Crear miles de cuentas con cuentas Google deshechables.
-- **Mitigación**: completar tasks §7 de `add-rate-limiting` (las 2 pendientes).
+- **Riesgo**: scraping masivo del ranking/perfiles públicos (DoS sobre BD) y creación masiva de cuentas con Google deshechables.
+- **Estado**: completado.
+  - `publicReadLimiter` (60/60s por IP) en `src/app/[locale]/page.tsx` y `src/app/[locale]/u/[username]/page.tsx`. Si rebasa, renderiza `<ThrottledState>` con un mensaje friendly (status 200 — limitación de Server Components; para 429 real haría falta middleware, deuda apuntada en WEAK-11).
+  - `signupLimiter` (5/3600s por IP) en el callback `signIn` de Auth.js. Detecta primer login (`!user.id`) y bloquea con `return false` si rebasa.
+  - Política fail-open: si el rate-limit falla por motivo de infra, permite la request (mejor que cortar a un usuario legítimo).
+
+#### WEAK-11 · Status 429 real en publicRead requiere middleware
+
+- **Riesgo**: cuando `publicReadLimiter` bloquea un page render, devolvemos HTML 200 con UI "demasiadas peticiones" en lugar de un 429 HTTP real. Los humanos lo verán bien; los bots de scrapeo no lo entenderán como rate-limit.
+- **Mitigación futura**: mover el check a `src/middleware.ts` con un client compatible con Edge runtime (`@upstash/redis` lo soporta vía REST). Aplazado: bloqueante para scrapers, no para usuarios reales.
 
 ### 8.2 Puntos débiles (mejorables, no bloqueantes)
 
@@ -280,7 +286,7 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 - [x] ~~CRIT-2: actualizar drizzle-orm a ≥0.45.2 + verificar suite verde.~~ (2026-05-15)
 - [ ] CRIT-3: validar CRON_SECRET sincronizado en Railway + GitHub.
 - [ ] CRIT-4: implementar `add-profile-privacy` con default sensato (público es OK si comunicamos claramente).
-- [ ] CRIT-5: terminar wiring de `add-rate-limiting` (publicRead + signup).
+- [x] ~~CRIT-5: terminar wiring de `add-rate-limiting` (publicRead + signup).~~ (2026-05-15)
 - [ ] Configurar UPSTASH_REDIS_REST_URL/TOKEN en Railway (sin esto el rate limit es noop).
 - [ ] WEAK-2: implementar `add-error-monitoring` (Sentry) + alertas Slack.
 - [ ] Política de privacidad pública en `/privacy` o `/legal`.

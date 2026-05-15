@@ -1,11 +1,15 @@
 import { TopChrome } from "@/components/layout/top-chrome";
+import { ThrottledState } from "@/components/common/throttled-state";
 import { AchievementsAccordion } from "@/components/public-profile/achievements-accordion";
 import { ProfileHero } from "@/components/public-profile/profile-hero";
 import { StatsRow } from "@/components/public-profile/stats-row";
 import { auth } from "@/lib/auth";
+import { checkPublicReadLimit } from "@/lib/rate-limit";
+import { getRequestIp } from "@/lib/request-ip";
 import { db } from "@/server/db/client";
 import { getPublicProfile } from "@/server/public-profile/queries";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
@@ -42,6 +46,15 @@ export default async function PublicProfilePage({
 }) {
   const { locale, username } = await params;
   setRequestLocale(locale);
+
+  // Rate limit antes de cualquier query. Mismo cupo que la landing
+  // (60 req/60s) — un scraper que recorra `/u/<username>` no debe
+  // consumir nuestra BD.
+  const ip = getRequestIp(await headers());
+  const rl = await checkPublicReadLimit(ip);
+  if (!rl.ok) {
+    return <ThrottledState />;
+  }
 
   const profile = await getPublicProfile(db, username);
   if (!profile) notFound();
