@@ -27,7 +27,6 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.4",
-    "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "drizzle-orm": "^0.45.2",
     "next": "^15.1.6",

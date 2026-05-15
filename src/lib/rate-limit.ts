@@ -1,4 +1,3 @@
-import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { dlog } from "@/lib/debug-log";
 
@@ -12,31 +11,39 @@ const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const NODE_ENV = process.env.NODE_ENV;
 
 /**
- * Rate limiting con Upstash. Defendemos los puntos donde un atacante
- * o bot podría hacer daño con poco esfuerzo:
+ * Rate limiting "casero" sobre Upstash Redis (o adapter HTTP
+ * compatible). No usamos `@upstash/ratelimit` directamente porque
+ * ese paquete ejecuta scripts Lua vía `EVALSHA`, y el adapter HTTP
+ * que tenemos en Railway (`luggapugga/serverless-redis`) no
+ * implementa Lua (responde `NoScript: No matching script`).
+ * Implementamos un **fixed window counter** con `INCR` + `EXPIRE`
+ * — comandos básicos que cualquier Redis (o adapter HTTP) entiende.
  *
- *  - `submitPredictionLimiter`: 10 submits / 60s por userId. Un user
- *    legítimo predice una decena de partidos seguidos como mucho.
- *  - `cronLimiter`: 6 req / 60s por IP. Defensa frente a un atacante
- *    que descubre la URL del cron y la spamea antes de pasar el
- *    bearer. El propio bearer es la primera defensa; esto es la
- *    segunda.
- *  - `publicReadLimiter`: 60 req / 60s por IP para `/` y
- *    `/u/<username>`. Permite ráfagas humanas sin penalizar pero
- *    corta scrapers.
- *  - `signupLimiter`: 5 signups / hora por IP. Auth.js callback
- *    Google es el único path donde se crean rows nuevos en `users`.
+ * Fixed window vs sliding window: fixed es menos preciso (un user
+ * puede hacer `limit` requests al final de una ventana + `limit`
+ * más al principio de la siguiente). Para nuestros umbrales (10
+ * por minuto, 60 por minuto, etc.) es perfectamente suficiente y
+ * no vamos a ver burst-abuse a esa escala temporal.
+ *
+ * Defendemos los puntos donde un atacante o bot podría hacer daño:
+ *
+ *  - `submit`:     10 / 60s    por userId. Predicción legítima ≪ 10/min.
+ *  - `cron`:        6 / 60s    por IP. Segunda línea tras el bearer.
+ *  - `publicRead`: 60 / 60s    por IP en `/` y `/u/<username>`.
+ *  - `signup`:      5 / 3600s  por IP. Anti-creación masiva de cuentas.
  *
  * **Modo noop**: si `UPSTASH_REDIS_REST_URL` o `..._TOKEN` no están
- * set, los limiters siempre devuelven `success: true`. Útil para dev
- * local sin Upstash y para que el deploy no falle si la BD Redis no
- * está aún configurada en Railway. En producción dejarlo así sería
- * NO tener rate limiting — el deploy log lo avisa con un warning.
+ * set, los checks siempre devuelven `ok: true`. Útil para dev local
+ * sin Redis y para que el deploy no falle si la BD no está aún
+ * configurada. En producción el módulo emite warning al arrancar.
+ *
+ * **Política fail-open**: si Redis falla por cualquier motivo, el
+ * check permite la request. Mejor abuso temporal que cortar a un
+ * usuario legítimo por un problema de infra interna.
  */
 
 type LimiterConfig = {
   name: "submit" | "cron" | "publicRead" | "signup";
-  /** "10 r/60 s" expresado como tuple [count, window]. */
   limit: number;
   windowSec: number;
 };
@@ -47,6 +54,8 @@ const CONFIGS: LimiterConfig[] = [
   { name: "publicRead", limit: 60, windowSec: 60 },
   { name: "signup", limit: 5, windowSec: 3600 },
 ];
+
+const CONFIG_BY_NAME = new Map(CONFIGS.map((c) => [c.name, c]));
 
 const isEnabled = Boolean(REDIS_URL) && Boolean(REDIS_TOKEN);
 
@@ -64,63 +73,59 @@ const redis = isEnabled
     })
   : null;
 
-function buildLimiter(config: LimiterConfig): Ratelimit | null {
-  if (!redis) return null;
-  return new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(config.limit, `${config.windowSec} s`),
-    prefix: `wm:rl:${config.name}`,
-    analytics: false,
-  });
-}
-
-const submitInstance = buildLimiter(CONFIGS[0]!);
-const cronInstance = buildLimiter(CONFIGS[1]!);
-const publicReadInstance = buildLimiter(CONFIGS[2]!);
-const signupInstance = buildLimiter(CONFIGS[3]!);
-
 export type RateLimitResult = {
   ok: boolean;
   /** Cuántos quedan en la ventana actual. */
   remaining: number;
-  /** Cuándo se resetea la ventana (timestamp ms). */
+  /** Timestamp ms aproximado en el que se resetea la ventana. */
   reset: number;
 };
 
 /**
- * Comprueba un limiter contra un identificador. Si los limiters están
- * deshabilitados (noop), siempre devuelve `ok: true` con números
- * placeholder.
+ * Fixed window counter: clave `wm:rl:<scope>:<id>:<bucketEpoch>`.
+ * En el primer hit del bucket hace `INCR` (→1) y `EXPIRE` con el
+ * tamaño exacto de la ventana, así la clave se autodestruye cuando
+ * cierra. Re-hits incrementan sin tocar el TTL.
  */
 async function check(
-  instance: Ratelimit | null,
   scope: LimiterConfig["name"],
   identifier: string,
 ): Promise<RateLimitResult> {
-  if (!instance) {
+  if (!redis) {
     return { ok: true, remaining: 999, reset: 0 };
   }
+  const config = CONFIG_BY_NAME.get(scope);
+  if (!config) {
+    return { ok: true, remaining: 999, reset: 0 };
+  }
+
+  const now = Date.now();
+  const bucketIndex = Math.floor(now / (config.windowSec * 1000));
+  const key = `wm:rl:${scope}:${identifier}:${bucketIndex}`;
+  const bucketEnd = (bucketIndex + 1) * config.windowSec * 1000;
+
   try {
-    const result = await instance.limit(identifier);
-    if (!result.success) {
-      // Solo loggeamos cuando se rechaza — un permitido no es
-      // interesante. Truncamos el identifier para no exponer IPs/IDs
-      // completos en los logs persistentes.
+    const count = await redis.incr(key);
+    if (count === 1) {
+      // Primera vez en este bucket → fijar TTL al cierre de la
+      // ventana. Re-hits no tocan el TTL (clave se autodestruye).
+      await redis.expire(key, config.windowSec);
+    }
+    const ok = count <= config.limit;
+    if (!ok) {
       dlog("ranking", "rate_limited", {
         scope,
         id: identifier.slice(0, 8),
-        reset: result.reset,
+        count,
+        limit: config.limit,
       });
     }
     return {
-      ok: result.success,
-      remaining: result.remaining,
-      reset: result.reset,
+      ok,
+      remaining: Math.max(0, config.limit - count),
+      reset: bucketEnd,
     };
   } catch (err) {
-    // Si Redis falla (latencia / down), preferimos no bloquear al
-    // usuario legítimo. Log y permitir. Esto se invierte cuando
-    // tengamos métricas de abuso real.
     dlog("ranking", "rate_limit_check_failed", {
       scope,
       err: err instanceof Error ? err.message : String(err),
@@ -130,19 +135,19 @@ async function check(
 }
 
 export async function checkSubmitLimit(userId: string): Promise<RateLimitResult> {
-  return check(submitInstance, "submit", userId);
+  return check("submit", userId);
 }
 
 export async function checkCronLimit(ip: string): Promise<RateLimitResult> {
-  return check(cronInstance, "cron", ip);
+  return check("cron", ip);
 }
 
 export async function checkPublicReadLimit(ip: string): Promise<RateLimitResult> {
-  return check(publicReadInstance, "publicRead", ip);
+  return check("publicRead", ip);
 }
 
 export async function checkSignupLimit(ip: string): Promise<RateLimitResult> {
-  return check(signupInstance, "signup", ip);
+  return check("signup", ip);
 }
 
 /** Pura, para tests. Indica si la integración con Upstash está activa. */
