@@ -1,3 +1,4 @@
+import { CountryFlag } from "@/components/common/country-flag";
 import { type PointsLocale, formatPoints } from "@/lib/format/number";
 import type { LeaderboardEntry, MiniLeaderboardView } from "@/server/dashboard/types";
 import { useLocale, useTranslations } from "next-intl";
@@ -64,16 +65,19 @@ function Row({ entry, isMe }: { entry: LeaderboardEntry; isMe: boolean }) {
       </span>
       <div className="min-w-0">
         <span
-          className={`block truncate text-[13px] font-extrabold ${
+          className={`flex min-w-0 items-center gap-1.5 text-[13px] font-extrabold ${
             isMe ? "text-gold" : "text-foreground"
           }`}
         >
-          {entry.flag && (
-            <span className="me-1 text-sm" role="img" aria-label={entry.name}>
-              {entry.flag}
-            </span>
+          {entry.countryCode && (
+            <CountryFlag
+              code={entry.countryCode}
+              name={entry.name}
+              size={16}
+              className="flex-shrink-0 rounded-sm"
+            />
           )}
-          {entry.name}
+          <span className="truncate">{entry.name}</span>
           {isMe && (
             <span className="ms-1.5 text-[10px] font-extrabold uppercase tracking-[0.06em] text-gold/70">
               {t("youTag")}

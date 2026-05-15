@@ -7,7 +7,7 @@ function entry(rank: number, userId: string, points = 5000 - rank * 100): Leader
   return {
     userId,
     name: `User ${userId.toUpperCase()}`,
-    flag: "🇲🇽",
+    countryCode: "MX",
     points,
     rank,
   };

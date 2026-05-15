@@ -404,7 +404,7 @@ export async function getMiniLeaderboard(
   const top: LeaderboardEntry[] = topRows.map((row, idx) => ({
     userId: row.userId,
     name: row.name ?? "—",
-    flag: countryCodeToFlag(row.country),
+    countryCode: row.country,
     points: row.points,
     rank: idx + 1,
   }));
@@ -431,7 +431,7 @@ export async function getMiniLeaderboard(
     me = {
       userId,
       name: meData.name ?? "—",
-      flag: countryCodeToFlag(meData.country),
+      countryCode: meData.country,
       points: meData.points,
       rank: (meAheadRows[0]?.ahead ?? 0) + 1,
     };

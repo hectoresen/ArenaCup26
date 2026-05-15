@@ -94,7 +94,9 @@ export type Progress = {
 export type LeaderboardEntry = {
   userId: string;
   name: string;
-  flag: string | null;
+  /** ISO 3166-1 alpha-2 ("ES", "MX"…). Para renderizar con
+   *  `<CountryFlag code={...} />`. Null si el user no tiene país. */
+  countryCode: string | null;
   points: number;
   rank: number;
 };

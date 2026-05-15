@@ -1,3 +1,4 @@
+import { CountryFlag } from "@/components/common/country-flag";
 import type { ProfileIdentity } from "@/server/public-profile/types";
 import { useTranslations } from "next-intl";
 import { CopyLinkButton } from "./copy-link-button";
@@ -51,14 +52,12 @@ export function ProfileHero({ identity }: Props) {
           @{identity.username}
         </div>
 
-        {identity.country && identity.flag && (
+        {identity.country && (
           <div
             aria-label={t("flagAria", { country: identity.country })}
             className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-border bg-card-hover px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.1em] text-foreground"
           >
-            <span aria-hidden="true" className="text-sm">
-              {identity.flag}
-            </span>
+            <CountryFlag code={identity.country} name={identity.country} size={16} className="rounded-sm" />
             {identity.country}
           </div>
         )}

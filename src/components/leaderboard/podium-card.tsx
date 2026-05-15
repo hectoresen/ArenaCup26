@@ -1,3 +1,4 @@
+import { CountryFlag } from "@/components/common/country-flag";
 import { Link } from "@/i18n/navigation";
 import { formatPointsEs } from "@/lib/format/number";
 import type { Player } from "@/lib/leaderboard/types";
@@ -85,9 +86,14 @@ export function PodiumCard({ player, place }: { player: Player; place: Place }) 
       >
         {initials(player.name)}
       </div>
-      <span className="mb-1 block text-base" aria-label={player.countryName}>
-        {player.flag}
-      </span>
+      <div className="mb-1 flex justify-center">
+        <CountryFlag
+          code={player.countryCode}
+          name={player.countryName}
+          size={20}
+          className="rounded-sm"
+        />
+      </div>
       <div className="mb-1.5 truncate text-[11px] font-extrabold text-foreground">
         {player.name.split(" ")[0] ?? player.name}
       </div>
