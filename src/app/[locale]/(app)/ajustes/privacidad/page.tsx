@@ -3,6 +3,7 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { PrivacyForm } from "@/components/settings/privacy-form";
 import { PushOptIn } from "@/components/push/push-opt-in";
+import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { env } from "@/lib/env";
 import { db } from "@/server/db/client";
@@ -47,6 +48,18 @@ export default async function PrivacySettingsPage({
           <PushOptIn vapidPublicKey={env.NEXT_PUBLIC_VAPID_PUBLIC_KEY} />
         </div>
       )}
+
+      {/* Zona peligrosa: eliminar cuenta. Link discreto al final
+          para que el user lo encuentre cuando lo busque sin que
+          sea lo primero que ve. */}
+      <div className="mt-10 border-t-2 border-border pt-6">
+        <Link
+          href="/ajustes/eliminar-cuenta"
+          className="cursor-pointer text-[12px] font-extrabold text-danger no-underline hover:underline"
+        >
+          {t("deleteAccountLink")}
+        </Link>
+      </div>
     </section>
   );
 }

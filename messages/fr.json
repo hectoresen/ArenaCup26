@@ -82,6 +82,7 @@
   "privacy": {
     "title": "Confidentialité",
     "subtitle": "Choisis qui peut ouvrir ton profil. Les changements sont appliqués instantanément.",
+    "deleteAccountLink": "Supprimer mon compte →",
     "visibility": {
       "legend": "Qui peut voir ton profil ?",
       "intro": "Le classement affiche toujours tes infos basiques (nom, drapeau, points). Ce paramètre contrôle uniquement si quelqu'un peut ouvrir ton profil complet.",
@@ -132,6 +133,28 @@
       "title": "Pas encore de prédictions",
       "body": "Quand tu enverras ta première prédiction, elle apparaîtra ici avec son résultat et les points que tu as gagnés.",
       "cta": "Aller aux matchs"
+    }
+  },
+  "settings": {
+    "deleteAccount": {
+      "title": "Supprimer mon compte",
+      "subtitle": "Cette action est définitive. Nous supprimerons toutes tes données de WebMundial 26.",
+      "backToSettings": "Retour à Confidentialité",
+      "intro": "En supprimant ton compte, tu perds de manière irréversible :",
+      "bullets": {
+        "predictions": "Toutes tes prédictions et les points associés.",
+        "friends": "Ta liste d'amis et les demandes en attente.",
+        "achievements": "Tous les succès débloqués.",
+        "history": "Ton historique de classement et ton avatar choisi."
+      },
+      "agreeLabel": "Je comprends que cette action est irréversible.",
+      "confirmLabel": "Écris <phrase></phrase> pour confirmer :",
+      "submit": "Supprimer mon compte pour toujours",
+      "submitting": "Suppression…",
+      "error": {
+        "unauthorized": "Session expirée. Reconnecte-toi.",
+        "confirmation_mismatch": "Le texte ne correspond pas. Copie-le exactement."
+      }
     }
   },
   "matches": {
@@ -377,7 +400,12 @@
       "viewFullRanking": "Voir le classement complet",
       "youTag": "(toi)",
       "ariaMyRow": "Ta position : numéro {rank}, {name}, {points} points",
-      "ariaRow": "Position {rank} : {name}, {points} points"
+      "ariaRow": "Position {rank} : {name}, {points} points",
+      "tabsAriaLabel": "Basculer entre classement global et amis",
+      "tabGlobal": "Global",
+      "tabFriends": "Amis",
+      "emptyGlobal": "Personne dans le classement pour l'instant. Sois le premier.",
+      "emptyFriends": "Pas encore d'amis sur WebMundial."
     },
     "streakChip": "Série {count}"
   },

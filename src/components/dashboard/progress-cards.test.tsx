@@ -53,25 +53,29 @@ describe("<ProgressCards>", () => {
     expect(screen.getByText(/Empezamos a registrar el 11 de junio/)).toBeInTheDocument();
   });
 
-  it("shows '▲ +3 posiciones esta semana' when rankDelta > 0", () => {
+  it("shows '▲ +3 posiciones esta semana' when current rank improved 3 spots", () => {
+    // weekAgoRank=45, rank=42 → delta=+3 (subió 3). El delta se
+    // calcula a partir del primer punto de la sparkline; el rankDelta
+    // del prop se mantiene por compatibilidad de tipos pero ya no es
+    // la fuente de verdad.
     renderWithProviders(
       <ProgressCards
         progress={buildProgress({
-          rank: { rank: 42, rankDelta: 3, sparkline: [] },
+          rank: { rank: 42, rankDelta: 3, sparkline: [45, 44, 43, 42] },
         })}
         now={NOW}
       />,
     );
     expect(screen.getByText(/▲ \+3 posiciones esta semana/)).toBeInTheDocument();
-    // Y el placeholder desaparece
     expect(screen.queryByText(/Empezamos a registrar el 11 de junio/)).not.toBeInTheDocument();
   });
 
-  it("shows '▼ 2 posiciones esta semana' when rankDelta < 0", () => {
+  it("shows '▼ 2 posiciones esta semana' when current rank dropped 2 spots", () => {
+    // weekAgoRank=40, rank=42 → delta=-2 (bajó 2).
     renderWithProviders(
       <ProgressCards
         progress={buildProgress({
-          rank: { rank: 42, rankDelta: -2, sparkline: [] },
+          rank: { rank: 42, rankDelta: -2, sparkline: [40, 41, 42, 42] },
         })}
         now={NOW}
       />,
@@ -79,11 +83,11 @@ describe("<ProgressCards>", () => {
     expect(screen.getByText(/▼ 2 posiciones esta semana/)).toBeInTheDocument();
   });
 
-  it("shows 'Sin cambios esta semana' when rankDelta === 0", () => {
+  it("shows 'Sin cambios esta semana' when rank stayed flat", () => {
     renderWithProviders(
       <ProgressCards
         progress={buildProgress({
-          rank: { rank: 42, rankDelta: 0, sparkline: [] },
+          rank: { rank: 42, rankDelta: 0, sparkline: [42, 42, 42, 42] },
         })}
         now={NOW}
       />,

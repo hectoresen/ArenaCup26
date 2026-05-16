@@ -82,6 +82,7 @@
   "privacy": {
     "title": "Privacidad",
     "subtitle": "Decide quién puede ver tu perfil. Los cambios se aplican al instante.",
+    "deleteAccountLink": "Eliminar mi cuenta →",
     "visibility": {
       "legend": "¿Quién puede ver tu perfil?",
       "intro": "El ranking siempre muestra tu información básica (nombre, bandera, puntos). Esto controla solo si alguien puede abrir tu perfil completo.",
@@ -132,6 +133,28 @@
       "title": "Aún no has predicho nada",
       "body": "Cuando hagas tu primera predicción, aparecerá aquí con su resultado y los puntos que ganaste.",
       "cta": "Ir a partidos"
+    }
+  },
+  "settings": {
+    "deleteAccount": {
+      "title": "Eliminar mi cuenta",
+      "subtitle": "Esta acción es definitiva. Borraremos toda tu información de WebMundial 26.",
+      "backToSettings": "Volver a Privacidad",
+      "intro": "Al eliminar tu cuenta perderás de forma irreversible:",
+      "bullets": {
+        "predictions": "Todas tus predicciones y los puntos asociados.",
+        "friends": "Tu lista de amigos y las solicitudes pendientes.",
+        "achievements": "Todos los logros desbloqueados.",
+        "history": "Tu histórico de ranking y avatar elegido."
+      },
+      "agreeLabel": "Entiendo que esta acción no se puede deshacer.",
+      "confirmLabel": "Escribe <phrase></phrase> para confirmar:",
+      "submit": "Eliminar mi cuenta para siempre",
+      "submitting": "Eliminando…",
+      "error": {
+        "unauthorized": "Sesión expirada. Vuelve a iniciar sesión.",
+        "confirmation_mismatch": "El texto no coincide. Cópialo exactamente."
+      }
     }
   },
   "matches": {
@@ -377,7 +400,12 @@
       "viewFullRanking": "Ver ranking completo",
       "youTag": "(tú)",
       "ariaMyRow": "Tu posición: número {rank}, {name}, {points} puntos",
-      "ariaRow": "Posición {rank}: {name}, {points} puntos"
+      "ariaRow": "Posición {rank}: {name}, {points} puntos",
+      "tabsAriaLabel": "Cambiar entre ranking global y amigos",
+      "tabGlobal": "Global",
+      "tabFriends": "Amigos",
+      "emptyGlobal": "Aún no hay nadie en el ranking. Sé el primero.",
+      "emptyFriends": "Aún no tienes amigos en WebMundial."
     },
     "streakChip": "Racha {count}"
   },

@@ -2,6 +2,7 @@ import { countryCodeToFlag } from "@/lib/format/country";
 import type { Database } from "@/server/db/client";
 import {
   achievementDefinitions,
+  friendships,
   matches,
   predictions,
   teams,
@@ -12,13 +13,15 @@ import {
 import { getRankHistory } from "@/server/ranking-history/queries";
 import { computeProvisionalScore } from "@/server/scoring/pipeline";
 import type { MatchStage } from "@/server/scoring/types";
-import { and, asc, desc, eq, gt, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { UPCOMING_LIMIT, buildMiniLeaderboard, sortUpcomingMatches } from "./transforms";
 import type {
   DashboardData,
+  FriendsMiniLeaderboardView,
   LeaderboardEntry,
   LiveMatchView,
+  MiniLeaderboardData,
   MiniLeaderboardView,
   PredictionView,
   Progress,
@@ -44,14 +47,17 @@ export async function getDashboardData(db: Database, userId: string): Promise<Da
     .limit(1);
   const userName = userRow[0]?.name ?? "";
 
-  const [stats, live, upcomingRaw, progress, miniRaw, achievementsTotal] = await Promise.all([
-    getUserStats(db, userId),
-    getLiveMatchForUser(db, userId),
-    getUpcomingMatches(db, userId, UPCOMING_LIMIT * 2),
-    getProgress(db, userId),
-    getMiniLeaderboard(db, userId, 5),
-    countAchievementDefinitions(db),
-  ]);
+  const [stats, live, upcomingRaw, progress, miniGlobal, miniFriends, achievementsTotal] =
+    await Promise.all([
+      getUserStats(db, userId),
+      getLiveMatchForUser(db, userId),
+      getUpcomingMatches(db, userId, UPCOMING_LIMIT * 2),
+      getProgress(db, userId),
+      getMiniLeaderboard(db, userId, 5),
+      getFriendsMiniLeaderboard(db, userId, 5),
+      countAchievementDefinitions(db),
+    ]);
+  const mini: MiniLeaderboardData = { global: miniGlobal, friends: miniFriends };
 
   const sortedAll = sortUpcomingMatches(upcomingRaw);
 
@@ -84,7 +90,7 @@ export async function getDashboardData(db: Database, userId: string): Promise<Da
     nextMatch,
     upcoming,
     progress,
-    mini: miniRaw,
+    mini,
   };
 }
 
@@ -452,4 +458,118 @@ export async function getMiniLeaderboard(
   }
 
   return buildMiniLeaderboard(top, me);
+}
+
+/**
+ * Variante del mini-leaderboard filtrada a "yo + mis amigos
+ * aceptados". Misma forma que el global para que el cliente reuse
+ * el componente `<MiniLeaderboard>` cambiando solo el `mini` prop.
+ *
+ * Casos especiales:
+ *  - Sin amigos: devuelve `top: []`, `me: null`, `friendsCount: 0`.
+ *    El widget oculta la tab "Amigos" en este caso.
+ *  - Amigo sin row en `user_points` (cuenta nueva sin puntos): se
+ *    incluye igualmente con `points: 0`. El ranking es inamovible.
+ *
+ * El `rank` que devolvemos es **relativo al subset de amigos**, no
+ * global — para que en la tab "Amigos" tu posición refleje el
+ * ranking dentro del grupo.
+ */
+export async function getFriendsMiniLeaderboard(
+  db: Database,
+  userId: string,
+  topCount: number,
+): Promise<FriendsMiniLeaderboardView> {
+  // IDs del grupo: yo + amigos aceptados (en cualquier dirección de
+  // la relación). Resolvemos primero los IDs para reusar la lista en
+  // el counter y el top.
+  const friendRows = await db
+    .select({
+      requesterId: friendships.requesterId,
+      addresseeId: friendships.addresseeId,
+    })
+    .from(friendships)
+    .where(
+      and(
+        eq(friendships.status, "accepted"),
+        or(eq(friendships.requesterId, userId), eq(friendships.addresseeId, userId)),
+      ),
+    );
+
+  const friendIds = friendRows.map((r) =>
+    r.requesterId === userId ? r.addresseeId : r.requesterId,
+  );
+  const friendsCount = friendIds.length;
+  const groupIds = [userId, ...friendIds];
+
+  // Sin amigos → top vacío, me nulo. La UI oculta la tab.
+  if (friendsCount === 0) {
+    return { top: [], me: null, friendsCount: 0 };
+  }
+
+  // Top N entre el grupo. LEFT JOIN para incluir users sin
+  // user_points (cuentas nuevas).
+  const topRows = await db
+    .select({
+      userId: users.id,
+      name: users.name,
+      country: users.country,
+      points: userPoints.totalPoints,
+    })
+    .from(users)
+    .leftJoin(userPoints, eq(userPoints.userId, users.id))
+    .where(inArray(users.id, groupIds))
+    .orderBy(desc(sql`coalesce(${userPoints.totalPoints}, 0)`), asc(users.id))
+    .limit(topCount);
+
+  const top: LeaderboardEntry[] = topRows.map((row, idx) => ({
+    userId: row.userId,
+    name: row.name?.trim() || "Jugador",
+    countryCode: row.country,
+    points: row.points ?? 0,
+    rank: idx + 1,
+  }));
+
+  // ¿El user ya aparece en el top? Si sí, `me` queda null para no
+  // duplicar — comportamiento idéntico a `getMiniLeaderboard` global.
+  const meInTop = top.find((row) => row.userId === userId);
+  if (meInTop) {
+    return { top, me: null, friendsCount };
+  }
+
+  // El user no entró en el top → calcular su rank dentro del grupo.
+  // Como ya tenemos `groupIds`, contamos cuántos miembros tienen más
+  // puntos que el user (con coalesce para los sin user_points).
+  const meRows = await db
+    .select({
+      name: users.name,
+      country: users.country,
+      points: userPoints.totalPoints,
+    })
+    .from(users)
+    .leftJoin(userPoints, eq(userPoints.userId, users.id))
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  const meData = meRows[0];
+  if (!meData) return { top, me: null, friendsCount };
+
+  const myPoints = meData.points ?? 0;
+  const aheadInGroup = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(userPoints)
+    .where(
+      and(
+        inArray(userPoints.userId, groupIds),
+        sql`${userPoints.totalPoints} > ${myPoints}`,
+      ),
+    );
+  const me: LeaderboardEntry = {
+    userId,
+    name: meData.name?.trim() || "Jugador",
+    countryCode: meData.country,
+    points: myPoints,
+    rank: (aheadInGroup[0]?.n ?? 0) + 1,
+  };
+  return { top, me, friendsCount };
 }

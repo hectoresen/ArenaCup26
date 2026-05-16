@@ -111,6 +111,24 @@ export type MiniLeaderboardView = {
   me: LeaderboardEntry | null;
 };
 
+/**
+ * Vista "Top entre amigos" del widget de mini-leaderboard. Mismo
+ * shape que el global pero las filas vienen filtradas a `userId IN
+ * (mis amigos aceptados + yo)`. El `me` sigue siendo null cuando ya
+ * estoy en el top.
+ *
+ * `friendsCount` es el counter total (puede ser >5 — el top está
+ * limitado a 5 filas pero el badge "n amigos" usa el counter).
+ */
+export type FriendsMiniLeaderboardView = MiniLeaderboardView & {
+  friendsCount: number;
+};
+
+export type MiniLeaderboardData = {
+  global: MiniLeaderboardView;
+  friends: FriendsMiniLeaderboardView;
+};
+
 export type DashboardData = {
   userName: string;
   stats: UserStats;
@@ -120,5 +138,5 @@ export type DashboardData = {
   nextMatch: UpcomingHeroView | null;
   upcoming: UpcomingMatch[];
   progress: Progress;
-  mini: MiniLeaderboardView;
+  mini: MiniLeaderboardData;
 };

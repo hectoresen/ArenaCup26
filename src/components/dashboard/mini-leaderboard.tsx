@@ -1,34 +1,60 @@
 import { CountryFlag } from "@/components/common/country-flag";
 import { Link } from "@/i18n/navigation";
 import { type PointsLocale, formatPoints } from "@/lib/format/number";
-import type { LeaderboardEntry, MiniLeaderboardView } from "@/server/dashboard/types";
+import type {
+  LeaderboardEntry,
+  MiniLeaderboardData,
+} from "@/server/dashboard/types";
 import { useLocale, useTranslations } from "next-intl";
 
+export type MiniTab = "global" | "amigos";
+
 type Props = {
-  mini: MiniLeaderboardView;
+  mini: MiniLeaderboardData;
+  /** Tab activa. Server-side desde el query param `?mini=amigos`. */
+  active: MiniTab;
 };
 
 /**
- * Top 5 + separador + fila del user. Si el user ya está en el top
- * (`mini.me === null`), el separador y la fila duplicada se omiten.
+ * Widget "Top del momento" con dos tabs:
+ *  - **Global** (default): top 5 del leaderboard mundial.
+ *  - **Amigos**: top 5 entre el grupo "yo + mis amigos aceptados".
+ *    Solo se renderiza la tab si el user tiene ≥1 amigo (cuando
+ *    `mini.friends.friendsCount === 0`, no se muestra la pestaña;
+ *    se simplifica al single-view).
+ *
+ * Tabs server-side via search param `?mini=amigos` (back/forward del
+ * navegador + URL compartible — mismo patrón que las tabs de
+ * `/partidos`).
  */
-export function MiniLeaderboard({ mini }: Props) {
+export function MiniLeaderboard({ mini, active }: Props) {
   const t = useTranslations("dashboard.miniLeaderboard");
+  const hasFriendsTab = mini.friends.friendsCount > 0;
+  // Si la tab activa es "amigos" pero el user no tiene amigos, fallback a global.
+  const effective: MiniTab = active === "amigos" && hasFriendsTab ? "amigos" : "global";
+  const view = effective === "amigos" ? mini.friends : mini.global;
 
   return (
     <>
+      {hasFriendsTab && <Tabs active={effective} />}
       <ul className="m-0 flex list-none flex-col gap-1 p-0">
-        {mini.top.map((entry) => (
-          <Row key={entry.userId} entry={entry} isMe={false} />
-        ))}
-        {mini.me && (
+        {view.top.length === 0 ? (
+          <li className="rounded-xl border-2 border-dashed border-border bg-card/40 px-3 py-4 text-center text-[11px] font-bold text-muted">
+            {effective === "amigos" ? t("emptyFriends") : t("emptyGlobal")}
+          </li>
+        ) : (
+          view.top.map((entry) => (
+            <Row key={entry.userId} entry={entry} isMe={false} />
+          ))
+        )}
+        {view.me && (
           <>
             <li
               data-testid="mini-leaderboard-separator"
               aria-hidden="true"
               className="my-1 h-px list-none bg-border/60"
             />
-            <Row entry={mini.me} isMe />
+            <Row entry={view.me} isMe />
           </>
         )}
       </ul>
@@ -41,6 +67,47 @@ export function MiniLeaderboard({ mini }: Props) {
         </Link>
       </div>
     </>
+  );
+}
+
+function Tabs({ active }: { active: MiniTab }) {
+  const t = useTranslations("dashboard.miniLeaderboard");
+  return (
+    <nav
+      aria-label={t("tabsAriaLabel")}
+      className="mb-2 inline-flex items-center gap-1 rounded-full border-2 border-border bg-card p-1"
+    >
+      <TabLink to="global" active={active} label={t("tabGlobal")} />
+      <TabLink to="amigos" active={active} label={t("tabFriends")} />
+    </nav>
+  );
+}
+
+function TabLink({
+  to,
+  active,
+  label,
+}: {
+  to: MiniTab;
+  active: MiniTab;
+  label: string;
+}) {
+  const isActive = to === active;
+  // "global" no añade param (es default); "amigos" sí.
+  const href = to === "global" ? "/inicio" : "/inicio?mini=amigos";
+  return (
+    <Link
+      href={href as never}
+      aria-current={isActive ? "page" : undefined}
+      // No resetar el scroll al cambiar de tab — el widget está abajo
+      // del panel y el cambio es local; no queremos saltar arriba.
+      scroll={false}
+      className={`cursor-pointer rounded-full px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.08em] no-underline transition-colors ${
+        isActive ? "bg-gold text-black" : "text-muted hover:text-foreground"
+      }`}
+    >
+      {label}
+    </Link>
   );
 }
 

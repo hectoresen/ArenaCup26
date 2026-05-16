@@ -1,5 +1,6 @@
 import type { Progress } from "@/server/dashboard/types";
 import { useTranslations } from "next-intl";
+import { LiveRankBody } from "./live-rank-body";
 
 type Props = {
   progress: Progress;
@@ -64,8 +65,15 @@ function AchievementsProgressCard({
 
 function RankProgressCard({ progress }: { progress: Progress }) {
   const t = useTranslations("dashboard.progress");
-  const { rank, rankDelta, sparkline } = progress.rank;
-  const hasHistory = rankDelta !== null || sparkline !== null;
+  const { rank, sparkline } = progress.rank;
+  // El sparkline SSR incluye el rank actual como último punto. Para
+  // la versión live, separamos histórico vs actual: el histórico
+  // viene de la BD (snapshots de N días) y el actual se actualiza
+  // cada 15s vía SSE en `<LiveRankBody>`.
+  const hasHistory = sparkline !== null && sparkline.length >= 1;
+  const historical = hasHistory ? sparkline.slice(0, -1) : null;
+  const weekAgoRank =
+    sparkline !== null && sparkline.length > 0 ? sparkline[0] ?? null : null;
 
   return (
     <article
@@ -79,91 +87,23 @@ function RankProgressCard({ progress }: { progress: Progress }) {
           {t("rankLabel")}
         </div>
       </div>
-      <div className="mb-2 font-display text-[28px] leading-none tracking-[-0.5px] text-gold">
-        {`#${rank}`}
-      </div>
-
       {hasHistory ? (
-        <>
-          <RankDeltaLine delta={rankDelta} />
-          {sparkline && sparkline.length >= 2 && (
-            <Sparkline points={sparkline} ariaLabel={t("sparklineAria")} />
-          )}
-        </>
+        <LiveRankBody
+          initialRank={rank}
+          weekAgoRank={weekAgoRank}
+          historical={historical}
+        />
       ) : (
-        <div className="mb-2.5 text-[11px] font-bold leading-[1.4] text-muted">
-          {t("historyStarting")}
-        </div>
+        <>
+          <div className="mb-2 font-display text-[28px] leading-none tracking-[-0.5px] text-gold">
+            {`#${rank}`}
+          </div>
+          <div className="mb-2.5 text-[11px] font-bold leading-[1.4] text-muted">
+            {t("historyStarting")}
+          </div>
+        </>
       )}
     </article>
-  );
-}
-
-/**
- * Mini-gráfica del rank en el tiempo. Eje Y invertido: rank 1 va
- * arriba del SVG (porque numéricamente menor = mejor). Polyline
- * gold, dos puntos en los extremos para anclar la lectura.
- */
-function Sparkline({ points, ariaLabel }: { points: number[]; ariaLabel: string }) {
-  const width = 120;
-  const height = 28;
-  const pad = 3;
-  const min = Math.min(...points);
-  const max = Math.max(...points);
-  const span = Math.max(max - min, 1);
-  const step = points.length > 1 ? (width - pad * 2) / (points.length - 1) : 0;
-  const coords = points.map((p, i) => ({
-    x: pad + i * step,
-    y: pad + ((p - min) / span) * (height - pad * 2),
-  }));
-  const d = coords.map((c, i) => `${i === 0 ? "M" : "L"}${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(" ");
-  const first = coords[0];
-  const last = coords[coords.length - 1];
-  if (!first || !last) return null;
-  return (
-    <svg
-      role="img"
-      aria-label={ariaLabel}
-      viewBox={`0 0 ${width} ${height}`}
-      className="mt-1 h-7 w-full"
-    >
-      <path
-        d={d}
-        fill="none"
-        stroke="var(--color-gold)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx={first.x} cy={first.y} r="2" fill="var(--color-gold)" opacity="0.5" />
-      <circle cx={last.x} cy={last.y} r="2.5" fill="var(--color-gold)" />
-    </svg>
-  );
-}
-
-function RankDeltaLine({ delta }: { delta: number | null }) {
-  const t = useTranslations("dashboard.progress");
-  if (delta === null) return null;
-  if (delta > 0) {
-    return (
-      <div className="mb-2.5 text-[11px] font-bold leading-[1.4] text-muted">
-        <span className="font-black text-success">{t("rankDeltaUp", { delta })}</span>
-      </div>
-    );
-  }
-  if (delta < 0) {
-    return (
-      <div className="mb-2.5 text-[11px] font-bold leading-[1.4] text-muted">
-        <span className="font-black text-danger">
-          {t("rankDeltaDown", { delta: Math.abs(delta) })}
-        </span>
-      </div>
-    );
-  }
-  return (
-    <div className="mb-2.5 text-[11px] font-bold leading-[1.4] text-muted">
-      {t("rankDeltaFlat")}
-    </div>
   );
 }
 

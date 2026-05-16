@@ -1,5 +1,6 @@
+import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
-import { getRealSnapshot } from "@/lib/leaderboard/real";
+import { getRealSnapshot, getRealSnapshotForUser } from "@/lib/leaderboard/real";
 
 // Force Node runtime — SSE necesita streaming response que el edge
 // runtime maneja distinto. Con Node + Railway funciona out-of-the-box.
@@ -14,24 +15,34 @@ const HEARTBEAT_MS = 30_000;
 const MAX_DURATION_MS = 5 * 60_000;
 
 /**
- * SSE stream del ranking público. Cada `TICK_MS` (15s) emite el
- * snapshot actual del leaderboard como evento `snapshot`. Cada
- * `HEARTBEAT_MS` (30s) emite un comentario `:hb` para mantener viva
- * la conexión a través de proxies que cierran idle.
+ * SSE stream del ranking público. Cada `TICK_MS` (15s) emite un evento
+ * `snapshot` con el shape:
  *
- * El payload es el mismo `LeaderboardSnapshot` que renderiza la
- * landing SSR — el cliente puede sustituir el state inicial sin
- * refresh.
+ *   { players, generatedAt, myRank }
  *
- * Limitación deliberada (MVP): el push es periódico, no event-driven.
- * Una mejora futura sería notificar solo cuando se inserta/actualiza
- * un `point_event`, vía Redis pub/sub o un bus en-process.
+ * Donde `players` es el top TOP_LIMIT global y `myRank` es la
+ * posición real del viewer logado (1-based) o `null` si está sin
+ * sesión. Esto permite a `/inicio` actualizar el último punto del
+ * sparkline + el "#N" de "Mi posición" en vivo, aunque el viewer
+ * esté fuera del top 100.
+ *
+ * `:hb` cada `HEARTBEAT_MS` para mantener viva la conexión a través
+ * de proxies que cierran idle.
+ *
+ * Limitación: push periódico, no event-driven. Mejora futura cuando
+ * exista pub/sub Redis o bus en-process.
  */
 export async function GET() {
+  // Resolvemos la sesión UNA VEZ al abrir la conexión. Aceptamos
+  // staleness durante la vida del stream (5 min máximo): si el user
+  // cierra sesión, sigue recibiendo su myRank hasta reconectar. Es
+  // una decisión de simplicidad — el rank no es información sensible.
+  const session = await auth();
+  const viewerId = session?.user?.id ?? null;
+
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
-      const startedAt = Date.now();
       let closed = false;
 
       const send = (event: string, data: unknown) => {
@@ -47,8 +58,13 @@ export async function GET() {
 
       const sendSnapshot = async () => {
         try {
-          const snapshot = await getRealSnapshot(db);
-          send("snapshot", snapshot);
+          if (viewerId) {
+            const { snapshot, myRank } = await getRealSnapshotForUser(db, viewerId);
+            send("snapshot", { ...snapshot, myRank });
+          } else {
+            const snapshot = await getRealSnapshot(db);
+            send("snapshot", { ...snapshot, myRank: null });
+          }
         } catch (err) {
           send("error", { message: err instanceof Error ? err.message : String(err) });
         }
@@ -67,11 +83,7 @@ export async function GET() {
         controller.close();
       }, MAX_DURATION_MS);
 
-      // Cleanup si el cliente cierra antes del max duration.
-      // Node ReadableStream no tiene un `oncancel` directo; usamos el
-      // controller.signal vía el request si está disponible. Fallback:
-      // los intervals se autodestruyen tras MAX_DURATION_MS.
-      controller.error = (err) => {
+      controller.error = () => {
         closed = true;
         clearInterval(tickInterval);
         clearInterval(hbInterval);

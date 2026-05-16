@@ -53,8 +53,11 @@ function buildData(overrides: Partial<DashboardData> = {}): DashboardData {
       },
     },
     mini: {
-      top: [{ userId: "u1", name: "Layla Hassan", countryCode: "SA", points: 4610, rank: 1 }],
-      me: { userId: "me", name: "Carlos Mendoza", countryCode: "MX", points: 1840, rank: 42 },
+      global: {
+        top: [{ userId: "u1", name: "Layla Hassan", countryCode: "SA", points: 4610, rank: 1 }],
+        me: { userId: "me", name: "Carlos Mendoza", countryCode: "MX", points: 1840, rank: 42 },
+      },
+      friends: { top: [], me: null, friendsCount: 0 },
     },
     ...overrides,
   };

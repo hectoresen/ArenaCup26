@@ -4,7 +4,7 @@ import { Hero } from "./hero";
 import { LiveAutoRefresh } from "./live-auto-refresh";
 import { LiveSection } from "./live-section";
 import { MatchCard } from "./match-card";
-import { MiniLeaderboard } from "./mini-leaderboard";
+import { MiniLeaderboard, type MiniTab } from "./mini-leaderboard";
 import { ProgressCards } from "./progress-cards";
 
 /**
@@ -12,7 +12,14 @@ import { ProgressCards } from "./progress-cards";
  * (no en `page.tsx`) para poder testarlo en jsdom sin que vitest
  * intente cargar `next/server` (que `auth()` arrastra).
  */
-export function DashboardSections({ data }: { data: DashboardData }) {
+export function DashboardSections({
+  data,
+  miniTab = "global",
+}: {
+  data: DashboardData;
+  /** Tab activa del mini-leaderboard. Server-side desde `?mini=`. */
+  miniTab?: MiniTab;
+}) {
   const t = useTranslations("dashboard.sections");
 
   return (
@@ -43,7 +50,7 @@ export function DashboardSections({ data }: { data: DashboardData }) {
       <ProgressCards progress={data.progress} />
 
       <SectionLabel title={t("miniLeaderboard")} />
-      <MiniLeaderboard mini={data.mini} />
+      <MiniLeaderboard mini={data.mini} active={miniTab} />
     </>
   );
 }

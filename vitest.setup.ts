@@ -32,6 +32,10 @@ vi.mock("@/server/invitations/actions", () => ({
   revokeInvitation: vi.fn(async () => ({ ok: true })),
   dismissInviteCookie: vi.fn(async () => ({ ok: true })),
 }));
+vi.mock("@/server/users/delete-account", () => ({
+  deleteAccount: vi.fn(async () => ({ ok: true })),
+  DELETE_CONFIRMATION_PHRASE: "ELIMINAR MI CUENTA",
+}));
 
 /**
  * Env vars mínimas para que cualquier test que importe (directa o

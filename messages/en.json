@@ -82,6 +82,7 @@
   "privacy": {
     "title": "Privacy",
     "subtitle": "Choose who can open your profile. Changes apply instantly.",
+    "deleteAccountLink": "Delete my account →",
     "visibility": {
       "legend": "Who can see your profile?",
       "intro": "The ranking always shows your basic info (name, flag, points). This only controls whether someone can open your full profile.",
@@ -132,6 +133,28 @@
       "title": "No predictions yet",
       "body": "When you submit your first prediction, it will show up here with the result and the points you earned.",
       "cta": "Go to matches"
+    }
+  },
+  "settings": {
+    "deleteAccount": {
+      "title": "Delete my account",
+      "subtitle": "This action is permanent. We'll delete all your data from WebMundial 26.",
+      "backToSettings": "Back to Privacy",
+      "intro": "Deleting your account irreversibly removes:",
+      "bullets": {
+        "predictions": "All your predictions and earned points.",
+        "friends": "Your friends list and pending requests.",
+        "achievements": "All unlocked achievements.",
+        "history": "Your ranking history and chosen avatar."
+      },
+      "agreeLabel": "I understand this action can't be undone.",
+      "confirmLabel": "Type <phrase></phrase> to confirm:",
+      "submit": "Delete my account forever",
+      "submitting": "Deleting…",
+      "error": {
+        "unauthorized": "Session expired. Sign in again.",
+        "confirmation_mismatch": "Text doesn't match. Copy it exactly."
+      }
     }
   },
   "matches": {
@@ -377,7 +400,12 @@
       "viewFullRanking": "View full ranking",
       "youTag": "(you)",
       "ariaMyRow": "Your position: number {rank}, {name}, {points} points",
-      "ariaRow": "Position {rank}: {name}, {points} points"
+      "ariaRow": "Position {rank}: {name}, {points} points",
+      "tabsAriaLabel": "Switch between global and friends ranking",
+      "tabGlobal": "Global",
+      "tabFriends": "Friends",
+      "emptyGlobal": "No one's on the ranking yet. Be the first.",
+      "emptyFriends": "No friends on WebMundial yet."
     },
     "streakChip": "Streak {count}"
   },
