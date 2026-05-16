@@ -18,13 +18,16 @@ name: Live scoring
 #   2. Reusar el `CRON_SECRET` ya configurado.
 
 on:
-  # Cada 2 minutos. El check de shouldSyncLive() es muy barato (2
-  # queries a Postgres ~5ms cada una) así que el coste de iteraciones
-  # vacías es despreciable. Durante el Mundial, con 4-6 horas de
-  # partidos al día, gastaremos: 6h × 30 calls/h × 1 fetch = 180
-  # requests al provider en ventanas activas. Manejable.
-  schedule:
-    - cron: "*/2 * * * *"
+  # PAUSADO 2026-05-16: la cuenta api-football está suspendida. Cuando
+  # vuelva, descomentar el cron. El check `shouldSyncLive` evitaría
+  # llamadas al provider sin live, pero ahora mismo hay una fila con
+  # `status='live'` en BD (seed antiguo o partido transicionado sin
+  # cerrar), así que cada tick generaría 502 en logs.
+  #
+  # Cadencia original: cada 2 min, refresca solo si hay live en BD o
+  # un kickoff en ±15-30 min.
+  # schedule:
+  #   - cron: "*/2 * * * *"
   workflow_dispatch: {}
 
 jobs:

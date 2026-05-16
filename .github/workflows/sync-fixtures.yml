@@ -20,17 +20,15 @@ name: Sync fixtures
 # off fuera (ej. dos workflows con schedules distintos).
 
 on:
-  # Cada 3 horas (en hora exacta). El backend está en modo `date-window`
-  # con una ventana de 9 días (1 atrás + 7 adelante + hoy), 1 request
-  # por día = 9 req por sync. 8 syncs/día × 9 req = 72 req/día. Cabe en
-  # el free tier de api-football (100/día) con margen.
+  # PAUSADO 2026-05-16: la cuenta api-football está suspendida (free
+  # tier rebasó cuota). El schedule queda comentado para no acumular
+  # 502 en logs durante días. `workflow_dispatch` sigue activo —
+  # cuando la cuenta vuelva, descomentar la línea de `cron` y listo.
   #
-  # Trade-off: una predicción que acaba a las 18:00 se resuelve entre
-  # las 18:00 y las 21:00 (max 3h hasta el siguiente tick). Si subimos
-  # la cadencia, hay que reducir la ventana o pagar plan Pro.
-  schedule:
-    - cron: "0 */3 * * *"
-  # Para disparar manualmente desde Actions → Run workflow.
+  # Cadencia original: cada 3h, ventana 9 días = 72 req/día (cabe en
+  # 100/día del free tier).
+  # schedule:
+  #   - cron: "0 */3 * * *"
   workflow_dispatch: {}
 
 jobs:
