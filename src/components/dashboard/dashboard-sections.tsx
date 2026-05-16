@@ -26,6 +26,14 @@ export function DashboardSections({
     <>
       <Hero userName={data.userName} stats={data.stats} />
 
+      {/* Cards de progreso (logros + ranking) directamente bajo el
+          hero — ambas clickables al panel correspondiente. La
+          sección "Tu progreso" del bottom queda eliminada para no
+          duplicar la info. */}
+      <div className="mt-4">
+        <ProgressCards progress={data.progress} />
+      </div>
+
       {/* Si hay live, sondeamos el server cada 30s para refrescar
           scores + puntos provisionales sin que el user pulse F5.
           Cuando aterrice add-leaderboard-sse se sustituye por push. */}
@@ -45,9 +53,6 @@ export function DashboardSections({
           </ul>
         </>
       )}
-
-      <SectionLabel title={t("progress")} />
-      <ProgressCards progress={data.progress} />
 
       <SectionLabel title={t("miniLeaderboard")} />
       <MiniLeaderboard mini={data.mini} active={miniTab} />

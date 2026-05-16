@@ -68,4 +68,23 @@ describe("<Hero>", () => {
     renderWithProviders(<Hero userName="Carlos Mendoza" stats={baseStats} />);
     expect(screen.getByText("8/24")).toBeInTheDocument();
   });
+
+  it("'Mi posición' mini-stat links to /ranking", () => {
+    renderWithProviders(<Hero userName="Carlos Mendoza" stats={baseStats} />);
+    const link = screen.getByRole("link", { name: /Mi posición 42/i });
+    expect(link.getAttribute("href")).toMatch(/\/ranking$/);
+  });
+
+  it("'Logros' mini-stat links to /logros", () => {
+    renderWithProviders(<Hero userName="Carlos Mendoza" stats={baseStats} />);
+    const link = screen.getByRole("link", { name: /8 Logros 24/i });
+    expect(link.getAttribute("href")).toMatch(/\/logros$/);
+  });
+
+  it("'Puntos' mini-stat is NOT a link (it's a stat, not a destination)", () => {
+    renderWithProviders(<Hero userName="Carlos Mendoza" stats={baseStats} />);
+    expect(
+      screen.queryByRole("link", { name: /Puntos/ }),
+    ).toBeNull();
+  });
 });

@@ -64,14 +64,30 @@ function buildData(overrides: Partial<DashboardData> = {}): DashboardData {
 }
 
 describe("<DashboardSections>", () => {
-  it("renders the four core sections in order", () => {
+  it("renders the core sections in order", () => {
     renderWithProviders(<DashboardSections data={buildData()} />);
     // "Carlos" aparece dos veces (greeting + mini leaderboard).
     expect(screen.getAllByText(/Carlos/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Próximo partido")).toBeInTheDocument();
     expect(screen.getByText(/Próximos partidos/)).toBeInTheDocument();
-    expect(screen.getByText(/Tu progreso/)).toBeInTheDocument();
     expect(screen.getByText(/Top del momento/)).toBeInTheDocument();
+    // El section label "Tu progreso" ya no existe — las cards de
+    // progreso se mueven al hero (debajo del nombre), accesibles
+    // como enlaces a /logros y /ranking. Verificamos que las cards
+    // siguen renderizándose.
+    expect(screen.getByLabelText(/Logros desbloqueados/i)).toBeInTheDocument();
+  });
+
+  it("achievement progress card links to /logros", () => {
+    renderWithProviders(<DashboardSections data={buildData()} />);
+    const link = screen.getByRole("link", { name: /Logros desbloqueados/i });
+    expect(link.getAttribute("href")).toMatch(/\/logros$/);
+  });
+
+  it("rank progress card links to /ranking", () => {
+    renderWithProviders(<DashboardSections data={buildData()} />);
+    const link = screen.getByRole("link", { name: /Tu posición global/i });
+    expect(link.getAttribute("href")).toMatch(/\/ranking$/);
   });
 
   it("does NOT render the upcoming section when the list is empty", () => {

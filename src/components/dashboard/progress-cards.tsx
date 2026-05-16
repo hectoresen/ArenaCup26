@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import type { Progress } from "@/server/dashboard/types";
 import { useTranslations } from "next-intl";
 import { LiveRankBody } from "./live-rank-body";
@@ -33,16 +34,23 @@ function AchievementsProgressCard({
   const days = lastUnlockedAt ? daysSince(lastUnlockedAt, now) : null;
 
   return (
-    <article
+    <Link
+      href="/logros"
       aria-label={t("achievementsLabel")}
-      className="relative overflow-hidden rounded-2xl border-2 border-border bg-card px-4 py-4 [animation:slideIn_0.45s_ease_forwards] opacity-0"
+      className="group relative block cursor-pointer overflow-hidden rounded-2xl border-2 border-border bg-card px-4 py-4 no-underline transition-[border-color,transform] hover:-translate-y-[2px] hover:border-gold/30 [animation:slideIn_0.45s_ease_forwards] opacity-0"
     >
       <CardAccent />
       <div className="mb-3 flex items-center gap-2.5">
         <IconBox>🏆</IconBox>
-        <div className="text-[11px] font-extrabold uppercase tracking-[0.06em] text-muted">
+        <div className="flex-1 text-[11px] font-extrabold uppercase tracking-[0.06em] text-muted">
           {t("achievementsLabel")}
         </div>
+        <span
+          aria-hidden="true"
+          className="text-[12px] font-extrabold text-gold transition-[transform,opacity] opacity-40 group-hover:translate-x-[2px] group-hover:opacity-100"
+        >
+          →
+        </span>
       </div>
       <div className="mb-2 font-display text-[28px] leading-none text-gold">
         {unlocked} <span className="text-base text-muted">/ {total}</span>
@@ -59,7 +67,7 @@ function AchievementsProgressCard({
           ? t("lastUnlocked", { title: lastUnlockedTitle, days })
           : t("lastUnlockedNone")}
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -76,16 +84,23 @@ function RankProgressCard({ progress }: { progress: Progress }) {
     sparkline !== null && sparkline.length > 0 ? sparkline[0] ?? null : null;
 
   return (
-    <article
+    <Link
+      href="/ranking"
       aria-label={t("rankLabel")}
-      className="relative overflow-hidden rounded-2xl border-2 border-border bg-card px-4 py-4 [animation:slideIn_0.45s_ease_forwards] opacity-0"
+      className="group relative block cursor-pointer overflow-hidden rounded-2xl border-2 border-border bg-card px-4 py-4 no-underline transition-[border-color,transform] hover:-translate-y-[2px] hover:border-gold/30 [animation:slideIn_0.45s_ease_forwards] opacity-0"
     >
       <CardAccent />
       <div className="mb-3 flex items-center gap-2.5">
         <IconBox>📊</IconBox>
-        <div className="text-[11px] font-extrabold uppercase tracking-[0.06em] text-muted">
+        <div className="flex-1 text-[11px] font-extrabold uppercase tracking-[0.06em] text-muted">
           {t("rankLabel")}
         </div>
+        <span
+          aria-hidden="true"
+          className="text-[12px] font-extrabold text-gold transition-[transform,opacity] opacity-40 group-hover:translate-x-[2px] group-hover:opacity-100"
+        >
+          →
+        </span>
       </div>
       {hasHistory ? (
         <LiveRankBody
@@ -103,7 +118,7 @@ function RankProgressCard({ progress }: { progress: Progress }) {
           </div>
         </>
       )}
-    </article>
+    </Link>
   );
 }
 

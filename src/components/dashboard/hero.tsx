@@ -1,4 +1,5 @@
 import { EditableName } from "@/components/profile/editable-name";
+import { Link } from "@/i18n/navigation";
 import { type PointsLocale, formatPoints } from "@/lib/format/number";
 import { firstName } from "@/server/dashboard/transforms";
 import type { UserStats } from "@/server/dashboard/types";
@@ -84,12 +85,14 @@ export function Hero({ userName, stats }: Props) {
           label={t("miniStats.rank")}
           tone="gold"
           ariaLabel={`${t("miniStats.rank")} ${stats.rank}`}
+          href="/ranking"
         />
         <MiniStat
           value={`${stats.achievementsUnlocked}/${stats.achievementsTotal}`}
           label={t("miniStats.achievements")}
           tone="gold"
           ariaLabel={`${stats.achievementsUnlocked} ${t("miniStats.achievements")} ${stats.achievementsTotal}`}
+          href="/logros"
         />
       </ul>
     </section>
@@ -101,22 +104,43 @@ function MiniStat({
   label,
   tone,
   ariaLabel,
+  href,
 }: {
   value: string;
   label: string;
   tone: "gold" | "amber";
   ariaLabel: string;
+  /** Si está set, la card se renderiza como `<Link>` clicable. */
+  href?: string;
 }) {
   const toneClass = tone === "gold" ? "text-gold" : "text-warm";
-  return (
-    <li
-      aria-label={ariaLabel}
-      className="flex-1 rounded-[14px] border-2 border-border bg-card px-2.5 py-3 text-center transition-transform duration-200 hover:-translate-y-[3px] hover:border-gold/30"
-    >
+  const body = (
+    <>
       <span className={`mb-[3px] block font-display text-[22px] leading-none ${toneClass}`}>
         {value}
       </span>
       <span className="text-[9px] font-black uppercase tracking-[0.14em] text-muted">{label}</span>
+    </>
+  );
+  const baseCls =
+    "flex-1 rounded-[14px] border-2 border-border bg-card px-2.5 py-3 text-center transition-transform duration-200 hover:-translate-y-[3px] hover:border-gold/30";
+
+  if (href) {
+    return (
+      <li className="flex-1">
+        <Link
+          href={href as never}
+          aria-label={ariaLabel}
+          className={`block cursor-pointer no-underline ${baseCls}`}
+        >
+          {body}
+        </Link>
+      </li>
+    );
+  }
+  return (
+    <li aria-label={ariaLabel} className={baseCls}>
+      {body}
     </li>
   );
 }
