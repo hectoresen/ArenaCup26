@@ -10,12 +10,20 @@ type Props = {
 };
 
 /**
- * Card de un logro individual. Dos variantes visuales:
+ * Card de un logro individual. Port del diseño en
+ * `docs/achievements-reference.html` (sección `.ach.common`, `.ach.rare`,
+ * …):
  *
- * - **unlocked**: color por tier, icono real, check verde, opcional
- *   share-chip al hover si el tier es legendary/mythic/goat.
- * - **locked**: greyscale + icono lock + descripción visible (para
- *   que el visitante sepa qué hay que lograr).
+ *  - **Rarity badge** arriba a la derecha con color tier.
+ *  - **Icon 36×36** bloque a la izquierda, sin chip — usa drop-shadow
+ *    teñido por tier.
+ *  - **Title** coloreado por tier con text-shadow en tier alto.
+ *  - **Description** muted, 2 líneas máx.
+ *  - **Unlocked check** SVG absolute bottom-right (no emoji).
+ *  - Hover: lift -3px + drop-shadow + icon scale 1.16 + rotate.
+ *  - Estado `locked` → opacity 0.36 + greyscale 0.7, sin pointer
+ *    events (no se puede compartir).
+ *  - Share chip al hover SOLO en tier legendary/mythic/goat.
  */
 export function AchievementCard({ achievement, ownerUsername }: Props) {
   const t = useTranslations("publicProfile");
@@ -28,47 +36,65 @@ export function AchievementCard({ achievement, ownerUsername }: Props) {
       data-tier={definition.tier}
       data-unlocked={unlocked ? "true" : "false"}
       aria-label={`${definition.title} — ${unlocked ? t("unlockedLabel") : t("lockedLabel")}`}
-      className={`group relative overflow-hidden rounded-2xl border-2 px-3.5 py-3.5 transition-transform ${
+      className={`group relative overflow-hidden rounded-2xl border-2 px-4 pb-3.5 pt-6 transition-[transform,box-shadow] duration-200 ${
         unlocked
-          ? `${tierBorder(definition.tier)} bg-card hover:-translate-y-[2px]`
-          : "border-border bg-card/60 opacity-60 [filter:grayscale(0.7)]"
+          ? `${tierBorder(definition.tier)} ${tierHoverShadow(definition.tier)} bg-card hover:-translate-y-[3px]`
+          : "pointer-events-none border-border bg-card opacity-[0.36] [filter:grayscale(0.7)]"
       }`}
     >
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <span
-          aria-hidden="true"
-          className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${
-            unlocked ? tierIconBg(definition.tier) : "border border-border bg-white/[0.04]"
-          }`}
-          style={unlocked ? { color: tierIconColor(definition.tier) } : undefined}
-        >
-          {unlocked ? (
-            <svg width="22" height="22" viewBox="0 0 36 36" aria-hidden="true">
-              <use href={achSymbolHref(definition.iconId)} />
-            </svg>
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" className="text-muted">
-              <use href="#ach-lock" />
-            </svg>
-          )}
-        </span>
-        {unlocked && (
-          <span
-            aria-hidden="true"
-            className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-success/20 text-[10px] text-success"
-            title={t("unlockedLabel")}
+      {/* Rarity badge — top-right, color per tier */}
+      <span
+        className={`absolute end-2.5 top-2.5 inline-flex items-center rounded-full border-[1.5px] px-2 py-px text-[9px] font-black uppercase tracking-[0.1em] ${rarityBadgeClass(definition.tier)}`}
+      >
+        {t(`tier.${definition.tier}`)}
+      </span>
+
+      {/* Icon block — 36×36, no chip, color via currentColor */}
+      <div
+        aria-hidden="true"
+        className="mb-2 block leading-none transition-transform duration-300 group-hover:-rotate-[5deg] group-hover:scale-[1.16]"
+        style={unlocked ? { color: tierIconColor(definition.tier) } : undefined}
+      >
+        {unlocked ? (
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 36 36"
+            className={tierIconFilter(definition.tier)}
           >
-            ✓
-          </span>
+            <use href={achSymbolHref(definition.iconId)} />
+          </svg>
+        ) : (
+          <svg width="28" height="28" viewBox="0 0 16 16" className="text-muted">
+            <use href="#ach-lock" />
+          </svg>
         )}
       </div>
-      <div className="mb-0.5 truncate text-[13px] font-extrabold text-foreground">
+
+      {/* Title + desc */}
+      <div
+        className={`mb-1 line-clamp-1 pe-12 font-display text-[15px] leading-[1.15] ${tierTitleClass(definition.tier)}`}
+      >
         {definition.title}
       </div>
       <div className="line-clamp-2 text-[11px] font-bold leading-snug text-muted">
         {definition.description}
       </div>
 
+      {/* Unlocked check — bottom-right, SVG (no emoji) */}
+      {unlocked && (
+        <span
+          aria-hidden="true"
+          className="absolute bottom-2.5 end-2.5"
+          title={t("unlockedLabel")}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16">
+            <use href="#ach-unlocked" />
+          </svg>
+        </span>
+      )}
+
+      {/* Share chip — solo unlocked + tier alto, hover-revealed */}
       {shareable && (
         <a
           href={`/u/${ownerUsername}#ach-${definition.id}`}
@@ -84,34 +110,51 @@ export function AchievementCard({ achievement, ownerUsername }: Props) {
 function tierBorder(tier: ProfileAchievement["definition"]["tier"]): string {
   switch (tier) {
     case "common":
-      return "border-success/30";
+      return "border-success/25";
     case "rare":
-      return "border-info/30";
+      return "border-info/25";
     case "epic":
       return "border-purple-400/30";
     case "legendary":
-      return "border-gold/30";
+      return "border-gold/35";
     case "mythic":
-      return "border-warm/30";
+      return "border-warm/35";
     case "goat":
-      return "border-silver/30";
+      return "border-silver/35";
   }
 }
 
-function tierIconBg(tier: ProfileAchievement["definition"]["tier"]): string {
+function tierHoverShadow(tier: ProfileAchievement["definition"]["tier"]): string {
   switch (tier) {
     case "common":
-      return "bg-success/15";
+      return "hover:shadow-[0_8px_24px_rgba(52,217,123,0.14)]";
     case "rare":
-      return "bg-info/15";
+      return "hover:shadow-[0_8px_24px_rgba(79,195,247,0.15)]";
     case "epic":
-      return "bg-purple-400/15";
+      return "hover:shadow-[0_8px_28px_rgba(192,132,252,0.18)]";
     case "legendary":
-      return "bg-gold/15";
+      return "hover:shadow-[0_8px_36px_rgba(245,200,66,0.22)]";
     case "mythic":
-      return "bg-warm/15";
+      return "hover:shadow-[0_8px_36px_rgba(255,140,66,0.22)]";
     case "goat":
-      return "bg-silver/15";
+      return "hover:shadow-[0_10px_42px_rgba(168,216,255,0.25)]";
+  }
+}
+
+function rarityBadgeClass(tier: ProfileAchievement["definition"]["tier"]): string {
+  switch (tier) {
+    case "common":
+      return "border-success/30 bg-success/[0.08] text-success";
+    case "rare":
+      return "border-info/30 bg-info/[0.08] text-info";
+    case "epic":
+      return "border-purple-400/30 bg-purple-400/[0.08] text-purple-400";
+    case "legendary":
+      return "border-gold/35 bg-gold/[0.08] text-gold";
+    case "mythic":
+      return "border-warm/35 bg-warm/[0.08] text-warm";
+    case "goat":
+      return "border-silver/35 bg-silver/[0.08] tracking-[0.2em] text-silver";
   }
 }
 
@@ -134,6 +177,40 @@ function tierIconColor(tier: ProfileAchievement["definition"]["tier"]): string {
       return "#ff8c42";
     case "goat":
       return "#a8d8ff";
+  }
+}
+
+function tierIconFilter(tier: ProfileAchievement["definition"]["tier"]): string {
+  switch (tier) {
+    case "common":
+      return "[filter:drop-shadow(0_0_5px_rgba(52,217,123,0.3))]";
+    case "rare":
+      return "[filter:drop-shadow(0_0_5px_rgba(79,195,247,0.3))]";
+    case "epic":
+      return "[filter:drop-shadow(0_0_6px_rgba(192,132,252,0.4))]";
+    case "legendary":
+      return "[filter:drop-shadow(0_0_8px_rgba(245,200,66,0.35))]";
+    case "mythic":
+      return "[filter:drop-shadow(0_0_8px_rgba(255,140,66,0.35))]";
+    case "goat":
+      return "[filter:drop-shadow(0_0_10px_rgba(168,216,255,0.45))]";
+  }
+}
+
+function tierTitleClass(tier: ProfileAchievement["definition"]["tier"]): string {
+  switch (tier) {
+    case "common":
+      return "text-[#a8ffd4]";
+    case "rare":
+      return "text-[#b8e8ff]";
+    case "epic":
+      return "text-[#e8d4ff]";
+    case "legendary":
+      return "text-gold [text-shadow:0_0_12px_rgba(245,200,66,0.35)]";
+    case "mythic":
+      return "text-[#ffd4a8] [text-shadow:0_0_12px_rgba(255,140,66,0.35)]";
+    case "goat":
+      return "text-silver [text-shadow:0_0_14px_rgba(168,216,255,0.5)]";
   }
 }
 
