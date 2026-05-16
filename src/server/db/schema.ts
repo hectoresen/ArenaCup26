@@ -403,6 +403,70 @@ export const userAchievements = pgTable(
 );
 
 /**
+ * Link de invitación generado por un user. El `token` se usa como
+ * slug del link público (`/?invite=<token>`); es alfanumérico,
+ * pseudo-random y único globalmente.
+ *
+ *  - `max_uses = 0` → ilimitado.
+ *  - `uses` se incrementa por cada redención exitosa.
+ *  - `revoked_at` set → el link no acepta más redenciones (el dueño
+ *    lo "rescindió" desde la UI). No borramos la fila para conservar
+ *    histórico de redenciones pasadas.
+ */
+export const invitations = pgTable(
+  "invitations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    token: text("token").notNull(),
+    inviterId: uuid("inviter_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    maxUses: integer("max_uses").notNull().default(0),
+    uses: integer("uses").notNull().default(0),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    uniqueToken: uniqueIndex("invitations_unique_token").on(table.token),
+    inviterIdx: index("invitations_inviter_idx").on(table.inviterId),
+  }),
+);
+
+/**
+ * Una fila por cada user que ha redimido un link. La unicidad por
+ * `invitee_id` evita que un user redima dos links distintos (decisión
+ * de producto: cada user "pertenece" a un solo inviter).
+ *
+ * `first_hit_at` se rellena cuando el invitado acierta su PRIMERA
+ * predicción. Ese evento dispara el pago de +10 puntos al inviter
+ * y desbloquea `better-with-friends`. La columna nullable + el
+ * `WHERE first_hit_at IS NULL` en el hook del pipeline garantiza
+ * idempotencia: aciertos sucesivos del invitee no vuelven a pagar.
+ */
+export const invitationRedemptions = pgTable(
+  "invitation_redemptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    invitationId: uuid("invitation_id")
+      .notNull()
+      .references(() => invitations.id, { onDelete: "cascade" }),
+    inviteeId: uuid("invitee_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    inviterId: uuid("inviter_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    firstHitAt: timestamp("first_hit_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    uniqueInvitee: uniqueIndex("invitation_redemptions_unique_invitee").on(table.inviteeId),
+    invitationIdx: index("invitation_redemptions_invitation_idx").on(table.invitationId),
+    inviterIdx: index("invitation_redemptions_inviter_idx").on(table.inviterId),
+  }),
+);
+
+/**
  * Suscripción web push del user a un device/browser concreto. Un
  * user puede tener N filas (móvil + desktop + tablet…). El
  * `endpoint` es único globalmente — si el browser regenera la

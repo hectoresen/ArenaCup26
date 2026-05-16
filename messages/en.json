@@ -586,7 +586,41 @@
       "comingSoon": "Coming soon",
       "emptyBody": "You haven't invited anyone yet. Soon you'll be able to share a link so your friends can play with you.",
       "countBody": "{count} friends invited.",
-      "inviteCta": "Invite a friend (soon)"
+      "inviteCta": "Invite a friend"
+    }
+  },
+  "invite": {
+    "title": "Invite friends",
+    "subtitleEmpty": "Nobody has joined with your links yet.",
+    "subtitleCount": "{count, plural, =1 {1 friend has joined with your invitation.} other {# friends have joined with your invitation.}}",
+    "backToFriends": "Back to Friends",
+    "warning": {
+      "title": "Auto-friendship",
+      "body": "Whoever joins with your link automatically becomes your friend and sees your full profile even if it's private to others. Share it only with people you trust."
+    },
+    "listHeader": "Your links",
+    "create": "Generate link",
+    "empty": "You don't have any active links. Generate one and share it with whoever you want to invite.",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "copyFallback": "Copy this link manually:",
+    "revoke": "Revoke",
+    "revokeConfirm": "Revoke this link? Nobody else will be able to use it.",
+    "rowUsesLimited": "{uses} / {max} uses",
+    "rowUsesUnlimited": "{uses} uses · unlimited",
+    "rowRevoked": "Revoked",
+    "rowExhausted": "Exhausted",
+    "feedback": {
+      "create": {
+        "ok": "Link generated. Copy and share.",
+        "unauthorized": "Session expired. Sign in again.",
+        "limit_reached": "Too many active links. Revoke one before generating another.",
+        "invalid_input": "Invalid value."
+      },
+      "revoke": {
+        "unauthorized": "Session expired. Sign in again.",
+        "not_found": "That link no longer exists or isn't yours."
+      }
     }
   },
   "friends": {

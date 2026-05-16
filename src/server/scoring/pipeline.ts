@@ -11,6 +11,7 @@ import {
 } from "@/server/db/schema";
 import { derr } from "@/lib/debug-log";
 import { evaluateAndUnlock } from "@/server/achievements/unlock";
+import { payReferralBonusIfFirstHit } from "@/server/invitations/referral-payout";
 import { createNotification } from "@/server/notifications/create";
 import { scoreMatchPrediction } from "./engine";
 import type {
@@ -152,6 +153,23 @@ export async function processFinishedMatch(
         await evaluateAndUnlock(db, p.userId);
       } catch (err) {
         derr("scoring", `evaluateAndUnlock threw for user ${p.userId}`, err);
+      }
+
+      // Referral payout: si este user es un invitado y este score
+      // fue su primer hit oficial, paga +10pts al inviter y
+      // desbloquea `better-with-friends`. Solo se considera hit si
+      // sumó puntos (excluye miss/voided). El payout es atómico
+      // (single-UPDATE guard) y no fallible — errores se loguean.
+      const isHit = scored.kind !== "miss" && scored.kind !== "voided";
+      if (isHit) {
+        try {
+          const payout = await payReferralBonusIfFirstHit(db, p.userId, matchId);
+          if (payout.paid) {
+            await evaluateAndUnlock(db, payout.inviterId);
+          }
+        } catch (err) {
+          derr("scoring", `referral payout threw for user ${p.userId}`, err);
+        }
       }
 
       result.processed++;

@@ -144,7 +144,7 @@ Editar nombre + avatar desde el perfil propio.
   - Query `getBracketMatches` filtra `matches` por
     `stage IN ('round-of-16','quarter','semi','third-place','final')`.
 
-## Bloque F — Invitaciones (fase análisis, no implementación)
+## Bloque F — Invitaciones ✓ (2026-05-16)
 
 - **F1 · Decisión técnica** (`6`):
   - **Modelo elegido**: link de invitación (`?invite=<userId>`)
@@ -174,8 +174,25 @@ Editar nombre + avatar desde el perfil propio.
   ```
 - **F3 · Copys frontales no funcionales**: solo cajas en perfil
   + CTA "Invitar". Botón abre modal con link copiable.
-- **F4 · Implementación funcional**: se decide en una sesión
-  posterior cuando el resto esté maduro.
+- **F4 · Implementación funcional**: ✓ aterrizado 2026-05-16.
+  - Tablas `invitations` (token, max_uses, uses, revoked_at) e
+    `invitation_redemptions` (unique invitee, first_hit_at).
+  - Middleware intercepta `?invite=<token>` → cookie httpOnly
+    30 días → redirect a URL limpia.
+  - `events.createUser` de Auth.js redime: insert redemption,
+    bump counter, auto-friendship `accepted` bidireccional,
+    notificación al inviter.
+  - Página `/amigos/invitar` con generar/copiar/rescindir.
+    Warning destacado sobre auto-amistad. Cap 5 links activos
+    por user. Default 1 uso por link (configurable a futuro).
+  - Referral payout: cuando el invitee acierta su primera
+    predicción (kind ≠ miss/voided), `payReferralBonusIfFirstHit`
+    atómicamente marca `first_hit_at` y paga +10 pts al inviter
+    (point_events kind='referral' + user_points.totalPoints +=10).
+    Logro `better-with-friends` desbloqueado automáticamente
+    para el inviter (out of PENDING_RULES, regla
+    `referredFirstHits >= 1`).
+  - i18n namespace `invite` en es/en/fr/ar.
 
 ## Bloque G — País por IP (decisión)
 

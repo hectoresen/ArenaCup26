@@ -586,7 +586,41 @@
       "comingSoon": "Próximamente",
       "emptyBody": "Aún no has invitado a nadie. Pronto podrás compartir un link para que tus amigos jueguen contigo.",
       "countBody": "{count} amigos invitados.",
-      "inviteCta": "Invitar a un amigo (próximamente)"
+      "inviteCta": "Invitar a un amigo"
+    }
+  },
+  "invite": {
+    "title": "Invitar a amigos",
+    "subtitleEmpty": "Aún no ha entrado nadie con tus links.",
+    "subtitleCount": "{count, plural, =1 {1 amigo se ha unido con tu invitación.} other {# amigos se han unido con tu invitación.}}",
+    "backToFriends": "Volver a Amigos",
+    "warning": {
+      "title": "Auto-amistad",
+      "body": "Quien entre con tu link se convertirá automáticamente en tu amigo y verá tu perfil completo aunque sea privado para los demás. Compártelo solo con gente de confianza."
+    },
+    "listHeader": "Tus links",
+    "create": "Generar link",
+    "empty": "No tienes ningún link activo. Genera uno y compártelo con quien quieras invitar.",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "copyFallback": "Copia este link manualmente:",
+    "revoke": "Rescindir",
+    "revokeConfirm": "¿Rescindir este link? Nadie más podrá usarlo.",
+    "rowUsesLimited": "{uses} / {max} usos",
+    "rowUsesUnlimited": "{uses} usos · sin límite",
+    "rowRevoked": "Rescindido",
+    "rowExhausted": "Agotado",
+    "feedback": {
+      "create": {
+        "ok": "Link generado. Cópialo y compártelo.",
+        "unauthorized": "Sesión expirada. Vuelve a iniciar sesión.",
+        "limit_reached": "Tienes demasiados links activos. Rescinde alguno antes de generar otro.",
+        "invalid_input": "Valor inválido."
+      },
+      "revoke": {
+        "unauthorized": "Sesión expirada. Vuelve a iniciar sesión.",
+        "not_found": "Ese link ya no existe o no es tuyo."
+      }
     }
   },
   "friends": {

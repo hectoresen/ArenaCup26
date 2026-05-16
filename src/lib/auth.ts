@@ -4,12 +4,15 @@ import { checkSignupLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { db } from "@/server/db/client";
 import { accounts, sessions, users, verificationTokens } from "@/server/db/schema";
+import { redeemInvitationForUser } from "@/server/invitations/redemption";
 import { resolveAvailableUsername, slugifyName } from "@/server/users/username";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+
+const INVITE_COOKIE = "wm_invite_token";
 
 /**
  * Auth.js v5 configuration.
@@ -64,6 +67,39 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return found.length > 0;
       });
       await db.update(users).set({ username }).where(eq(users.id, user.id));
+
+      // Redime el token de invitación si el visitor llegó con uno.
+      // El middleware persistió el token en una cookie httpOnly al
+      // detectar `?invite=` en la URL antes del OAuth; aquí cerramos
+      // el ciclo: insertamos redemption + auto-friendship + bump del
+      // counter del link. Si algo falla, no rompemos el signup —
+      // simplemente el user no queda emparejado con el inviter.
+      try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get(INVITE_COOKIE)?.value;
+        if (token) {
+          const result = await redeemInvitationForUser(
+            db,
+            user.id,
+            token,
+            user.name ?? null,
+          );
+          dlog("ranking", "invite redemption attempted on createUser", {
+            userId: user.id,
+            ok: result.ok,
+            code: result.ok ? null : result.code,
+          });
+          // Limpia la cookie independientemente del resultado: si fue
+          // OK, su trabajo terminó; si falló, no queremos reintentar
+          // en un re-login (es un fallo definitivo: token inválido,
+          // revocado, agotado o auto-redeem).
+          cookieStore.delete(INVITE_COOKIE);
+        }
+      } catch (err) {
+        dlog("ranking", "invite redemption error on createUser", {
+          err: err instanceof Error ? err.message : String(err),
+        });
+      }
     },
   },
   callbacks: {

@@ -4,6 +4,7 @@ import type { Database } from "@/server/db/client";
 import { pointEvents, userPoints } from "@/server/db/schema";
 import { getPredictionHistory } from "@/server/history/queries";
 import type { HistoryEntry } from "@/server/history/types";
+import { countRedeemedInvitations } from "@/server/invitations/queries";
 
 export type OwnerStreakStats = {
   /** Racha activa ahora mismo. 0 si no hay racha. */
@@ -31,15 +32,15 @@ export type OwnerExtras = {
  * el dueño del perfil. Las queries son baratas y se hacen en
  * paralelo. No se ejecutan para visitantes anónimos.
  *
- * `invitationsCount` queda en 0 hasta que aterrice
- * `add-social-invitations` (fase 6 del análisis). Por ahora la
- * caja es un placeholder con CTA "Invitar a un amigo".
+ * `invitationsCount` cuenta cuántos users han redimido un link de
+ * invitación creado por este usuario (sistema F4 — `add-invitations`,
+ * 2026-05-16).
  */
 export async function getOwnerExtras(
   db: Database,
   userId: string,
 ): Promise<OwnerExtras> {
-  const [pointsRow, comboCount, recent] = await Promise.all([
+  const [pointsRow, comboCount, recent, invitationsTotal] = await Promise.all([
     db
       .select({
         current: userPoints.streak,
@@ -53,6 +54,7 @@ export async function getOwnerExtras(
       .from(pointEvents)
       .where(and(eq(pointEvents.userId, userId), eq(pointEvents.kind, "combo"))),
     getPredictionHistory(db, userId, 5),
+    countRedeemedInvitations(db, userId),
   ]);
 
   const streakStats: OwnerStreakStats = {
@@ -65,13 +67,12 @@ export async function getOwnerExtras(
     userId,
     streakStats,
     recent: recent.length,
+    invitations: invitationsTotal,
   });
 
   return {
     streakStats,
     recentPredictions: recent,
-    // Placeholder hasta que aterrice la capability de invitaciones
-    // (fase 6 del análisis 2026-05-15).
-    invitationsCount: 0,
+    invitationsCount: invitationsTotal,
   };
 }

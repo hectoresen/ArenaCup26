@@ -1,8 +1,9 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNotNull, sql } from "drizzle-orm";
 import { dlog } from "@/lib/debug-log";
 import type { Database } from "@/server/db/client";
 import {
   achievementDefinitions,
+  invitationRedemptions,
   pointEvents,
   userAchievements,
   userPoints,
@@ -29,6 +30,12 @@ type UnlockContext = {
   exactCount: number;
   rank: number | null;
   totalUsers: number;
+  /**
+   * Cuántos de los invitados de este user han acertado su primera
+   * predicción (redemption con `first_hit_at IS NOT NULL`). El
+   * logro `better-with-friends` se desbloquea al llegar a 1.
+   */
+  referredFirstHits: number;
 };
 
 const UNLOCK_RULES: Record<string, (ctx: UnlockContext) => boolean> = {
@@ -37,6 +44,7 @@ const UNLOCK_RULES: Record<string, (ctx: UnlockContext) => boolean> = {
   "good-eye": (c) => c.correctCount >= 10,
   "first-hundred": (c) => c.totalPoints >= 100,
   "five-of-five": (c) => c.exactCount >= 5,
+  "better-with-friends": (c) => c.referredFirstHits >= 1,
 
   // ───── Poco común ─────
   "power-200": (c) => c.totalPoints >= 200,
@@ -65,7 +73,6 @@ const UNLOCK_RULES: Record<string, (ctx: UnlockContext) => boolean> = {
  */
 const PENDING_RULES = new Set([
   "group-analyst", // necesita contar predictions en stage=group
-  "better-with-friends", // necesita sistema de referidos
   "total-strategist", // necesita "todos los partidos de fase de grupos"
   "half-world", // 50% de partidos del Mundial
   "the-step-before", // semifinal del Mundial
@@ -192,6 +199,20 @@ async function loadContext(db: Database, userId: string): Promise<UnlockContext>
     .from(userPoints);
   const totalUsers = totalUsersRow[0]?.total ?? 0;
 
+  // Cuántos invitados de este user han acertado su primera
+  // predicción. Source of truth: `invitation_redemptions.firstHitAt`
+  // (lo setea el referral payout en el pipeline de scoring).
+  const referredFirstHitsRow = await db
+    .select({ total: sql<number>`count(*)::int` })
+    .from(invitationRedemptions)
+    .where(
+      and(
+        eq(invitationRedemptions.inviterId, userId),
+        isNotNull(invitationRedemptions.firstHitAt),
+      ),
+    );
+  const referredFirstHits = referredFirstHitsRow[0]?.total ?? 0;
+
   return {
     totalPoints: points?.totalPoints ?? 0,
     streak: points?.streak ?? 0,
@@ -199,6 +220,7 @@ async function loadContext(db: Database, userId: string): Promise<UnlockContext>
     exactCount,
     rank,
     totalUsers,
+    referredFirstHits,
   };
 }
 

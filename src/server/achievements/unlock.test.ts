@@ -18,6 +18,7 @@ type Ctx = {
   correctCount: number;
   exactCount: number;
   rank: number | null;
+  referredFirstHits: number;
 };
 
 const RULES: Record<string, (c: Ctx) => boolean> = {
@@ -25,6 +26,7 @@ const RULES: Record<string, (c: Ctx) => boolean> = {
   "good-eye": (c) => c.correctCount >= 10,
   "first-hundred": (c) => c.totalPoints >= 100,
   "five-of-five": (c) => c.exactCount >= 5,
+  "better-with-friends": (c) => c.referredFirstHits >= 1,
   "power-200": (c) => c.totalPoints >= 200,
   "on-fire": (c) => c.streak >= 5,
   "exact-shot": (c) => c.exactCount >= 1,
@@ -45,6 +47,7 @@ function ctx(overrides: Partial<Ctx> = {}): Ctx {
     correctCount: 0,
     exactCount: 0,
     rank: null,
+    referredFirstHits: 0,
     ...overrides,
   };
 }
@@ -66,6 +69,12 @@ describe("achievement unlock rules", () => {
     expect(RULES["first-hundred"]?.(ctx({ totalPoints: 100 }))).toBe(true);
     expect(RULES["power-200"]?.(ctx({ totalPoints: 199 }))).toBe(false);
     expect(RULES["power-200"]?.(ctx({ totalPoints: 200 }))).toBe(true);
+  });
+
+  it("better-with-friends triggers on first referred user's first hit", () => {
+    expect(RULES["better-with-friends"]?.(ctx({ referredFirstHits: 0 }))).toBe(false);
+    expect(RULES["better-with-friends"]?.(ctx({ referredFirstHits: 1 }))).toBe(true);
+    expect(RULES["better-with-friends"]?.(ctx({ referredFirstHits: 5 }))).toBe(true);
   });
 
   it("exact-shot/five-of-five/elite-shooter/seer scale with exactCount", () => {
@@ -98,7 +107,9 @@ describe("achievement unlock rules", () => {
     expect(RULES["king-of-the-moment"]?.(ctx({ rank: 2 }))).toBe(false);
   });
 
-  it("rules covers 15 evaluable achievements (rest are pending)", () => {
-    expect(Object.keys(RULES)).toHaveLength(15);
+  it("rules covers 16 evaluable achievements (rest are pending)", () => {
+    // 16 = 15 originales + better-with-friends (añadido 2026-05-16
+    // al aterrizar F4 invitations). PENDING_RULES bajó de 9 a 8.
+    expect(Object.keys(RULES)).toHaveLength(16);
   });
 });

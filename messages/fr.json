@@ -586,7 +586,41 @@
       "comingSoon": "Bientôt",
       "emptyBody": "Tu n'as encore invité personne. Bientôt tu pourras partager un lien pour que tes amis jouent avec toi.",
       "countBody": "{count} amis invités.",
-      "inviteCta": "Inviter un ami (bientôt)"
+      "inviteCta": "Inviter un ami"
+    }
+  },
+  "invite": {
+    "title": "Inviter des amis",
+    "subtitleEmpty": "Personne n'est encore venu avec tes liens.",
+    "subtitleCount": "{count, plural, =1 {1 ami a rejoint avec ton invitation.} other {# amis ont rejoint avec ton invitation.}}",
+    "backToFriends": "Retour à Amis",
+    "warning": {
+      "title": "Amitié automatique",
+      "body": "Toute personne qui s'inscrit avec ton lien devient automatiquement ton ami et voit ton profil complet même s'il est privé pour les autres. Partage-le uniquement avec des personnes de confiance."
+    },
+    "listHeader": "Tes liens",
+    "create": "Générer un lien",
+    "empty": "Tu n'as aucun lien actif. Génère-en un et partage-le avec qui tu veux inviter.",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "copyFallback": "Copie ce lien manuellement :",
+    "revoke": "Révoquer",
+    "revokeConfirm": "Révoquer ce lien ? Personne ne pourra plus l'utiliser.",
+    "rowUsesLimited": "{uses} / {max} usages",
+    "rowUsesUnlimited": "{uses} usages · illimité",
+    "rowRevoked": "Révoqué",
+    "rowExhausted": "Épuisé",
+    "feedback": {
+      "create": {
+        "ok": "Lien généré. Copie-le et partage-le.",
+        "unauthorized": "Session expirée. Reconnecte-toi.",
+        "limit_reached": "Trop de liens actifs. Révoque-en un avant d'en générer un autre.",
+        "invalid_input": "Valeur invalide."
+      },
+      "revoke": {
+        "unauthorized": "Session expirée. Reconnecte-toi.",
+        "not_found": "Ce lien n'existe plus ou n'est pas à toi."
+      }
     }
   },
   "friends": {

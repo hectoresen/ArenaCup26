@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { AchievementsIconSprite } from "@/components/public-profile/achievement-sprite";
 import { TierSection } from "@/components/public-profile/tier-section";
 import { dlog } from "@/lib/debug-log";
 import { auth } from "@/lib/auth";
@@ -67,6 +68,10 @@ export default async function LogrosPage({
 
   return (
     <section className="-mx-5 -mt-5 px-5 pt-5">
+      {/* Sprite SVG con los 24 símbolos del catálogo. Sin esto los
+          <use href="#ach-..."> de las cards renderizan vacíos
+          (idéntico al patrón del <AchievementsAccordion>). */}
+      <AchievementsIconSprite />
       <header className="mb-6 text-center">
         <h1 className="font-display text-3xl text-gold">{t("title")}</h1>
         <p className="mt-2 text-sm font-bold text-muted">
