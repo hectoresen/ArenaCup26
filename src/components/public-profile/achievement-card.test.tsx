@@ -36,7 +36,9 @@ describe("<AchievementCard>", () => {
       <AchievementCard achievement={build("the-goat", false)} ownerUsername="carlos" />,
     );
     expect(container.querySelector("[data-unlocked='false']")).not.toBeNull();
-    expect(screen.getByText("🔒")).toBeInTheDocument();
+    // El estado bloqueado renderiza el sprite `#ach-lock` en lugar
+    // del emoji 🔒 que se usaba antes del port del reference.
+    expect(container.querySelector('use[href="#ach-lock"]')).not.toBeNull();
   });
 
   it("renders the share-chip ONLY when unlocked AND tier is legendary/mythic/goat", () => {

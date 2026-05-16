@@ -144,10 +144,11 @@ function NotificationRow({
     item.readAt === null ? "bg-gold/[0.04]" : ""
   }`;
 
-  if (item.matchId) {
+  const href = resolveNotificationHref(item);
+  if (href) {
     return (
       <li>
-        <Link href={`/partidos/${item.matchId}` as never} onClick={onClose} className={rowCls}>
+        <Link href={href as never} onClick={onClose} className={rowCls}>
           {inner}
         </Link>
       </li>
@@ -158,6 +159,34 @@ function NotificationRow({
       <div className={rowCls}>{inner}</div>
     </li>
   );
+}
+
+/**
+ * Decide a dónde lleva el click sobre una notificación. La columna
+ * `notifications.matchId` cubre el caso "partido" pero hay tipos
+ * como `friend_request` que no llevan matchId — deduplicamos la
+ * lógica aquí en lugar de añadir una columna `url` a la tabla.
+ *
+ *  - prediction_sent / prediction_locked / match_finished → al detalle
+ *    del partido si tenemos matchId.
+ *  - achievement_unlocked → a la galería `/logros`.
+ *  - friend_request / friend_accepted → a `/amigos` (bandeja + lista).
+ *  - system → sin destino, fila no clickable.
+ */
+function resolveNotificationHref(item: NotificationItem): string | null {
+  switch (item.kind) {
+    case "friend_request":
+    case "friend_accepted":
+      return "/amigos";
+    case "achievement_unlocked":
+      return "/logros";
+    case "prediction_sent":
+    case "prediction_locked":
+    case "match_finished":
+      return item.matchId ? `/partidos/${item.matchId}` : null;
+    case "system":
+      return null;
+  }
 }
 
 /**

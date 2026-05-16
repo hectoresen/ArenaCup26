@@ -1,6 +1,7 @@
 import { isShareable } from "@/server/public-profile/transforms";
 import type { ProfileAchievement } from "@/server/public-profile/types";
 import { useTranslations } from "next-intl";
+import { achSymbolHref } from "./achievement-sprite";
 
 type Props = {
   achievement: ProfileAchievement;
@@ -36,11 +37,20 @@ export function AchievementCard({ achievement, ownerUsername }: Props) {
       <div className="mb-2 flex items-center justify-between gap-2">
         <span
           aria-hidden="true"
-          className={`inline-flex h-9 w-9 items-center justify-center rounded-xl text-base ${
-            unlocked ? `${tierIconBg(definition.tier)}` : "border border-border bg-white/[0.04]"
+          className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${
+            unlocked ? tierIconBg(definition.tier) : "border border-border bg-white/[0.04]"
           }`}
+          style={unlocked ? { color: tierIconColor(definition.tier) } : undefined}
         >
-          {unlocked ? definition.iconId.charAt(definition.iconId.length - 1) : "🔒"}
+          {unlocked ? (
+            <svg width="22" height="22" viewBox="0 0 36 36" aria-hidden="true">
+              <use href={achSymbolHref(definition.iconId)} />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" className="text-muted">
+              <use href="#ach-lock" />
+            </svg>
+          )}
         </span>
         {unlocked && (
           <span
@@ -102,6 +112,28 @@ function tierIconBg(tier: ProfileAchievement["definition"]["tier"]): string {
       return "bg-warm/15";
     case "goat":
       return "bg-silver/15";
+  }
+}
+
+/**
+ * Color del trazo del icono SVG. Lo pasamos como `color` para que el
+ * `currentColor` del sprite herede el matiz del tier. Valores
+ * alineados con `docs/achievements-reference.html` (líneas 264-516).
+ */
+function tierIconColor(tier: ProfileAchievement["definition"]["tier"]): string {
+  switch (tier) {
+    case "common":
+      return "#34d97b";
+    case "rare":
+      return "#4fc3f7";
+    case "epic":
+      return "#c084fc";
+    case "legendary":
+      return "#f5c842";
+    case "mythic":
+      return "#ff8c42";
+    case "goat":
+      return "#a8d8ff";
   }
 }
 
