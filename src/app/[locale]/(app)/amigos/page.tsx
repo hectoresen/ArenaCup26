@@ -1,6 +1,7 @@
 import { FriendsList } from "@/components/friends/friends-list";
 import { FriendRequestsInbox } from "@/components/friends/friend-requests-inbox";
 import { AddFriendForm } from "@/components/friends/add-friend-form";
+import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { getFriends, getPendingFriendRequests } from "@/server/friends/queries";
@@ -46,14 +47,24 @@ function AmigosLayout({
   const t = useTranslations("friends");
   return (
     <>
-      <header className="mb-5">
-        <h1 className="mb-1 font-display text-[26px] leading-none text-foreground">{t("title")}</h1>
-        <p className="text-[13px] font-bold text-muted">
-          {friendsCount} {friendsCount === 1 ? t("friendCount.one") : t("friendCount.many")}
-          {pendingCount > 0
-            ? ` · ${pendingCount} ${pendingCount === 1 ? t("pendingCount.one") : t("pendingCount.many")}`
-            : ""}
-        </p>
+      <header className="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="mb-1 font-display text-[26px] leading-none text-foreground">
+            {t("title")}
+          </h1>
+          <p className="text-[13px] font-bold text-muted">
+            {friendsCount} {friendsCount === 1 ? t("friendCount.one") : t("friendCount.many")}
+            {pendingCount > 0
+              ? ` · ${pendingCount} ${pendingCount === 1 ? t("pendingCount.one") : t("pendingCount.many")}`
+              : ""}
+          </p>
+        </div>
+        <Link
+          href="/amigos/invitar"
+          className="flex-shrink-0 cursor-pointer rounded-full border-2 border-gold/40 bg-gradient-to-br from-gold to-gold-deep px-4 py-1.5 font-display text-[12px] uppercase tracking-[0.1em] text-[#1a1000] no-underline shadow-[0_0_16px_rgba(245,200,66,0.25)] transition-[transform] hover:scale-[1.02]"
+        >
+          ✉️ {t("inviteByLink")}
+        </Link>
       </header>
 
       <AddFriendForm />

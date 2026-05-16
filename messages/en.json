@@ -633,6 +633,7 @@
       "one": "pending request",
       "many": "pending requests"
     },
+    "inviteByLink": "Invite by link",
     "requestsHeader": "Received requests",
     "friendsHeader": "Your crew",
     "addForm": {

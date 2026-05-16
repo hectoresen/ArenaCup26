@@ -633,6 +633,7 @@
       "one": "demande en attente",
       "many": "demandes en attente"
     },
+    "inviteByLink": "Inviter par lien",
     "requestsHeader": "Demandes reçues",
     "friendsHeader": "Ton équipe",
     "addForm": {

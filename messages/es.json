@@ -633,6 +633,7 @@
       "one": "solicitud pendiente",
       "many": "solicitudes pendientes"
     },
+    "inviteByLink": "Invitar por link",
     "requestsHeader": "Solicitudes recibidas",
     "friendsHeader": "Tu gente",
     "addForm": {

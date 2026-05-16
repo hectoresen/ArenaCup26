@@ -633,6 +633,7 @@
       "one": "طلب معلّق",
       "many": "طلبات معلّقة"
     },
+    "inviteByLink": "دعوة برابط",
     "requestsHeader": "الطلبات الواردة",
     "friendsHeader": "أصدقاؤك",
     "addForm": {
