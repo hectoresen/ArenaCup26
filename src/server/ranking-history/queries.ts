@@ -44,20 +44,27 @@ export async function getRankHistory(db: Database, userId: string): Promise<Rank
     )
     .orderBy(asc(rankingSnapshots.snapshotDate));
 
+  return summarizeRankHistory(rows.map((r) => ({ rank: r.rank })));
+}
+
+/**
+ * Pure transform: dado un array de filas (rank + snapshotDate)
+ * ordenadas ASC por fecha, devuelve la pareja `{ weekAgoRank,
+ * sparkline }` que consume la card del panel. Extraída del flujo de
+ * `getRankHistory` para poder testarla sin tocar BD.
+ *
+ *  - `[]` → `{ weekAgoRank: null, sparkline: null }`.
+ *  - `[r1]` → `weekAgoRank = r1`, `sparkline = [r1]` (delta=0).
+ *  - `[r1, r2, …, rn]` → `weekAgoRank = r1` (más antiguo),
+ *    `sparkline = [r1, r2, …, rn]`.
+ */
+export function summarizeRankHistory(rows: { rank: number }[]): RankHistory {
   if (rows.length === 0) {
     return { weekAgoRank: null, sparkline: null };
   }
-
   const first = rows[0];
-  if (!first) {
-    // En la práctica inalcanzable (rows.length > 0 arriba), pero TS
-    // exige el guard para strictNullChecks.
-    return { weekAgoRank: null, sparkline: null };
-  }
+  if (!first) return { weekAgoRank: null, sparkline: null };
   return {
-    // El snapshot más antiguo de la ventana es la referencia para el
-    // delta "vs hace 7 días". Si solo hay un snapshot (cuenta nueva),
-    // weekAgoRank coincide con el actual → delta = 0.
     weekAgoRank: first.rank,
     sparkline: rows.map((r) => r.rank),
   };
