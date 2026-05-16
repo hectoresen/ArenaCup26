@@ -675,47 +675,47 @@
       "sections": {
         "intro": {
           "heading": "Résumé rapide",
-          "body": "WebMundial 26 est un jeu de prédictions sur la Coupe du Monde 2026. Pour jouer, nous avons besoin du strict minimum : ton identité Google (e-mail, nom, photo) et, en option, ton pays. Nous ne vendons pas tes données, nous n'utilisons pas de publicité tierce, et tu peux demander la suppression de ton compte à tout moment."
+          "body": "WebMundial 26 est un jeu de prédictions sur la Coupe du Monde 2026. Pour jouer, nous avons besoin du strict minimum : l'e-mail, le nom et la photo de ton compte Google et, en option, ton pays. Nous ne vendons pas tes données, nous n'utilisons pas de publicité tierce, et tu peux demander la suppression de ton compte à tout moment."
         },
         "controller": {
           "heading": "Responsable du traitement",
-          "body": "Le responsable de tes données est Héctor Escolante (projet personnel indépendant). Tu peux nous contacter à tout moment à hector.escolante@clouddistrict.com."
+          "body": "Le responsable de tes données est l'équipe de WebMundial 26. Lorsque la plateforme sera ouverte au public, nous activerons un canal de contact et le mettrons en lien ici."
         },
         "dataCollected": {
           "heading": "Quelles données nous collectons",
-          "body": "1) Identité Google : e-mail, nom, photo. Nécessaire pour créer ton compte via Auth.js + Google OAuth.\n2) Pays : tu le choisis dans le wizard /bienvenido. Utilisé uniquement pour afficher ton drapeau dans le classement.\n3) Nom d'utilisateur : tu le choisis. Public, fait partie de l'URL de ton profil (/u/username).\n4) Activité de jeu : prédictions, points, séries, succès. Générés par ton usage normal.\n5) Dernière activité : timestamp pour afficher l'indicateur vert \"en ligne\" (24h) dans le classement.\n6) Si tu choisis un avatar de la galerie ou changes ton nom : nous gardons un timestamp pour appliquer le cooldown de 48h."
+          "body": "1) Les données de ton compte Google à la connexion : e-mail, nom et photo de profil.\n2) Ton pays, si tu choisis de l'indiquer à la création du compte. Utilisé uniquement pour afficher ton drapeau dans le classement.\n3) Ton nom d'utilisateur public, que tu choisis. Il fait partie du lien public de ton profil.\n4) Ton activité de jeu : prédictions, points, séries et succès débloqués.\n5) Ta date de dernière activité, pour afficher un indicateur « en ligne » dans le classement pendant les 24 heures suivantes.\n6) Si tu changes ton avatar ou ton nom, nous gardons la date pour limiter les changements à un toutes les 48 heures."
         },
         "purpose": {
           "heading": "À quoi servent les données",
-          "body": "À faire fonctionner le jeu : t'identifier, calculer tes points, t'afficher dans le classement, débloquer les succès, prévenir l'abus (rate-limits) et résoudre des bugs si tu nous contactes. Nous ne profilons pas tes données et ne les utilisons pas à des fins publicitaires."
+          "body": "À faire fonctionner le jeu : t'identifier à la connexion, calculer tes points, t'afficher dans le classement, débloquer les succès, prévenir l'abus du service et résoudre les problèmes si tu nous contactes. Nous ne te profilons pas pour la publicité ni rien de ce genre."
         },
         "legalBasis": {
           "heading": "Base légale (RGPD)",
-          "body": "Le traitement s'appuie sur l'exécution du service que tu demandes à l'inscription (art. 6.1.b RGPD) et notre intérêt légitime à prévenir l'abus (rate-limits, logs anonymisés — art. 6.1.f RGPD). Si tu actives Sentry ou des analytics, nous le ferons toujours sur une base légale claire et en t'informant."
+          "body": "Le traitement s'appuie sur l'exécution du service que tu demandes à l'inscription (art. 6.1.b RGPD) et notre intérêt légitime à prévenir l'abus du service via des journaux anonymisés (art. 6.1.f RGPD)."
         },
         "thirdParties": {
           "heading": "Tiers avec qui nous partageons",
-          "body": "Uniquement ceux nécessaires :\n— Google (authentification) : ton identité passe par leur flow OAuth.\n— Railway (hébergement + base de données PostgreSQL dans l'UE).\n— api-football (données du Mondial) : nous n'envoyons aucune donnée de toi, seulement des données publiques de matchs.\n— Sentry (monitoring d'erreurs, optionnel) : si activé, les traces sont envoyées avec ton user_id tronqué. PII (e-mail, nom) est purgé avant l'envoi.\n— Upstash Redis (rate-limit, optionnel) : compteurs anonymes par IP."
+          "body": "Uniquement ceux strictement nécessaires pour exploiter le service :\n— Google, comme fournisseur d'authentification : ton identité passe par son flux de connexion.\n— Notre fournisseur d'hébergement dans l'Union européenne, où tourne l'app et où se trouve la base de données.\n— Notre fournisseur de données sportives, qui nous envoie des informations publiques sur les matchs du Mondial. Nous ne lui envoyons aucune de tes données.\n\nSi nous ajoutons un jour des outils supplémentaires de mesure ou de monitoring, nous le ferons toujours sur une base légale claire et nous le consignerons ici avant de les activer."
         },
         "retention": {
           "heading": "Combien de temps nous gardons les données",
-          "body": "Tant que ton compte est actif. Si tu demandes la suppression, nous effaçons toute information personnelle dans un délai maximal de 30 jours. Les logs d'erreur/opérationnels sont effacés automatiquement après 90 jours."
+          "body": "Tant que ton compte est actif. Si tu demandes la suppression, nous effaçons toutes tes informations personnelles dans un délai maximal de 30 jours. Les journaux opérationnels sont effacés automatiquement après 90 jours."
         },
         "rights": {
           "heading": "Tes droits",
-          "body": "Tu as le droit d'accéder, rectifier, supprimer, t'opposer au traitement, porter tes données et limiter leur usage (arts. 15-22 RGPD). Pour les exercer, écris à hector.escolante@clouddistrict.com. Tu peux aussi déposer une plainte auprès de l'AEPD."
+          "body": "Tu as le droit d'accéder, rectifier, supprimer, t'opposer au traitement, porter tes données et limiter leur usage (arts. 15-22 RGPD). Pour les exercer, utilise le canal de contact que nous activerons à l'ouverture publique de la plateforme. Tu peux aussi déposer une plainte auprès de l'autorité espagnole de protection des données (AEPD)."
         },
         "cookies": {
           "heading": "Cookies et stockage local",
-          "body": "Nous utilisons uniquement des cookies techniques (session Auth.js, préférence de langue). Aucun cookie tiers, analytique ou publicitaire. C'est pourquoi nous n'affichons pas de bandeau cookies — le RGPD/ePrivacy le permet quand seuls des cookies techniques strictement nécessaires sont utilisés."
+          "body": "Nous utilisons uniquement des cookies techniques strictement nécessaires : celui qui maintient ta session ouverte et celui qui retient ta préférence de langue. Aucun cookie tiers, analytique ou publicitaire. C'est pourquoi nous n'affichons pas de bandeau cookies."
         },
         "changes": {
           "heading": "Changements de cette politique",
-          "body": "Si nous changeons quelque chose de matériel, nous mettrons à jour la date \"dernière mise à jour\" et te préviendrons dans l'app ou par e-mail. Les changements mineurs (typos, réorganisation) ne nécessitent pas de notification."
+          "body": "Si nous changeons quelque chose de matériel, nous mettrons à jour la date « dernière mise à jour » et te préviendrons dans l'app. Les changements mineurs (typos, réorganisation) ne nécessitent pas de notification."
         },
         "contact": {
           "heading": "Contact",
-          "body": "Pour toute question sur la vie privée ou exercer un droit : hector.escolante@clouddistrict.com. Réponse sous 30 jours."
+          "body": "Pour toute question sur la vie privée ou pour exercer un droit, tu pourras nous écrire via le canal de contact que nous activerons à l'ouverture publique de la plateforme. Nous répondrons dans un délai maximal de 30 jours."
         }
       }
     },
@@ -728,7 +728,7 @@
       "sections": {
         "intro": {
           "heading": "Acceptation",
-          "body": "En créant un compte ou en utilisant WebMundial 26 tu acceptes ces conditions. Si tu n'es pas d'accord, n'utilise pas l'app et, si tu as déjà un compte, écris-nous pour le supprimer."
+          "body": "En créant un compte ou en utilisant WebMundial 26 tu acceptes ces conditions. Si tu n'es pas d'accord, n'utilise pas l'app ; si tu as déjà un compte, tu pourras nous demander de le supprimer via le canal de contact que nous activerons à l'ouverture publique de la plateforme."
         },
         "eligibility": {
           "heading": "Qui peut jouer",
@@ -736,23 +736,23 @@
         },
         "account": {
           "heading": "Ton compte",
-          "body": "Chaque utilisateur a un seul compte. Tu es responsable de son usage. Si nous détectons plusieurs comptes du même utilisateur pour gonfler le classement, nous pouvons les suspendre. Tu peux demander la suppression à tout moment."
+          "body": "Chaque utilisateur a un seul compte. Tu es responsable de son usage. Si nous détectons plusieurs comptes du même utilisateur pour gonfler le classement, nous pouvons les suspendre. Tu peux demander la suppression à tout moment depuis Réglages."
         },
         "gameplay": {
           "heading": "Règles du jeu",
-          "body": "Les règles de score (prédiction simple, exacte, double, séries, combos) sont dans /faq et docs/scoring.md. Pas de changements arbitraires : toute modification est annoncée avant d'affecter les matchs futurs et n'affecte jamais rétroactivement les points déjà consolidés."
+          "body": "Les règles de score (prédictions simple, exacte, double, séries, combos) sont expliquées dans la section Questions fréquentes. Elles ne sont pas sujettes à des changements arbitraires : toute modification est annoncée avant d'affecter les matchs futurs et n'affecte jamais rétroactivement les points déjà consolidés."
         },
         "userContent": {
           "heading": "Contenu que tu génères",
-          "body": "Ton nom, ton username et tes prédictions sont visibles selon ta configuration de confidentialité. Tu gardes la propriété de ce contenu ; nous l'affichons seulement. Pas d'usage commercial."
+          "body": "Ton nom, ton nom d'utilisateur et tes prédictions sont visibles selon ta configuration de confidentialité. Tu gardes la propriété de ce contenu ; nous l'affichons uniquement à l'intérieur du jeu. Pas d'usage commercial."
         },
         "conduct": {
           "heading": "Comportement attendu",
-          "body": "Ne pas utiliser l'app pour : harcèlement, langage offensant, manipulation du classement (multi-comptes, bots), abus d'API, rétro-ingénierie, attaques. Nous nous réservons le droit de suspendre les comptes en infraction."
+          "body": "Il est interdit d'utiliser l'app pour harceler d'autres utilisateurs, employer un langage offensant dans ton nom ou ton nom d'utilisateur, manipuler le classement avec de faux comptes ou des automatisations, ou attaquer le service. Nous nous réservons le droit de suspendre les comptes en infraction."
         },
         "intellectualProperty": {
           "heading": "Propriété intellectuelle",
-          "body": "Le code, design, copys et la marque \"WebMundial 26\" appartiennent à Héctor Escolante. Les données des matchs viennent d'api-football et appartiennent à leurs détenteurs respectifs."
+          "body": "Le code, design, textes et la marque « WebMundial 26 » appartiennent à son équipe de développement. Les données des matchs de la Coupe du Monde 2026 proviennent de notre fournisseur de données sportives et appartiennent à leurs détenteurs respectifs. Ne reproduis pas l'app sans autorisation."
         },
         "termination": {
           "heading": "Résiliation",
@@ -760,7 +760,7 @@
         },
         "disclaimer": {
           "heading": "Avertissement",
-          "body": "WebMundial 26 est un jeu de divertissement. Ce n'est pas un service de paris : pas de prix monétaires. L'app est fournie \"telle quelle\", sans garantie de disponibilité continue. Si les données api-football arrivent en retard ou avec des erreurs, nous faisons de notre mieux mais ne pouvons pas garantir l'exactitude absolue."
+          "body": "WebMundial 26 est un jeu de divertissement. Ce n'est pas un service de paris : pas de prix monétaires. L'app est fournie « telle quelle », sans garantie de disponibilité continue. Si les données des matchs arrivent en retard ou avec des erreurs depuis notre fournisseur externe, nous faisons de notre mieux pour les corriger, mais nous ne pouvons pas garantir l'exactitude absolue."
         },
         "liability": {
           "heading": "Limitation de responsabilité",
@@ -768,7 +768,7 @@
         },
         "changes": {
           "heading": "Changements des conditions",
-          "body": "Nous pouvons mettre à jour ces conditions. Si le changement est matériel, nous t'informerons avant l'entrée en vigueur."
+          "body": "Nous pouvons mettre à jour ces conditions. Si le changement est matériel, nous t'informerons dans l'app avant l'entrée en vigueur."
         },
         "governingLaw": {
           "heading": "Loi applicable",
@@ -776,7 +776,7 @@
         },
         "contact": {
           "heading": "Contact",
-          "body": "Toute question sur ces conditions : hector.escolante@clouddistrict.com."
+          "body": "Pour toute question sur ces conditions, tu pourras nous écrire via le canal de contact que nous activerons à l'ouverture publique de la plateforme."
         }
       }
     }

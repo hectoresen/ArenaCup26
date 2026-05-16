@@ -370,7 +370,7 @@ Para que los usuarios reciban notificaciones push (friend requests, partidos fin
 2. Railway → Variables:
    - `NEXT_PUBLIC_VAPID_PUBLIC_KEY=<public-key>` (visible al browser).
    - `VAPID_PRIVATE_KEY=<private-key>` (server-only, firma los pushes).
-   - `VAPID_SUBJECT=mailto:<email-de-contacto>` (default: `mailto:hector.escolante@clouddistrict.com`).
+   - `VAPID_SUBJECT=mailto:<email-de-contacto>` (sin default — requerido. Setear con el correo oficial de soporte cuando esté habilitado).
 3. Redeploy.
 4. Verificación: ir a `/ajustes/privacidad` con sesión iniciada → debe aparecer el bloque "Notificaciones push" con botón "Activar".
 

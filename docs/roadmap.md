@@ -197,6 +197,19 @@ Editar nombre + avatar desde el perfil propio.
 
 Sin solapamiento con el análisis de producto, siguen activos:
 
+- **Canal de contacto público (correo de soporte)** — la política
+  de privacidad y los términos de uso referencian "el canal de
+  contacto que habilitaremos cuando la plataforma se abra al
+  público". Cuando esté listo (e.g. `soporte@<dominio>` o un
+  helpdesk), hay que:
+    - Setear `VAPID_SUBJECT=mailto:<correo>` en Railway para que
+      el push system salga de noop (ver `src/server/push/client.ts`).
+    - Añadir el correo en las secciones `controller`, `rights`,
+      `contact` de `legal.privacy` y `legal.terms` en es/en/fr/ar
+      (sin nombres personales).
+    - Reflejarlo en `docs/security.md §9.5`.
+  Hasta entonces, la app puede operar sin push (queda en noop) y
+  los copys legales mencionan el canal "próximamente".
 - **CRIT-1 · Rotar credenciales filtradas**
   (`API_FOOTBALL_KEY`, `GOOGLE_CLIENT_SECRET`). Tarea operativa
   manual; pasos detallados en `docs/security.md §9.1`.

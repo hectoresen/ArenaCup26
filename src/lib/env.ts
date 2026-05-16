@@ -91,7 +91,13 @@ const baseSchema = z.object({
   // en `docs/security.md §9.5`.
   NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
-  VAPID_SUBJECT: z.string().default("mailto:hector.escolante@clouddistrict.com"),
+  // Subject identifies WHO operates the push service to providers
+  // (Mozilla/Apple/FCM) — necesario para que acepten los pushes.
+  // **No** debe ser un email personal. TODO: cuando habilitemos el
+  // canal de contacto oficial, setear `VAPID_SUBJECT=mailto:<email>`
+  // en Railway. Mientras no esté seteado, el push system queda en
+  // noop igual que sin VAPID keys (ver `getPushClient`).
+  VAPID_SUBJECT: z.string().optional(),
 
   // Runtime
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),

@@ -14,7 +14,15 @@ import { dlog } from "@/lib/debug-log";
  * firma los pushes).
  */
 export function getPushClient(): typeof webpush | null {
-  if (!env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY) {
+  if (
+    !env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
+    !env.VAPID_PRIVATE_KEY ||
+    !env.VAPID_SUBJECT
+  ) {
+    // Falta VAPID_SUBJECT también: los providers (FCM/Mozilla) lo
+    // exigen como contacto del operador del push service. Mientras
+    // no haya un canal de contacto público, el sistema queda en
+    // noop a propósito (mejor que filtrar un correo personal).
     return null;
   }
   webpush.setVapidDetails(
