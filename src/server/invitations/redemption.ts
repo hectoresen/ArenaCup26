@@ -7,7 +7,7 @@ import {
   invitationRedemptions,
   invitations,
 } from "@/server/db/schema";
-import { createNotification } from "@/server/notifications/create";
+import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import { findRedeemableInvitation } from "./queries";
 
 /**
@@ -131,12 +131,13 @@ export async function redeemInvitationForUser(
 
   // Notificación al inviter. El invitee es nuevo así que no tiene
   // bell todavía; no le notificamos.
-  await createNotification({
+  await notifyWithPush({
     db,
     userId: invitation.inviterId,
     kind: "friend_accepted",
     title: `${inviteeName?.trim() || "Alguien"} se ha unido con tu invitación`,
     body: null,
+    pushable: true,
   });
 
   dlog("ranking", "invitation redeemed", {

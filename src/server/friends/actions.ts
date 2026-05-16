@@ -6,7 +6,7 @@ import { dlog } from "@/lib/debug-log";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { friendships, users } from "@/server/db/schema";
-import { createNotification } from "@/server/notifications/create";
+import { notifyWithPush } from "@/server/notifications/notify-with-push";
 
 export type FriendActionResult =
   | { ok: true }
@@ -76,12 +76,13 @@ export async function sendFriendRequest(targetUsername: string): Promise<FriendA
     status: "pending",
   });
 
-  await createNotification({
+  await notifyWithPush({
     db,
     userId: target.id,
     kind: "friend_request",
     title: `${session.user.name ?? "Alguien"} te ha enviado una solicitud de amistad`,
     body: null,
+    pushable: true,
   });
 
   dlog("ranking", "friend_request_sent", { fromId, toId: target.id });
@@ -115,12 +116,13 @@ export async function acceptFriendRequest(friendshipId: string): Promise<FriendA
   const row = rows[0];
   if (!row) return { ok: false, code: "not_pending" };
 
-  await createNotification({
+  await notifyWithPush({
     db,
     userId: row.requesterId,
     kind: "friend_accepted",
     title: `${session.user.name ?? "Tu amigo"} ha aceptado tu solicitud`,
     body: null,
+    pushable: true,
   });
 
   dlog("ranking", "friend_request_accepted", { friendshipId, by: userId });

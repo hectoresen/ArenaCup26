@@ -8,7 +8,7 @@ import {
   userAchievements,
   userPoints,
 } from "@/server/db/schema";
-import { createNotification } from "@/server/notifications/create";
+import { notifyWithPush } from "@/server/notifications/notify-with-push";
 
 /**
  * Reglas de unlock evaluables hoy a partir del estado en BD. Para
@@ -136,13 +136,14 @@ export async function evaluateAndUnlock(
         .where(eq(achievementDefinitions.id, achievementId))
         .limit(1);
 
-      await createNotification({
+      await notifyWithPush({
         db,
         userId,
         kind: "achievement_unlocked",
         title: "Logro desbloqueado",
         body: def[0]?.title ?? achievementId,
         achievementId,
+        pushable: true,
       });
 
       newlyUnlocked.push(achievementId);

@@ -12,7 +12,7 @@ import {
 import { derr } from "@/lib/debug-log";
 import { evaluateAndUnlock } from "@/server/achievements/unlock";
 import { payReferralBonusIfFirstHit } from "@/server/invitations/referral-payout";
-import { createNotification } from "@/server/notifications/create";
+import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import { scoreMatchPrediction } from "./engine";
 import type {
   MatchOutcome,
@@ -325,7 +325,7 @@ async function persistScore({
     });
 
   // 3) Notificación al usuario con el resultado.
-  await createNotification({
+  await notifyWithPush({
     db,
     userId,
     kind: "match_finished",
@@ -334,6 +334,7 @@ async function persistScore({
       ? `+${scored.points} puntos ${scored.kind === "exact" ? "💎 marcador exacto" : ""}`.trim()
       : "Fallaste esta predicción. ¡La próxima!",
     matchId,
+    pushable: true,
   });
 }
 
