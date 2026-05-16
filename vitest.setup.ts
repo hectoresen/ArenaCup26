@@ -27,6 +27,11 @@ vi.mock("@/server/friends/actions", () => ({
   rejectFriendRequest: vi.fn(async () => ({ ok: true })),
   removeFriend: vi.fn(async () => ({ ok: true })),
 }));
+vi.mock("@/server/invitations/actions", () => ({
+  createInvitation: vi.fn(async () => ({ ok: true, token: "tok", url: "http://x/?invite=tok" })),
+  revokeInvitation: vi.fn(async () => ({ ok: true })),
+  dismissInviteCookie: vi.fn(async () => ({ ok: true })),
+}));
 
 /**
  * Env vars mínimas para que cualquier test que importe (directa o

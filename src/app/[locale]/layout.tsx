@@ -1,3 +1,4 @@
+import { InviteBannerMount } from "@/components/invitations/invite-banner-mount";
 import { env } from "@/lib/env";
 import { isValidLocale, routing } from "@/i18n/routing";
 import type { Metadata, Viewport } from "next";
@@ -117,7 +118,13 @@ export default async function LocaleLayout({
         >
           {dir === "rtl" ? "تخطّى إلى المحتوى" : "Saltar al contenido"}
         </a>
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>
+          {/* Banner sticky cuando hay cookie de invite activa y el
+              visitante NO está logado. SSR-only — el server resuelve
+              el inviter; si no aplica, no se monta nada. */}
+          <InviteBannerMount />
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

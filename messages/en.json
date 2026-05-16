@@ -590,6 +590,12 @@
     }
   },
   "invite": {
+    "banner": {
+      "ariaLabel": "Active invite",
+      "title": "<em>{name}</em> invited you",
+      "subtitle": "When you sign up, we automatically connect as friends.",
+      "dismiss": "Dismiss invite"
+    },
     "title": "Invite friends",
     "subtitleEmpty": "Nobody has joined with your links yet.",
     "subtitleCount": "{count, plural, =1 {1 friend has joined with your invitation.} other {# friends have joined with your invitation.}}",

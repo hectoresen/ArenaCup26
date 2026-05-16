@@ -1,11 +1,13 @@
 "use server";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { dlog } from "@/lib/debug-log";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { invitations } from "@/server/db/schema";
+import { INVITE_COOKIE } from "./cookie";
 import { generateInvitationToken } from "./redemption";
 
 export type CreateInvitationResult =
@@ -95,5 +97,18 @@ export async function revokeInvitation(
     invitationId,
   });
   revalidatePath("/amigos/invitar");
+  return { ok: true };
+}
+
+/**
+ * Borra la cookie del invite token. La invoca el botón × del
+ * `<InviteBanner>` cuando el visitante quiere ocultarlo sin
+ * registrarse. Diferenciado del flow de redención porque aquí no
+ * tocamos BD — solo desechamos el token persistido en cookie.
+ */
+export async function dismissInviteCookie(): Promise<{ ok: true }> {
+  const cookieStore = await cookies();
+  cookieStore.delete(INVITE_COOKIE);
+  dlog("ranking", "invite cookie dismissed by user");
   return { ok: true };
 }

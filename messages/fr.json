@@ -590,6 +590,12 @@
     }
   },
   "invite": {
+    "banner": {
+      "ariaLabel": "Invitation active",
+      "title": "<em>{name}</em> t'a invité",
+      "subtitle": "Lors de ton inscription, vous devenez amis automatiquement.",
+      "dismiss": "Ignorer l'invitation"
+    },
     "title": "Inviter des amis",
     "subtitleEmpty": "Personne n'est encore venu avec tes liens.",
     "subtitleCount": "{count, plural, =1 {1 ami a rejoint avec ton invitation.} other {# amis ont rejoint avec ton invitation.}}",

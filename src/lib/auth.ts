@@ -4,6 +4,7 @@ import { checkSignupLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { db } from "@/server/db/client";
 import { accounts, sessions, users, verificationTokens } from "@/server/db/schema";
+import { INVITE_COOKIE } from "@/server/invitations/cookie-constants";
 import { redeemInvitationForUser } from "@/server/invitations/redemption";
 import { resolveAvailableUsername, slugifyName } from "@/server/users/username";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
@@ -11,8 +12,6 @@ import { eq } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-
-const INVITE_COOKIE = "wm_invite_token";
 
 /**
  * Auth.js v5 configuration.
