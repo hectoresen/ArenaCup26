@@ -78,4 +78,66 @@ describe("<NotificationBell> — dropdown abierto", () => {
     expect(screen.getByText("Predicción enviada")).toBeInTheDocument();
     expect(screen.getByText("Argentina vs México")).toBeInTheDocument();
   });
+
+  it("friend_request enlaza a /amigos (click navigates al inbox)", async () => {
+    const item: NotificationItem = {
+      id: "n2",
+      kind: "friend_request",
+      title: "Krawer te envió una solicitud",
+      body: null,
+      matchId: null,
+      achievementId: null,
+      readAt: null,
+      createdAt: new Date(),
+    };
+    const user = (await import("@testing-library/user-event")).default.setup();
+    renderWithProviders(
+      <NotificationBell initialItems={[item]} initialUnreadCount={1} onMarkAllRead={noop} />,
+    );
+    await user.click(screen.getByRole("button", { name: /sin leer/ }));
+    const link = screen.getByRole("link", { name: /Krawer/ });
+    expect(link.getAttribute("href")).toMatch(/\/amigos$/);
+  });
+
+  it("achievement_unlocked enlaza a /logros", async () => {
+    const item: NotificationItem = {
+      id: "n3",
+      kind: "achievement_unlocked",
+      title: "Logro desbloqueado",
+      body: "Primer Acierto",
+      matchId: null,
+      achievementId: "first-hit",
+      readAt: null,
+      createdAt: new Date(),
+    };
+    const user = (await import("@testing-library/user-event")).default.setup();
+    renderWithProviders(
+      <NotificationBell initialItems={[item]} initialUnreadCount={1} onMarkAllRead={noop} />,
+    );
+    await user.click(screen.getByRole("button", { name: /sin leer/ }));
+    const link = screen.getByRole("link", { name: /Logro desbloqueado/ });
+    expect(link.getAttribute("href")).toMatch(/\/logros$/);
+  });
+
+  it("system kind no enlaza (div no clicable)", async () => {
+    const item: NotificationItem = {
+      id: "n4",
+      kind: "system",
+      title: "Mantenimiento programado",
+      body: null,
+      matchId: null,
+      achievementId: null,
+      readAt: null,
+      createdAt: new Date(),
+    };
+    const user = (await import("@testing-library/user-event")).default.setup();
+    const { container } = renderWithProviders(
+      <NotificationBell initialItems={[item]} initialUnreadCount={1} onMarkAllRead={noop} />,
+    );
+    await user.click(screen.getByRole("button", { name: /sin leer/ }));
+    // No hay <a> con ese texto: la fila se renderiza como <div>.
+    expect(screen.queryByRole("link", { name: /Mantenimiento/ })).toBeNull();
+    // Pero el texto sigue visible dentro del menu.
+    expect(container.textContent).toContain("Mantenimiento programado");
+  });
 });

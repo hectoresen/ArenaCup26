@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { dlog } from "@/lib/debug-log";
 import { auth } from "@/lib/auth";
@@ -33,18 +33,14 @@ export async function createInvitation(
   }
   const userId = session.user.id;
 
-  const active = await db
-    .select({ id: invitations.id })
+  // Cap solo a links NO revocados — el user puede rotar libremente
+  // sin quedar bloqueado por links viejos que ya cortó. COUNT(*) en
+  // BD para no traer filas innecesarias.
+  const countRows = await db
+    .select({ n: sql<number>`count(*)::int` })
     .from(invitations)
-    .where(and(eq(invitations.inviterId, userId)));
-  const stillActive = active.length; // counter rough — incluye revocados, simpler
-  // Refinamos: solo los no-revocados cuentan para el cap.
-  const live = await db
-    .select({ id: invitations.id })
-    .from(invitations)
-    .where(and(eq(invitations.inviterId, userId)));
-  const liveCount = live.length;
-  void stillActive;
+    .where(and(eq(invitations.inviterId, userId), isNull(invitations.revokedAt)));
+  const liveCount = countRows[0]?.n ?? 0;
   if (liveCount >= MAX_ACTIVE_LINKS) {
     return { ok: false, code: "limit_reached" };
   }
