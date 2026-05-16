@@ -361,22 +361,64 @@ Lo que tracking: page views + outbound link clicks. NO se envía ni email, ni no
 
 ### 9.5 Activar Web Push notifications (opcional)
 
-Para que los usuarios reciban notificaciones push (friend requests, partidos finalizados, etc.) cuando la app no está abierta:
+#### Qué es VAPID y por qué lo usamos
+
+VAPID (RFC 8292, *Voluntary Application Server Identification for Web Push*) es el estándar que permite a un servidor identificarse ante los servicios de push del navegador (Google FCM, Mozilla autopush, Apple Push) **sin tener que registrarse en cada uno por separado**. La identificación se hace con un par de claves criptográficas: una pública que el navegador del usuario incluye en su subscripción al hacer opt-in, y una privada que el servidor usa para firmar cada push. El servicio del navegador verifica la firma y, si cuadra, entrega la notificación. Sin VAPID configurado, no podemos enviar pushes a través de ningún navegador moderno.
+
+#### Cómo funciona el flujo end-to-end
+
+1. **Setup global** (una vez): generamos un par VAPID en `Railway → Variables`. La pública es pública (viaja al cliente); la privada es secreta (solo server).
+2. **Opt-in del usuario**: en `/ajustes/privacidad` aparece el bloque "Notificaciones push" cuando hay VAPID público en el cliente. El usuario clica "Activar", el navegador pide permiso, y al aceptar registra una subscripción contra el push service correspondiente (FCM si Chrome/Edge, Mozilla si Firefox, Apple si Safari).
+3. **Persistencia**: la subscripción (`endpoint + p256dh + auth`) se guarda en la tabla `push_subscriptions` ligada al `user_id`. Un usuario puede tener varias (móvil + escritorio + tablet).
+4. **Envío**: cuando ocurre un evento pushable (ver tabla abajo), `notifyWithPush` inserta la fila in-app y dispara push a todas las subscripciones del destinatario en paralelo. La URL del push coincide con la del click en la campana (`resolveNotificationHref`).
+5. **Cleanup**: si un push devuelve 404/410 (subscripción revocada por el usuario o caducada), la fila se borra automáticamente para no reintentar.
+
+#### Setup operativo
 
 1. Generar VAPID keys (una vez):
    ```bash
-   npx web-push generate-vapid-keys
+   npx web-push generate-vapid-keys --json
    ```
-2. Railway → Variables:
-   - `NEXT_PUBLIC_VAPID_PUBLIC_KEY=<public-key>` (visible al browser).
-   - `VAPID_PRIVATE_KEY=<private-key>` (server-only, firma los pushes).
-   - `VAPID_SUBJECT=mailto:<email-de-contacto>` (sin default — requerido. Setear con el correo oficial de soporte cuando esté habilitado).
-3. Redeploy.
-4. Verificación: ir a `/ajustes/privacidad` con sesión iniciada → debe aparecer el bloque "Notificaciones push" con botón "Activar".
+   La salida es un JSON con `publicKey` y `privateKey`. Guarda ambos — la privada **no se vuelve a poder recuperar** si la pierdes; tendrías que generar otro par y eso invalida todas las subscripciones existentes.
 
-Sin las dos primeras variables, el bloque no se monta (UX limpia para entornos sin push). El service worker `public/sw.js` se registra dinámicamente al activar.
+2. Railway → Variables del servicio principal:
+   - `NEXT_PUBLIC_VAPID_PUBLIC_KEY=<publicKey>` (visible al browser; el prefijo `NEXT_PUBLIC_` se inyecta en bundle cliente).
+   - `VAPID_PRIVATE_KEY=<privateKey>` (server-only; **secret** — no commiteable, no logueable).
+   - `VAPID_SUBJECT=mailto:<email-de-contacto>` (requerido por los push providers para contacto en caso de abuso; ver §9.6 para el TODO del correo público).
+3. Railway redeploya automáticamente al setear variables.
+4. Verificación: ir a `/ajustes/privacidad` con sesión → bloque "Notificaciones push" visible con botón "Activar".
 
-PII / data flow: la subscripción del browser (endpoint + 2 keys) se guarda en la tabla `push_subscriptions` ligada al `user_id`. El payload de cada push es `{title, body, url}` — sin email, sin password tokens. Si el provider devuelve 410 Gone, la fila se borra automáticamente.
+#### Eventos pushables
+
+| Kind del notification | Origen en código | URL al hacer click |
+| --------------------- | ----------------- | ----------------- |
+| `friend_request` | `friends/actions.ts::sendFriendRequest` | `/amigos` |
+| `friend_accepted` (manual) | `friends/actions.ts::acceptFriendRequest` | `/amigos` |
+| `friend_accepted` (invitación) | `invitations/redemption.ts::redeemInvitationForUser` | `/amigos` |
+| `achievement_unlocked` | `achievements/unlock.ts::evaluateAndUnlock` | `/logros` |
+| `match_finished` | `scoring/pipeline.ts::processFinishedMatch` | `/partidos/<matchId>` |
+
+No-pushables (in-app únicamente):
+- `prediction_sent` — demasiado ruidoso si el user envía muchas seguidas.
+- `prediction_locked` — informativo, sin urgencia.
+- `system` — sin URL de destino; usado para mensajes operativos puntuales (e.g. bonus de referral).
+
+#### Comportamiento sin VAPID configurado
+
+- El bloque "Notificaciones push" en `/ajustes/privacidad` **no se renderiza** (la página detecta que `NEXT_PUBLIC_VAPID_PUBLIC_KEY` está vacía).
+- `notifyWithPush` cae en la rama `not_configured` y **solo guarda la fila in-app**. La campana del shell sigue funcionando con normalidad — solo se pierden los pushes al sistema operativo del usuario.
+- Ningún error visible para el usuario final. El modo noop es 100% transparente.
+
+#### PII y data flow
+
+- Lo que persiste: `endpoint` (URL del push service), `p256dh` (clave pública del browser), `auth` (secret del browser), `userId`, `createdAt`, `lastUsedAt`.
+- Lo que se envía al push service: el payload `{title, body, url}` cifrado con la clave del browser + firma VAPID. El payload **nunca contiene email, nombre real ni tokens de sesión**.
+- Lo que el push service ve en claro: solo el `endpoint` (que él mismo emitió) y los headers VAPID con el subject. No ve quién es el destinatario más allá de "el dueño del endpoint".
+- Borrado: al desactivar push desde la UI, la subscripción se borra en cliente (`unsubscribe()`) y en servidor (`unsubscribePush`).
+
+#### Service worker
+
+El service worker está en `public/sw.js` y se registra dinámicamente cuando el usuario clica "Activar". No intercepta `fetch` (la app **no es offline-first** hoy). Solo escucha los eventos `push` (mostrar notificación) y `notificationclick` (enfocar pestaña existente o abrir nueva). Si en el futuro queremos modo offline, ese mismo SW alojará las cache strategies.
 
 ---
 
