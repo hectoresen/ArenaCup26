@@ -1,22 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="40%" r="65%">
-      <stop offset="0%" stop-color="#f5c842"/>
-      <stop offset="55%" stop-color="#e8a800"/>
-      <stop offset="100%" stop-color="#1a1000"/>
-    </radialGradient>
-    <linearGradient id="ball" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#cdd6e4"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a2030"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </linearGradient>
+    <linearGradient id="tG" x1="256" y1="112" x2="256" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#ffe066"/>
+      <stop offset="45%"  stop-color="#f5c842"/>
+      <stop offset="100%" stop-color="#a06800"/>
+    </linearGradient>
+    <linearGradient id="tS" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe88a"/>
+      <stop offset="100%" stop-color="#7a4800"/>
+    </linearGradient>
+    <linearGradient id="hG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffe066"/>
+      <stop offset="100%" stop-color="#c88800"/>
+    </linearGradient>
+    <linearGradient id="sG" x1="224" y1="304" x2="288" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d4920a"/>
+      <stop offset="100%" stop-color="#a06800"/>
+    </linearGradient>
+    <linearGradient id="bsG" x1="176" y1="400" x2="336" y2="432" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#c88800"/>
+      <stop offset="50%" stop-color="#f0b830"/>
+      <stop offset="100%" stop-color="#a06800"/>
     </linearGradient>
   </defs>
+
+  <!-- Rounded square background (PWA/iOS convention) -->
   <rect width="512" height="512" rx="100" fill="url(#bg)"/>
-  <g transform="translate(256 256)">
-    <circle r="150" fill="url(#ball)" stroke="#1a1000" stroke-width="6"/>
-    <polygon points="0,-60 57,-19 35,49 -35,49 -57,-19" fill="#1a1000"/>
-    <polygon points="-150,0 -90,-60 -57,-19 -100,40 -150,30" fill="#1a1000" opacity="0.4"/>
-    <polygon points="150,0 90,-60 57,-19 100,40 150,30" fill="#1a1000" opacity="0.4"/>
-    <polygon points="-100,90 -35,49 0,90 35,49 100,90 0,150" fill="#1a1000" opacity="0.4"/>
-  </g>
+
+  <!-- Trophy cup body -->
+  <path d="M144 112 C120 112 96 136 96 176 C96 232 128 272 184 296 L216 312 L296 312 L328 296 C384 272 416 232 416 176 C416 136 392 112 368 112 Z"
+        fill="url(#tG)" stroke="url(#tS)" stroke-width="3"/>
+
+  <!-- Cup shine -->
+  <ellipse cx="208" cy="176" rx="32" ry="56" fill="rgba(255,255,255,0.18)" transform="rotate(-10 208 176)"/>
+
+  <!-- Left handle -->
+  <path d="M144 160 C88 152 72 208 96 240 C104 256 128 264 144 256"
+        fill="none" stroke="url(#hG)" stroke-width="26" stroke-linecap="round"/>
+
+  <!-- Right handle -->
+  <path d="M368 160 C424 152 440 208 416 240 C408 256 384 264 368 256"
+        fill="none" stroke="url(#hG)" stroke-width="26" stroke-linecap="round"/>
+
+  <!-- Stem -->
+  <rect x="227" y="312" width="58" height="88" rx="16" fill="url(#sG)"/>
+
+  <!-- Base -->
+  <rect x="176" y="400" width="160" height="36" rx="18" fill="url(#bsG)"/>
+
+  <!-- Football on top of cup -->
+  <circle cx="256" cy="88" r="52" fill="#f0f0f0" stroke="#1a1a2e" stroke-width="3"/>
+  <polygon points="256,45 275,61 268,84 244,84 237,61" fill="#111" opacity="0.85"/>
+  <polygon points="211,67 237,61 244,84 224,99 205,89" fill="#111" opacity="0.65"/>
+  <polygon points="301,67 275,61 268,84 288,99 307,89" fill="#111" opacity="0.65"/>
+  <polygon points="220,114 244,84 256,99 268,84 292,114 256,140" fill="#111" opacity="0.7"/>
 </svg>

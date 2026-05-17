@@ -20,9 +20,12 @@ type Props = {
  *  - **Title** coloreado por tier con text-shadow en tier alto.
  *  - **Description** muted, 2 líneas máx.
  *  - **Unlocked check** SVG absolute bottom-right (no emoji).
+ *  - **Accent strip** top-edge degradada según tier (refuerza la
+ *    identidad cromática cuando hay muchas cards juntas).
  *  - Hover: lift -3px + drop-shadow + icon scale 1.16 + rotate.
- *  - Estado `locked` → opacity 0.36 + greyscale 0.7, sin pointer
- *    events (no se puede compartir).
+ *  - Estado `locked` → borde dashed en tier-color con opacity baja,
+ *    greyscale parcial y opacity 0.55. Más legible que un fade plano
+ *    y deja clarísimo que "está ahí pero todavía no es tuyo".
  *  - Share chip al hover SOLO en tier legendary/mythic/goat.
  */
 export function AchievementCard({ achievement, ownerUsername }: Props) {
@@ -39,9 +42,17 @@ export function AchievementCard({ achievement, ownerUsername }: Props) {
       className={`group relative overflow-hidden rounded-2xl border-2 px-4 pb-3.5 pt-6 transition-[transform,box-shadow] duration-200 ${
         unlocked
           ? `${tierBorder(definition.tier)} ${tierHoverShadow(definition.tier)} bg-card hover:-translate-y-[3px]`
-          : "pointer-events-none border-border bg-card opacity-[0.36] [filter:grayscale(0.7)]"
+          : `${tierBorderLocked(definition.tier)} pointer-events-none border-dashed bg-card opacity-[0.55] [filter:grayscale(0.45)]`
       }`}
     >
+      {/* Accent strip top — refuerza la identidad de tier */}
+      {unlocked && (
+        <span
+          aria-hidden="true"
+          className={`absolute inset-x-0 top-0 h-[2px] ${tierAccentStrip(definition.tier)}`}
+        />
+      )}
+
       {/* Rarity badge — top-right, color per tier */}
       <span
         className={`absolute end-2.5 top-2.5 inline-flex items-center rounded-full border-[1.5px] px-2 py-px text-[9px] font-black uppercase tracking-[0.1em] ${rarityBadgeClass(definition.tier)}`}
@@ -121,6 +132,49 @@ function tierBorder(tier: ProfileAchievement["definition"]["tier"]): string {
       return "border-warm/35";
     case "goat":
       return "border-silver/35";
+  }
+}
+
+/**
+ * Borde dashed con muy poca opacidad para el estado locked. Mantiene
+ * la identidad de tier sin gritar — el contenido ya está fadeado.
+ */
+function tierBorderLocked(tier: ProfileAchievement["definition"]["tier"]): string {
+  switch (tier) {
+    case "common":
+      return "border-success/20";
+    case "rare":
+      return "border-info/20";
+    case "epic":
+      return "border-purple-400/20";
+    case "legendary":
+      return "border-gold/25";
+    case "mythic":
+      return "border-warm/25";
+    case "goat":
+      return "border-silver/25";
+  }
+}
+
+/**
+ * Franja superior de 2px con gradiente del color del tier. Solo se
+ * pinta en cards unlocked. Refuerza la identidad cromática cuando
+ * hay un grid de muchas cards mezcladas.
+ */
+function tierAccentStrip(tier: ProfileAchievement["definition"]["tier"]): string {
+  switch (tier) {
+    case "common":
+      return "bg-gradient-to-r from-transparent via-success/60 to-transparent";
+    case "rare":
+      return "bg-gradient-to-r from-transparent via-info/60 to-transparent";
+    case "epic":
+      return "bg-gradient-to-r from-transparent via-purple-400/70 to-transparent";
+    case "legendary":
+      return "bg-gradient-to-r from-transparent via-gold/80 to-transparent";
+    case "mythic":
+      return "bg-gradient-to-r from-transparent via-warm/80 to-transparent";
+    case "goat":
+      return "bg-gradient-to-r from-transparent via-silver/90 to-transparent";
   }
 }
 
