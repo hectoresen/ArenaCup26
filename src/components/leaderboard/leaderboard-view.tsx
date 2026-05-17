@@ -1,5 +1,6 @@
 "use client";
 
+import { CountryFlag } from "@/components/common/country-flag";
 import { TopChrome } from "@/components/layout/top-chrome";
 import { useLiveSnapshot } from "@/hooks/use-live-snapshot";
 import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/types";
@@ -67,10 +68,10 @@ export function LeaderboardView({
           <div className="mb-2.5 font-display text-[13px] uppercase tracking-[0.18em] text-gold opacity-80">
             {t("tagline")}
           </div>
-          <div className="mb-3 block text-xl tracking-[4px]">
-            <span aria-label={t("hostFlags.canada")}>🇨🇦</span>{" "}
-            <span aria-label={t("hostFlags.mexico")}>🇲🇽</span>{" "}
-            <span aria-label={t("hostFlags.usa")}>🇺🇸</span>
+          <div className="mb-3 flex items-center justify-center gap-2">
+            <CountryFlag code="CA" name={t("hostFlags.canada")} size={28} className="rounded-sm" />
+            <CountryFlag code="MX" name={t("hostFlags.mexico")} size={28} className="rounded-sm" />
+            <CountryFlag code="US" name={t("hostFlags.usa")} size={28} className="rounded-sm" />
           </div>
           <LiveBadge>{t("liveBadge")}</LiveBadge>
           {!user && (

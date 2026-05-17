@@ -8,6 +8,9 @@
       "cancel": "Annuler"
     }
   },
+  "footer": {
+    "tagline": "Pronostics de la Coupe du Monde 2026"
+  },
   "leaderboard": {
     "tagline": "FIFA Coupe du Monde · Canada · Mexique · USA",
     "liveBadge": "Classement en direct",
@@ -309,6 +312,7 @@
     "identityLabel": "Profil de {name}",
     "avatarLabel": "Avatar de {name}",
     "flagAria": "Pays : {country}",
+    "onlineLabel": "Actif dans les dernières 24h",
     "copyLink": "Copier le lien",
     "copied": "Copié !",
     "rankLabel": "Ta position",

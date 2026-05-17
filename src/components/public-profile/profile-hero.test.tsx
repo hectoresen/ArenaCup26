@@ -12,6 +12,7 @@ function buildIdentity(overrides: Partial<ProfileIdentity> = {}): ProfileIdentit
     flag: "🇲🇽",
     image: null,
     avatarId: null,
+    isOnline: false,
     ...overrides,
   };
 }

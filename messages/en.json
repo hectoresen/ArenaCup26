@@ -8,6 +8,9 @@
       "cancel": "Cancel"
     }
   },
+  "footer": {
+    "tagline": "2026 World Cup predictions"
+  },
   "leaderboard": {
     "tagline": "FIFA World Cup · Canada · Mexico · USA",
     "liveBadge": "Live ranking",
@@ -309,6 +312,7 @@
     "identityLabel": "{name}'s profile",
     "avatarLabel": "{name}'s avatar",
     "flagAria": "Country: {country}",
+    "onlineLabel": "Active in the last 24h",
     "copyLink": "Copy link",
     "copied": "Copied!",
     "rankLabel": "Your rank",

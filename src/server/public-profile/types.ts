@@ -16,6 +16,12 @@ export type ProfileIdentity = {
    * Si está set, prevalece sobre `image` en el render del avatar.
    */
   avatarId: string | null;
+  /**
+   * `true` si el `lastActiveAt` está dentro de la ventana de 24h
+   * (mismo umbral que el ranking, ver `src/lib/leaderboard/real.ts`).
+   * Renderiza el puntito verde sobre el avatar en el hero.
+   */
+  isOnline: boolean;
 };
 
 export type ProfileStats = {

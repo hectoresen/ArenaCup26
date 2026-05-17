@@ -8,6 +8,9 @@
       "cancel": "إلغاء"
     }
   },
+  "footer": {
+    "tagline": "توقعات كأس العالم 2026"
+  },
   "leaderboard": {
     "tagline": "كأس العالم فيفا · كندا · المكسيك · الولايات المتحدة",
     "liveBadge": "التصنيف المباشر",
@@ -309,6 +312,7 @@
     "identityLabel": "الملف الشخصي لـ {name}",
     "avatarLabel": "الصورة الرمزية لـ {name}",
     "flagAria": "البلد: {country}",
+    "onlineLabel": "نشط خلال الـ 24 ساعة الأخيرة",
     "copyLink": "نسخ الرابط",
     "copied": "تم النسخ!",
     "rankLabel": "ترتيبك",

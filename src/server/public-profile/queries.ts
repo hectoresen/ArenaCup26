@@ -40,6 +40,7 @@ export async function getPublicProfile(
       image: users.image,
       avatarId: users.avatarId,
       privacy: users.privacy,
+      lastActiveAt: users.lastActiveAt,
     })
     .from(users)
     .where(eq(users.username, username))
@@ -103,6 +104,14 @@ export async function getPublicProfile(
 
   const unlockedMap = new Map(achievementRows.map((r) => [r.achievementId, r.unlockedAt]));
 
+  // Mismo umbral que el ranking: 24h. Si lastActiveAt es null, el
+  // user nunca pingó (no logueado nunca o seed sin online flag) →
+  // offline.
+  const ONLINE_WINDOW_MS = 24 * 60 * 60 * 1000;
+  const isOnline = user.lastActiveAt
+    ? Date.now() - user.lastActiveAt.getTime() <= ONLINE_WINDOW_MS
+    : false;
+
   return {
     kind: "found",
     profile: {
@@ -114,6 +123,7 @@ export async function getPublicProfile(
         flag,
         image: user.image,
         avatarId: user.avatarId,
+        isOnline,
       },
       stats: {
         rank,

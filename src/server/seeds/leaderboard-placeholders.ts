@@ -35,8 +35,14 @@ const SEED_USERS = [
     country: "BG",
     image: null as string | null,
     totalPoints: 85,
-    streak: 2,
+    // Algunos placeholders tienen rachas ≥ 3 para que el ranking
+    // se vea vivo (chip 🔥 ×N en `rank-row.tsx`); otros no, para
+    // que conviva con "sin racha" y resulte realista.
+    streak: 5,
     correctCount: 4,
+    /** Si `true`, el seed apareceá con el puntito verde de online
+     *  (ventana 24h en `real.ts`). Repartido para variedad. */
+    online: true,
     /** IDs de logros del catálogo a desbloquear (ver `achievements/catalog.ts`). */
     unlockedAchievements: ["first-hit", "exact-shot"],
   },
@@ -48,8 +54,9 @@ const SEED_USERS = [
     country: "JP",
     image: null as string | null,
     totalPoints: 70,
-    streak: 2,
+    streak: 4,
     correctCount: 4,
+    online: true,
     unlockedAchievements: ["first-hit", "exact-shot"],
   },
   {
@@ -60,8 +67,9 @@ const SEED_USERS = [
     country: "PE",
     image: null as string | null,
     totalPoints: 55,
-    streak: 1,
+    streak: 3,
     correctCount: 3,
+    online: false,
     unlockedAchievements: ["first-hit", "exact-shot"],
   },
   {
@@ -74,6 +82,7 @@ const SEED_USERS = [
     totalPoints: 40,
     streak: 0,
     correctCount: 2,
+    online: true,
     unlockedAchievements: ["first-hit"],
   },
   {
@@ -84,8 +93,9 @@ const SEED_USERS = [
     country: "SE",
     image: null as string | null,
     totalPoints: 30,
-    streak: 0,
+    streak: 6,
     correctCount: 2,
+    online: false,
     unlockedAchievements: ["first-hit"],
   },
   {
@@ -98,6 +108,7 @@ const SEED_USERS = [
     totalPoints: 20,
     streak: 0,
     correctCount: 1,
+    online: true,
     unlockedAchievements: ["first-hit"],
   },
   {
@@ -108,8 +119,9 @@ const SEED_USERS = [
     country: "CI",
     image: null as string | null,
     totalPoints: 10,
-    streak: 0,
+    streak: 3,
     correctCount: 1,
+    online: false,
     unlockedAchievements: ["first-hit"],
   },
 ] as const;
@@ -128,10 +140,17 @@ const SEED_USERS = [
  */
 export async function seedLeaderboardPlaceholders(db: Database): Promise<number> {
   let count = 0;
+  // `lastActiveAt` derivado del flag `online` del seed: si online,
+  // set a now() → muestra puntito verde en ranking y perfil. Si no,
+  // queda `null` → sin actividad reciente. Se refresca en cada
+  // ejecución del seed (deploys) para mantener "vivos" a los users
+  // que deberían estarlo.
+  const now = new Date();
   for (const seed of SEED_USERS) {
     // 1) Upsert del user. `email` es NOT NULL en el schema (Auth.js
     //    DrizzleAdapter); usamos un dominio reservado para que no
     //    colisione con emails reales y se detecte como sintético.
+    const lastActiveAt = seed.online ? now : null;
     await db
       .insert(users)
       .values({
@@ -141,6 +160,7 @@ export async function seedLeaderboardPlaceholders(db: Database): Promise<number>
         username: seed.username,
         country: seed.country,
         image: seed.image,
+        lastActiveAt,
       })
       .onConflictDoUpdate({
         target: users.id,
@@ -150,6 +170,7 @@ export async function seedLeaderboardPlaceholders(db: Database): Promise<number>
           username: seed.username,
           country: seed.country,
           image: seed.image,
+          lastActiveAt,
         },
       });
 

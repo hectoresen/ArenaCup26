@@ -1,3 +1,4 @@
+import { AppFooter } from "@/components/common/app-footer";
 import { InviteBannerMount } from "@/components/invitations/invite-banner-mount";
 import { env } from "@/lib/env";
 import { isValidLocale, routing } from "@/i18n/routing";
@@ -124,6 +125,7 @@ export default async function LocaleLayout({
               el inviter; si no aplica, no se monta nada. */}
           <InviteBannerMount />
           {children}
+          <AppFooter />
         </NextIntlClientProvider>
       </body>
     </html>

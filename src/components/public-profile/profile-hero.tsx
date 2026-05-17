@@ -26,26 +26,35 @@ export function ProfileHero({ identity, isOwner = false }: Props) {
   const galleryAvatar = getAvatar(identity.avatarId);
 
   const avatarVisual = (
-    <span
-      role="img"
-      aria-label={t("avatarLabel", { name: identity.name })}
-      className="inline-flex h-24 w-24 items-center justify-center rounded-full p-[3px] [background:conic-gradient(var(--color-gold)_0deg,var(--color-bronze)_120deg,var(--color-gold)_240deg,var(--color-gold-deep)_360deg)]"
-    >
-      <span className="inline-flex h-full w-full items-center justify-center overflow-hidden rounded-full border-[3px] border-black/25 bg-[radial-gradient(135deg,#ffe066,#c8900a)] font-display text-[34px] text-[#1a1000]">
-        {galleryAvatar ? (
-          <span className="text-[44px] leading-none">{galleryAvatar.emoji}</span>
-        ) : identity.image ? (
-          // biome-ignore lint/performance/noImgElement: small avatar
-          // biome-ignore lint/a11y/useAltText: alt resolved by parent label
-          <img
-            src={identity.image}
-            alt=""
-            className="h-full w-full rounded-full object-cover"
-          />
-        ) : (
-          initial
-        )}
+    <span className="relative inline-block">
+      <span
+        role="img"
+        aria-label={t("avatarLabel", { name: identity.name })}
+        className="inline-flex h-24 w-24 items-center justify-center rounded-full p-[3px] [background:conic-gradient(var(--color-gold)_0deg,var(--color-bronze)_120deg,var(--color-gold)_240deg,var(--color-gold-deep)_360deg)]"
+      >
+        <span className="inline-flex h-full w-full items-center justify-center overflow-hidden rounded-full border-[3px] border-black/25 bg-[radial-gradient(135deg,#ffe066,#c8900a)] font-display text-[34px] text-[#1a1000]">
+          {galleryAvatar ? (
+            <span className="text-[44px] leading-none">{galleryAvatar.emoji}</span>
+          ) : identity.image ? (
+            // biome-ignore lint/performance/noImgElement: small avatar
+            // biome-ignore lint/a11y/useAltText: alt resolved by parent label
+            <img
+              src={identity.image}
+              alt=""
+              className="h-full w-full rounded-full object-cover"
+            />
+          ) : (
+            initial
+          )}
+        </span>
       </span>
+      {identity.isOnline && (
+        <span
+          aria-label={t("onlineLabel")}
+          title={t("onlineLabel")}
+          className="absolute bottom-1 end-1 h-3.5 w-3.5 rounded-full border-2 border-card bg-success"
+        />
+      )}
     </span>
   );
 
