@@ -85,21 +85,25 @@ if (isProd) {
 }
 
 /**
- * Dominio primario donde queremos servir todo el tráfico SEO. Los
- * dominios secundarios apuntados a Railway hacen 301 a este host
- * preservando path + query.
+ * Dominio primario (canónico SEO). Los dominios secundarios
+ * apuntados a Railway hacen 301 aquí preservando path + query.
  *
- * `arenacup26.eu` y `arenacup26.online` están comprados pero no
- * conectados a Railway todavía (tier actual permite 2 custom
- * domains). Cuando se añadan, incluirlos en `SECONDARY_HOSTS`
- * y el redirect entra solo.
+ * Por qué `www.arenacup26.com` en vez del apex: Arsys (registrador)
+ * protege los registros A/AAAA del parking y no permite CNAME en
+ * `@` por restricción RFC. Solución pragmática: usar `www` como
+ * canónico (igual que Wikipedia o BBC). El apex `arenacup26.com`
+ * → 301 a `www` mediante "Comportamiento del dominio" en Arsys
+ * (capa registrador, antes de llegar a Railway).
  *
- * Si cambia el primario (e.g. migración a otro TLD), basta editar
- * la constante y desplegar — `redirects()` la lee al build.
+ * Apices secundarios (`arenacup26.es` y los .eu/.online cuando se
+ * compren custom-domain en Railway) también redirigen al primario
+ * mediante next.config + Arsys según el caso.
  */
-const PRIMARY_HOST = "arenacup26.com";
+const PRIMARY_HOST = "www.arenacup26.com";
 const SECONDARY_HOSTS = [
-  "arenacup26.es",
+  // www.arenacup26.es apuntado a Railway → 301 al primario por la
+  // app. El apex arenacup26.es lo redirige Arsys (no llega a Next).
+  "www.arenacup26.es",
   "wmundial-production.up.railway.app",
 ];
 
