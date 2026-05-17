@@ -84,6 +84,22 @@ if (isProd) {
   });
 }
 
+/**
+ * Dominio primario donde queremos servir todo el tráfico SEO. Los
+ * otros TLDs (`arenacup26.es`, `arenacup26.eu`, `arenacup26.online`)
+ * y el host de Railway hacen 301 a este host preservando path + query.
+ *
+ * Si cambia el primario (e.g. migración a otro TLD), basta editar
+ * la constante y desplegar — el `redirects()` la lee al build.
+ */
+const PRIMARY_HOST = "arenacup26.com";
+const SECONDARY_HOSTS = [
+  "arenacup26.es",
+  "arenacup26.eu",
+  "arenacup26.online",
+  "wmundial-production.up.railway.app",
+];
+
 const config: NextConfig = {
   // Promovido fuera de `experimental` en Next 15.5+
   typedRoutes: true,
@@ -94,6 +110,34 @@ const config: NextConfig = {
         headers: securityHeaders,
       },
     ];
+  },
+  async redirects() {
+    // 301 permanente desde cualquier dominio secundario al primario.
+    // Cubrimos también `www.*` para evitar duplicate content si el
+    // visitante teclea con o sin subdominio. `as const` en `type`
+    // para que TS narrow al variant `host` (sin requerir `key`).
+    return SECONDARY_HOSTS.flatMap((host) => [
+      {
+        source: "/:path*",
+        has: [{ type: "host" as const, value: host }],
+        destination: `https://${PRIMARY_HOST}/:path*`,
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host" as const, value: `www.${host}` }],
+        destination: `https://${PRIMARY_HOST}/:path*`,
+        permanent: true,
+      },
+    ]).concat([
+      // `www.arenacup26.com` → `arenacup26.com` (apex preferido).
+      {
+        source: "/:path*",
+        has: [{ type: "host" as const, value: `www.${PRIMARY_HOST}` }],
+        destination: `https://${PRIMARY_HOST}/:path*`,
+        permanent: true,
+      },
+    ]);
   },
 };
 
