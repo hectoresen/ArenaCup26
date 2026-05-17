@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "@/i18n/navigation";
-import { deleteAccount, DELETE_CONFIRMATION_PHRASE } from "@/server/users/delete-account";
+import { deleteAccount } from "@/server/users/delete-account";
+import { DELETE_CONFIRMATION_PHRASE } from "@/server/users/delete-account-constants";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 

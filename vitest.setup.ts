@@ -34,7 +34,6 @@ vi.mock("@/server/invitations/actions", () => ({
 }));
 vi.mock("@/server/users/delete-account", () => ({
   deleteAccount: vi.fn(async () => ({ ok: true })),
-  DELETE_CONFIRMATION_PHRASE: "ELIMINAR MI CUENTA",
 }));
 
 /**

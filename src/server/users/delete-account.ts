@@ -6,21 +6,11 @@ import { auth } from "@/lib/auth";
 import { dlog } from "@/lib/debug-log";
 import { db } from "@/server/db/client";
 import { users } from "@/server/db/schema";
+import { DELETE_CONFIRMATION_PHRASE } from "./delete-account-constants";
 
 export type DeleteAccountResult =
   | { ok: true }
   | { ok: false; code: "unauthorized" | "confirmation_mismatch" };
-
-/**
- * Frase de confirmación que el user debe teclear literalmente para
- * disparar el borrado. En mayúsculas y en español — coherente con el
- * idioma por defecto del producto y suficiente para evitar deletions
- * accidentales por click. La frase NO se localiza: queremos un único
- * gate exacto (un user árabo-parlante que tenga la app en árabe
- * sigue viendo este string para confirmar, junto con la traducción
- * informativa al lado).
- */
-export const DELETE_CONFIRMATION_PHRASE = "ELIMINAR MI CUENTA";
 
 /**
  * Borra la cuenta del user actual y todos sus datos asociados.
