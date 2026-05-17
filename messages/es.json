@@ -630,9 +630,10 @@
     "backToFriends": "Volver a Amigos",
     "warning": {
       "title": "Auto-amistad",
-      "body": "Quien entre con tu link se convertirá automáticamente en tu amigo y verá tu perfil completo aunque sea privado para los demás. Compártelo solo con gente de confianza."
+      "body": "Quien entre con tu link se convertirá automáticamente en tu amigo."
     },
     "listHeader": "Tus links",
+    "singleUseLabel": "Marcar como link de un solo uso",
     "create": "Generar link",
     "empty": "No tienes ningún link activo. Genera uno y compártelo con quien quieras invitar.",
     "copy": "Copiar",
@@ -693,7 +694,9 @@
     },
     "list": {
       "empty": "Aún no tienes amigos en WebMundial. Comparte tu perfil para que te encuentren.",
-      "pts": "pts"
+      "pts": "pts",
+      "removeAria": "Eliminar a {name} de tu lista de amigos",
+      "removeConfirm": "¿Eliminar a {name} de tu lista de amigos? Tú dejarás de verle y él dejará de verte como amigo."
     },
     "actionButton": {
       "add": "Añadir amigo",

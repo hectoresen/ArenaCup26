@@ -11,6 +11,7 @@ function entry(rank: number, userId: string, points = 5000 - rank * 100): Leader
   return {
     userId,
     name: `User ${userId.toUpperCase()}`,
+    username: `user-${userId}`,
     countryCode: "MX",
     points,
     rank,
@@ -82,7 +83,9 @@ describe("<MiniLeaderboard>", () => {
       me: { ...entry(42, "me", 1840), name: "Carlos" },
     });
     renderWithProviders(<MiniLeaderboard mini={mini} active="global" />);
-    expect(screen.getByRole("listitem", { name: /Tu posición.*42/ })).toBeInTheDocument();
+    // El aria-label vive ahora en el <Link> (no en el <li>) porque
+    // toda la fila es clicable a /u/<username>.
+    expect(screen.getByRole("link", { name: /Tu posición.*42/ })).toBeInTheDocument();
   });
 
   it("renders 'Ver ranking completo' CTA linking to /ranking", () => {
@@ -154,5 +157,29 @@ describe("<MiniLeaderboard>", () => {
     );
     renderWithProviders(<MiniLeaderboard mini={mini} active="amigos" />);
     expect(screen.getByText(/Aún no tienes amigos/i)).toBeInTheDocument();
+  });
+
+  it("each row with a username is a clickable link to /u/<username>", () => {
+    const mini = buildMini({ top, me: null });
+    const { container } = renderWithProviders(<MiniLeaderboard mini={mini} active="global" />);
+    expect(container.querySelector('a[href$="/u/user-u1"]')).not.toBeNull();
+  });
+
+  it("renders 'me' row as link when username is present", () => {
+    const mini = buildMini({
+      top,
+      me: { ...entry(42, "me", 1840), name: "Carlos", username: "carlos-test" },
+    });
+    const { container } = renderWithProviders(<MiniLeaderboard mini={mini} active="global" />);
+    expect(container.querySelector('a[href$="/u/carlos-test"]')).not.toBeNull();
+  });
+
+  it("falls back to non-clickable li when username is null", () => {
+    const mini = buildMini({
+      top: [{ ...entry(1, "noname"), username: null }],
+      me: null,
+    });
+    const { container } = renderWithProviders(<MiniLeaderboard mini={mini} active="global" />);
+    expect(container.querySelector('a[href*="/u/"]')).toBeNull();
   });
 });

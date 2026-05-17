@@ -69,9 +69,17 @@ export type RevokeInvitationResult =
   | { ok: false; code: "unauthorized" | "not_found" };
 
 /**
- * Rescinde un link: pone `revoked_at = now()` si pertenece al user.
- * No borra la fila para conservar histórico de redenciones pasadas;
- * solo lo marca como no-redimible.
+ * Rescinde un link: lo BORRA de la BD. Decisión QA 2026-05-17:
+ * antes hacíamos soft-delete (`revoked_at = now()`) para conservar
+ * histórico, pero el row revocado se quedaba en el listado en gris
+ * y confundía. Ahora el revoke es definitivo — el link desaparece
+ * de la UI y deja de ser redimible.
+ *
+ * El histórico de redenciones (`invitation_redemptions`) tiene
+ * `onDelete: cascade`, así que al borrar la invitation también se
+ * borran las filas de redenciones asociadas. Las amistades ya
+ * consolidadas (`friendships`) NO se tocan — son independientes
+ * del link que las originó.
  */
 export async function revokeInvitation(
   invitationId: string,
@@ -80,8 +88,7 @@ export async function revokeInvitation(
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
 
   const rows = await db
-    .update(invitations)
-    .set({ revokedAt: new Date() })
+    .delete(invitations)
     .where(
       and(
         eq(invitations.id, invitationId),
@@ -92,7 +99,7 @@ export async function revokeInvitation(
 
   if (rows.length === 0) return { ok: false, code: "not_found" };
 
-  dlog("ranking", "invitation revoked", {
+  dlog("ranking", "invitation revoked (deleted)", {
     userId: session.user.id,
     invitationId,
   });

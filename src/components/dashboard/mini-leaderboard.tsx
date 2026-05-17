@@ -119,15 +119,8 @@ function Row({ entry, isMe }: { entry: LeaderboardEntry; isMe: boolean }) {
     ? t("ariaMyRow", { rank: entry.rank, name: entry.name, points })
     : t("ariaRow", { rank: entry.rank, name: entry.name, points });
 
-  return (
-    <li
-      aria-label={label}
-      className={`grid grid-cols-[36px_1fr_auto] items-center gap-2.5 rounded-xl border-2 px-3.5 py-2.5 transition-[background,transform] duration-200 hover:translate-x-[3px] ${
-        isMe
-          ? "border-gold/30 bg-gold/[0.07] shadow-[0_0_16px_rgba(245,200,66,0.08)]"
-          : "border-transparent bg-card hover:bg-card-hover"
-      }`}
-    >
+  const body = (
+    <>
       <span className={`text-right font-display text-base ${isMe ? "text-gold" : "text-muted"}`}>
         #{entry.rank}
       </span>
@@ -158,6 +151,34 @@ function Row({ entry, isMe }: { entry: LeaderboardEntry; isMe: boolean }) {
       >
         {points}
       </span>
+    </>
+  );
+
+  const baseCls = `grid grid-cols-[36px_1fr_auto] items-center gap-2.5 rounded-xl border-2 px-3.5 py-2.5 transition-[background,transform] duration-200 hover:translate-x-[3px] ${
+    isMe
+      ? "border-gold/30 bg-gold/[0.07] shadow-[0_0_16px_rgba(245,200,66,0.08)]"
+      : "border-transparent bg-card hover:bg-card-hover"
+  }`;
+
+  // Si el user tiene username, la fila completa enlaza a su perfil
+  // público (`/u/<username>`). Sin username (caso raro post-backfill)
+  // queda como `<li>` no clicable.
+  if (entry.username) {
+    return (
+      <li>
+        <Link
+          href={`/u/${entry.username}` as never}
+          aria-label={label}
+          className={`block cursor-pointer no-underline ${baseCls}`}
+        >
+          {body}
+        </Link>
+      </li>
+    );
+  }
+  return (
+    <li aria-label={label} className={baseCls}>
+      {body}
     </li>
   );
 }

@@ -408,12 +408,14 @@ export async function getMiniLeaderboard(
   userId: string,
   topCount: number,
 ): Promise<MiniLeaderboardView> {
-  // Top N por puntos descendente.
+  // Top N por puntos descendente. Incluimos username para que la
+  // fila pueda enlazar a `/u/<username>`.
   const topRows = await db
     .select({
       userId: userPoints.userId,
       points: userPoints.totalPoints,
       name: users.name,
+      username: users.username,
       country: users.country,
     })
     .from(userPoints)
@@ -424,6 +426,7 @@ export async function getMiniLeaderboard(
   const top: LeaderboardEntry[] = topRows.map((row, idx) => ({
     userId: row.userId,
     name: row.name ?? "—",
+    username: row.username,
     countryCode: row.country,
     points: row.points,
     rank: idx + 1,
@@ -434,6 +437,7 @@ export async function getMiniLeaderboard(
     .select({
       points: userPoints.totalPoints,
       name: users.name,
+      username: users.username,
       country: users.country,
     })
     .from(userPoints)
@@ -451,6 +455,7 @@ export async function getMiniLeaderboard(
     me = {
       userId,
       name: meData.name ?? "—",
+      username: meData.username,
       countryCode: meData.country,
       points: meData.points,
       rank: (meAheadRows[0]?.ahead ?? 0) + 1,
@@ -508,11 +513,13 @@ export async function getFriendsMiniLeaderboard(
   }
 
   // Top N entre el grupo. LEFT JOIN para incluir users sin
-  // user_points (cuentas nuevas).
+  // user_points (cuentas nuevas). Incluimos username para que la
+  // fila pueda enlazar a `/u/<username>`.
   const topRows = await db
     .select({
       userId: users.id,
       name: users.name,
+      username: users.username,
       country: users.country,
       points: userPoints.totalPoints,
     })
@@ -525,6 +532,7 @@ export async function getFriendsMiniLeaderboard(
   const top: LeaderboardEntry[] = topRows.map((row, idx) => ({
     userId: row.userId,
     name: row.name?.trim() || "Jugador",
+    username: row.username,
     countryCode: row.country,
     points: row.points ?? 0,
     rank: idx + 1,
@@ -538,11 +546,10 @@ export async function getFriendsMiniLeaderboard(
   }
 
   // El user no entró en el top → calcular su rank dentro del grupo.
-  // Como ya tenemos `groupIds`, contamos cuántos miembros tienen más
-  // puntos que el user (con coalesce para los sin user_points).
   const meRows = await db
     .select({
       name: users.name,
+      username: users.username,
       country: users.country,
       points: userPoints.totalPoints,
     })
@@ -567,6 +574,7 @@ export async function getFriendsMiniLeaderboard(
   const me: LeaderboardEntry = {
     userId,
     name: meData.name?.trim() || "Jugador",
+    username: meData.username,
     countryCode: meData.country,
     points: myPoints,
     rank: (aheadInGroup[0]?.n ?? 0) + 1,

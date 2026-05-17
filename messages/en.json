@@ -630,9 +630,10 @@
     "backToFriends": "Back to Friends",
     "warning": {
       "title": "Auto-friendship",
-      "body": "Whoever joins with your link automatically becomes your friend and sees your full profile even if it's private to others. Share it only with people you trust."
+      "body": "Whoever joins with your link automatically becomes your friend."
     },
     "listHeader": "Your links",
+    "singleUseLabel": "Mark as single-use link",
     "create": "Generate link",
     "empty": "You don't have any active links. Generate one and share it with whoever you want to invite.",
     "copy": "Copy",
@@ -693,7 +694,9 @@
     },
     "list": {
       "empty": "No friends yet on WebMundial. Share your profile so they find you.",
-      "pts": "pts"
+      "pts": "pts",
+      "removeAria": "Remove {name} from your friends list",
+      "removeConfirm": "Remove {name} from your friends list? You will no longer see them, and they will no longer see you as a friend."
     },
     "actionButton": {
       "add": "Add friend",

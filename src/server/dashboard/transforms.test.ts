@@ -105,6 +105,7 @@ function entry(rank: number, userId: string): LeaderboardEntry {
   return {
     userId,
     name: `user-${userId}`,
+    username: `user-${userId}`,
     countryCode: null,
     points: 5000 - rank * 100,
     rank,

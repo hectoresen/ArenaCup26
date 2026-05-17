@@ -98,6 +98,12 @@ export type Progress = {
 export type LeaderboardEntry = {
   userId: string;
   name: string;
+  /**
+   * Username público del user. Si está set, la fila del
+   * mini-leaderboard es clickable a `/u/<username>`. Si es null
+   * (caso raro post-backfill), la fila no enlaza.
+   */
+  username: string | null;
   /** ISO 3166-1 alpha-2 ("ES", "MX"…). Para renderizar con
    *  `<CountryFlag code={...} />`. Null si el user no tiene país. */
   countryCode: string | null;

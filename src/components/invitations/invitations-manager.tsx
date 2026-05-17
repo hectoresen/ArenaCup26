@@ -14,25 +14,30 @@ type Props = {
 
 /**
  * Cliente que gestiona el listado de invitaciones. Optimistic UI:
- * al generar un link nuevo lo añade al state local sin esperar al
- * refresh; al rescindir uno, marca la fila como revoked y queda
- * gris hasta que el siguiente refresh confirme.
+ *  - Al generar un link nuevo lo añade al state local sin esperar
+ *    al refresh.
+ *  - Al rescindir uno, lo ELIMINA del state local (server action
+ *    también lo borra de BD — revoke = delete duro, sin gris).
  *
- * No persiste nada en local — todo el state real vive en BD; este
- * componente solo refleja la última respuesta del server action.
+ * Por defecto los links generados son de USOS ILIMITADOS. El usuario
+ * puede marcar el checkbox "un solo uso" antes de generar si quiere
+ * un link que se autodestruye tras la primera redención.
  */
 export function InvitationsManager({ invitations: initial }: Props) {
   const t = useTranslations("invite");
   const [items, setItems] = useState<InvitationListItem[]>(initial);
+  const [singleUse, setSingleUse] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function create() {
     setFeedback(null);
+    // `0` = ilimitado en la BD (findRedeemableInvitation:
+    // `row.maxUses > 0 && row.uses >= row.maxUses` salta el check).
+    // `1` = un solo uso.
+    const maxUses = singleUse ? 1 : 0;
     startTransition(async () => {
-      // Por ahora, links de UN USO. Cuando queramos exponer una UX
-      // para "ilimitado" o "N usos" en el form, basta cambiar este 1.
-      const result = await createInvitation(1);
+      const result = await createInvitation(maxUses);
       if (!result.ok) {
         setFeedback(
           t(`feedback.create.${result.code}` as
@@ -48,7 +53,7 @@ export function InvitationsManager({ invitations: initial }: Props) {
           id: now.getTime().toString(), // placeholder hasta el refresh
           token: result.token,
           url: result.url,
-          maxUses: 1,
+          maxUses,
           uses: 0,
           revokedAt: null,
           createdAt: now,
@@ -62,9 +67,9 @@ export function InvitationsManager({ invitations: initial }: Props) {
   function revoke(id: string) {
     if (!confirm(t("revokeConfirm"))) return;
     const previous = items;
-    setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, revokedAt: new Date() } : i)),
-    );
+    // Optimistic: la fila desaparece inmediatamente. Si la action
+    // falla, restauramos el listado anterior.
+    setItems((prev) => prev.filter((i) => i.id !== id));
     startTransition(async () => {
       const result = await revokeInvitation(id);
       if (!result.ok) {
@@ -91,6 +96,16 @@ export function InvitationsManager({ invitations: initial }: Props) {
           + {t("create")}
         </button>
       </header>
+
+      <label className="mb-3 flex cursor-pointer items-center gap-2 text-[12px] font-bold text-muted">
+        <input
+          type="checkbox"
+          checked={singleUse}
+          onChange={(e) => setSingleUse(e.target.checked)}
+          className="cursor-pointer accent-gold"
+        />
+        <span>{t("singleUseLabel")}</span>
+      </label>
 
       {feedback && (
         <p className="mb-3 text-[12px] font-bold text-success">{feedback}</p>

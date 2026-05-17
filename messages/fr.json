@@ -630,9 +630,10 @@
     "backToFriends": "Retour à Amis",
     "warning": {
       "title": "Amitié automatique",
-      "body": "Toute personne qui s'inscrit avec ton lien devient automatiquement ton ami et voit ton profil complet même s'il est privé pour les autres. Partage-le uniquement avec des personnes de confiance."
+      "body": "Toute personne qui s'inscrit avec ton lien devient automatiquement ton ami."
     },
     "listHeader": "Tes liens",
+    "singleUseLabel": "Marquer comme lien à usage unique",
     "create": "Générer un lien",
     "empty": "Tu n'as aucun lien actif. Génère-en un et partage-le avec qui tu veux inviter.",
     "copy": "Copier",
@@ -693,7 +694,9 @@
     },
     "list": {
       "empty": "Pas encore d'amis sur WebMundial. Partage ton profil.",
-      "pts": "pts"
+      "pts": "pts",
+      "removeAria": "Retirer {name} de ta liste d'amis",
+      "removeConfirm": "Retirer {name} de ta liste d'amis ? Tu ne le verras plus, et il ne te verra plus comme ami."
     },
     "actionButton": {
       "add": "Ajouter un ami",
