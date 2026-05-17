@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { CountryFlag } from "@/components/common/country-flag";
 import { Link } from "@/i18n/navigation";
 import { removeFriend } from "@/server/friends/actions";
@@ -24,15 +25,19 @@ type Props = {
  */
 export function FriendsList({ friends: initial }: Props) {
   const t = useTranslations("friends.list");
+  const tCommon = useTranslations("common.confirm");
   const [friends, setFriends] = useState<Friend[]>(initial);
-  const [, startTransition] = useTransition();
+  const [pendingRemove, setPendingRemove] = useState<Friend | null>(null);
+  const [isPending, startTransition] = useTransition();
 
-  function remove(f: Friend) {
-    if (!confirm(t("removeConfirm", { name: f.name }))) return;
+  function confirmRemove() {
+    if (!pendingRemove) return;
+    const target = pendingRemove;
     const previous = friends;
-    setFriends((prev) => prev.filter((x) => x.userId !== f.userId));
+    setFriends((prev) => prev.filter((x) => x.userId !== target.userId));
+    setPendingRemove(null);
     startTransition(async () => {
-      const result = await removeFriend(f.userId);
+      const result = await removeFriend(target.userId);
       if (!result.ok) {
         setFriends(previous);
       }
@@ -48,11 +53,33 @@ export function FriendsList({ friends: initial }: Props) {
   }
 
   return (
-    <ul className="m-0 flex list-none flex-col gap-2 p-0">
-      {friends.map((f) => (
-        <FriendRow key={f.userId} friend={f} onRemove={() => remove(f)} />
-      ))}
-    </ul>
+    <>
+      <ul className="m-0 flex list-none flex-col gap-2 p-0">
+        {friends.map((f) => (
+          <FriendRow
+            key={f.userId}
+            friend={f}
+            onRemove={() => setPendingRemove(f)}
+          />
+        ))}
+      </ul>
+
+      <ConfirmDialog
+        open={pendingRemove !== null}
+        title={t("removeTitle")}
+        body={
+          pendingRemove
+            ? t("removeBody", { name: pendingRemove.name })
+            : ""
+        }
+        confirmLabel={t("removeCta")}
+        cancelLabel={tCommon("cancel")}
+        variant="danger"
+        isPending={isPending}
+        onConfirm={confirmRemove}
+        onCancel={() => setPendingRemove(null)}
+      />
+    </>
   );
 }
 

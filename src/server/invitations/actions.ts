@@ -55,7 +55,7 @@ export async function createInvitation(
   });
 
   dlog("ranking", "invitation created", { userId, maxUses });
-  revalidatePath("/amigos/invitar");
+  revalidatePath("/amigos");
 
   // Construimos la URL en el client-side via buildInvitationUrl —
   // aquí devolvemos también el host para que el botón "Copiar" no
@@ -103,7 +103,7 @@ export async function revokeInvitation(
     userId: session.user.id,
     invitationId,
   });
-  revalidatePath("/amigos/invitar");
+  revalidatePath("/amigos");
   return { ok: true };
 }
 

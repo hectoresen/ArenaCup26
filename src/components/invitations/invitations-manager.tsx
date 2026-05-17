@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import {
   createInvitation,
   revokeInvitation,
@@ -25,9 +26,11 @@ type Props = {
  */
 export function InvitationsManager({ invitations: initial }: Props) {
   const t = useTranslations("invite");
+  const tCommon = useTranslations("common.confirm");
   const [items, setItems] = useState<InvitationListItem[]>(initial);
   const [singleUse, setSingleUse] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [pendingRevokeId, setPendingRevokeId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function create() {
@@ -64,9 +67,11 @@ export function InvitationsManager({ invitations: initial }: Props) {
     });
   }
 
-  function revoke(id: string) {
-    if (!confirm(t("revokeConfirm"))) return;
+  function confirmRevoke() {
+    if (!pendingRevokeId) return;
+    const id = pendingRevokeId;
     const previous = items;
+    setPendingRevokeId(null);
     // Optimistic: la fila desaparece inmediatamente. Si la action
     // falla, restauramos el listado anterior.
     setItems((prev) => prev.filter((i) => i.id !== id));
@@ -118,10 +123,26 @@ export function InvitationsManager({ invitations: initial }: Props) {
       ) : (
         <ul className="m-0 flex list-none flex-col gap-2 p-0">
           {items.map((item) => (
-            <InvitationRow key={item.id} item={item} onRevoke={() => revoke(item.id)} />
+            <InvitationRow
+              key={item.id}
+              item={item}
+              onRevoke={() => setPendingRevokeId(item.id)}
+            />
           ))}
         </ul>
       )}
+
+      <ConfirmDialog
+        open={pendingRevokeId !== null}
+        title={t("revokeTitle")}
+        body={t("revokeBody")}
+        confirmLabel={t("revokeCta")}
+        cancelLabel={tCommon("cancel")}
+        variant="danger"
+        isPending={isPending}
+        onConfirm={confirmRevoke}
+        onCancel={() => setPendingRevokeId(null)}
+      />
     </section>
   );
 }

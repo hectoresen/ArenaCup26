@@ -76,8 +76,8 @@ export async function findRedeemableInvitation(
 
 /**
  * Counter de redenciones recibidas — el inviter ve "tus invitados".
- * Útil para mostrar "X amigos invitados" en la cabecera de
- * `/amigos/invitar`.
+ * Útil para mostrar "X amigos invitados" en la sección de
+ * invitaciones de `/amigos`.
  */
 export async function countRedeemedInvitations(
   db: Database,

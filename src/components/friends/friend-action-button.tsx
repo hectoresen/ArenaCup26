@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import {
   acceptFriendRequest,
   removeFriend,
@@ -38,8 +39,10 @@ export function FriendActionButton({
   pendingFriendshipId,
 }: Props) {
   const t = useTranslations("friends.actionButton");
+  const tCommon = useTranslations("common.confirm");
   const [relation, setRelation] = useState<ViewerRelation>(initialRelation);
   const [isPending, startTransition] = useTransition();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   if (relation === "self" || relation === "blocked-by-me" || relation === "blocked-by-them") {
     return null;
@@ -64,8 +67,8 @@ export function FriendActionButton({
     });
   }
 
-  function remove() {
-    if (!confirm(t("removeConfirm"))) return;
+  function confirmRemove() {
+    setConfirmOpen(false);
     const prev = relation;
     setRelation("none");
     startTransition(async () => {
@@ -110,13 +113,27 @@ export function FriendActionButton({
 
   // accepted
   return (
-    <button
-      type="button"
-      onClick={remove}
-      disabled={isPending}
-      className="cursor-pointer rounded-full border-2 border-border bg-card-hover px-4 py-1.5 text-[12px] font-extrabold uppercase tracking-[0.1em] text-foreground transition-colors hover:border-danger/40 hover:text-danger disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      ✓ {t("friends")}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setConfirmOpen(true)}
+        disabled={isPending}
+        className="cursor-pointer rounded-full border-2 border-border bg-card-hover px-4 py-1.5 text-[12px] font-extrabold uppercase tracking-[0.1em] text-foreground transition-colors hover:border-danger/40 hover:text-danger disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        ✓ {t("friends")}
+      </button>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={t("removeTitle")}
+        body={t("removeBody")}
+        confirmLabel={t("removeCta")}
+        cancelLabel={tCommon("cancel")}
+        variant="danger"
+        isPending={isPending}
+        onConfirm={confirmRemove}
+        onCancel={() => setConfirmOpen(false)}
+      />
+    </>
   );
 }

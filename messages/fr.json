@@ -3,6 +3,11 @@
     "title": "ArenaCup26 · Classement",
     "description": "Plateforme sociale et compétitive autour de la Coupe du Monde 2026. Prédisez les matchs, montez au classement, débloquez des succès."
   },
+  "common": {
+    "confirm": {
+      "cancel": "Annuler"
+    }
+  },
   "leaderboard": {
     "tagline": "FIFA Coupe du Monde · Canada · Mexique · USA",
     "liveBadge": "Classement en direct",
@@ -636,7 +641,6 @@
     "title": "Inviter des amis",
     "subtitleEmpty": "Personne n'est encore venu avec tes liens.",
     "subtitleCount": "{count, plural, =1 {1 ami a rejoint avec ton invitation.} other {# amis ont rejoint avec ton invitation.}}",
-    "backToFriends": "Retour à Amis",
     "warning": {
       "title": "Amitié automatique",
       "body": "Toute personne qui s'inscrit avec ton lien devient automatiquement ton ami."
@@ -649,7 +653,9 @@
     "copied": "Copié !",
     "copyFallback": "Copie ce lien manuellement :",
     "revoke": "Révoquer",
-    "revokeConfirm": "Révoquer ce lien ? Personne ne pourra plus l'utiliser.",
+    "revokeTitle": "Révoquer le lien",
+    "revokeBody": "Révoquer ce lien ? Personne ne pourra plus l'utiliser.",
+    "revokeCta": "Révoquer",
     "rowUsesLimited": "{uses} / {max} usages",
     "rowUsesUnlimited": "{uses} usages · illimité",
     "rowRevoked": "Révoqué",
@@ -677,7 +683,6 @@
       "one": "demande en attente",
       "many": "demandes en attente"
     },
-    "inviteByLink": "Inviter par lien",
     "requestsHeader": "Demandes reçues",
     "friendsHeader": "Ton équipe",
     "addForm": {
@@ -705,14 +710,18 @@
       "empty": "Pas encore d'amis sur ArenaCup26. Partage ton profil.",
       "pts": "pts",
       "removeAria": "Retirer {name} de ta liste d'amis",
-      "removeConfirm": "Retirer {name} de ta liste d'amis ? Tu ne le verras plus, et il ne te verra plus comme ami."
+      "removeTitle": "Retirer cet ami",
+      "removeBody": "Retirer {name} de ta liste d'amis ? Tu ne le verras plus, et il ne te verra plus comme ami.",
+      "removeCta": "Retirer"
     },
     "actionButton": {
       "add": "Ajouter un ami",
       "pendingOut": "Demande envoyée",
       "acceptIn": "Accepter la demande",
       "friends": "Amis",
-      "removeConfirm": "Retirer de tes amis ?"
+      "removeTitle": "Retirer cet ami",
+      "removeBody": "Veux-tu retirer cette personne de ta liste d'amis ?",
+      "removeCta": "Retirer"
     }
   },
   "push": {

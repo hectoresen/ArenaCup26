@@ -3,6 +3,11 @@
     "title": "ArenaCup26 · Ranking",
     "description": "Social and competitive platform around the 2026 FIFA World Cup. Predict matches, climb the ranking, unlock achievements."
   },
+  "common": {
+    "confirm": {
+      "cancel": "Cancel"
+    }
+  },
   "leaderboard": {
     "tagline": "FIFA World Cup · Canada · Mexico · USA",
     "liveBadge": "Live ranking",
@@ -636,7 +641,6 @@
     "title": "Invite friends",
     "subtitleEmpty": "Nobody has joined with your links yet.",
     "subtitleCount": "{count, plural, =1 {1 friend has joined with your invitation.} other {# friends have joined with your invitation.}}",
-    "backToFriends": "Back to Friends",
     "warning": {
       "title": "Auto-friendship",
       "body": "Whoever joins with your link automatically becomes your friend."
@@ -649,7 +653,9 @@
     "copied": "Copied!",
     "copyFallback": "Copy this link manually:",
     "revoke": "Revoke",
-    "revokeConfirm": "Revoke this link? Nobody else will be able to use it.",
+    "revokeTitle": "Revoke link",
+    "revokeBody": "Revoke this link? Nobody else will be able to use it.",
+    "revokeCta": "Revoke",
     "rowUsesLimited": "{uses} / {max} uses",
     "rowUsesUnlimited": "{uses} uses · unlimited",
     "rowRevoked": "Revoked",
@@ -677,7 +683,6 @@
       "one": "pending request",
       "many": "pending requests"
     },
-    "inviteByLink": "Invite by link",
     "requestsHeader": "Received requests",
     "friendsHeader": "Your crew",
     "addForm": {
@@ -705,14 +710,18 @@
       "empty": "No friends yet on ArenaCup26. Share your profile so they find you.",
       "pts": "pts",
       "removeAria": "Remove {name} from your friends list",
-      "removeConfirm": "Remove {name} from your friends list? You will no longer see them, and they will no longer see you as a friend."
+      "removeTitle": "Remove friend",
+      "removeBody": "Remove {name} from your friends list? You will no longer see them, and they will no longer see you as a friend.",
+      "removeCta": "Remove"
     },
     "actionButton": {
       "add": "Add friend",
       "pendingOut": "Request sent",
       "acceptIn": "Accept request",
       "friends": "Friends",
-      "removeConfirm": "Remove from friends?"
+      "removeTitle": "Remove friend",
+      "removeBody": "Do you want to remove this person from your friends list?",
+      "removeCta": "Remove"
     }
   },
   "push": {
