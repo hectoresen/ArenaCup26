@@ -22,7 +22,7 @@ type Props = {
  *  - **Unlocked check** SVG absolute bottom-right (no emoji).
  *  - **Accent strip** top-edge degradada según tier (refuerza la
  *    identidad cromática cuando hay muchas cards juntas).
- *  - Hover: lift -3px + drop-shadow + icon scale 1.16 + rotate.
+ *  - Hover: lift -3px + drop-shadow (icono se queda quieto).
  *  - Estado `locked` → borde dashed en tier-color con opacity baja,
  *    greyscale parcial y opacity 0.55. Más legible que un fade plano
  *    y deja clarísimo que "está ahí pero todavía no es tuyo".
@@ -60,10 +60,12 @@ export function AchievementCard({ achievement, ownerUsername }: Props) {
         {t(`tier.${definition.tier}`)}
       </span>
 
-      {/* Icon block — 36×36, no chip, color via currentColor */}
+      {/* Icon block — 36×36, no chip, color via currentColor. El icono
+          se queda quieto al hover; el lift de la card ya da feedback
+          suficiente sin marear con dos animaciones a la vez. */}
       <div
         aria-hidden="true"
-        className="mb-2 block leading-none transition-transform duration-300 group-hover:-rotate-[5deg] group-hover:scale-[1.16]"
+        className="mb-2 block leading-none"
         style={unlocked ? { color: tierIconColor(definition.tier) } : undefined}
       >
         {unlocked ? (
