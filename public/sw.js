@@ -34,8 +34,8 @@ self.addEventListener("push", (event) => {
   const title = payload.title || "ArenaCup26";
   const options = {
     body: payload.body || "",
-    icon: "/icon.svg",
-    badge: "/icon.svg",
+    icon: "/pwa-icon.svg",
+    badge: "/pwa-icon.svg",
     data: { url: payload.url || "/inicio" },
     // Si llegan dos pushes del mismo tipo, reemplazar — evitar spam.
     tag: payload.tag || "arenacup26-default",
