@@ -86,17 +86,20 @@ if (isProd) {
 
 /**
  * Dominio primario donde queremos servir todo el tráfico SEO. Los
- * otros TLDs (`arenacup26.es`, `arenacup26.eu`, `arenacup26.online`)
- * y el host de Railway hacen 301 a este host preservando path + query.
+ * dominios secundarios apuntados a Railway hacen 301 a este host
+ * preservando path + query.
+ *
+ * `arenacup26.eu` y `arenacup26.online` están comprados pero no
+ * conectados a Railway todavía (tier actual permite 2 custom
+ * domains). Cuando se añadan, incluirlos en `SECONDARY_HOSTS`
+ * y el redirect entra solo.
  *
  * Si cambia el primario (e.g. migración a otro TLD), basta editar
- * la constante y desplegar — el `redirects()` la lee al build.
+ * la constante y desplegar — `redirects()` la lee al build.
  */
 const PRIMARY_HOST = "arenacup26.com";
 const SECONDARY_HOSTS = [
   "arenacup26.es",
-  "arenacup26.eu",
-  "arenacup26.online",
   "wmundial-production.up.railway.app",
 ];
 
