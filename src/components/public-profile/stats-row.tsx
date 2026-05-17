@@ -4,6 +4,11 @@ import { useLocale, useTranslations } from "next-intl";
 
 type Props = {
   stats: ProfileStats;
+  /**
+   * Cambia el copy contextual: el owner ve "Tu posición", un
+   * visitante ve "Posición" a secas (más neutral que "Su posición").
+   */
+  isOwner: boolean;
 };
 
 /**
@@ -12,7 +17,7 @@ type Props = {
  * así que `stats.rank` siempre es un número — incluso usuarios sin
  * puntos tienen una posición real (al final de la cola).
  */
-export function StatsRow({ stats }: Props) {
+export function StatsRow({ stats, isOwner }: Props) {
   const t = useTranslations("publicProfile");
   const locale = useLocale() as PointsLocale;
 
@@ -21,7 +26,7 @@ export function StatsRow({ stats }: Props) {
       <StatCard
         tone="rank"
         value={`#${stats.rank}`}
-        label={t("rankLabel")}
+        label={isOwner ? t("rankLabel") : t("rankLabelGuest")}
         sub={t("rankOfTotal", { total: formatPoints(stats.totalPlayers, locale) })}
       />
       <StatCard

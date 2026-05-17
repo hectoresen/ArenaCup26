@@ -11,9 +11,9 @@ type Props = {
 /**
  * Acordeón nativo `<details>`/`<summary>` con el catálogo de logros.
  *
- * Cerrado por defecto (decisión `docs/public-profile.md` 2026-05-07).
- * No usa JS para abrir/cerrar — el navegador lo gestiona y el SSR
- * sirve el estado cerrado sin coste.
+ * Abierto por defecto: en el perfil queremos que los logros sean lo
+ * primero que se vea sin que el user tenga que clicar. Se mantiene el
+ * mecanismo de plegado para quien quiera ahorrar scroll.
  */
 export function AchievementsAccordion({ achievements, ownerUsername }: Props) {
   const t = useTranslations("publicProfile");
@@ -28,7 +28,7 @@ export function AchievementsAccordion({ achievements, ownerUsername }: Props) {
           al cargar el acordeón. Sin esto, los `<use href="#ach-...">`
           de las cards renderizan vacíos. */}
       <AchievementsIconSprite />
-      <details className="mt-6 group rounded-2xl border-2 border-border bg-card open:border-gold/30">
+      <details open className="mt-6 group rounded-2xl border-2 border-border bg-card open:border-gold/30">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 py-4 transition-colors hover:bg-card-hover">
         <div className="flex-1">
           <div className="mb-1.5 flex items-center gap-2">

@@ -127,14 +127,12 @@ export default async function PublicProfilePage({
     <>
       <TopChrome user={session?.user ?? null} />
       <main className="relative z-10 mx-auto max-w-[560px] px-5 py-9 pt-16">
-        {isOwner && (
-          <Link
-            href="/inicio"
-            className="mb-4 inline-flex cursor-pointer items-center gap-1.5 text-xs font-extrabold text-gold no-underline transition-[gap] hover:gap-2.5"
-          >
-            <span aria-hidden="true">←</span> {t("backToHome")}
-          </Link>
-        )}
+        <Link
+          href="/inicio"
+          className="mb-4 inline-flex cursor-pointer items-center gap-1.5 text-xs font-extrabold text-gold no-underline transition-[gap] hover:gap-2.5"
+        >
+          <span aria-hidden="true">←</span> {t("backToHome")}
+        </Link>
         <ProfileHero identity={profile.identity} isOwner={isOwner} />
         {friendInfo && (
           <div className="mt-3 flex justify-center">
@@ -146,7 +144,7 @@ export default async function PublicProfilePage({
             />
           </div>
         )}
-        <StatsRow stats={profile.stats} />
+        <StatsRow stats={profile.stats} isOwner={isOwner} />
         {ownerExtras && (
           <>
             <StreakStatsCard stats={ownerExtras.streakStats} />

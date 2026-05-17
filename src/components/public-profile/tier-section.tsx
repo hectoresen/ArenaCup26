@@ -20,9 +20,18 @@ const TIER_COLOR: Record<ProfileAchievementTierGroup["tier"], string> = {
  * Sección de un tier dentro del acordeón. Cabecera con nombre del
  * tier + contador unlocked/total, y grid 2 columnas (1 en móvil) con
  * las cards.
+ *
+ * Orden interno: desbloqueados primero, bloqueados después. Dentro de
+ * cada grupo se respeta el orden original del catálogo (ya viene
+ * estable desde la query, evitamos re-sort por timestamp para no
+ * mover de sitio los logros entre cargas).
  */
 export function TierSection({ group, ownerUsername }: Props) {
   const t = useTranslations("publicProfile");
+  const sortedItems = [...group.items].sort((a, b) => {
+    if (a.unlocked === b.unlocked) return 0;
+    return a.unlocked ? -1 : 1;
+  });
   return (
     <section aria-label={t(`tier.${group.tier}`)} className="space-y-2.5">
       <header className="flex items-center justify-between">
@@ -36,7 +45,7 @@ export function TierSection({ group, ownerUsername }: Props) {
         </span>
       </header>
       <div className="grid grid-cols-2 gap-2 max-[460px]:grid-cols-1">
-        {group.items.map((item) => (
+        {sortedItems.map((item) => (
           <AchievementCard
             key={item.definition.id}
             achievement={item}

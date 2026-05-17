@@ -312,6 +312,7 @@
     "copyLink": "Copiar enlace",
     "copied": "¡Copiado!",
     "rankLabel": "Tu posición",
+    "rankLabelGuest": "Posición",
     "rankOfTotal": "de {total} jugadores",
     "rankNone": "Sin actividad todavía",
     "pointsLabel": "Puntos oficiales",

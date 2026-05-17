@@ -4,16 +4,17 @@ import { describe, expect, it } from "vitest";
 import { AchievementsAccordion } from "./achievements-accordion";
 
 describe("<AchievementsAccordion>", () => {
-  it("renders the summary closed by default (zero unlocked)", () => {
+  it("renders the summary open by default (zero unlocked)", () => {
     const achievements = buildProfileAchievements(new Map());
     renderWithProviders(
       <AchievementsAccordion achievements={achievements} ownerUsername="carlos" />,
     );
     // El summary muestra "0 de 24"
     expect(screen.getByText(/0 de 24/)).toBeInTheDocument();
-    // El `<details>` viene sin atributo `open`.
+    // El `<details>` viene con atributo `open` para que el catálogo
+    // sea lo primero que se ve sin clic.
     const details = screen.getByText(/0 de 24/).closest("details");
-    expect(details?.hasAttribute("open")).toBe(false);
+    expect(details?.hasAttribute("open")).toBe(true);
   });
 
   it("renders all 6 tier sections inside the body", () => {
