@@ -195,26 +195,10 @@ export function AccountMenu({
             {t("friends")}
           </Link>
 
-          <Link
-            href="/ajustes/privacidad"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="flex w-full cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05]"
-          >
-            <svg
-              className="h-4 w-4 text-muted"
-              viewBox="0 0 16 16"
-              aria-hidden="true"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M8 2 L3 4 V8 a6 6 0 0 0 5 6 a6 6 0 0 0 5 -6 V4 L8 2 Z" />
-            </svg>
-            {t("privacy")}
-          </Link>
+          {/* Privacy + push + delete account viven dentro del
+              acordeón "Ajustes de mi cuenta" del perfil público.
+              El link "Mi perfil" arriba ya lleva al user a su
+              página `/u/<username>` donde encuentra todo. */}
 
           <Link
             href="/faq"

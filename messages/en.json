@@ -447,6 +447,15 @@
       "main": "Main navigation"
     }
   },
+  "accountSettings": {
+    "title": "Account settings",
+    "subtitle": "Visibility, notifications, and account deletion.",
+    "privacyTitle": "Profile visibility",
+    "privacySubtitle": "Who can open your full profile.",
+    "pushTitle": "Push notifications",
+    "dangerTitle": "Danger zone",
+    "dangerSubtitle": "Deleting your account is irreversible."
+  },
   "accountMenu": {
     "openLabel": "Open account menu",
     "closeLabel": "Close account menu",

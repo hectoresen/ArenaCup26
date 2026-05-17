@@ -447,6 +447,15 @@
       "main": "Navegación principal"
     }
   },
+  "accountSettings": {
+    "title": "Ajustes de mi cuenta",
+    "subtitle": "Visibilidad, notificaciones y eliminación de cuenta.",
+    "privacyTitle": "Visibilidad del perfil",
+    "privacySubtitle": "Quién puede abrir tu perfil completo.",
+    "pushTitle": "Notificaciones push",
+    "dangerTitle": "Zona peligrosa",
+    "dangerSubtitle": "Eliminar la cuenta es irreversible."
+  },
   "accountMenu": {
     "openLabel": "Abrir menú de cuenta",
     "closeLabel": "Cerrar menú de cuenta",

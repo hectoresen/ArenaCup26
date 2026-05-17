@@ -447,6 +447,15 @@
       "main": "التنقل الرئيسي"
     }
   },
+  "accountSettings": {
+    "title": "إعدادات الحساب",
+    "subtitle": "الظهور، الإشعارات وحذف الحساب.",
+    "privacyTitle": "ظهور الملف الشخصي",
+    "privacySubtitle": "من يمكنه فتح ملفك الكامل.",
+    "pushTitle": "إشعارات Push",
+    "dangerTitle": "منطقة خطرة",
+    "dangerSubtitle": "حذف الحساب نهائي ولا يمكن التراجع عنه."
+  },
   "accountMenu": {
     "openLabel": "فتح قائمة الحساب",
     "closeLabel": "إغلاق قائمة الحساب",
