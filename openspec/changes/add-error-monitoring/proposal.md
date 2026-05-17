@@ -6,7 +6,7 @@ Hoy los errores solo aparecen en stdout de Railway (`railway logs`). Cualquier e
 
 - Un fallo silencioso en `processFinishedMatch` puede dejar a un usuario sin puntos sin que nadie se entere.
 - Un spike de 5xx en producción no notifica.
-- Los `[WM/...]` son útiles para debug en vivo pero no se persisten más allá del retention de Railway (~30 días).
+- Los `[AC/...]` son útiles para debug en vivo pero no se persisten más allá del retention de Railway (~30 días).
 
 ## What changes
 

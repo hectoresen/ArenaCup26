@@ -1,4 +1,4 @@
-# Security — runbook de WebMundial 26
+# Security — runbook de ArenaCup26
 
 Este documento concentra los procedimientos de seguridad operativa
 del proyecto. Lectura obligada antes de cualquier rotación de
@@ -57,7 +57,7 @@ Si un secret se filtra (chat público, PR, screenshot, log expuesto):
 ### 3.2 `GOOGLE_CLIENT_SECRET`
 
 1. https://console.cloud.google.com/apis/credentials.
-2. Selecciona el OAuth Client ID de WebMundial.
+2. Selecciona el OAuth Client ID de ArenaCup26.
 3. **Reset secret** (botón).
 4. Copiar el nuevo.
 5. Railway → Variables → `GOOGLE_CLIENT_SECRET`.
@@ -160,7 +160,7 @@ Si no están set, los limiters quedan en **noop mode** (siempre
 permiten). En producción el deploy emite warning:
 
 ```
-[WM/ratelimit] UPSTASH_REDIS_REST_URL / TOKEN not set in production — rate limiting is DISABLED
+[AC/ratelimit] UPSTASH_REDIS_REST_URL / TOKEN not set in production — rate limiting is DISABLED
 ```
 
 ### Política fail-open
@@ -284,7 +284,7 @@ Cuando tengamos métricas reales de abuso, evaluar invertir.
 - ✅ Idempotencia en scoring pipeline (no duplica puntos).
 - ✅ Notification kind enum cerrado (no se puede inyectar tipo arbitrario).
 - ✅ Username validation (regex + uniqueness + backfill).
-- ✅ Logs `[WM/...]` con truncado de IPs/userIds (no exponen completo).
+- ✅ Logs `[AC/...]` con truncado de IPs/userIds (no exponen completo).
 
 ### 8.4 Checklist antes de "Open beta"
 

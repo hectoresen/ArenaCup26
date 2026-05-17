@@ -124,7 +124,7 @@ export function createApiFootballProvider(config: ApiFootballConfig): MatchDataP
             // Día fuera del rango del free tier: log y continúa.
             // eslint-disable-next-line no-console
             console.log(
-              `[WM/provider] plan_limited for date=${day}, skipping (free tier covers a narrow window)`,
+              `[AC/provider] plan_limited for date=${day}, skipping (free tier covers a narrow window)`,
             );
             continue;
           }

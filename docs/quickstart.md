@@ -1,4 +1,4 @@
-# Quickstart — WebMundial 26 en local
+# Quickstart — ArenaCup26 en local
 
 Esta guía levanta el proyecto en una máquina nueva en ~5 minutos. Sigue los pasos en orden.
 

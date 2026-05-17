@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 /**
  * Tests de las reglas puras de unlock. La integración con BD
  * (`evaluateAndUnlock`) requiere postgres; se valida en e2e y a mano
- * en Railway via los logs `[WM/scoring]`.
+ * en Railway via los logs `[AC/scoring]`.
  *
  * Estos tests verifican que las condiciones de unlock están
  * correctamente expresadas para no regresar reglas del catálogo en

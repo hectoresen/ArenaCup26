@@ -2,7 +2,7 @@
 
 ## Why
 
-WebMundial 26 apunta a una audiencia global del Mundial. Hacer i18n **ahora**, con la base de UI todavía pequeña, ahorra el retrabajo masivo de extraer cientos de strings cuando el producto crezca. Cada componente futuro (predicciones, dashboard, FAQ, perfil) nacerá ya i18n-aware.
+ArenaCup26 apunta a una audiencia global del Mundial. Hacer i18n **ahora**, con la base de UI todavía pequeña, ahorra el retrabajo masivo de extraer cientos de strings cuando el producto crezca. Cada componente futuro (predicciones, dashboard, FAQ, perfil) nacerá ya i18n-aware.
 
 Idiomas elegidos:
 

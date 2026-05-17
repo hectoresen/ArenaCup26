@@ -1,4 +1,4 @@
-/* WebMundial 26 — Service Worker para push notifications.
+/* ArenaCup26 — Service Worker para push notifications.
  *
  * Funcionalidad mínima:
  *  - `push` event: parsea el payload JSON y muestra una notificación
@@ -31,14 +31,14 @@ self.addEventListener("push", (event) => {
     // como title fallback.
     payload = { title: event.data.text() };
   }
-  const title = payload.title || "WebMundial 26";
+  const title = payload.title || "ArenaCup26";
   const options = {
     body: payload.body || "",
     icon: "/icon.svg",
     badge: "/icon.svg",
     data: { url: payload.url || "/inicio" },
     // Si llegan dos pushes del mismo tipo, reemplazar — evitar spam.
-    tag: payload.tag || "wmundial-default",
+    tag: payload.tag || "arenacup26-default",
     renotify: false,
   };
   event.waitUntil(self.registration.showNotification(title, options));

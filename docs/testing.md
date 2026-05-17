@@ -1,6 +1,6 @@
 # Testing — estrategia y estándares
 
-Este documento define **cómo se prueba el código de WebMundial 26** y por qué. Lee esto antes de añadir o cambiar tests.
+Este documento define **cómo se prueba el código de ArenaCup26** y por qué. Lee esto antes de añadir o cambiar tests.
 
 ## Filosofía
 

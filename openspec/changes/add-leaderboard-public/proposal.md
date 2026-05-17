@@ -2,7 +2,7 @@
 
 ## Why
 
-El leaderboard es la **puerta de entrada** de WebMundial 26: cualquier visitante (autenticado o no) llega a la home `/` y ve el ranking en vivo del torneo. Es el reclamo principal del producto y debe estar disponible desde el día 1, aunque los datos reales lleguen después con `add-match-data-providers`.
+El leaderboard es la **puerta de entrada** de ArenaCup26: cualquier visitante (autenticado o no) llega a la home `/` y ve el ranking en vivo del torneo. Es el reclamo principal del producto y debe estar disponible desde el día 1, aunque los datos reales lleguen después con `add-match-data-providers`.
 
 Esta propuesta materializa el visual cerrado en `docs/leaderboard-reference.html` como una página real Next.js, valida el setup de Tailwind v4 con los tokens del brand, y deja la pipeline preparada para conectar SSE más adelante sin tocar componentes.
 

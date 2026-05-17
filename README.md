@@ -1,8 +1,8 @@
-# WebMundial 26
+# ArenaCup26
 
 Plataforma social y competitiva alrededor de la **Copa Mundial 2026** (Canadá · México · USA). Los usuarios predicen partidos, compiten en un ranking global y entre amigos, y desbloquean logros a lo largo del torneo.
 
-## ¿Qué es WebMundial 26?
+## ¿Qué es ArenaCup26?
 
 Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundial, ganar puntos según los aciertos, escalar posiciones en un ranking en tiempo real e invitar a amigos para competir uno contra uno. No es un servicio de apuestas: no hay dinero ni premios materiales — es un juego de predicciones para que el torneo se vea con más emoción y con tus amigos.
 

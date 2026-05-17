@@ -1,6 +1,6 @@
 # Purpose
 
-Definir el modelo de datos relacional que sostiene todas las capabilities de WebMundial 26: identidad de usuarios, autenticación, partidos del Mundial, predicciones, puntos, logros y perfil público.
+Definir el modelo de datos relacional que sostiene todas las capabilities de ArenaCup26: identidad de usuarios, autenticación, partidos del Mundial, predicciones, puntos, logros y perfil público.
 
 # Requirements
 

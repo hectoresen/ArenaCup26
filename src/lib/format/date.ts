@@ -82,7 +82,7 @@ const LABELS: Record<SupportedLocale, DateLabels> = {
 
 /**
  * Comparación de "día calendario" en UTC. Dos fechas son el mismo
- * día si comparten año, mes y día UTC. (Para WebMundial 26 los
+ * día si comparten año, mes y día UTC. (Para ArenaCup26 los
  * kickoffs y "now()" siempre vienen en UTC del servidor.)
  */
 export function isSameUtcDay(a: Date, b: Date): boolean {

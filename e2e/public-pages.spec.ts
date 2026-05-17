@@ -13,8 +13,8 @@ import { expect, test } from "@playwright/test";
  */
 
 const PUBLIC_PATHS = [
-  { path: "/", expect: /ranking|WebMundial/i },
-  { path: "/es", expect: /WebMundial|ranking/i },
+  { path: "/", expect: /ranking|ArenaCup26/i },
+  { path: "/es", expect: /ArenaCup26|ranking/i },
   { path: "/faq", expect: /preguntas|frequent/i },
   { path: "/legal/privacy", expect: /privacidad|privacy/i },
   { path: "/legal/terms", expect: /términos|terms/i },
@@ -39,7 +39,7 @@ test("manifest.webmanifest is served", async ({ page }) => {
   const response = await page.request.get("/manifest.webmanifest");
   expect(response.status()).toBe(200);
   const body = await response.json();
-  expect(body.name).toBe("WebMundial 26");
+  expect(body.name).toBe("ArenaCup26");
 });
 
 test("status endpoint returns a known shape", async ({ page }) => {

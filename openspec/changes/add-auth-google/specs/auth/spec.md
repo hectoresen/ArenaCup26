@@ -1,6 +1,6 @@
 # Purpose
 
-Permitir a un visitante de WebMundial 26 iniciar sesión con su cuenta de Google y obtener una sesión persistente en el servidor. Esta capability sienta la base de identidad para todas las superficies privadas (dashboard, predicciones, cuenta, perfil propio en edición).
+Permitir a un visitante de ArenaCup26 iniciar sesión con su cuenta de Google y obtener una sesión persistente en el servidor. Esta capability sienta la base de identidad para todas las superficies privadas (dashboard, predicciones, cuenta, perfil propio en edición).
 
 # Requirements
 

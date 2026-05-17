@@ -37,6 +37,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("[wmundial] bootstrap failed:", err);
+  console.error("[arenacup26] bootstrap failed:", err);
   process.exit(1);
 });

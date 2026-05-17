@@ -17,7 +17,7 @@ export default function ErrorPage({
   const t = useTranslations("errors.runtime");
 
   useEffect(() => {
-    console.error("[wmundial] runtime error", error);
+    console.error("[arenacup26] runtime error", error);
   }, [error]);
 
   return (

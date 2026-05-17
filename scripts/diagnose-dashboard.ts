@@ -74,6 +74,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("[wmundial] diagnose failed:", err);
+  console.error("[arenacup26] diagnose failed:", err);
   process.exit(1);
 });

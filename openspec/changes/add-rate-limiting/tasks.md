@@ -25,6 +25,6 @@
 
 ## Logs / tests
 
-- [ ] 12. `[WM/ratelimit]` log al 429 con scope + id truncado.
+- [ ] 12. `[AC/ratelimit]` log al 429 con scope + id truncado.
 - [ ] 13. Tests unitarios: noop cuando env vacío; rate limit correctamente cuando set; multiple identifiers no se cruzan.
 - [ ] 14. Test de integración submit: 11 calls seguidos → 11º es 429.

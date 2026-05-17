@@ -1,5 +1,5 @@
 /**
- * Catálogo canónico de los 24 logros de WebMundial 26.
+ * Catálogo canónico de los 24 logros de ArenaCup26.
  *
  * Source of truth en código. Refleja `docs/achievements.md` 1:1.
  * Cualquier cambio aquí requiere actualizar el doc y abrir una propuesta

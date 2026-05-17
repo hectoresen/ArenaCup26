@@ -1,4 +1,4 @@
-# Dosier de decisiones técnicas — WebMundial 26
+# Dosier de decisiones técnicas — ArenaCup26
 
 Documento vivo. Cada vez que una capability nueva cierra una decisión técnica no obvia se añade aquí. El objetivo es que cualquier persona (o agente) entrando frío pueda entender por qué algo está como está sin leerse la historia de los commits.
 

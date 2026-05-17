@@ -1,6 +1,6 @@
 # Purpose
 
-Implementar el motor de puntuación de WebMundial 26 como una **función pura** que, dado el resultado oficial de un partido, una predicción de usuario y el estado de su racha, devuelve los puntos a sumar, el tipo de evento, la racha resultante y los bonus de combo disparados. Sin BD, sin I/O, totalmente testeable.
+Implementar el motor de puntuación de ArenaCup26 como una **función pura** que, dado el resultado oficial de un partido, una predicción de usuario y el estado de su racha, devuelve los puntos a sumar, el tipo de evento, la racha resultante y los bonus de combo disparados. Sin BD, sin I/O, totalmente testeable.
 
 # Requirements
 

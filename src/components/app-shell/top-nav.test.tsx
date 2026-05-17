@@ -59,7 +59,7 @@ describe("<TopNav>", () => {
   it("logo link points to /inicio", () => {
     renderTopNav("/partidos");
     // El logo tiene aria-label propio (no se confunde con el tab Inicio).
-    const logo = screen.getByLabelText(/WebMundial 26.*inicio/i);
+    const logo = screen.getByLabelText(/ArenaCup26.*inicio/i);
     expect(logo.getAttribute("href")).toMatch(/\/inicio$/);
   });
 });

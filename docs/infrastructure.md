@@ -1,4 +1,4 @@
-# Infraestructura — WebMundial 26
+# Infraestructura — ArenaCup26
 
 Diagrama operativo de los servicios que componen la app en
 producción (Railway, proyecto `artistic-cooperation`) y por qué

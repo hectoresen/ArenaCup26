@@ -2,7 +2,7 @@
 
 ## Why
 
-Hoy la app **no tiene páginas de error propias**. Si un usuario navega a una ruta que no existe (`/foo`), Next.js sirve su 404 por defecto — un fondo blanco con texto pequeño en negro, completamente fuera del lenguaje visual de WebMundial 26. Lo mismo con cualquier excepción no controlada en runtime.
+Hoy la app **no tiene páginas de error propias**. Si un usuario navega a una ruta que no existe (`/foo`), Next.js sirve su 404 por defecto — un fondo blanco con texto pequeño en negro, completamente fuera del lenguaje visual de ArenaCup26. Lo mismo con cualquier excepción no controlada en runtime.
 
 Esta propuesta añade 404 y error.tsx con el mismo brand que el resto del producto y, ya que `add-i18n` está vivo, ambas páginas nacen multi-idioma.
 

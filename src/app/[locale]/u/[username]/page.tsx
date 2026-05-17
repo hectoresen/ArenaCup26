@@ -46,17 +46,17 @@ export async function generateMetadata({
   const { username } = await params;
   const result = await getPublicProfile(db, username);
   if (result.kind === "not_found") {
-    return { title: "Perfil no encontrado · WebMundial 26" };
+    return { title: "Perfil no encontrado · ArenaCup26" };
   }
   if (result.kind === "private") {
     return {
-      title: `${result.identity.name} · WebMundial 26`,
-      description: "Perfil privado en WebMundial 26.",
+      title: `${result.identity.name} · ArenaCup26`,
+      description: "Perfil privado en ArenaCup26.",
     };
   }
   return {
-    title: `${result.profile.identity.name} · WebMundial 26`,
-    description: `Perfil de ${result.profile.identity.name} (@${result.profile.identity.username}) en WebMundial 26.`,
+    title: `${result.profile.identity.name} · ArenaCup26`,
+    description: `Perfil de ${result.profile.identity.name} (@${result.profile.identity.username}) en ArenaCup26.`,
   };
 }
 

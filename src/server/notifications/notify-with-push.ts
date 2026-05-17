@@ -87,7 +87,7 @@ export async function notifyWithPush(
     // llegan dos solicitudes seguidas, la nueva reemplaza a la
     // antigua en lugar de apilar. Distinto por kind para que
     // friend_request no pise un achievement_unlocked.
-    tag: `wmundial-${input.kind}`,
+    tag: `arenacup26-${input.kind}`,
   };
 
   const results = await Promise.allSettled(

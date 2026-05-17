@@ -1,4 +1,4 @@
-# Arquitectura — WebMundial 26
+# Arquitectura — ArenaCup26
 
 > Estado: borrador. Sujeta a revisión durante la fase de entendimiento.
 

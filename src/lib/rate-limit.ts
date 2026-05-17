@@ -62,7 +62,7 @@ const isEnabled = Boolean(REDIS_URL) && Boolean(REDIS_TOKEN);
 if (!isEnabled && NODE_ENV === "production") {
   // eslint-disable-next-line no-console
   console.warn(
-    "[WM/ratelimit] UPSTASH_REDIS_REST_URL / TOKEN not set in production — rate limiting is DISABLED",
+    "[AC/ratelimit] UPSTASH_REDIS_REST_URL / TOKEN not set in production — rate limiting is DISABLED",
   );
 }
 

@@ -1,6 +1,6 @@
 # Purpose
 
-Sembrar el catálogo de los 24 logros de WebMundial 26 en `achievement_definitions` desde un módulo TypeScript versionado, fiel a `docs/achievements.md`. Idempotente: re-correr el seed tras un cambio en código sincroniza la BD sin duplicados.
+Sembrar el catálogo de los 24 logros de ArenaCup26 en `achievement_definitions` desde un módulo TypeScript versionado, fiel a `docs/achievements.md`. Idempotente: re-correr el seed tras un cambio en código sincroniza la BD sin duplicados.
 
 # Requirements
 

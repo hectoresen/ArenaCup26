@@ -1,6 +1,6 @@
 # Purpose
 
-Ofrecer al visitante anónimo de la página pública (`/`) un punto de entrada visible y persistente para iniciar sesión y empezar a participar en WebMundial 26. Esta capability sirve solo como superficie de UI y delega el flow real de autenticación en `add-auth-google`.
+Ofrecer al visitante anónimo de la página pública (`/`) un punto de entrada visible y persistente para iniciar sesión y empezar a participar en ArenaCup26. Esta capability sirve solo como superficie de UI y delega el flow real de autenticación en `add-auth-google`.
 
 # Requirements
 

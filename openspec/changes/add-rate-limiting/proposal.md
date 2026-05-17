@@ -44,7 +44,7 @@ Si están vacías → noop (todos los limiters dejan pasar). Útil para dev loca
 
 ### Logs
 
-Cada 429 emite `[WM/ratelimit]` con scope + identificador truncado (`userId.slice(0, 8)` o `ip.slice(0, 7)`).
+Cada 429 emite `[AC/ratelimit]` con scope + identificador truncado (`userId.slice(0, 8)` o `ip.slice(0, 7)`).
 
 ## Impact
 

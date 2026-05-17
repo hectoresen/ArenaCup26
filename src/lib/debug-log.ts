@@ -1,9 +1,9 @@
 /**
  * Logger compartido para trazar el pipeline durante el sprint de
  * validación end-to-end con datos reales. Todas las trazas comparten
- * el prefijo `[WM]` para filtrar en Railway:
+ * el prefijo `[AC]` (ArenaCup26) para filtrar en Railway:
  *
- *   railway logs --service web | grep '\[WM/'
+ *   railway logs --service web | grep '\[AC/'
  *
  * Una vez validado el flujo en producción, los `dlog(...)` se retiran
  * y dejamos solo errores/warns esenciales. Mientras tanto, son
@@ -25,7 +25,7 @@ type Scope =
  * "compacto" para que sea grep-able. Si `data` es undefined, solo prefijo.
  */
 export function dlog(scope: Scope, message: string, data?: unknown): void {
-  const prefix = `[WM/${scope}]`;
+  const prefix = `[AC/${scope}]`;
   if (data === undefined) {
     console.log(`${prefix} ${message}`);
     return;
@@ -50,7 +50,7 @@ export function dlog(scope: Scope, message: string, data?: unknown): void {
  * tree-shakeable en el cliente.
  */
 export function derr(scope: Scope, message: string, err: unknown): void {
-  const prefix = `[WM/${scope}]`;
+  const prefix = `[AC/${scope}]`;
   if (err instanceof Error) {
     console.error(`${prefix} ${message}: ${err.message}`, err.stack);
   } else {

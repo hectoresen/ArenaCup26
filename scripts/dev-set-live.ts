@@ -48,6 +48,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("[wmundial] dev:set-live failed:", err);
+  console.error("[arenacup26] dev:set-live failed:", err);
   process.exit(1);
 });

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "WebMundial 26 · Classement",
+    "title": "ArenaCup26 · Classement",
     "description": "Plateforme sociale et compétitive autour de la Coupe du Monde 2026. Prédisez les matchs, montez au classement, débloquez des succès."
   },
   "leaderboard": {
@@ -138,7 +138,7 @@
   "settings": {
     "deleteAccount": {
       "title": "Supprimer mon compte",
-      "subtitle": "Cette action est définitive. Nous supprimerons toutes tes données de WebMundial 26.",
+      "subtitle": "Cette action est définitive. Nous supprimerons toutes tes données de ArenaCup26.",
       "backToSettings": "Retour à Confidentialité",
       "intro": "En supprimant ton compte, tu perds de manière irréversible :",
       "bullets": {
@@ -405,7 +405,7 @@
       "tabGlobal": "Global",
       "tabFriends": "Amis",
       "emptyGlobal": "Personne dans le classement pour l'instant. Sois le premier.",
-      "emptyFriends": "Pas encore d'amis sur WebMundial."
+      "emptyFriends": "Pas encore d'amis sur ArenaCup26."
     },
     "streakChip": "Série {count}"
   },
@@ -413,7 +413,7 @@
     "brand": {
       "year": "26",
       "tag": "WC 26",
-      "logoAria": "WebMundial 26 — retour à l'accueil"
+      "logoAria": "ArenaCup26 — retour à l'accueil"
     },
     "tabs": {
       "home": "Accueil",
@@ -702,7 +702,7 @@
       "reject": "Refuser"
     },
     "list": {
-      "empty": "Pas encore d'amis sur WebMundial. Partage ton profil.",
+      "empty": "Pas encore d'amis sur ArenaCup26. Partage ton profil.",
       "pts": "pts",
       "removeAria": "Retirer {name} de ta liste d'amis",
       "removeConfirm": "Retirer {name} de ta liste d'amis ? Tu ne le verras plus, et il ne te verra plus comme ami."
@@ -756,11 +756,11 @@
       "sections": {
         "intro": {
           "heading": "Résumé rapide",
-          "body": "WebMundial 26 est un jeu de prédictions sur la Coupe du Monde 2026. Pour jouer, nous avons besoin du strict minimum : l'e-mail, le nom et la photo de ton compte Google et, en option, ton pays. Nous ne vendons pas tes données, nous n'utilisons pas de publicité tierce, et tu peux demander la suppression de ton compte à tout moment."
+          "body": "ArenaCup26 est un jeu de prédictions sur la Coupe du Monde 2026. Pour jouer, nous avons besoin du strict minimum : l'e-mail, le nom et la photo de ton compte Google et, en option, ton pays. Nous ne vendons pas tes données, nous n'utilisons pas de publicité tierce, et tu peux demander la suppression de ton compte à tout moment."
         },
         "controller": {
           "heading": "Responsable du traitement",
-          "body": "Le responsable de tes données est l'équipe de WebMundial 26. Lorsque la plateforme sera ouverte au public, nous activerons un canal de contact et le mettrons en lien ici."
+          "body": "Le responsable de tes données est l'équipe de ArenaCup26. Lorsque la plateforme sera ouverte au public, nous activerons un canal de contact et le mettrons en lien ici."
         },
         "dataCollected": {
           "heading": "Quelles données nous collectons",
@@ -809,7 +809,7 @@
       "sections": {
         "intro": {
           "heading": "Acceptation",
-          "body": "En créant un compte ou en utilisant WebMundial 26 tu acceptes ces conditions. Si tu n'es pas d'accord, n'utilise pas l'app ; si tu as déjà un compte, tu pourras nous demander de le supprimer via le canal de contact que nous activerons à l'ouverture publique de la plateforme."
+          "body": "En créant un compte ou en utilisant ArenaCup26 tu acceptes ces conditions. Si tu n'es pas d'accord, n'utilise pas l'app ; si tu as déjà un compte, tu pourras nous demander de le supprimer via le canal de contact que nous activerons à l'ouverture publique de la plateforme."
         },
         "eligibility": {
           "heading": "Qui peut jouer",
@@ -833,7 +833,7 @@
         },
         "intellectualProperty": {
           "heading": "Propriété intellectuelle",
-          "body": "Le code, design, textes et la marque « WebMundial 26 » appartiennent à son équipe de développement. Les données des matchs de la Coupe du Monde 2026 proviennent de notre fournisseur de données sportives et appartiennent à leurs détenteurs respectifs. Ne reproduis pas l'app sans autorisation."
+          "body": "Le code, design, textes et la marque « ArenaCup26 » appartiennent à son équipe de développement. Les données des matchs de la Coupe du Monde 2026 proviennent de notre fournisseur de données sportives et appartiennent à leurs détenteurs respectifs. Ne reproduis pas l'app sans autorisation."
         },
         "termination": {
           "heading": "Résiliation",
@@ -841,7 +841,7 @@
         },
         "disclaimer": {
           "heading": "Avertissement",
-          "body": "WebMundial 26 est un jeu de divertissement. Ce n'est pas un service de paris : pas de prix monétaires. L'app est fournie « telle quelle », sans garantie de disponibilité continue. Si les données des matchs arrivent en retard ou avec des erreurs depuis notre fournisseur externe, nous faisons de notre mieux pour les corriger, mais nous ne pouvons pas garantir l'exactitude absolue."
+          "body": "ArenaCup26 est un jeu de divertissement. Ce n'est pas un service de paris : pas de prix monétaires. L'app est fournie « telle quelle », sans garantie de disponibilité continue. Si les données des matchs arrivent en retard ou avec des erreurs depuis notre fournisseur externe, nous faisons de notre mieux pour les corriger, mais nous ne pouvons pas garantir l'exactitude absolue."
         },
         "liability": {
           "heading": "Limitation de responsabilité",

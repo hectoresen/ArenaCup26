@@ -1,6 +1,6 @@
 {
-  "name": "WebMundial 26",
-  "short_name": "WebMundial",
+  "name": "ArenaCup26",
+  "short_name": "ArenaCup26",
   "description": "Predice los partidos del Mundial 2026 y compite con tus amigos.",
   "start_url": "/",
   "scope": "/",

@@ -1,4 +1,4 @@
-# project.md — WebMundial 26
+# project.md — ArenaCup26
 
 Contexto vivo del proyecto para asistentes IA. Actualízalo cuando una decisión cambie.
 

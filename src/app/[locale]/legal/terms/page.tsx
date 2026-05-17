@@ -29,7 +29,7 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "legal.terms" });
   return {
-    title: `${t("title")} · WebMundial 26`,
+    title: `${t("title")} · ArenaCup26`,
     description: t("subtitle"),
   };
 }

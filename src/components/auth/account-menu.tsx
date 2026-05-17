@@ -61,7 +61,7 @@ export function AccountMenu({
     try {
       await signOut({ callbackUrl: "/" });
     } catch (error) {
-      console.error("[wmundial] sign-out error", error);
+      console.error("[arenacup26] sign-out error", error);
       setSigningOut(false);
     }
   }

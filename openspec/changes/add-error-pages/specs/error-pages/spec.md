@@ -1,6 +1,6 @@
 # Purpose
 
-Servir páginas de error (404 y runtime) que sigan el lenguaje visual de WebMundial 26 y respeten el locale del usuario, en vez de caer al fallback genérico de Next.js. Garantiza un suelo de calidad bajo cualquier propuesta futura: si una página falla o no existe, el usuario sigue dentro del producto.
+Servir páginas de error (404 y runtime) que sigan el lenguaje visual de ArenaCup26 y respeten el locale del usuario, en vez de caer al fallback genérico de Next.js. Garantiza un suelo de calidad bajo cualquier propuesta futura: si una página falla o no existe, el usuario sigue dentro del producto.
 
 # Requirements
 

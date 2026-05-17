@@ -1,6 +1,6 @@
 # Despliegue en Railway (entorno de pruebas)
 
-Guía paso-a-paso para llevar WebMundial 26 a un entorno accesible desde el móvil para validar el flujo end-to-end. **No es producción aún** — es la sandbox que tú usas para iterar sin tener que cargar todo localmente.
+Guía paso-a-paso para llevar ArenaCup26 a un entorno accesible desde el móvil para validar el flujo end-to-end. **No es producción aún** — es la sandbox que tú usas para iterar sin tener que cargar todo localmente.
 
 Plataforma: [Railway](https://railway.app). Web Next + Postgres + sync manual en un solo dashboard, ~$5/mes pay-as-you-go (probablemente cabe en los créditos del plan Hobby sin pagar nada con tráfico de una persona).
 

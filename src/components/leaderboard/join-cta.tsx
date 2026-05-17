@@ -30,7 +30,7 @@ export function JoinCta() {
       // Tras autenticar, llevamos al panel privado, no a la landing.
       await signIn("google", { callbackUrl: "/inicio" });
     } catch (error) {
-      console.error("[wmundial] sign-in error", error);
+      console.error("[arenacup26] sign-in error", error);
       setPending(false);
     }
   }
