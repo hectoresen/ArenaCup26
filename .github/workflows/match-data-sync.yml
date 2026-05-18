@@ -1,23 +1,29 @@
-name: Sync fixtures
+name: Match data sync
 
-# Llama a /api/cron/sync-fixtures de la app desplegada en Railway de
-# forma periódica para que partidos, scores y puntos se actualicen
-# sin que el desarrollador tenga que hacer curl a mano.
+# Sincronización periódica del CALENDARIO de partidos desde api-football
+# a nuestra BD. Pilla partidos de las 7 ligas configuradas en una ventana
+# de hoy-1d a hoy+7d: equipos, kickoff, estadio, fase y status.
 #
-# **Setup en GitHub** antes de que esto funcione:
-#   1. Settings → Secrets and variables → Actions → New secret.
-#   2. Crear `RAILWAY_SYNC_URL` con valor:
-#        https://<tu-dominio>.up.railway.app/api/cron/sync-fixtures
-#   3. (Opcional) `CRON_SECRET` con el mismo valor que en Railway, si
-#      lo activaste como variable. En entorno de pruebas se puede dejar
-#      vacío — el endpoint acepta cualquier POST cuando CRON_SECRET no
-#      está configurado en producción … en realidad lo cierra con 401.
-#      Para production-grade: poner CRON_SECRET tanto aquí como en
-#      Railway.
+# - Upserta partidos nuevos y actualiza cambios (fecha movida, status,
+#   marcador final si llega).
+# - Si un partido transiciona a `finished` durante el sync, dispara
+#   `processFinishedMatch` → calcula y persiste puntos en `user_points`.
+# - Descubre equipos nuevos al vuelo (escudo + nombre + código).
 #
-# Cuando vayas a la fase pre-Mundial con tráfico esperado, cambia la
-# cadencia para que sea más agresiva durante ventanas de partido y
-# off fuera (ej. dos workflows con schedules distintos).
+# Es el "calendario amplio". Complementario a `live-scoring.yml` que
+# corre cada 2 min con ventana solo de hoy.
+#
+# Ver `docs/data-pipeline.md` para el flujo completo de datos.
+#
+# **Setup en GitHub** (una vez):
+#   1. Settings → Secrets → `RAILWAY_SYNC_URL` =
+#      https://www.arenacup26.com/api/cron/sync-fixtures
+#   2. Reusar `CRON_SECRET` (mismo valor que en Railway).
+#
+# Nota: el endpoint sigue siendo `/api/cron/sync-fixtures` por compat
+# con el secret existente. El workflow se renombró a `match-data-sync`
+# (2026-05-18) porque "fixtures" en jerga sports se confundía con
+# "fixtures de test" del lenguaje dev.
 
 on:
   # Reactivado 2026-05-18 con plan Pro. Cadencia cada 3h (8 ticks/día).

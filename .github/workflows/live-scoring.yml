@@ -1,20 +1,24 @@
 name: Live scoring
 
-# Cron de alta frecuencia que llama a /api/cron/live-scoring cada 2
-# minutos. El endpoint hace un check rápido en BD: si NO hay partidos
-# `live` y NO hay kickoffs en ±15-30 min, devuelve 204 sin tocar
-# api-football. Así no consumimos requests del free-tier cuando no
-# hay nada que sincronizar.
+# Cron de alta frecuencia (cada 2 min) que refresca los MARCADORES en
+# vivo. Llama a /api/cron/live-scoring:
 #
-# Trade-off vs sync-fixtures (cada 3h, 9 días de ventana):
-#  - sync-fixtures: visibilidad amplia, baja frecuencia. Detecta
-#    partidos nuevos en la temporada + cambios de calendario.
-#  - live-scoring: ventana solo del día actual, alta frecuencia.
-#    Marcadores en vivo cerca de tiempo real (max 2 min de delay).
+# - Si NO hay partidos `live` y NO hay kickoffs en ±15/30 min → 204
+#   sin tocar api-football (skip silencioso).
+# - Si SÍ → 1 req a api-football pidiendo solo los fixtures de hoy,
+#   actualiza marcadores y status en BD.
+# - Cuando un partido pasa a `finished` → dispara
+#   `processFinishedMatch` in-band → calcula puntos y los persiste en
+#   `user_points` para todos los users que predijeron.
+#
+# Es el cron de "marcador en vivo". Complementario a
+# `match-data-sync.yml` que corre cada 3h con ventana amplia.
+#
+# Ver `docs/data-pipeline.md` para el flujo completo de datos.
 #
 # **Setup en GitHub** (una vez):
-#   1. Settings → Secrets → New secret `RAILWAY_LIVE_URL` =
-#      https://<dominio>/api/cron/live-scoring
+#   1. Settings → Secrets → `RAILWAY_LIVE_URL` =
+#      https://www.arenacup26.com/api/cron/live-scoring
 #   2. Reusar el `CRON_SECRET` ya configurado.
 
 on:
