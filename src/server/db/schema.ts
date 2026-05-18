@@ -109,6 +109,13 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "system",
   "friend_request",
   "friend_accepted",
+  // ───── Grupos de competición (add-competition-groups, 2026-05-18) ─────
+  "group_invited",
+  "group_joined",
+  "group_left",
+  "group_expelled",
+  "group_admin_transferred",
+  "group_deleted",
 ]);
 
 export const friendshipStatusEnum = pgEnum("friendship_status", [
@@ -116,6 +123,33 @@ export const friendshipStatusEnum = pgEnum("friendship_status", [
   "accepted",
   "blocked",
 ]);
+
+export const groupVisibilityEnum = pgEnum("group_visibility", ["public", "private"]);
+export const groupMemberRoleEnum = pgEnum("group_member_role", ["admin", "member"]);
+export const groupInvitationStatusEnum = pgEnum("group_invitation_status", [
+  "pending",
+  "accepted",
+  "rejected",
+]);
+
+/**
+ * Paleta cerrada de colores temáticos para distinguir grupos
+ * visualmente. Misma filosofía que `AVATAR_GALLERY`: galería curada
+ * sin necesidad de upload de assets. Se valida en la server action
+ * `createGroup` / `updateGroup`. Si el día de mañana queremos más
+ * colores, se añade aquí y la UI los lee automáticamente.
+ */
+export const GROUP_COLORS = [
+  "gold",
+  "blue",
+  "purple",
+  "green",
+  "orange",
+  "red",
+  "teal",
+  "pink",
+] as const;
+export type GroupColor = (typeof GROUP_COLORS)[number];
 
 // ─── USERS & AUTH (Auth.js compatible) ─────────────────────
 
@@ -599,6 +633,140 @@ export const friendships = pgTable(
   }),
 );
 
+// ─── GRUPOS DE COMPETICIÓN ─────────────────────────────────
+// Sistema introducido por `add-competition-groups` (2026-05-18). El
+// scoring es idéntico al global: cada grupo es un FILTRO+REORDER
+// sobre el mismo `user_points`. No hay puntos paralelos.
+
+/**
+ * Grupo de competición. El creator inicial es el `admin`; la
+ * relación se persiste en `group_memberships.role` para soportar
+ * transfer de admin (siempre hay exactamente 1 admin por grupo
+ * activo — invariante mantenido en las server actions).
+ */
+export const groups = pgTable(
+  "groups",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    creatorId: uuid("creator_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    color: text("color").notNull(),
+    visibility: groupVisibilityEnum("visibility").notNull().default("private"),
+    /**
+     * Cap configurable por el admin en el rango [5, 100]. Validado
+     * en `createGroup`/`updateGroup` (zod). Reducir por debajo del
+     * count actual se bloquea en la action.
+     */
+    maxMembers: integer("max_members").notNull().default(25),
+    /** Soft delete — preserva memberships con snapshot histórico. */
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    creatorIdx: index("groups_creator_idx").on(table.creatorId),
+    visibilityIdx: index("groups_visibility_idx").on(table.visibility),
+  }),
+);
+
+/**
+ * Pertenencia de un user a un grupo. Al abandonar con la opción
+ * "mantener perfil en ranking", `left_at` se set y los campos
+ * `frozen_*` capturan el snapshot de los puntos en ese momento.
+ * El ranking del grupo joinea: activos (puntos vivos de `user_points`)
+ * con ex-miembros (puntos congelados de esta tabla).
+ *
+ * Cap 3 grupos activos por user — invariante mantenido en
+ * `caps.canJoinAnotherGroup` antes de cualquier insert.
+ */
+export const groupMemberships = pgTable(
+  "group_memberships",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: groupMemberRoleEnum("role").notNull().default("member"),
+    joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
+    leftAt: timestamp("left_at", { withTimezone: true }),
+    /** Snapshot de puntos al `left_at`. NULL si miembro activo. */
+    frozenPoints: integer("frozen_points"),
+    frozenStreakMax: integer("frozen_streak_max"),
+    frozenSimpleHits: integer("frozen_simple_hits"),
+  },
+  (table) => ({
+    uniqueMembership: uniqueIndex("group_memberships_unique").on(table.groupId, table.userId),
+    userIdx: index("group_memberships_user_idx").on(table.userId),
+    groupActiveIdx: index("group_memberships_group_active_idx").on(table.groupId, table.leftAt),
+  }),
+);
+
+/**
+ * Invitación directa de admin a user concreto. Distinta de los
+ * links de invitación (que son tokens reutilizables). El invitee
+ * la acepta o la rechaza desde `/social`. Una invitación pending
+ * por (group, invitee) es el invariante — al aceptar, status pasa
+ * a 'accepted' y se crea la membership; al rechazar, queda como
+ * 'rejected' para histórico (no se borra).
+ */
+export const groupInvitations = pgTable(
+  "group_invitations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    invitedBy: uuid("invited_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    inviteeId: uuid("invitee_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: groupInvitationStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+  },
+  (table) => ({
+    inviteeIdx: index("group_invitations_invitee_idx").on(table.inviteeId, table.status),
+    groupIdx: index("group_invitations_group_idx").on(table.groupId),
+  }),
+);
+
+/**
+ * Links de invitación reutilizables (token compartible). A diferencia
+ * de `group_invitations` (1-a-1), un link puede ser usado por N
+ * personas (`max_uses = 0` ilimitado, o N concreto). El creador
+ * puede revocar en cualquier momento (`revoked_at != null`).
+ *
+ * Cap 5 links activos (revoked_at IS NULL) por grupo — invariante
+ * en `createLink`.
+ */
+export const groupLinks = pgTable(
+  "group_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    /** Token aleatorio (UUID-like) que va en la URL `/social/grupos/unirse/<token>`. */
+    token: text("token").notNull(),
+    /** 0 = ilimitado, N = al alcanzar `uses = N` el link queda agotado. */
+    maxUses: integer("max_uses").notNull().default(0),
+    uses: integer("uses").notNull().default(0),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    uniqueToken: uniqueIndex("group_links_token_unique").on(table.token),
+    groupActiveIdx: index("group_links_group_active_idx").on(table.groupId, table.revokedAt),
+  }),
+);
+
 // ─── RELATIONS ─────────────────────────────────────────────
 
 export const usersRelations = relations(users, ({ many, one }) => ({
@@ -683,4 +851,26 @@ export const userAchievementsRelations = relations(userAchievements, ({ one }) =
     fields: [userAchievements.achievementId],
     references: [achievementDefinitions.id],
   }),
+}));
+
+export const groupsRelations = relations(groups, ({ one, many }) => ({
+  creator: one(users, { fields: [groups.creatorId], references: [users.id] }),
+  memberships: many(groupMemberships),
+  invitations: many(groupInvitations),
+  links: many(groupLinks),
+}));
+
+export const groupMembershipsRelations = relations(groupMemberships, ({ one }) => ({
+  group: one(groups, { fields: [groupMemberships.groupId], references: [groups.id] }),
+  user: one(users, { fields: [groupMemberships.userId], references: [users.id] }),
+}));
+
+export const groupInvitationsRelations = relations(groupInvitations, ({ one }) => ({
+  group: one(groups, { fields: [groupInvitations.groupId], references: [groups.id] }),
+  invitee: one(users, { fields: [groupInvitations.inviteeId], references: [users.id] }),
+  inviter: one(users, { fields: [groupInvitations.invitedBy], references: [users.id] }),
+}));
+
+export const groupLinksRelations = relations(groupLinks, ({ one }) => ({
+  group: one(groups, { fields: [groupLinks.groupId], references: [groups.id] }),
 }));
