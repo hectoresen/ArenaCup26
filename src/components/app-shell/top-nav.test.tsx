@@ -31,7 +31,7 @@ describe("<TopNav>", () => {
     expect(screen.getByRole("link", { name: /^Inicio$/ })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /^Partidos$/ })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /^Ranking$/ })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /^Logros$/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /^Social$/ })).toBeInTheDocument();
   });
 
   it("marks aria-current='page' on the active tab", () => {
@@ -41,7 +41,7 @@ describe("<TopNav>", () => {
     // los otros tres no
     expect(screen.getByRole("link", { name: /^Inicio$/ }).getAttribute("aria-current")).toBeNull();
     expect(screen.getByRole("link", { name: /^Ranking$/ }).getAttribute("aria-current")).toBeNull();
-    expect(screen.getByRole("link", { name: /^Logros$/ }).getAttribute("aria-current")).toBeNull();
+    expect(screen.getByRole("link", { name: /^Social$/ }).getAttribute("aria-current")).toBeNull();
   });
 
   it("active tab also matches when on a sub-route", () => {

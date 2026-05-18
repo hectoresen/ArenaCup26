@@ -121,7 +121,7 @@ describe("notifyWithPush", () => {
       pushable: true,
     });
     const [, payload] = mockSend.mock.calls[0] ?? [];
-    expect((payload as { url: string }).url).toBe("/amigos");
+    expect((payload as { url: string }).url).toBe("/social");
   });
 
   it("skips push entirely when the kind has no destination (system)", async () => {

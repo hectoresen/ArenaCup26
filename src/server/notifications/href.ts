@@ -22,7 +22,7 @@ export function resolveNotificationHref(item: NotificationItem): string | null {
   switch (item.kind) {
     case "friend_request":
     case "friend_accepted":
-      return "/amigos";
+      return "/social";
     case "achievement_unlocked":
       return "/logros";
     case "prediction_sent":

@@ -433,7 +433,7 @@
       "home": "الرئيسية",
       "matches": "المباريات",
       "ranking": "الترتيب",
-      "achievements": "الإنجازات",
+      "social": "اجتماعي",
       "sectionsLabel": "الأقسام",
       "mobileLabel": "تنقل الجوال"
     },
@@ -477,7 +477,7 @@
     "profile": "ملفي الشخصي",
     "settings": "الإعدادات",
     "history": "سجلّي",
-    "friends": "الأصدقاء",
+    "achievements": "الإنجازات",
     "privacy": "الخصوصية",
     "faq": "الأسئلة الشائعة",
     "legalPrivacy": "سياسة الخصوصية",

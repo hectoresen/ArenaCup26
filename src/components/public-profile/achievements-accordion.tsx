@@ -28,7 +28,7 @@ export function AchievementsAccordion({ achievements, ownerUsername }: Props) {
           al cargar el acordeón. Sin esto, los `<use href="#ach-...">`
           de las cards renderizan vacíos. */}
       <AchievementsIconSprite />
-      <details open className="mt-6 group rounded-2xl border-2 border-border bg-card open:border-gold/30">
+      <details id="achievements" open className="mt-6 group rounded-2xl border-2 border-border bg-card open:border-gold/30 scroll-mt-20">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 py-4 transition-colors hover:bg-card-hover">
         <div className="flex-1">
           <div className="mb-1.5 flex items-center gap-2">

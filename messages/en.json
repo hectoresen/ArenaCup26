@@ -433,7 +433,7 @@
       "home": "Home",
       "matches": "Matches",
       "ranking": "Ranking",
-      "achievements": "Achievements",
+      "social": "Social",
       "sectionsLabel": "Sections",
       "mobileLabel": "Mobile navigation"
     },
@@ -477,7 +477,7 @@
     "profile": "My profile",
     "settings": "Settings",
     "history": "My history",
-    "friends": "Friends",
+    "achievements": "Achievements",
     "privacy": "Privacy",
     "faq": "Frequently asked questions",
     "legalPrivacy": "Privacy policy",

@@ -17,9 +17,9 @@ function build(overrides: Partial<NotificationItem>): NotificationItem {
 }
 
 describe("resolveNotificationHref", () => {
-  it("friend_request and friend_accepted route to /amigos (no matchId needed)", () => {
-    expect(resolveNotificationHref(build({ kind: "friend_request" }))).toBe("/amigos");
-    expect(resolveNotificationHref(build({ kind: "friend_accepted" }))).toBe("/amigos");
+  it("friend_request and friend_accepted route to /social (no matchId needed)", () => {
+    expect(resolveNotificationHref(build({ kind: "friend_request" }))).toBe("/social");
+    expect(resolveNotificationHref(build({ kind: "friend_accepted" }))).toBe("/social");
   });
 
   it("achievement_unlocked routes to /logros even without achievementId", () => {

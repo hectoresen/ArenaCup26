@@ -87,7 +87,7 @@ export async function sendFriendRequest(targetUsername: string): Promise<FriendA
 
   dlog("ranking", "friend_request_sent", { fromId, toId: target.id });
 
-  revalidatePath("/amigos");
+  revalidatePath("/social");
   if (target.username) revalidatePath(`/u/${target.username}`);
   return { ok: true };
 }
@@ -127,7 +127,7 @@ export async function acceptFriendRequest(friendshipId: string): Promise<FriendA
 
   dlog("ranking", "friend_request_accepted", { friendshipId, by: userId });
 
-  revalidatePath("/amigos");
+  revalidatePath("/social");
   return { ok: true };
 }
 
@@ -154,7 +154,7 @@ export async function rejectFriendRequest(friendshipId: string): Promise<FriendA
 
   if (rows.length === 0) return { ok: false, code: "not_pending" };
   dlog("ranking", "friend_request_rejected", { friendshipId, by: userId });
-  revalidatePath("/amigos");
+  revalidatePath("/social");
   return { ok: true };
 }
 
@@ -181,6 +181,6 @@ export async function removeFriend(otherUserId: string): Promise<FriendActionRes
     );
 
   dlog("ranking", "friend_removed", { userId, otherUserId });
-  revalidatePath("/amigos");
+  revalidatePath("/social");
   return { ok: true };
 }

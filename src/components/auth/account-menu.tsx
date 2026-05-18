@@ -194,8 +194,13 @@ export function AccountMenu({
             {t("history")}
           </Link>
 
+          {/* Amigos ya vive en la bottom-nav como "Social" — no
+              duplicamos en el dropdown. Logros se mueve aquí porque
+              dejó de tener pestaña propia (decisión QA 2026-05-18).
+              El path /logros redirige server-side a /u/<username>
+              con el ancla del acordeón. */}
           <Link
-            href="/amigos"
+            href="/logros"
             role="menuitem"
             onClick={() => setOpen(false)}
             className="flex w-full cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05]"
@@ -210,11 +215,11 @@ export function AccountMenu({
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <circle cx="5.5" cy="6" r="2.5" />
-              <circle cx="11" cy="6" r="2" />
-              <path d="M1.5 13.5 a4 4 0 0 1 8 0 M9 13.5 a3 3 0 0 1 5.5 0" />
+              <path d="M5 3 H11 V5.5 C11 8 9.5 9 8 9 C6.5 9 5 8 5 5.5 Z" />
+              <path d="M5 4 H3 V5 C3 6.5 4 7 5 7 M11 4 H13 V5 C13 6.5 12 7 11 7" />
+              <path d="M8 9 V11 M6 11 H10 V13 H6 Z" />
             </svg>
-            {t("friends")}
+            {t("achievements")}
           </Link>
 
           {/* Ajustes (privacy + push + delete) ya tienen su propio

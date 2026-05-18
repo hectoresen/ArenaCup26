@@ -79,7 +79,7 @@ describe("<NotificationBell> — dropdown abierto", () => {
     expect(screen.getByText("Argentina vs México")).toBeInTheDocument();
   });
 
-  it("friend_request enlaza a /amigos (click navigates al inbox)", async () => {
+  it("friend_request enlaza a /social (click navigates al inbox)", async () => {
     const item: NotificationItem = {
       id: "n2",
       kind: "friend_request",
@@ -96,7 +96,7 @@ describe("<NotificationBell> — dropdown abierto", () => {
     );
     await user.click(screen.getByRole("button", { name: /sin leer/ }));
     const link = screen.getByRole("link", { name: /Krawer/ });
-    expect(link.getAttribute("href")).toMatch(/\/amigos$/);
+    expect(link.getAttribute("href")).toMatch(/\/social$/);
   });
 
   it("achievement_unlocked enlaza a /logros", async () => {

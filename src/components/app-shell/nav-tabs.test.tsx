@@ -7,7 +7,7 @@ describe("APP_SHELL_TABS", () => {
       "home",
       "matches",
       "ranking",
-      "achievements",
+      "social",
     ]);
   });
 

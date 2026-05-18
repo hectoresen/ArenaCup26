@@ -30,12 +30,12 @@ describe("<BottomNav>", () => {
     expect(screen.getByRole("link", { name: /^Inicio$/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /^Partidos$/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /^Ranking$/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /^Logros$/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /^Social$/i })).toBeInTheDocument();
   });
 
   it("marks the active tab via aria-current", () => {
-    renderBottomNav("/logros");
-    expect(screen.getByRole("link", { name: /^Logros$/i }).getAttribute("aria-current")).toBe(
+    renderBottomNav("/social");
+    expect(screen.getByRole("link", { name: /^Social$/i }).getAttribute("aria-current")).toBe(
       "page",
     );
   });

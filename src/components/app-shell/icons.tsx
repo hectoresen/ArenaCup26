@@ -103,6 +103,19 @@ export function ShellIconSprite() {
           </text>
         </symbol>
 
+        <symbol id="ico-social" viewBox="0 0 20 20">
+          {/* Dos figuras: head + shoulders solapadas, evoca grupo */}
+          <circle cx="7" cy="7" r="2.8" fill="none" stroke="currentColor" strokeWidth="1.4" />
+          <circle cx="13.5" cy="8" r="2.2" fill="none" stroke="currentColor" strokeWidth="1.4" />
+          <path
+            d="M2 17 a5 5 0 0 1 10 0 M10.5 17 a3.6 3.6 0 0 1 7 0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+        </symbol>
+
         <symbol id="ico-bell" viewBox="0 0 20 20">
           <path
             d="M10 2 C10 2 6 4.5 6 9 L6 14 L4 16 L16 16 L14 14 L14 9 C14 4.5 10 2 10 2Z"

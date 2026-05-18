@@ -35,7 +35,7 @@ export function InvitationsPlaceholderCard({ count }: Props) {
         </p>
       )}
       <Link
-        href="/amigos#invitaciones"
+        href="/social#invitaciones"
         className="inline-flex w-full cursor-pointer items-center justify-center rounded-full border-2 border-gold/40 bg-gold/10 px-4 py-2 text-xs font-extrabold text-gold no-underline transition-colors hover:bg-gold/15"
       >
         {t("inviteCta")}
