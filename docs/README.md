@@ -31,6 +31,8 @@ El README principal del repo ([`../README.md`](../README.md)) tiene el dosier co
 | [`deployment.md`](deployment.md)               | vivo       | Despliegue, variables de entorno, troubleshooting del primer arranque. |
 | [`security.md`](security.md)                   | vivo       | Runbook de seguridad: secrets, auditoría, operativa manual del owner. |
 | [`testing.md`](testing.md)                     | vivo       | Filosofía y estándares de testing. Threshold de cobertura + gaps conocidos + anti-patrones. |
+| [`pre-launch-checklist.md`](pre-launch-checklist.md) | activo | Lista canónica de lo pendiente antes y durante el Mundial. |
+| [`incident-2026-05-18-data-wipe.md`](incident-2026-05-18-data-wipe.md) | histórico | Post-mortem del wipe accidental + reglas para prevenir recurrencia. |
 | [`data-pipeline.md`](data-pipeline.md)         | vivo       | Cómo llegan los datos a la app: crons, fuentes, flujo gol → ranking. |
 | [`api-football-config.md`](api-football-config.md) | vivo   | Config del provider deportivo + IDs de liga + switch al Mundial 2026. |
 | [`match-data-research.md`](match-data-research.md) | histórico  | Pre-análisis de APIs candidatas. Decisión: api-football. Plan de failover. |
