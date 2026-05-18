@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { updateProfileAvatar } from "@/server/profile/actions";
@@ -41,6 +42,15 @@ export function AvatarPicker({
   const [toast, setToast] = useState<string | null>(null);
   const [draft, setDraft] = useState<string | null>(currentAvatarId);
   const [isPending, startTransition] = useTransition();
+  // Portal flag: durante SSR no hay document, hidratamos a client.
+  // Sin esto el modal renderiza dentro del ProfileHero, que tiene
+  // animación con `transform` y por spec CSS captura el `position:fixed`
+  // del modal a su propio bounding box en vez del viewport. Sintoma
+  // observado: avatar picker queda recortado dentro de la card en iOS.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const cooldownActive = (cooldownRemainingMs ?? 0) > 0;
   const cooldownMinutes = cooldownActive
     ? Math.max(1, Math.ceil((cooldownRemainingMs ?? 0) / 60_000))
@@ -104,7 +114,7 @@ export function AvatarPicker({
         {trigger}
       </button>
 
-      {open && (
+      {open && mounted && createPortal(
         <div
           role="dialog"
           aria-modal="true"
@@ -191,7 +201,8 @@ export function AvatarPicker({
               </button>
             </footer>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {toast && (
