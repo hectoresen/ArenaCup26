@@ -97,6 +97,14 @@ const baseSchema = z.object({
   // Sin esta var, el push system queda en noop (ver `getPushClient`).
   VAPID_SUBJECT: z.string().optional(),
 
+  // Achievements gate: ningún logro se desbloquea hasta que el
+  // sistema tenga al menos N matches con `status = 'finished'`.
+  // Default 0 = sin gate (QA + producción pre-Mundial). Para el
+  // Mundial: setear a 5 antes del kickoff para que las primeras
+  // predicciones no distorsionen el ranking con achievements
+  // triviales. El gate aplica solo en `evaluateAndUnlock`.
+  ACHIEVEMENTS_MIN_FINISHED_MATCHES: z.coerce.number().int().nonnegative().default(0),
+
   // Runtime
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });

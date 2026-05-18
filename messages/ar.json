@@ -624,6 +624,9 @@
     "changeAvatarAria": "تغيير الأفاتار",
     "avatarPickerTitle": "اختر أفاتارك",
     "close": "إغلاق",
+    "save": "حفظ",
+    "saving": "يجري الحفظ…",
+    "discard": "تجاهل",
     "backToGoogle": "العودة إلى أفاتار Google",
     "usingGoogle": "تستخدم أفاتار Google",
     "streakCard": {

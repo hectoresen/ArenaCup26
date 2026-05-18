@@ -1,9 +1,11 @@
 import { and, eq, isNotNull, sql } from "drizzle-orm";
 import { dlog } from "@/lib/debug-log";
+import { env } from "@/lib/env";
 import type { Database } from "@/server/db/client";
 import {
   achievementDefinitions,
   invitationRedemptions,
+  matches,
   pointEvents,
   userAchievements,
   userPoints,
@@ -97,6 +99,30 @@ export async function evaluateAndUnlock(
   db: Database,
   userId: string,
 ): Promise<string[]> {
+  // Gate global: bloqueamos los logros hasta que se hayan jugado N
+  // matches en el sistema (configurable via env). Pensado para el
+  // Mundial: queremos evitar que un user que acierte una sola
+  // predicción el día 1 se lleve achievements de forma trivial. Una
+  // vez se llegue al umbral, todos los users desbloquean
+  // retroactivamente lo que les corresponda en su siguiente unlock
+  // check (siguiente match scored). Default 0 → sin gate (QA).
+  const minFinished = env.ACHIEVEMENTS_MIN_FINISHED_MATCHES;
+  if (minFinished > 0) {
+    const finishedRows = await db
+      .select({ total: sql<number>`count(*)::int` })
+      .from(matches)
+      .where(eq(matches.status, "finished"));
+    const finishedCount = finishedRows[0]?.total ?? 0;
+    if (finishedCount < minFinished) {
+      dlog("scoring", "achievements gate active — skipping unlocks", {
+        userId,
+        finishedCount,
+        minFinished,
+      });
+      return [];
+    }
+  }
+
   // 1) Reunir contexto del user.
   const ctx = await loadContext(db, userId);
   dlog("scoring", "evaluating achievements", { userId, ctx });

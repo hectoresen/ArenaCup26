@@ -624,6 +624,9 @@
     "changeAvatarAria": "Change avatar",
     "avatarPickerTitle": "Pick your avatar",
     "close": "Close",
+    "save": "Save",
+    "saving": "Saving…",
+    "discard": "Discard",
     "backToGoogle": "Back to Google avatar",
     "usingGoogle": "Using Google avatar",
     "streakCard": {

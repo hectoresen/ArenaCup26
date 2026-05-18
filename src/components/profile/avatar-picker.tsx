@@ -23,9 +23,11 @@ type Props = {
 
 /**
  * Modal con la galería de avatares + opción "Volver al de Google".
- * Se invoca pulsando el trigger (típicamente el avatar actual del
- * user). Submit dispara la server action con cooldown 48h y muestra
- * toast si está bloqueado.
+ *
+ * Patrón **preview + commit**: clicar un emoji solo lo marca como
+ * "seleccionado" en el state local (`draft`). El user confirma con
+ * "Guardar" o aborta con "Descartar". Esto evita cambios accidentales
+ * y consume el cooldown solo cuando hay intención clara.
  */
 export function AvatarPicker({
   trigger,
@@ -37,11 +39,13 @@ export function AvatarPicker({
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [toast, setToast] = useState<string | null>(null);
+  const [draft, setDraft] = useState<string | null>(currentAvatarId);
   const [isPending, startTransition] = useTransition();
   const cooldownActive = (cooldownRemainingMs ?? 0) > 0;
   const cooldownMinutes = cooldownActive
     ? Math.max(1, Math.ceil((cooldownRemainingMs ?? 0) / 60_000))
     : 0;
+  const isDirty = draft !== currentAvatarId;
 
   useEffect(() => {
     if (!toast) return;
@@ -49,19 +53,22 @@ export function AvatarPicker({
     return () => clearTimeout(id);
   }, [toast]);
 
-  function pick(avatarId: string | null) {
-    if (avatarId === currentAvatarId) {
+  function discard() {
+    setDraft(currentAvatarId);
+    setOpen(false);
+  }
+
+  function save() {
+    if (!isDirty) {
       setOpen(false);
       return;
     }
     startTransition(async () => {
-      const result = await updateProfileAvatar(avatarId);
+      const result = await updateProfileAvatar(draft);
       if (result.ok) {
         setOpen(false);
-        // Re-renderiza el layout (app) para que el AppAvatar del
-        // dropdown se actualice con el nuevo `avatarId` (issue #8 del
-        // QA 2026-05-18). Sin esto, el avatar arriba-derecha queda
-        // stale hasta el siguiente full-load.
+        // Re-renderiza el layout para que AppAvatar del dropdown
+        // se actualice (issue #8 del QA 2026-05-18).
         router.refresh();
       } else if (result.code === "cooldown") {
         const minutes = Math.max(1, Math.ceil((result.remainingMs ?? 0) / 60_000));
@@ -81,6 +88,10 @@ export function AvatarPicker({
             setToast(t("cooldownToast", { minutes: cooldownMinutes }));
             return;
           }
+          // Reset draft al estado actual cada vez que se abre la modal
+          // — si el user había cancelado antes con un draft a medias,
+          // que no aparezca pre-seleccionado al reabrir.
+          setDraft(currentAvatarId);
           setOpen(true);
         }}
         className="cursor-pointer border-0 bg-transparent p-0 transition-transform hover:scale-105"
@@ -100,19 +111,19 @@ export function AvatarPicker({
           aria-label={t("avatarPickerTitle")}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm [animation:fadeUp_0.2s_ease_forwards]"
           onClick={(e) => {
-            if (e.target === e.currentTarget) setOpen(false);
+            if (e.target === e.currentTarget) discard();
           }}
           onKeyDown={(e) => {
-            if (e.key === "Escape") setOpen(false);
+            if (e.key === "Escape") discard();
           }}
         >
-          <div className="w-full max-w-md overflow-hidden rounded-3xl border-2 border-gold/30 bg-card p-5 shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
+          <div className="w-full max-w-md rounded-3xl border-2 border-gold/30 bg-card p-5 shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
             <header className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-lg text-gold">{t("avatarPickerTitle")}</h2>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
-                className="cursor-pointer rounded-full border-2 border-border bg-card px-2 py-0.5 text-xs font-extrabold text-muted hover:border-gold/30 hover:text-foreground"
+                onClick={discard}
+                className="cursor-pointer rounded-full border-2 border-border bg-card-hover px-2 py-0.5 text-xs font-extrabold text-muted hover:border-gold/30 hover:text-foreground"
                 aria-label={t("close")}
               >
                 ✕
@@ -129,12 +140,12 @@ export function AvatarPicker({
                   key={a.id}
                   type="button"
                   role="radio"
-                  aria-checked={currentAvatarId === a.id}
+                  aria-checked={draft === a.id}
                   aria-label={a.label}
-                  onClick={() => pick(a.id)}
+                  onClick={() => setDraft(a.id)}
                   disabled={isPending}
                   className={`flex aspect-square cursor-pointer items-center justify-center rounded-2xl border-2 text-3xl transition-all disabled:cursor-wait disabled:opacity-60 ${
-                    currentAvatarId === a.id
+                    draft === a.id
                       ? "border-gold bg-gold/[0.12] scale-105"
                       : "border-border bg-card-hover hover:border-gold/40 hover:scale-105"
                   }`}
@@ -145,17 +156,40 @@ export function AvatarPicker({
             </div>
 
             {hasGoogleImage && (
-              <footer className="mt-4 border-t border-border pt-3 text-center">
+              <div className="mt-4 border-t border-border pt-3 text-center">
                 <button
                   type="button"
-                  onClick={() => pick(null)}
-                  disabled={isPending || currentAvatarId === null}
-                  className="cursor-pointer rounded-full border-2 border-border bg-card px-4 py-2 text-xs font-extrabold text-muted transition-colors hover:border-gold/30 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={() => setDraft(null)}
+                  disabled={isPending || draft === null}
+                  className={`cursor-pointer rounded-full border-2 px-4 py-2 text-xs font-extrabold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                    draft === null
+                      ? "border-gold bg-gold/[0.08] text-gold"
+                      : "border-border bg-card-hover text-muted hover:border-gold/30 hover:text-foreground"
+                  }`}
                 >
-                  {currentAvatarId === null ? t("usingGoogle") : t("backToGoogle")}
+                  {draft === null ? t("usingGoogle") : t("backToGoogle")}
                 </button>
-              </footer>
+              </div>
             )}
+
+            <footer className="mt-5 flex justify-end gap-2 border-t border-border pt-4">
+              <button
+                type="button"
+                onClick={discard}
+                disabled={isPending}
+                className="cursor-pointer rounded-xl border-2 border-border bg-card-hover px-4 py-2 text-[12px] font-extrabold uppercase tracking-[0.1em] text-muted transition-colors hover:border-gold/30 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {t("discard")}
+              </button>
+              <button
+                type="button"
+                onClick={save}
+                disabled={isPending || !isDirty}
+                className="cursor-pointer rounded-xl border-2 border-gold/40 bg-gold/10 px-4 py-2 text-[12px] font-extrabold uppercase tracking-[0.1em] text-gold transition-colors hover:bg-gold/15 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isPending ? t("saving") : t("save")}
+              </button>
+            </footer>
           </div>
         </div>
       )}
