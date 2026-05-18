@@ -618,7 +618,6 @@
   "profileEditor": {
     "editAria": "Modifier le nom {name}",
     "cooldownToast": "Tu peux le changer toutes les 1h. Réessaie dans {minutes} min.",
-    "cooldownHint": "{minutes} min",
     "cooldownAria": "Changement verrouillé pendant {minutes} min",
     "genericError": "Impossible d'enregistrer. Réessaie.",
     "changeAvatarAria": "Changer d'avatar",

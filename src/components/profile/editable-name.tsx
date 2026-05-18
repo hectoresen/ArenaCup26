@@ -110,23 +110,9 @@ export function EditableName({ initial, display, className, cooldownRemainingMs 
         >
           {display ?? name}
         </button>
-        {cooldownActive && (
-          <span className="ms-2 inline-flex items-center gap-1 align-middle text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted">
-            <svg
-              width="9"
-              height="9"
-              viewBox="0 0 12 12"
-              aria-hidden="true"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <circle cx="6" cy="6" r="5" />
-              <path d="M6 3 v3 l2 1.5" strokeLinecap="round" />
-            </svg>
-            {t("cooldownHint", { minutes: cooldownMinutes })}
-          </span>
-        )}
+        {/* Sin hint inline: el toast al hacer click ya informa del
+            tiempo restante. Una segunda indicación visual permanente
+            distraía sin aportar (decisión QA 2026-05-18). */}
         {toast && (
           <div
             role="status"

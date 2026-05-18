@@ -618,7 +618,6 @@
   "profileEditor": {
     "editAria": "تعديل الاسم {name}",
     "cooldownToast": "يمكنك تغييره فقط كل ساعة. حاول مرة أخرى خلال {minutes} دقيقة.",
-    "cooldownHint": "{minutes} د",
     "cooldownAria": "التغيير مغلق لمدة {minutes} دقيقة",
     "genericError": "تعذّر الحفظ. أعد المحاولة.",
     "changeAvatarAria": "تغيير الأفاتار",
