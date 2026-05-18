@@ -137,7 +137,27 @@ export async function getFilteredMatches(
     .leftJoin(homeTeam, eq(homeTeam.id, matches.homeTeamId))
     .leftJoin(awayTeam, eq(awayTeam.id, matches.awayTeamId))
     .where(whereConds.length > 0 ? and(...whereConds) : undefined)
-    .orderBy(asc(matches.kickoffAt));
+    // Orden por relevancia para el user:
+    //  1) En curso (`live`) arriba del todo.
+    //  2) Próximos (`kickoffAt >= now`) ascendente — el más cercano
+    //     en el tiempo primero, para que sea fácil ir a predecir.
+    //  3) Pasados/`finished` al final, descendente — el más reciente
+    //     primero, en lugar de tener WC2022 abriendo la página.
+    // Si el user aplica filtro de status, este orden interno respeta
+    // la semántica (e.g. `?status=finished` ya solo trae pasados → el
+    // CASE colapsa a un solo bucket y queda `kickoffAt desc`).
+    .orderBy(
+      sql`CASE
+        WHEN ${matches.status} = 'live' THEN 0
+        WHEN ${matches.kickoffAt} >= NOW() THEN 1
+        ELSE 2
+      END`,
+      sql`CASE
+        WHEN ${matches.status} = 'live' OR ${matches.kickoffAt} >= NOW()
+          THEN ${matches.kickoffAt}
+      END ASC NULLS LAST`,
+      sql`${matches.kickoffAt} DESC`,
+    );
 
   if (rows.length === 0) return [];
   const predictionMap = await fetchPredictionMap(
