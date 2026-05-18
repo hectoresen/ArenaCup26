@@ -381,6 +381,46 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
 
 ---
 
+## 14.5 Guardrails contra operaciones destructivas (2026-05-18)
+
+- **Contexto**: el 2026-05-18, durante un wipe de QA para repoblar `matches` desde api-football, el script `dev-reset-matches` borró las predicciones y puntos de usuarios reales de producción además de los seeds. Ver `docs/incident-2026-05-18-data-wipe.md` para el post-mortem completo.
+- **Decisión**: `scripts/dev-reset-matches.ts` cuenta cuántos usuarios reales tienen datos no triviales (≥1 `point_event` o `user_points.total_points > 0`) antes de aceptar `--apply`. Si hay >0, exige un segundo flag explícito `--really-prod`. El mensaje de abort indica el alternative path: `scripts/recompute-user-points.ts` (idempotente, no destructivo).
+- **Decisión adicional**: prohibido mantener endpoints HTTP admin destructivos en `main`. Si se necesita una op puntual, se crea en branch efímera + se borra inmediatamente tras uso.
+- **`point_events` como source-of-truth**: `user_points` es DENORMALIZACIÓN. Modificarlo via SQL bypassa el audit trail. El path correcto para resincronizar es `point_events` → `recompute-user-points.ts`.
+
+## 14.6 Cooldown nombre/avatar 48 h → 1 h (2026-05-18)
+
+- **Contexto**: el cooldown original de 48 h era sobre-protección para fase muy temprana. En QA generaba fricción al editar perfil pero NO aportaba contra trolleo real (un troll espera 48 h sin problema).
+- **Decisión**: bajar a 1 h. Suficiente para evitar spam pero ágil para corregir errores tipográficos. La UI muestra countdown ("48 min") junto al elemento editable; click cuando cooldown activo dispara toast en vez de abrir el input.
+
+## 14.7 Toggle `showHistory` en privacy (2026-05-18)
+
+- **Contexto**: usuarios quieren decidir si mostrar su histórico de predicciones a visitantes del perfil. La privacy global (`public/friends_only/private`) no era granular suficiente — querían poder ser públicos sin exhibir el histórico.
+- **Decisión**: añadir `showHistory: boolean` (default `true`) en `UserPrivacy`. Si `true` y el visitante puede ver el perfil, ve las últimas 5 predicciones del owner. El owner siempre ve su propio histórico independientemente del toggle.
+
+## 14.8 Achievements gate por env var (2026-05-18)
+
+- **Contexto**: en los primeros partidos del Mundial, un user que predice por suerte el día 1 podría desbloquear logros de tier alto (GOAT, mítico) que distorsionarían el ranking mientras la mayoría todavía no ha empezado.
+- **Decisión**: `evaluateAndUnlock` lee `env.ACHIEVEMENTS_MIN_FINISHED_MATCHES` (default 0 = sin gate). Si > 0 y el número global de `matches.status='finished'` es menor al threshold, NO desbloquea nada. Set a 5 en Railway antes del kickoff. Tras pasar threshold, los unlocks retroactivos se sueltan en el siguiente match scored de cada user.
+- **Alternativa rechazada**: lock por tier (común desde día 1, GOAT tras 20). Más fino pero opaco para el user.
+
+## 14.9 Cadencia de backups dual (2026-05-18)
+
+- **Contexto**: backup diario era suficiente off-season. Durante el Mundial perder hasta 24h de actividad sería inaceptable.
+- **Decisión**: dos workflows — `db-backup.yml` (diario 03:00 UTC, prefijo `daily/`, retención 30 días) activo todo el año. `db-backup-tournament.yml` (cada 6h, prefijo `tournament/`, date guard 11 jun → 19 jul 2026) añade granularidad fina solo durante el torneo. Lifecycle: `daily/` 30 días, `tournament/` 14 días.
+
+## 14.10 Plan Pro de api-football (2026-05-17)
+
+- **Contexto**: free tier limitado a 100 req/día y restringido a temporadas 2022-2024. Insuficiente para el Mundial 2026.
+- **Decisión**: contratado plan Pro $19/mes (7500 req/día). **Allowlist de IPs vaciado** en el dashboard del provider porque Railway usa IPs dinámicas; auth queda únicamente por header `x-apisports-key`. Config detallada en `docs/api-football-config.md`.
+
+## 14.11 Ajustes en página dedicada `/ajustes` (2026-05-18)
+
+- **Contexto**: privacy + push + delete vivían como acordeón dentro de `/u/<username>`, owner-only. Forzaba al user a pasar por su perfil público para configurar su cuenta.
+- **Decisión**: nueva ruta `/ajustes` accesible desde el dropdown del avatar (top right), justo debajo de "Mi perfil". El acordeón se elimina y la página `/u/<username>` queda como perfil público puro.
+
+---
+
 ## 15. Roadmap diferido (no decidido todavía)
 
 Estas son capabilities propuestas pero **no abiertas** todavía. Se documenta solo el alcance esperado para que cuando llegue el momento de drafter la propuesta haya un contexto previo.

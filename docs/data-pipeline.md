@@ -22,9 +22,10 @@ $CRON_SECRET`. Si necesitas mover uno a otro scheduler externo
 | Workflow                                         | Cadencia       | Endpoint                          | Aporta                                  |
 |--------------------------------------------------|----------------|-----------------------------------|------------------------------------------|
 | [`match-data-sync.yml`](../.github/workflows/match-data-sync.yml) | cada 3 h   | `/api/cron/sync-fixtures`         | Calendario de partidos en BD            |
-| [`live-scoring.yml`](../.github/workflows/live-scoring.yml)       | cada 2 min | `/api/cron/live-scoring`          | Marcadores en vivo + trigger de scoring |
+| [`live-scoring.yml`](../.github/workflows/live-scoring.yml)       | cada 2 min | `/api/cron/live-scoring`          | Marcadores en vivo + kickoff reminders + trigger de scoring |
 | [`snapshot-ranking.yml`](../.github/workflows/snapshot-ranking.yml) | 00:05 UTC | `/api/cron/snapshot-ranking`      | Histórico del ranking (delta + sparkline)|
-| [`db-backup.yml`](../.github/workflows/db-backup.yml)             | 03:00 UTC  | (script `pg_dump` a S3)           | Backup integral de la BD                |
+| [`db-backup.yml`](../.github/workflows/db-backup.yml)             | 03:00 UTC  | (script `pg_dump` a S3, prefijo `daily/`) | Backup integral diario, retención 30d |
+| [`db-backup-tournament.yml`](../.github/workflows/db-backup-tournament.yml) | cada 6h (solo Mundial) | (script `pg_dump` a S3, prefijo `tournament/`) | Backup elevado durante el torneo (date guard 11 jun → 19 jul 2026) |
 
 ### match-data-sync — _calendario amplio_
 
@@ -38,12 +39,18 @@ puebla el calendario para que el user tenga qué predecir.
 ### live-scoring — _marcador en vivo_
 
 Cada 2 min comprueba en BD si hay algún match `live` o un kickoff a
-±15/30 min. Si NO, devuelve 204 sin tocar el provider (skip silencioso,
-0 cost). Si SÍ, fetch a api-football limitado a los fixtures de hoy y
-actualiza marcadores en BD. **Cuando detecta que un partido pasó a
-`finished`, ejecuta `processFinishedMatch` in-band**: calcula puntos
-para cada predicción, persiste en `user_points`, y los SSE clients
-reciben el ranking actualizado en el siguiente tick (≤15 s).
+±15/30 min. Si NO, devuelve 200 con `synced:false` sin tocar el provider
+(skip silencioso, 0 cost). Si SÍ, fetch a api-football limitado a los
+fixtures de hoy y actualiza marcadores en BD. **Cuando detecta que un
+partido pasó a `finished`, ejecuta `processFinishedMatch` in-band**:
+calcula puntos para cada predicción, persiste en `user_points`, y los
+SSE clients reciben el ranking actualizado en el siguiente tick (≤15 s).
+
+**Kickoff reminders**: en cada tick (independiente de si hay sync o no),
+busca partidos con kickoff en [+25, +35] min y dispara push
+`prediction_locked` a usuarios activos (lastActive < 30d) que no hayan
+predicho. Dedup natural por `notifications.matchId + kind` evita
+duplicados.
 
 ### snapshot-ranking — _histórico del ranking_
 
@@ -52,13 +59,29 @@ tabla `ranking_snapshots` el rank + puntos de cada user. **Alimenta el
 delta semanal** (▲/▼) y la sparkline de la card "Tu posición" en
 `/inicio`. Sin esto, el dashboard no puede mostrar evolución temporal.
 
-### db-backup — _seguridad operativa_
+### db-backup — _seguridad operativa (daily)_
 
 Cada noche a las 03:00 UTC ejecuta `pg_dump` del Postgres de Railway y
-sube el `.sql.gz` a un bucket S3-compatible (Backblaze B2). El bucket
-tiene lifecycle policy a 30 días. **Sin esto, un incidente en Railway
-significaría pérdida total de predicciones y puntos** — es la red de
-seguridad del producto.
+sube el `.sql.gz` a un bucket S3-compatible (Backblaze B2) bajo el
+prefijo `daily/`. Lifecycle policy 30 días. **Sin esto, un incidente
+en Railway significaría pérdida total de predicciones y puntos** — es
+la red de seguridad base.
+
+### db-backup-tournament — _granularidad fina durante el Mundial_
+
+Cada 6 h durante la ventana del Mundial (11 jun → 19 jul 2026) sube
+backups adicionales con prefijo `tournament/`. Fuera de la ventana,
+el primer step del job hace short-circuit y no toca BD ni S3. Lifecycle
+policy del bucket: borrar `tournament/*` tras 14 días para que no se
+acumulen ~120 backups indefinidamente. Para recovery a momento más
+granular durante un partido, este es el path.
+
+### Script auxiliar: `recompute-user-points.ts`
+
+No es un cron — es un script manual idempotente que reconstruye
+`user_points` desde `point_events` (la fuente de verdad inmutable).
+Útil cuando los dos quedan desincronizados por un incidente o bug.
+Dry-run por default; aplicar con `--apply`.
 
 ## Bootstrap (no-cron)
 

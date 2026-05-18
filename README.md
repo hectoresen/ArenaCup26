@@ -28,10 +28,13 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 
 ### Perfil y privacidad
 
-- **Perfil público** en `/u/<username>`: avatar, bandera, posición, puntos, logros.
+- **Perfil público** en `/u/<username>`: avatar, bandera, posición, puntos, historial (opcional), logros.
 - **3 niveles de privacidad**: `public`, `friends_only`, `private`. El ranking nunca se ve afectado; la privacidad solo controla si alguien puede abrir tu perfil completo o ve un cartel "Perfil privado".
-- **Editor inline** del nombre y avatar (cooldown 48 h entre cambios para evitar trolleo). Galería curada de 24 emoji-avatares o foto de Google.
+- **Toggle "Mostrar historial públicamente"**: granularidad extra para decidir si los visitantes ven las últimas 5 predicciones del owner en su perfil. Default ON; el owner siempre ve su histórico.
+- **Editor inline** del nombre y avatar con cooldown de 1 h entre cambios (evita trolleo sin entorpecer cambios legítimos). UI muestra el countdown ("48 min") antes del próximo cambio permitido. Galería curada de 24 emoji-avatares o foto de Google.
+- **AvatarPicker preview → save** explícito: clicar un emoji solo marca selección; "Guardar"/"Descartar" finaliza. Evita cambios accidentales y propagación de cooldown.
 - **Stats personales** visibles solo para el dueño del perfil: rachas (actual, mejor, milestones), últimas 5 predicciones, links de invitación.
+- **Ajustes de cuenta** accesibles desde el dropdown del avatar (`/ajustes`): privacidad, push notifications, eliminar cuenta.
 
 ### Amistad y social
 
@@ -44,6 +47,7 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 - **24 logros** organizados en 6 tiers: común, raro, épico, legendario, mítico, GOAT. Cada uno con icono SVG propio, descripción y condición de desbloqueo.
 - **Catálogo público** visible en cualquier perfil + página `/logros` con progreso por tier.
 - **Logros compartibles** (legendarios/míticos/GOAT) llevan un share-chip al hover.
+- **Gate de arranque del torneo**: durante los primeros N partidos del Mundial (configurable vía `ACHIEVEMENTS_MIN_FINISHED_MATCHES`, default 0 en QA, set 5 antes del kickoff), `evaluateAndUnlock` no concede ningún logro. Evita que un acierto trivial del día 1 produzca un GOAT desbloqueado.
 
 ### Partidos
 
@@ -54,8 +58,9 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 ### Notificaciones
 
 - **Campana del shell** con bandeja de las últimas 20 notificaciones. Click en cada una navega a la sección correspondiente (`/partidos/...` para resultados, `/amigos` para solicitudes, `/logros` para desbloqueos).
-- **Tipos**: predicción enviada, predicción bloqueada, partido terminado, logro desbloqueado, solicitud de amistad, solicitud aceptada, sistema.
-- **Web push notifications** (opt-in): service worker propio, las notificaciones del bell también se envían al móvil/desktop cuando el user las activa desde `/ajustes/privacidad`. Sin cookies de terceros.
+- **7 tipos**: predicción enviada, predicción bloqueada (kickoff reminder), partido terminado, logro desbloqueado, solicitud de amistad, solicitud aceptada, sistema.
+- **Web push** activa para 5 kinds time-sensitive (`prediction_sent`, `match_finished`, `achievement_unlocked`, `friend_request`, `friend_accepted`, `prediction_locked`). Service worker propio, opt-in desde `/ajustes`. Sin cookies de terceros.
+- **Kickoff reminder**: 30 min antes del kickoff de un partido, los users activos (últimos 30 días) que no hayan predicho reciben un push. Disparado piggyback en el cron de live-scoring; dedup por `notifications.matchId + kind`.
 
 ### Internacionalización
 
@@ -66,12 +71,15 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 ### Operación y resiliencia
 
 - **Snapshot diario del ranking** vía cron a las 00:05 UTC para alimentar el histórico (delta + sparkline).
-- **Sync de partidos** vía cron cada 3 h (date-window de 9 días) + cron de live-scoring cada 2 min que solo dispara si hay partidos activos o kickoffs en ±15 min.
-- **Backup diario** de la base de datos con `pg_dump` → bucket S3-compatible (Backblaze B2 / R2) y verificación de integridad.
-- **Página de status** pública en `/status` con health de DB, autenticación y proveedor de datos deportivos.
+- **Sync de partidos (`match-data-sync`)** vía cron cada 3 h con ventana hoy-1d / +7d, filtrado a 7 ligas top (La Liga, Premier, Serie A, Bundesliga, Ligue 1, UCL, MLS) durante la fase pre-Mundial; switch a `MODE=season + LEAGUE_ID=1 + SEASON=2026` para el torneo.
+- **Live-scoring** cada 2 min que solo dispara fetch al provider si hay partidos en curso o kickoffs en ±15-30 min; in-band kickoff-reminder push al mismo tiempo.
+- **Backup diario** a 03:00 UTC + **backup cada 6 h durante el Mundial** (workflow `db-backup-tournament.yml` con date guard 11 jun → 19 jul). Verificación de integridad inline. `pg_dump` → bucket S3-compatible.
+- **Script `recompute-user-points`** idempotente (dry-run por default) reconstruye `user_points` desde `point_events` si se desincronizan.
+- **Página de status** pública en `/status` que **pinga al provider real** (api-football `/status` con timeout 3 s, no solo check de env vars) + DB latency.
 - **Rate-limiting** por IP en endpoints públicos, sign-up y crons.
-- **Monitorización de errores** vía Sentry (opt-in por env var) con scrub de PII antes de enviar.
-- **Páginas legales** completas en 4 idiomas: política de privacidad y términos de uso accesibles sin login.
+- **Monitorización de errores** vía Sentry activo, con scrub de PII en `beforeSend`.
+- **Páginas legales** completas en 4 idiomas (privacidad + términos) con contacto `contact@arenacup26.com` integrado. Accesibles sin login.
+- **Guardrails contra ops destructivas**: el script `dev-reset-matches.ts` cuenta usuarios reales con datos antes de aceptar `--apply`, y requiere doble flag `--really-prod` si detecta cualquiera. Ver `docs/incident-2026-05-18-data-wipe.md` para el contexto.
 
 ---
 
@@ -92,7 +100,7 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 | Push             | Service Worker propio + librería `web-push` con VAPID   |
 | Testing          | Vitest + Testing Library (unit/component) · Playwright (E2E) |
 | Lint/format      | Biome (`npm run check`)                                 |
-| CI/cron          | GitHub Actions: tests E2E, sync-fixtures, snapshot-ranking, live-scoring, db-backup |
+| CI/cron          | GitHub Actions: tests E2E, match-data-sync, snapshot-ranking, live-scoring, db-backup (daily + tournament 6h) |
 
 ### Cómo se monta
 
@@ -106,7 +114,7 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 ### APIs y proveedores externos
 
 - **Google OAuth** — autenticación de usuarios vía Auth.js.
-- **api-football** (api-sports.io) — fuente primaria de fixtures, marcadores y eventos del Mundial 26. Plan free con ventana de fechas, ampliable a Pro al iniciar el torneo.
+- **api-football** (api-sports.io) — fuente primaria de fixtures, marcadores y eventos del Mundial 26. **Plan Pro $19/mes** activo desde 2026-05-17 (7500 req/día); allowlist de IPs vaciado para que Railway pueda llamar. Config detallada en [`docs/api-football-config.md`](docs/api-football-config.md).
 - **Upstash Redis** (opcional) — backend del rate-limit. Sin variables → modo noop.
 - **Sentry** (opcional) — monitorización de errores server-side. Sin DSN → modo noop.
 - **Plausible** (opcional) — analytics privacy-friendly sin cookies. Sin dominio → no se inyecta.
@@ -188,7 +196,11 @@ Toda la documentación humana vive en [`docs/`](docs/). Cada archivo cubre un as
 | [`docs/deployment.md`](docs/deployment.md)             | Guía completa de despliegue: variables de entorno requeridas, pasos para subir a una plataforma nueva, troubleshooting del primer arranque. |
 | [`docs/security.md`](docs/security.md)                 | Runbook de seguridad: secrets que gestionamos, auditoría de cyber issues (CRIT/WEAK), checklist pre-launch, operativa manual del owner. **§9.5** explica qué es VAPID, cómo funciona el flow end-to-end de web push y cómo activarlo en Railway. |
 | [`docs/testing.md`](docs/testing.md)                   | Filosofía y estándares de testing: capas, patrones aceptados, anti-patrones, threshold de cobertura, roadmap para subirlo. Lectura obligada antes de añadir o cambiar tests. |
-| [`docs/match-data-research.md`](docs/match-data-research.md) | Pre-análisis de APIs candidatas para datos de partidos. Decisión histórica de por qué elegimos api-football y plan de failover si llega el momento. |
+| [`docs/data-pipeline.md`](docs/data-pipeline.md)       | Cómo llegan los datos a la app: crons, fuentes, flujo gol → ranking actualizado, env vars relevantes y runbook básico de "qué hacer si se rompe X". |
+| [`docs/api-football-config.md`](docs/api-football-config.md) | Config del provider deportivo (plan Pro $19), IDs de liga (Mundial = 1), endpoints clave y procedimiento exacto para el switch al Mundial. |
+| [`docs/pre-launch-checklist.md`](docs/pre-launch-checklist.md) | Lista canónica de lo pendiente antes y durante el Mundial: dominios, backups, monitoring, performance. Done items al final para referencia. |
+| [`docs/incident-2026-05-18-data-wipe.md`](docs/incident-2026-05-18-data-wipe.md) | Post-mortem del wipe accidental de QA. Causas raíz, mitigaciones aplicadas y reglas operativas para no repetirlo. |
+| [`docs/match-data-research.md`](docs/match-data-research.md) | Pre-análisis histórico de APIs candidatas para datos de partidos. Decisión: api-football. Plan de failover. |
 | [`docs/pre-launch-testing.md`](docs/pre-launch-testing.md) | Estrategia de validación del flow end-to-end (predicciones + scoring + leaderboard) antes del kickoff del 11 de junio 2026. |
 
 ### Referencias visuales
