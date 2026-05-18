@@ -3,8 +3,8 @@ name: Live scoring
 # Cron de alta frecuencia (cada 2 min) que refresca los MARCADORES en
 # vivo. Llama a /api/cron/live-scoring:
 #
-# - Si NO hay partidos `live` y NO hay kickoffs en ±15/30 min → 204
-#   sin tocar api-football (skip silencioso).
+# - Si NO hay partidos `live` y NO hay kickoffs en ±15/30 min → 200
+#   con `synced: false` sin tocar api-football (skip silencioso).
 # - Si SÍ → 1 req a api-football pidiendo solo los fixtures de hoy,
 #   actualiza marcadores y status en BD.
 # - Cuando un partido pasa a `finished` → dispara
@@ -23,9 +23,10 @@ name: Live scoring
 
 on:
   # Reactivado 2026-05-18 con plan Pro $19 (7 500 req/día). Cada 2 min
-  # = 720 ticks/día. La mayoría devuelven 204 sin tocar api-football
-  # gracias a `shouldSyncLive`. Solo cuando hay live o kickoff cercano
-  # se hace 1 req al provider → cabe sobrado en el budget Pro.
+  # = 720 ticks/día. La mayoría devuelven `synced:false` sin tocar
+  # api-football gracias a `shouldSyncLive`. Solo cuando hay live o
+  # kickoff cercano se hace 1 req al provider → cabe sobrado en el
+  # budget Pro.
   schedule:
     - cron: "*/2 * * * *"
   workflow_dispatch: {}

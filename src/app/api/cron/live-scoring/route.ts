@@ -15,7 +15,8 @@ import { handleLiveCronRequest } from "./handler";
  *  - Algún match con `status = 'live'`.
  *  - Algún kickoff en los próximos 15 min o en los últimos 30 min.
  *
- * Si no hay nada que refrescar → 204 sin tocar api-football.
+ * Si no hay nada que refrescar → 200 con `synced: false` sin tocar
+ * api-football.
  * Si lo hay → date-window de hoy únicamente (1 fetch al provider).
  *
  * Mismo Bearer auth + rate-limit que `sync-fixtures`.

@@ -18,7 +18,11 @@ export type CronHandlerDeps = {
 
 export type LiveCronResponse =
   | { status: 200; body: { synced: true; reason: string; sample: string; report: SyncReport } }
-  | { status: 204; body: { synced: false; reason: "no_live_matches" } }
+  // No-op informativo: respondemos 200 con `synced: false`. HTTP/1.1
+  // prohíbe body en 204 y `NextResponse.json(body, {status:204})`
+  // lanza unhandled → 500 vacío. El workflow del cron solo abortar
+  // con `status >= 400`, así que 200 sigue siendo green-check.
+  | { status: 200; body: { synced: false; reason: "no_live_matches" } }
   | { status: 401; body: { error: "unauthorized" } }
   | { status: 405; body: { error: "method_not_allowed" } }
   | { status: 429; body: { error: "rate_limited" } }
@@ -55,7 +59,7 @@ export async function handleLiveCronRequest(
 
   const decision = await deps.shouldSync();
   if (!decision.sync) {
-    return { status: 204, body: { synced: false, reason: "no_live_matches" } };
+    return { status: 200, body: { synced: false, reason: "no_live_matches" } };
   }
 
   if (!deps.env.API_FOOTBALL_KEY) {

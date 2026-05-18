@@ -36,7 +36,7 @@ const reportOk = {
 };
 
 describe("live-scoring handler", () => {
-  it("returns 204 when shouldSync returns sync=false", async () => {
+  it("returns 200 with synced=false when shouldSync returns sync=false", async () => {
     const res = await handleLiveCronRequest(
       buildReq("POST", { authorization: "Bearer topsecret" }),
       {
@@ -45,7 +45,8 @@ describe("live-scoring handler", () => {
         runSync: vi.fn(),
       },
     );
-    expect(res.status).toBe(204);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ synced: false, reason: "no_live_matches" });
   });
 
   it("runs sync and returns 200 with reason when shouldSync says yes", async () => {
