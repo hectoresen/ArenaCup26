@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { updateProfileName } from "@/server/profile/actions";
 
@@ -38,6 +39,7 @@ type Props = {
  */
 export function EditableName({ initial, display, className, cooldownRemainingMs }: Props) {
   const t = useTranslations("profileEditor");
+  const router = useRouter();
   const [name, setName] = useState(initial);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(initial);
@@ -45,8 +47,8 @@ export function EditableName({ initial, display, className, cooldownRemainingMs 
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
   const cooldownActive = (cooldownRemainingMs ?? 0) > 0;
-  const cooldownHours = cooldownActive
-    ? Math.ceil((cooldownRemainingMs ?? 0) / 3_600_000)
+  const cooldownMinutes = cooldownActive
+    ? Math.max(1, Math.ceil((cooldownRemainingMs ?? 0) / 60_000))
     : 0;
 
   useEffect(() => {
@@ -71,9 +73,12 @@ export function EditableName({ initial, display, className, cooldownRemainingMs 
       if (result.ok) {
         setName(trimmed);
         setEditing(false);
+        // Re-render del layout para refrescar el AppAvatar (iniciales)
+        // y cualquier otro lugar que dependa del nombre.
+        router.refresh();
       } else if (result.code === "cooldown") {
-        const hours = Math.ceil((result.remainingMs ?? 0) / 3_600_000);
-        setToast(t("cooldownToast", { hours }));
+        const minutes = Math.max(1, Math.ceil((result.remainingMs ?? 0) / 60_000));
+        setToast(t("cooldownToast", { minutes }));
         setEditing(false);
         setDraft(name);
       } else {
@@ -91,7 +96,7 @@ export function EditableName({ initial, display, className, cooldownRemainingMs 
           type="button"
           onClick={() => {
             if (cooldownActive) {
-              setToast(t("cooldownToast", { hours: cooldownHours }));
+              setToast(t("cooldownToast", { minutes: cooldownMinutes }));
               return;
             }
             setEditing(true);
@@ -99,7 +104,7 @@ export function EditableName({ initial, display, className, cooldownRemainingMs 
           className={`cursor-pointer border-0 bg-transparent p-0 text-inherit transition-opacity hover:opacity-80 ${className ?? ""}`}
           aria-label={
             cooldownActive
-              ? t("cooldownAria", { hours: cooldownHours })
+              ? t("cooldownAria", { minutes: cooldownMinutes })
               : t("editAria", { name })
           }
         >
@@ -119,7 +124,7 @@ export function EditableName({ initial, display, className, cooldownRemainingMs 
               <circle cx="6" cy="6" r="5" />
               <path d="M6 3 v3 l2 1.5" strokeLinecap="round" />
             </svg>
-            {t("cooldownHint", { hours: cooldownHours })}
+            {t("cooldownHint", { minutes: cooldownMinutes })}
           </span>
         )}
         {toast && (

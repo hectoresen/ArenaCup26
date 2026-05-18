@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { updateProfileAvatar } from "@/server/profile/actions";
 import { AVATAR_GALLERY } from "@/server/profile/avatars";
@@ -34,11 +35,12 @@ export function AvatarPicker({
 }: Props) {
   const t = useTranslations("profileEditor");
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const [toast, setToast] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const cooldownActive = (cooldownRemainingMs ?? 0) > 0;
-  const cooldownHours = cooldownActive
-    ? Math.ceil((cooldownRemainingMs ?? 0) / 3_600_000)
+  const cooldownMinutes = cooldownActive
+    ? Math.max(1, Math.ceil((cooldownRemainingMs ?? 0) / 60_000))
     : 0;
 
   useEffect(() => {
@@ -56,9 +58,14 @@ export function AvatarPicker({
       const result = await updateProfileAvatar(avatarId);
       if (result.ok) {
         setOpen(false);
+        // Re-renderiza el layout (app) para que el AppAvatar del
+        // dropdown se actualice con el nuevo `avatarId` (issue #8 del
+        // QA 2026-05-18). Sin esto, el avatar arriba-derecha queda
+        // stale hasta el siguiente full-load.
+        router.refresh();
       } else if (result.code === "cooldown") {
-        const hours = Math.ceil((result.remainingMs ?? 0) / 3_600_000);
-        setToast(t("cooldownToast", { hours }));
+        const minutes = Math.max(1, Math.ceil((result.remainingMs ?? 0) / 60_000));
+        setToast(t("cooldownToast", { minutes }));
       } else {
         setToast(t("genericError"));
       }
@@ -71,7 +78,7 @@ export function AvatarPicker({
         type="button"
         onClick={() => {
           if (cooldownActive) {
-            setToast(t("cooldownToast", { hours: cooldownHours }));
+            setToast(t("cooldownToast", { minutes: cooldownMinutes }));
             return;
           }
           setOpen(true);
@@ -79,7 +86,7 @@ export function AvatarPicker({
         className="cursor-pointer border-0 bg-transparent p-0 transition-transform hover:scale-105"
         aria-label={
           cooldownActive
-            ? t("cooldownAria", { hours: cooldownHours })
+            ? t("cooldownAria", { minutes: cooldownMinutes })
             : t("changeAvatarAria")
         }
       >

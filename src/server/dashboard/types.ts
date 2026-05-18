@@ -145,4 +145,9 @@ export type DashboardData = {
   upcoming: UpcomingMatch[];
   progress: Progress;
   mini: MiniLeaderboardData;
+  /**
+   * Cooldown restante (ms) del último cambio de nombre. Forwardeado
+   * al `EditableName` del saludo. 0 si no hay cooldown activo.
+   */
+  nameCooldownRemainingMs: number;
 };

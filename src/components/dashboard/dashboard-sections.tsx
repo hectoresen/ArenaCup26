@@ -24,7 +24,11 @@ export function DashboardSections({
 
   return (
     <>
-      <Hero userName={data.userName} stats={data.stats} />
+      <Hero
+        userName={data.userName}
+        stats={data.stats}
+        nameCooldownRemainingMs={data.nameCooldownRemainingMs}
+      />
 
       {/* Cards de progreso (logros + ranking) directamente bajo el
           hero — ambas clickables al panel correspondiente. La

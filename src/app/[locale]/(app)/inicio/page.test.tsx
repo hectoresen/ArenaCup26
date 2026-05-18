@@ -75,6 +75,7 @@ function buildData(overrides: Partial<DashboardData> = {}): DashboardData {
       },
       friends: { top: [], me: null, friendsCount: 0 },
     },
+    nameCooldownRemainingMs: 0,
     ...overrides,
   };
 }

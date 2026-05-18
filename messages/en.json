@@ -611,9 +611,9 @@
   },
   "profileEditor": {
     "editAria": "Edit name {name}",
-    "cooldownToast": "You can only change this every 48h ({hours}h left).",
-    "cooldownHint": "{hours}h",
-    "cooldownAria": "Change locked for {hours}h",
+    "cooldownToast": "You can only change this every 1h. Try again in {minutes} min.",
+    "cooldownHint": "{minutes} min",
+    "cooldownAria": "Change locked for {minutes} min",
     "genericError": "Couldn't save. Try again.",
     "changeAvatarAria": "Change avatar",
     "avatarPickerTitle": "Pick your avatar",
@@ -780,7 +780,7 @@
         },
         "dataCollected": {
           "heading": "What data we collect",
-          "body": "1) The data from your Google account when you sign in: email, name and profile picture.\n2) Your country, if you choose to provide it when creating your account. Used only to show your flag on the ranking.\n3) Your public username, which you choose. It's part of your profile's public URL.\n4) Your game activity: predictions, points, streaks and unlocked achievements.\n5) Your last activity timestamp, to show an \"online\" indicator on the ranking during the next 24 hours.\n6) When you change your avatar or your name, we store when you did so to limit changes to once every 48 hours."
+          "body": "1) The data from your Google account when you sign in: email, name and profile picture.\n2) Your country, if you choose to provide it when creating your account. Used only to show your flag on the ranking.\n3) Your public username, which you choose. It's part of your profile's public URL.\n4) Your game activity: predictions, points, streaks and unlocked achievements.\n5) Your last activity timestamp, to show an \"online\" indicator on the ranking during the next 24 hours.\n6) When you change your avatar or your name, we store when you did so to limit changes to once per hour."
         },
         "purpose": {
           "heading": "What we use the data for",

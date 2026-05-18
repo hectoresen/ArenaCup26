@@ -611,9 +611,9 @@
   },
   "profileEditor": {
     "editAria": "Modifier le nom {name}",
-    "cooldownToast": "Tu peux le changer toutes les 48h ({hours}h restantes).",
-    "cooldownHint": "{hours}h",
-    "cooldownAria": "Changement verrouillé pendant {hours}h",
+    "cooldownToast": "Tu peux le changer toutes les 1h. Réessaie dans {minutes} min.",
+    "cooldownHint": "{minutes} min",
+    "cooldownAria": "Changement verrouillé pendant {minutes} min",
     "genericError": "Impossible d'enregistrer. Réessaie.",
     "changeAvatarAria": "Changer d'avatar",
     "avatarPickerTitle": "Choisis ton avatar",
@@ -780,7 +780,7 @@
         },
         "dataCollected": {
           "heading": "Quelles données nous collectons",
-          "body": "1) Les données de ton compte Google à la connexion : e-mail, nom et photo de profil.\n2) Ton pays, si tu choisis de l'indiquer à la création du compte. Utilisé uniquement pour afficher ton drapeau dans le classement.\n3) Ton nom d'utilisateur public, que tu choisis. Il fait partie du lien public de ton profil.\n4) Ton activité de jeu : prédictions, points, séries et succès débloqués.\n5) Ta date de dernière activité, pour afficher un indicateur « en ligne » dans le classement pendant les 24 heures suivantes.\n6) Si tu changes ton avatar ou ton nom, nous gardons la date pour limiter les changements à un toutes les 48 heures."
+          "body": "1) Les données de ton compte Google à la connexion : e-mail, nom et photo de profil.\n2) Ton pays, si tu choisis de l'indiquer à la création du compte. Utilisé uniquement pour afficher ton drapeau dans le classement.\n3) Ton nom d'utilisateur public, que tu choisis. Il fait partie du lien public de ton profil.\n4) Ton activité de jeu : prédictions, points, séries et succès débloqués.\n5) Ta date de dernière activité, pour afficher un indicateur « en ligne » dans le classement pendant les 24 heures suivantes.\n6) Si tu changes ton avatar ou ton nom, nous gardons la date pour limiter les changements à un par heure."
         },
         "purpose": {
           "heading": "À quoi servent les données",

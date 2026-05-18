@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { CountryFlag } from "@/components/common/country-flag";
 import { getAvatar } from "@/server/profile/avatars";
@@ -18,6 +19,7 @@ type Props = {
  */
 export function FriendRequestsInbox({ requests }: Props) {
   const t = useTranslations("friends.inbox");
+  const router = useRouter();
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
 
@@ -29,7 +31,15 @@ export function FriendRequestsInbox({ requests }: Props) {
     setHidden(new Set([...hidden, id]));
     startTransition(async () => {
       const result = await fn(id);
-      if (!result.ok) setHidden(previous);
+      if (!result.ok) {
+        setHidden(previous);
+        return;
+      }
+      // Tras aceptar/rechazar, re-renderiza el SSR de /amigos para que
+      // la FriendsList vecina recoja al nuevo amigo (en accept) o el
+      // contador de solicitudes baje. Sin esto, la fila desaparece de
+      // la inbox pero el resto de la página queda stale hasta F5.
+      router.refresh();
     });
   }
 

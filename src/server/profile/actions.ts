@@ -11,10 +11,10 @@ import { AVATAR_GALLERY } from "./avatars";
 
 /**
  * Ventana mínima entre cambios de un mismo campo del perfil
- * (nombre, avatar). 48h es lo acordado en el análisis del producto
- * 2026-05-15 (§2.2 + §5.2 + §5.3).
+ * (nombre, avatar). 1h desde 2026-05-18 (antes 48h, demasiado
+ * restrictivo para la fase actual). Si abusan, subimos.
  */
-const COOLDOWN_MS = 48 * 60 * 60 * 1000;
+const COOLDOWN_MS = 60 * 60 * 1000;
 
 const nameSchema = z.string().trim().min(1).max(60);
 
@@ -37,10 +37,10 @@ export type ProfileActionResult =
     };
 
 /**
- * Actualiza el `name` del user logado. Aplica cooldown de 48h:
+ * Actualiza el `name` del user logado. Aplica cooldown de 1h:
  *  - Si el user no ha cambiado nunca (`name_changed_at IS NULL`),
  *    pasa.
- *  - Si el último cambio fue hace ≥ 48h, pasa.
+ *  - Si el último cambio fue hace ≥ 1h, pasa.
  *  - Si fue hace menos, devuelve `code: "cooldown"` con el tiempo
  *    restante para que el cliente lo muestre.
  */
@@ -97,7 +97,7 @@ export async function updateProfileName(
 /**
  * Cambia el `avatar_id` del user. `null` significa "volver al avatar
  * de Google" (renderizamos `user.image` cuando avatar_id es null).
- * Mismo cooldown 48h que el nombre.
+ * Mismo cooldown 1h que el nombre.
  */
 export async function updateProfileAvatar(
   rawAvatarId: string | null,

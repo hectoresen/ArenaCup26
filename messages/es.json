@@ -611,9 +611,9 @@
   },
   "profileEditor": {
     "editAria": "Editar nombre {name}",
-    "cooldownToast": "Solo puedes cambiarlo cada 48h ({hours}h restantes).",
-    "cooldownHint": "{hours}h",
-    "cooldownAria": "Cambio bloqueado durante {hours}h",
+    "cooldownToast": "Solo puedes cambiarlo cada 1h. Vuelve en {minutes} min.",
+    "cooldownHint": "{minutes} min",
+    "cooldownAria": "Cambio bloqueado durante {minutes} min",
     "genericError": "No se pudo guardar. Inténtalo otra vez.",
     "changeAvatarAria": "Cambiar avatar",
     "avatarPickerTitle": "Elige tu avatar",
@@ -780,7 +780,7 @@
         },
         "dataCollected": {
           "heading": "Qué datos recopilamos",
-          "body": "1) Datos de tu cuenta de Google al iniciar sesión: correo, nombre y foto de perfil.\n2) Tu país, si decides indicarlo al crear la cuenta. Solo se usa para mostrar tu bandera en el ranking.\n3) Tu username público, que tú eliges. Forma parte del enlace público de tu perfil.\n4) Tu actividad de juego: predicciones, puntos, rachas y logros desbloqueados.\n5) La fecha de tu última actividad, para mostrar un indicador de \"en línea\" en el ranking durante las 24 horas siguientes.\n6) Si cambias tu avatar o tu nombre, guardamos cuándo lo hiciste para limitar los cambios a uno cada 48 horas."
+          "body": "1) Datos de tu cuenta de Google al iniciar sesión: correo, nombre y foto de perfil.\n2) Tu país, si decides indicarlo al crear la cuenta. Solo se usa para mostrar tu bandera en el ranking.\n3) Tu username público, que tú eliges. Forma parte del enlace público de tu perfil.\n4) Tu actividad de juego: predicciones, puntos, rachas y logros desbloqueados.\n5) La fecha de tu última actividad, para mostrar un indicador de \"en línea\" en el ranking durante las 24 horas siguientes.\n6) Si cambias tu avatar o tu nombre, guardamos cuándo lo hiciste para limitar los cambios a uno por hora."
         },
         "purpose": {
           "heading": "Para qué usamos los datos",

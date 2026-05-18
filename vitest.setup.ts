@@ -2,6 +2,28 @@ import "@testing-library/jest-dom/vitest";
 import { vi } from "vitest";
 
 /**
+ * `next/navigation`: en jsdom no hay AppRouterProvider, así que
+ * `useRouter()`/`usePathname()` lanzan al ser invocados. Los
+ * componentes cliente como `<EditableName>` y `<AvatarPicker>` los
+ * llaman para hacer `router.refresh()` tras una acción. Stub global
+ * con no-op evita reemplazar el mock en cada test file.
+ */
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    refresh: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+  redirect: vi.fn(),
+  notFound: vi.fn(),
+}));
+
+/**
  * Mock global de los módulos server-action que importan `next-auth`
  * o `next/server` (no funcionan bien en jsdom). Componentes cliente
  * como `<EditableName>` o `<AvatarPicker>` los importan, así que

@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { getAvatar } from "@/server/profile/avatars";
 
 /**
  * Iniciales para el fallback del avatar. Toma la primera letra de las
@@ -23,7 +24,7 @@ export function avatarInitials(name: string | null | undefined): string {
 }
 
 type Props = {
-  user: { name?: string | null; image?: string | null };
+  user: { name?: string | null; image?: string | null; avatarId?: string | null };
   size?: "sm" | "md";
 };
 
@@ -40,9 +41,14 @@ export function AppAvatar({ user, size = "md" }: Props) {
   const t = useTranslations("appShell.avatar");
   const initials = avatarInitials(user.name);
   const label = t("labelOf", { name: user.name ?? "" });
+  // Si el user eligió un avatar de la galería, este gana sobre la
+  // foto de Google. Mismo orden de prioridad que en ProfileHero del
+  // perfil público.
+  const galleryAvatar = getAvatar(user.avatarId ?? null);
 
   const outer = size === "sm" ? "h-8 w-8 p-[2px]" : "h-9 w-9 p-[2px]";
   const inner = size === "sm" ? "h-6 w-6 text-[10px]" : "h-7 w-7 text-[11px]";
+  const emojiSize = size === "sm" ? "text-[14px]" : "text-[16px]";
 
   return (
     <span
@@ -53,7 +59,9 @@ export function AppAvatar({ user, size = "md" }: Props) {
       <span
         className={`${inner} inline-flex items-center justify-center overflow-hidden rounded-full border-2 border-black/25 bg-[radial-gradient(135deg,#ffe066,#c8900a)] font-display text-[#1a1000]`}
       >
-        {user.image ? (
+        {galleryAvatar ? (
+          <span className={`${emojiSize} leading-none`}>{galleryAvatar.emoji}</span>
+        ) : user.image ? (
           <img src={user.image} alt="" className="h-full w-full object-cover" />
         ) : (
           initials

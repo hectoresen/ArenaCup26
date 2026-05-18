@@ -42,11 +42,17 @@ export default async function AppGroupLayout({
     .select({
       onboardedAt: users.onboardedAt,
       lastActiveAt: users.lastActiveAt,
+      avatarId: users.avatarId,
+      name: users.name,
+      image: users.image,
     })
     .from(users)
     .where(eq(users.id, session.user.id))
     .limit(1);
   const isOnboarded = Boolean(onboardingRow[0]?.onboardedAt);
+  const dbAvatarId = onboardingRow[0]?.avatarId ?? null;
+  const dbName = onboardingRow[0]?.name ?? null;
+  const dbImage = onboardingRow[0]?.image ?? null;
   if (!isOnboarded) {
     redirect(`/${locale}/bienvenido`);
   }
@@ -66,9 +72,20 @@ export default async function AppGroupLayout({
 
   const { items, unreadCount } = await getNotificationsForUser(db, session.user.id);
 
+  // Fusionamos los datos del session JWT con los más frescos de BD —
+  // `name`/`image` del session vienen del último login y no reflejan
+  // cambios in-app (editor de nombre, avatar picker). Tras `router.refresh()`
+  // el avatar nuevo aparece inmediatamente en la cabecera.
+  const freshUser = {
+    ...session.user,
+    name: dbName ?? session.user.name,
+    image: dbImage ?? session.user.image,
+    avatarId: dbAvatarId,
+  };
+
   return (
     <AppShell
-      user={session.user}
+      user={freshUser}
       notifications={items}
       unreadCount={unreadCount}
       onMarkAllRead={markAllReadAction}

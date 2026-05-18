@@ -39,13 +39,22 @@ import type {
  * (testeable en aislamiento contra DB real). El orquestador solo hace
  * `Promise.all` y composición.
  */
+// Cooldown 48h → 1h (2026-05-18). Cambio acordado en el sprint actual
+// para reducir fricción del editor de perfil. Constante en server/dashboard
+// y server/profile/actions debe coincidir.
+const NAME_COOLDOWN_MS = 60 * 60 * 1000;
+
 export async function getDashboardData(db: Database, userId: string): Promise<DashboardData> {
   const userRow = await db
-    .select({ name: users.name })
+    .select({ name: users.name, nameChangedAt: users.nameChangedAt })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
   const userName = userRow[0]?.name ?? "";
+  const nameChangedAt = userRow[0]?.nameChangedAt ?? null;
+  const nameCooldownRemainingMs = nameChangedAt
+    ? Math.max(0, NAME_COOLDOWN_MS - (Date.now() - nameChangedAt.getTime()))
+    : 0;
 
   const [stats, live, upcomingRaw, progress, miniGlobal, miniFriends, achievementsTotal] =
     await Promise.all([
@@ -91,6 +100,7 @@ export async function getDashboardData(db: Database, userId: string): Promise<Da
     upcoming,
     progress,
     mini,
+    nameCooldownRemainingMs,
   };
 }
 

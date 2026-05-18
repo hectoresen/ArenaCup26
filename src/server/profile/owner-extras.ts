@@ -38,7 +38,7 @@ export type OwnerExtras = {
   cooldowns: OwnerCooldowns;
 };
 
-const COOLDOWN_MS = 48 * 60 * 60 * 1000;
+const COOLDOWN_MS = 60 * 60 * 1000;
 
 /**
  * Carga las cajas extra que solo se muestran cuando el viewer es
@@ -107,7 +107,7 @@ export async function getOwnerExtras(
 
 /**
  * Devuelve milisegundos restantes hasta que el cooldown expire. 0 si
- * `lastChange` es null o ya pasaron 48h.
+ * `lastChange` es null o ya pasó 1h.
  */
 function cooldownRemaining(lastChange: Date | null, now: number): number {
   if (!lastChange) return 0;

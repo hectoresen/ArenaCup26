@@ -8,6 +8,12 @@ import { useLocale, useTranslations } from "next-intl";
 type Props = {
   userName: string;
   stats: UserStats;
+  /**
+   * Si > 0, el cooldown de cambio de nombre sigue activo. Forwardeado
+   * al EditableName del saludo para que el clic muestre toast en vez
+   * de abrir el input (consistencia con el del perfil público).
+   */
+  nameCooldownRemainingMs?: number;
 };
 
 /**
@@ -20,7 +26,7 @@ type Props = {
  * predicción" en lugar del "Vas el #X de Y jugadores", pero seguimos
  * mostrando su posición real (#N) en la mini-stat.
  */
-export function Hero({ userName, stats }: Props) {
+export function Hero({ userName, stats, nameCooldownRemainingMs }: Props) {
   const t = useTranslations("dashboard");
   const locale = useLocale() as PointsLocale;
   const first = firstName(userName);
@@ -44,7 +50,11 @@ export function Hero({ userName, stats }: Props) {
               name: first,
               em: () => (
                 <em className="not-italic text-gold">
-                  <EditableName initial={userName} display={first} />
+                  <EditableName
+                    initial={userName}
+                    display={first}
+                    cooldownRemainingMs={nameCooldownRemainingMs}
+                  />
                 </em>
               ),
             })
