@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { dlog } from "@/lib/debug-log";
 import type { Database } from "@/server/db/client";
@@ -112,16 +112,51 @@ export async function processFinishedMatch(
     .where(eq(predictions.matchId, matchId));
   dlog("scoring", `found ${matchPredictions.length} predictions to score`);
 
-  for (const p of matchPredictions) {
-    try {
-      const wasProcessed = await hasPointEventFor(db, p.userId, matchId);
-      if (wasProcessed) {
-        dlog("scoring", "already scored, skipping", { userId: p.userId, matchId });
-        result.skipped++;
-        continue;
-      }
+  if (matchPredictions.length === 0) {
+    dlog("scoring", "no predictions for match, nothing to do", { matchId });
+    return result;
+  }
 
-      const streakBefore = await loadStreak(db, p.userId);
+  // Pre-carga batch: dos queries en vez de 2×N. Para 5000 predictores
+  // esto solo nos ahorra ~50s de round-trips a Postgres. Las pre-cargas
+  // viven en memoria durante el loop; los UPDATEs posteriores siguen
+  // siendo individuales (Drizzle no expone UPDATE FROM batch sencillo,
+  // y los UPSERTs dependen del streak de cada user). La concurrencia
+  // (más abajo) hace el otro 80% del trabajo.
+  const userIds = matchPredictions.map((p) => p.userId);
+  const [alreadyScoredRows, streakRows] = await Promise.all([
+    db
+      .selectDistinct({ userId: pointEvents.userId })
+      .from(pointEvents)
+      .where(and(eq(pointEvents.matchId, matchId), inArray(pointEvents.userId, userIds))),
+    db
+      .select({ userId: userPoints.userId, streak: userPoints.streak })
+      .from(userPoints)
+      .where(inArray(userPoints.userId, userIds)),
+  ]);
+  const alreadyScored = new Set(alreadyScoredRows.map((r) => r.userId));
+  const streakMap = new Map(streakRows.map((r) => [r.userId, r.streak]));
+
+  const matchup = matchupLabel(match.homeTeamName, match.awayTeamName);
+
+  // Concurrencia controlada: 25 users en paralelo para no saturar el
+  // pool de conexiones de Postgres (default Drizzle/postgres-js ~10-20).
+  // En partidos con 5k predictores baja el tiempo total de ~150s
+  // (serial × 30ms/iter) a ~6s. En partidos con <100 predictores el
+  // overhead del limiter es despreciable.
+  const CONCURRENCY = 25;
+  await mapWithConcurrency(matchPredictions, CONCURRENCY, async (p) => {
+    if (alreadyScored.has(p.userId)) {
+      dlog("scoring", "already scored, skipping", { userId: p.userId, matchId });
+      result.skipped++;
+      return;
+    }
+
+    try {
+      const streakBefore: StreakState = {
+        current: streakMap.get(p.userId) ?? 0,
+        containsDouble: false,
+      };
       const prediction: Prediction = {
         kind: p.kind,
         predictedWinner: p.predictedWinner,
@@ -142,7 +177,7 @@ export async function processFinishedMatch(
         userId: p.userId,
         matchId,
         scored,
-        matchup: matchupLabel(match.homeTeamName, match.awayTeamName),
+        matchup,
       });
 
       // Tras persistir puntos/racha, evaluamos los logros del user. El
@@ -180,7 +215,7 @@ export async function processFinishedMatch(
         reason: err instanceof Error ? err.message : String(err),
       });
     }
-  }
+  });
 
   dlog("scoring", "processFinishedMatch done", {
     matchId,
@@ -228,35 +263,6 @@ export function matchRowToOutcome(row: {
     scoreAt90,
     scoreAtExtra,
     penaltyWinner,
-  };
-}
-
-async function hasPointEventFor(
-  db: Database,
-  userId: string,
-  matchId: string,
-): Promise<boolean> {
-  const rows = await db
-    .select({ id: pointEvents.id })
-    .from(pointEvents)
-    .where(and(eq(pointEvents.userId, userId), eq(pointEvents.matchId, matchId)))
-    .limit(1);
-  return rows.length > 0;
-}
-
-async function loadStreak(db: Database, userId: string): Promise<StreakState> {
-  const rows = await db
-    .select({ streak: userPoints.streak })
-    .from(userPoints)
-    .where(eq(userPoints.userId, userId))
-    .limit(1);
-  return {
-    current: rows[0]?.streak ?? 0,
-    // No persistimos `containsDouble` aún (sería una columna nueva en
-    // `user_points`). Por ahora asumimos `false` — afecta solo a los
-    // hitos de combo y se puede recalcular post-hoc cuando aterrice
-    // la columna. Es una pequeña deuda técnica documentada.
-    containsDouble: false,
   };
 }
 
@@ -383,4 +389,37 @@ export function computeProvisionalScore(
     penaltyWinner: null,
   };
   return scoreMatchPrediction(outcomeAsIf, prediction, streakBefore);
+}
+
+/**
+ * Procesa `items` en paralelo con un tope simultáneo de `concurrency`.
+ * Útil para no saturar el pool de conexiones de Postgres ni la quota
+ * de push providers cuando hay muchos predictores de un mismo match.
+ *
+ * Implementación de "worker pool sencillo": spawn N workers que tiran
+ * del array compartido vía un cursor atómico (índice incremental).
+ * Cada worker espera a `task()` antes de coger el siguiente. No es
+ * `Promise.all([...].map())` porque ese sí lanza todo a la vez.
+ *
+ * No corta en errores — el caller es responsable de envolver `task`
+ * en try/catch si quiere recoger fallos sin abortar el resto.
+ */
+async function mapWithConcurrency<T>(
+  items: readonly T[],
+  concurrency: number,
+  task: (item: T) => Promise<void>,
+): Promise<void> {
+  if (items.length === 0) return;
+  const limit = Math.max(1, Math.min(concurrency, items.length));
+  let cursor = 0;
+  async function worker() {
+    while (true) {
+      const i = cursor++;
+      if (i >= items.length) return;
+      const item = items[i];
+      if (item === undefined) return;
+      await task(item);
+    }
+  }
+  await Promise.all(Array.from({ length: limit }, worker));
 }
