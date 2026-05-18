@@ -774,7 +774,7 @@
         },
         "controller": {
           "heading": "Data controller",
-          "body": "The controller of your data is the ArenaCup26 team. When the platform opens to the public we'll enable a contact channel and link it here."
+          "body": "The controller of your data is the ArenaCup26 team. For any inquiry you can write to us at contact@arenacup26.com."
         },
         "dataCollected": {
           "heading": "What data we collect",
@@ -798,7 +798,7 @@
         },
         "rights": {
           "heading": "Your rights",
-          "body": "You have the right to access, rectify, erase, object to processing, port your data, and restrict its use (Arts. 15-22 GDPR). To exercise them, use the contact channel we'll enable when the platform opens to the public. You can also lodge a complaint with the Spanish data protection authority (AEPD) if you feel we haven't responded properly."
+          "body": "You have the right to access, rectify, erase, object to processing, port your data, and restrict its use (Arts. 15-22 GDPR). To exercise them, write to us at contact@arenacup26.com. You can also lodge a complaint with the Spanish data protection authority (AEPD) if you feel we haven't responded properly."
         },
         "cookies": {
           "heading": "Cookies and local storage",
@@ -810,7 +810,7 @@
         },
         "contact": {
           "heading": "Contact",
-          "body": "If you have privacy questions or want to exercise any right, you'll be able to write to us through the contact channel we'll enable when the platform opens to the public. We'll reply within at most 30 days."
+          "body": "If you have privacy questions or want to exercise any right, write to us at contact@arenacup26.com. We'll reply within at most 30 days."
         }
       }
     },
@@ -823,7 +823,7 @@
       "sections": {
         "intro": {
           "heading": "Acceptance",
-          "body": "By creating an account or using ArenaCup26 you accept these terms. If you don't agree with something, don't use the app; if you already have an account, you'll be able to request its deletion through the contact channel we'll enable when the platform opens to the public."
+          "body": "By creating an account or using ArenaCup26 you accept these terms. If you don't agree with something, don't use the app; if you already have an account, you can request its deletion by writing to contact@arenacup26.com."
         },
         "eligibility": {
           "heading": "Who can play",
@@ -871,7 +871,7 @@
         },
         "contact": {
           "heading": "Contact",
-          "body": "For any questions about these terms, you'll be able to write to us through the contact channel we'll enable when the platform opens to the public."
+          "body": "For any questions about these terms, write to us at contact@arenacup26.com."
         }
       }
     }

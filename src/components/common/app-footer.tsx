@@ -15,7 +15,13 @@ export function AppFooter() {
   return (
     <footer className="relative z-[1] mx-auto mt-10 max-w-[720px] px-5 pb-20 pt-4 text-center sm:pb-4">
       <p className="text-[11px] font-bold leading-tight text-muted/70">
-        © {year} ArenaCup26 · {t("tagline")}
+        © {year} ArenaCup26 · {t("tagline")} ·{" "}
+        <a
+          href="mailto:contact@arenacup26.com"
+          className="text-muted/80 underline-offset-2 hover:text-foreground hover:underline"
+        >
+          contact@arenacup26.com
+        </a>
       </p>
     </footer>
   );

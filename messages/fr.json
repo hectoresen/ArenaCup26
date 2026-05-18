@@ -774,7 +774,7 @@
         },
         "controller": {
           "heading": "Responsable du traitement",
-          "body": "Le responsable de tes données est l'équipe de ArenaCup26. Lorsque la plateforme sera ouverte au public, nous activerons un canal de contact et le mettrons en lien ici."
+          "body": "Le responsable de tes données est l'équipe de ArenaCup26. Pour toute question, tu peux nous écrire à contact@arenacup26.com."
         },
         "dataCollected": {
           "heading": "Quelles données nous collectons",
@@ -798,7 +798,7 @@
         },
         "rights": {
           "heading": "Tes droits",
-          "body": "Tu as le droit d'accéder, rectifier, supprimer, t'opposer au traitement, porter tes données et limiter leur usage (arts. 15-22 RGPD). Pour les exercer, utilise le canal de contact que nous activerons à l'ouverture publique de la plateforme. Tu peux aussi déposer une plainte auprès de l'autorité espagnole de protection des données (AEPD)."
+          "body": "Tu as le droit d'accéder, rectifier, supprimer, t'opposer au traitement, porter tes données et limiter leur usage (arts. 15-22 RGPD). Pour les exercer, écris-nous à contact@arenacup26.com. Tu peux aussi déposer une plainte auprès de l'autorité espagnole de protection des données (AEPD)."
         },
         "cookies": {
           "heading": "Cookies et stockage local",
@@ -810,7 +810,7 @@
         },
         "contact": {
           "heading": "Contact",
-          "body": "Pour toute question sur la vie privée ou pour exercer un droit, tu pourras nous écrire via le canal de contact que nous activerons à l'ouverture publique de la plateforme. Nous répondrons dans un délai maximal de 30 jours."
+          "body": "Pour toute question sur la vie privée ou pour exercer un droit, écris-nous à contact@arenacup26.com. Nous répondrons dans un délai maximal de 30 jours."
         }
       }
     },
@@ -823,7 +823,7 @@
       "sections": {
         "intro": {
           "heading": "Acceptation",
-          "body": "En créant un compte ou en utilisant ArenaCup26 tu acceptes ces conditions. Si tu n'es pas d'accord, n'utilise pas l'app ; si tu as déjà un compte, tu pourras nous demander de le supprimer via le canal de contact que nous activerons à l'ouverture publique de la plateforme."
+          "body": "En créant un compte ou en utilisant ArenaCup26 tu acceptes ces conditions. Si tu n'es pas d'accord, n'utilise pas l'app ; si tu as déjà un compte, tu peux nous demander de le supprimer en écrivant à contact@arenacup26.com."
         },
         "eligibility": {
           "heading": "Qui peut jouer",
@@ -871,7 +871,7 @@
         },
         "contact": {
           "heading": "Contact",
-          "body": "Pour toute question sur ces conditions, tu pourras nous écrire via le canal de contact que nous activerons à l'ouverture publique de la plateforme."
+          "body": "Pour toute question sur ces conditions, écris-nous à contact@arenacup26.com."
         }
       }
     }
