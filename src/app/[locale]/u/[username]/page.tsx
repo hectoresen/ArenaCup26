@@ -133,7 +133,11 @@ export default async function PublicProfilePage({
         >
           <span aria-hidden="true">←</span> {t("backToHome")}
         </Link>
-        <ProfileHero identity={profile.identity} isOwner={isOwner} />
+        <ProfileHero
+          identity={profile.identity}
+          isOwner={isOwner}
+          cooldowns={ownerExtras?.cooldowns}
+        />
         {friendInfo && (
           <div className="mt-3 flex justify-center">
             <FriendActionButton

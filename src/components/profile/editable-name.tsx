@@ -19,6 +19,12 @@ type Props = {
   display?: string;
   /** Clases del span/input para mantener el estilo del contexto. */
   className?: string;
+  /**
+   * Si > 0, el cooldown de 48h sigue activo. Mostramos un hint
+   * pequeño "Próximo cambio en Xh" y al clic mostramos toast en vez
+   * de abrir el input. Si undefined o 0, comportamiento normal.
+   */
+  cooldownRemainingMs?: number;
 };
 
 /**
@@ -30,7 +36,7 @@ type Props = {
  * `firstName(userName)` pero edita el nombre completo) y en la card
  * de identidad de `/u/<username>` (cuando el viewer es el dueño).
  */
-export function EditableName({ initial, display, className }: Props) {
+export function EditableName({ initial, display, className, cooldownRemainingMs }: Props) {
   const t = useTranslations("profileEditor");
   const [name, setName] = useState(initial);
   const [editing, setEditing] = useState(false);
@@ -38,6 +44,10 @@ export function EditableName({ initial, display, className }: Props) {
   const [toast, setToast] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
+  const cooldownActive = (cooldownRemainingMs ?? 0) > 0;
+  const cooldownHours = cooldownActive
+    ? Math.ceil((cooldownRemainingMs ?? 0) / 3_600_000)
+    : 0;
 
   useEffect(() => {
     if (editing) inputRef.current?.select();
@@ -79,12 +89,39 @@ export function EditableName({ initial, display, className }: Props) {
       <>
         <button
           type="button"
-          onClick={() => setEditing(true)}
+          onClick={() => {
+            if (cooldownActive) {
+              setToast(t("cooldownToast", { hours: cooldownHours }));
+              return;
+            }
+            setEditing(true);
+          }}
           className={`cursor-pointer border-0 bg-transparent p-0 text-inherit transition-opacity hover:opacity-80 ${className ?? ""}`}
-          aria-label={t("editAria", { name })}
+          aria-label={
+            cooldownActive
+              ? t("cooldownAria", { hours: cooldownHours })
+              : t("editAria", { name })
+          }
         >
           {display ?? name}
         </button>
+        {cooldownActive && (
+          <span className="ms-2 inline-flex items-center gap-1 align-middle text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted">
+            <svg
+              width="9"
+              height="9"
+              viewBox="0 0 12 12"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <circle cx="6" cy="6" r="5" />
+              <path d="M6 3 v3 l2 1.5" strokeLinecap="round" />
+            </svg>
+            {t("cooldownHint", { hours: cooldownHours })}
+          </span>
+        )}
         {toast && (
           <div
             role="status"

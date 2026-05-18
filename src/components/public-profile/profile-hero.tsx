@@ -10,6 +10,15 @@ type Props = {
   identity: ProfileIdentity;
   /** True si el viewer es el dueño del perfil. Habilita editar. */
   isOwner?: boolean;
+  /**
+   * Cooldowns activos del owner para mostrar countdown en vez de
+   * dejarle clicar y ver un toast post-mortem. Solo se pasan si
+   * `isOwner` es true (los visitantes no necesitan saberlo).
+   */
+  cooldowns?: {
+    nameCooldownRemainingMs: number;
+    avatarCooldownRemainingMs: number;
+  };
 };
 
 /**
@@ -20,7 +29,7 @@ type Props = {
  * nombre también (<EditableName> inline). Ambos respetan cooldown
  * 48h vía server action.
  */
-export function ProfileHero({ identity, isOwner = false }: Props) {
+export function ProfileHero({ identity, isOwner = false, cooldowns }: Props) {
   const t = useTranslations("publicProfile");
   const initial = (identity.name?.[0] ?? identity.username[0] ?? "?").toUpperCase();
   const galleryAvatar = getAvatar(identity.avatarId);
@@ -74,13 +83,21 @@ export function ProfileHero({ identity, isOwner = false }: Props) {
             trigger={avatarVisual}
             currentAvatarId={identity.avatarId}
             hasGoogleImage={Boolean(identity.image)}
+            cooldownRemainingMs={cooldowns?.avatarCooldownRemainingMs}
           />
         ) : (
           avatarVisual
         )}
 
         <div className="font-display text-[26px] leading-tight text-foreground">
-          {isOwner ? <EditableName initial={identity.name} /> : identity.name}
+          {isOwner ? (
+            <EditableName
+              initial={identity.name}
+              cooldownRemainingMs={cooldowns?.nameCooldownRemainingMs}
+            />
+          ) : (
+            identity.name
+          )}
         </div>
         <div className="-mt-1.5 text-[13px] font-extrabold tracking-wide text-muted">
           @{identity.username}

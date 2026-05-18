@@ -12,6 +12,12 @@ type Props = {
   currentAvatarId: string | null;
   /** True si el user tiene imagen de Google disponible. */
   hasGoogleImage: boolean;
+  /**
+   * Si > 0, el cooldown de 48h sigue activo. Al hacer clic mostramos
+   * toast en vez de abrir la modal. Si undefined o 0, comportamiento
+   * normal.
+   */
+  cooldownRemainingMs?: number;
 };
 
 /**
@@ -20,11 +26,20 @@ type Props = {
  * user). Submit dispara la server action con cooldown 48h y muestra
  * toast si está bloqueado.
  */
-export function AvatarPicker({ trigger, currentAvatarId, hasGoogleImage }: Props) {
+export function AvatarPicker({
+  trigger,
+  currentAvatarId,
+  hasGoogleImage,
+  cooldownRemainingMs,
+}: Props) {
   const t = useTranslations("profileEditor");
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const cooldownActive = (cooldownRemainingMs ?? 0) > 0;
+  const cooldownHours = cooldownActive
+    ? Math.ceil((cooldownRemainingMs ?? 0) / 3_600_000)
+    : 0;
 
   useEffect(() => {
     if (!toast) return;
@@ -54,9 +69,19 @@ export function AvatarPicker({ trigger, currentAvatarId, hasGoogleImage }: Props
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          if (cooldownActive) {
+            setToast(t("cooldownToast", { hours: cooldownHours }));
+            return;
+          }
+          setOpen(true);
+        }}
         className="cursor-pointer border-0 bg-transparent p-0 transition-transform hover:scale-105"
-        aria-label={t("changeAvatarAria")}
+        aria-label={
+          cooldownActive
+            ? t("cooldownAria", { hours: cooldownHours })
+            : t("changeAvatarAria")
+        }
       >
         {trigger}
       </button>

@@ -612,6 +612,8 @@
   "profileEditor": {
     "editAria": "Edit name {name}",
     "cooldownToast": "You can only change this every 48h ({hours}h left).",
+    "cooldownHint": "{hours}h",
+    "cooldownAria": "Change locked for {hours}h",
     "genericError": "Couldn't save. Try again.",
     "changeAvatarAria": "Change avatar",
     "avatarPickerTitle": "Pick your avatar",

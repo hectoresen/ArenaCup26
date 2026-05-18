@@ -30,11 +30,13 @@ export async function GET() {
   // "auth_config_present" es suficiente para el health check).
   services.auth = process.env.AUTH_SECRET ? "ok" : "down";
 
-  // Provider de match data: solo verificamos config presente — un
-  // ping real a api-football consumiría free tier en cada call al
-  // health check. Cualquier monitor real debería pollear con
-  // frecuencia ≤1/min.
-  services.match_data = process.env.API_FOOTBALL_KEY ? "ok" : "degraded";
+  // Provider de match data: hacemos un ping real a un endpoint barato
+  // del provider (status) con timeout corto. Es necesario porque
+  // checks anteriores solo verificaban env vars y devolvían "ok"
+  // incluso con la cuenta suspendida o IP allowlist bloqueando
+  // (incidente 2026-05-18). Con Pro $19 / 7500 req/día el coste de
+  // pollear esto cada minuto es despreciable (~1440 req/día).
+  services.match_data = await checkMatchDataProvider();
 
   const overall: "ok" | "degraded" | "down" = Object.values(services).every((s) => s === "ok")
     ? "ok"
@@ -54,4 +56,35 @@ export async function GET() {
       },
     },
   );
+}
+
+/**
+ * Ping real a api-football. Llama a `/status` (endpoint trivial que
+ * devuelve uso de quota) con timeout 3s. Si la key no está set
+ * devolvemos `degraded` directamente (no hay nada que pingear).
+ */
+async function checkMatchDataProvider(): Promise<"ok" | "degraded" | "down"> {
+  const key = process.env.API_FOOTBALL_KEY;
+  if (!key) return "degraded";
+
+  const base = process.env.API_FOOTBALL_BASE_URL ?? "https://v3.football.api-sports.io";
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 3000);
+  try {
+    const res = await fetch(`${base}/status`, {
+      headers: { "x-apisports-key": key },
+      signal: controller.signal,
+      cache: "no-store",
+    });
+    if (!res.ok) return "down";
+    const body = (await res.json()) as { errors?: unknown };
+    const hasErrors = Array.isArray(body.errors)
+      ? body.errors.length > 0
+      : body.errors && Object.keys(body.errors).length > 0;
+    return hasErrors ? "down" : "ok";
+  } catch {
+    return "down";
+  } finally {
+    clearTimeout(timer);
+  }
 }
