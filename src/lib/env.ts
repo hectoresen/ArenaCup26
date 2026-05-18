@@ -92,11 +92,9 @@ const baseSchema = z.object({
   NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
   // Subject identifies WHO operates the push service to providers
-  // (Mozilla/Apple/FCM) — necesario para que acepten los pushes.
-  // **No** debe ser un email personal. TODO: cuando habilitemos el
-  // canal de contacto oficial, setear `VAPID_SUBJECT=mailto:<email>`
-  // en Railway. Mientras no esté seteado, el push system queda en
-  // noop igual que sin VAPID keys (ver `getPushClient`).
+  // (Mozilla/Apple/FCM) — necesario para que acepten los pushes. Va
+  // como `mailto:contact@arenacup26.com` en Railway desde 2026-05-18.
+  // Sin esta var, el push system queda en noop (ver `getPushClient`).
   VAPID_SUBJECT: z.string().optional(),
 
   // Runtime

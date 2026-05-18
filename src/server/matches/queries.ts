@@ -157,7 +157,12 @@ export async function getFilteredMatches(
           THEN ${matches.kickoffAt}
       END ASC NULLS LAST`,
       sql`${matches.kickoffAt} DESC`,
-    );
+    )
+    // Tope generoso para evitar payloads enormes con calendarios
+    // grandes (Mundial 104 + ligas activas). El user puede filtrar
+    // por status/stage/predictedOnly para acotar. 250 cubre cualquier
+    // visión razonable; paginación se introduce si la cifra crece.
+    .limit(250);
 
   if (rows.length === 0) return [];
   const predictionMap = await fetchPredictionMap(

@@ -2,7 +2,7 @@ import { dlog } from "@/lib/debug-log";
 import { checkSubmitLimit } from "@/lib/rate-limit";
 import type { Database } from "@/server/db/client";
 import { matches, predictions, teams } from "@/server/db/schema";
-import { createNotification } from "@/server/notifications/create";
+import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import type { MatchStage } from "@/server/scoring/types";
 import { and, eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -148,17 +148,20 @@ export async function submitPrediction(
     });
 
   // Solo notificar en el primer submit. Editar más tarde no genera
-  // una notificación nueva (sería ruido).
+  // una notificación nueva (sería ruido). Push activado para sync
+  // cross-device: si predigo desde el móvil, mi desktop también ve la
+  // confirmación; tag por kind dedup en la misma device.
   if (isNew) {
     const matchup =
       match.homeName && match.awayName ? `${match.homeName} vs ${match.awayName}` : matchId;
-    await createNotification({
+    await notifyWithPush({
       db,
       userId,
       kind: "prediction_sent",
       title: "Predicción enviada",
       body: matchup,
       matchId,
+      pushable: true,
     });
   }
 

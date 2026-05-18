@@ -65,7 +65,7 @@ describe("live-scoring handler", () => {
     );
     expect(res.status).toBe(200);
     expect(runSync).toHaveBeenCalledOnce();
-    if (res.status === 200) {
+    if (res.status === 200 && "synced" in res.body && res.body.synced === true) {
       expect(res.body.reason).toBe("live_in_progress");
       expect(res.body.sample).toBe("match-123");
     }

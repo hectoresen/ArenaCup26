@@ -5,11 +5,12 @@
  * (WC2022, etc.) y queremos que el próximo sync construya desde 0.
  *
  * Lo que hace, en orden:
- *  1. `DELETE FROM matches`       — cascade a predictions + point_events
- *                                    (FK con `onDelete: 'cascade'` en
- *                                    schema). `notifications.match_id`
- *                                    se pone a NULL.
- *  2. Resetea `user_points` de los **usuarios reales** a 0/0/0/0/0.
+ *  1. Cuenta usuarios reales con `point_events` y/o `user_points` no
+ *     vacíos. Si hay >0 y NO se pasa `--really-prod`, aborta.
+ *  2. `DELETE FROM matches` — cascade a predictions + point_events
+ *     (FK con `onDelete: 'cascade'` en schema). `notifications.match_id`
+ *     se pone a NULL.
+ *  3. Resetea `user_points` de los usuarios reales a 0/0/0/0/0.
  *     Los seed placeholders se restablecen al ejecutar el bootstrap
  *     después de este script (preservan su decoración del ranking).
  *
@@ -17,20 +18,49 @@
  *  - `users`, `user_achievements`, `friendships`, `invitations`.
  *  - Tabla `teams` (se conservan; el sync los reutiliza por externalId).
  *
- * Uso (UNA SOLA VEZ, con cuidado):
+ * Uso:
  *
+ *   Dry-run (solo plan, sin tocar nada):
+ *     DATABASE_URL=postgresql://... npx tsx scripts/dev-reset-matches.ts
+ *
+ *   QA (BD sin datos de usuarios reales):
  *     DATABASE_URL=postgresql://... npx tsx scripts/dev-reset-matches.ts --confirm
  *
- * Sin `--confirm` solo imprime el plan y aborta.
+ *   Prod (CONFIRMA QUE QUIERES BORRAR DATOS DE USUARIOS REALES):
+ *     DATABASE_URL=postgresql://... npx tsx scripts/dev-reset-matches.ts --confirm --really-prod
+ *
+ * Ver `docs/incident-2026-05-18-data-wipe.md` para contexto histórico
+ * sobre por qué este guard existe.
  */
 import { db } from "@/server/db/client";
-import { matches, userPoints } from "@/server/db/schema";
+import { matches, pointEvents, userPoints } from "@/server/db/schema";
 import { sql } from "drizzle-orm";
 
 const SEED_PLACEHOLDER_PREFIX = "00000000-0000-4000-a000-";
 
 async function main() {
   const confirmed = process.argv.includes("--confirm");
+  const reallyProd = process.argv.includes("--really-prod");
+
+  // Cuenta de usuarios reales con datos: si hay >0, este script puede
+  // ser destructivo en producción. Bloqueamos a menos que se pase el
+  // segundo flag explícito.
+  const realPointEventsRows = await db
+    .select({ count: sql<number>`count(distinct ${pointEvents.userId})::int` })
+    .from(pointEvents)
+    .where(sql`${pointEvents.userId}::text NOT LIKE ${SEED_PLACEHOLDER_PREFIX + "%"}`);
+  const realUsersWithEvents = realPointEventsRows[0]?.count ?? 0;
+
+  const realUserPointsRows = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(userPoints)
+    .where(
+      sql`${userPoints.userId}::text NOT LIKE ${SEED_PLACEHOLDER_PREFIX + "%"}
+          AND ${userPoints.totalPoints} > 0`,
+    );
+  const realUsersWithPoints = realUserPointsRows[0]?.count ?? 0;
+
+  const realUsersTouched = Math.max(realUsersWithEvents, realUsersWithPoints);
 
   if (!confirmed) {
     console.log("Plan:");
@@ -38,8 +68,26 @@ async function main() {
     console.log("  2. UPDATE user_points SET total_points=0,...  para usuarios reales");
     console.log("     (los 7 placeholders se restablecen vía bootstrap después)");
     console.log("");
-    console.log("Ejecuta con --confirm para aplicar.");
+    console.log(`Estado actual: ${realUsersTouched} usuarios REALES tienen datos de scoring.`);
+    if (realUsersTouched > 0) {
+      console.log("");
+      console.log("⚠  Si ejecutas esto, ESOS usuarios pierden sus puntos.");
+      console.log("⚠  Requiere `--confirm --really-prod` para proceder.");
+    }
+    console.log("");
+    console.log("Ejecuta con --confirm (+ --really-prod si hay usuarios reales) para aplicar.");
     process.exit(0);
+  }
+
+  if (realUsersTouched > 0 && !reallyProd) {
+    console.error(
+      `❌ ABORT: ${realUsersTouched} usuarios reales tienen puntos/predicciones. ` +
+        "Si REALMENTE quieres borrarlos, añade `--really-prod` al comando. " +
+        "Antes de hacerlo, considera: (a) ¿hay backup reciente?, " +
+        "(b) ¿es necesario? El script `recompute-user-points.ts` puede recalcular " +
+        "sin destruir; los datos quedarán inconsistentes si no se restaura desde backup.",
+    );
+    process.exit(2);
   }
 
   console.log("→ Borrando matches (cascade)...");
