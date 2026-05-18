@@ -32,7 +32,7 @@ const MAX_DURATION_MS = 5 * 60_000;
  * Limitación: push periódico, no event-driven. Mejora futura cuando
  * exista pub/sub Redis o bus en-process.
  */
-export async function GET() {
+export async function GET(req: Request) {
   // Resolvemos la sesión UNA VEZ al abrir la conexión. Aceptamos
   // staleness durante la vida del stream (5 min máximo): si el user
   // cierra sesión, sigue recibiendo su myRank hasta reconectar. Es
@@ -40,23 +40,53 @@ export async function GET() {
   const session = await auth();
   const viewerId = session?.user?.id ?? null;
 
+  // Estado del stream compartido entre `start` y `cancel`. Cuando el
+  // cliente cierra la pestaña, Next.js invoca `cancel` y/o aborta el
+  // `req.signal` — ambos paths limpian intervals para evitar el bug
+  // `TypeError: Controller is already closed` que floodeaba logs al
+  // intentar `enqueue` sobre un controller cerrado.
+  let closed = false;
+  let tickInterval: ReturnType<typeof setInterval> | null = null;
+  let hbInterval: ReturnType<typeof setInterval> | null = null;
+  let maxDuration: ReturnType<typeof setTimeout> | null = null;
+
+  const cleanup = () => {
+    if (closed) return;
+    closed = true;
+    if (tickInterval) clearInterval(tickInterval);
+    if (hbInterval) clearInterval(hbInterval);
+    if (maxDuration) clearTimeout(maxDuration);
+  };
+
+  // Cliente cierra pestaña/red → AbortSignal. Es complementario a
+  // `cancel()` del stream; en algunos runtimes solo dispara uno.
+  req.signal.addEventListener("abort", cleanup);
+
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
-      let closed = false;
+
+      const safeEnqueue = (chunk: string) => {
+        if (closed) return;
+        try {
+          controller.enqueue(encoder.encode(chunk));
+        } catch {
+          // Si el controller ya está cerrado (race condition entre
+          // cancel y un tick en vuelo), simplemente paramos.
+          cleanup();
+        }
+      };
 
       const send = (event: string, data: unknown) => {
-        if (closed) return;
-        const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
-        controller.enqueue(encoder.encode(payload));
+        safeEnqueue(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
       };
 
       const sendHeartbeat = () => {
-        if (closed) return;
-        controller.enqueue(encoder.encode(`:hb\n\n`));
+        safeEnqueue(`:hb\n\n`);
       };
 
       const sendSnapshot = async () => {
+        if (closed) return;
         try {
           if (viewerId) {
             const { snapshot, myRank } = await getRealSnapshotForUser(db, viewerId);
@@ -73,22 +103,20 @@ export async function GET() {
       // Snapshot inicial inmediato + ticks periódicos.
       await sendSnapshot();
 
-      const tickInterval = setInterval(sendSnapshot, TICK_MS);
-      const hbInterval = setInterval(sendHeartbeat, HEARTBEAT_MS);
+      tickInterval = setInterval(sendSnapshot, TICK_MS);
+      hbInterval = setInterval(sendHeartbeat, HEARTBEAT_MS);
 
-      const maxDuration = setTimeout(() => {
-        closed = true;
-        clearInterval(tickInterval);
-        clearInterval(hbInterval);
-        controller.close();
+      maxDuration = setTimeout(() => {
+        cleanup();
+        try {
+          controller.close();
+        } catch {
+          // Ya cerrado por cancel; no-op.
+        }
       }, MAX_DURATION_MS);
-
-      controller.error = () => {
-        closed = true;
-        clearInterval(tickInterval);
-        clearInterval(hbInterval);
-        clearTimeout(maxDuration);
-      };
+    },
+    cancel() {
+      cleanup();
     },
   });
 

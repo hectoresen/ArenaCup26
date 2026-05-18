@@ -20,15 +20,12 @@ name: Sync fixtures
 # off fuera (ej. dos workflows con schedules distintos).
 
 on:
-  # PAUSADO 2026-05-16: la cuenta api-football está suspendida (free
-  # tier rebasó cuota). El schedule queda comentado para no acumular
-  # 502 en logs durante días. `workflow_dispatch` sigue activo —
-  # cuando la cuenta vuelva, descomentar la línea de `cron` y listo.
-  #
-  # Cadencia original: cada 3h, ventana 9 días = 72 req/día (cabe en
-  # 100/día del free tier).
-  # schedule:
-  #   - cron: "0 */3 * * *"
+  # Reactivado 2026-05-18 con plan Pro. Cadencia cada 3h (8 ticks/día).
+  # Cada tick hace 1 req al provider con ventana ±1/+7 días filtrada a
+  # las 7 ligas top. Coste real ≈ 8 req/día — despreciable frente al
+  # budget Pro de 7 500/día.
+  schedule:
+    - cron: "0 */3 * * *"
   workflow_dispatch: {}
 
 jobs:

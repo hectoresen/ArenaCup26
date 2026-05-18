@@ -18,16 +18,12 @@ name: Live scoring
 #   2. Reusar el `CRON_SECRET` ya configurado.
 
 on:
-  # PAUSADO 2026-05-16: la cuenta api-football está suspendida. Cuando
-  # vuelva, descomentar el cron. El check `shouldSyncLive` evitaría
-  # llamadas al provider sin live, pero ahora mismo hay una fila con
-  # `status='live'` en BD (seed antiguo o partido transicionado sin
-  # cerrar), así que cada tick generaría 502 en logs.
-  #
-  # Cadencia original: cada 2 min, refresca solo si hay live en BD o
-  # un kickoff en ±15-30 min.
-  # schedule:
-  #   - cron: "*/2 * * * *"
+  # Reactivado 2026-05-18 con plan Pro $19 (7 500 req/día). Cada 2 min
+  # = 720 ticks/día. La mayoría devuelven 204 sin tocar api-football
+  # gracias a `shouldSyncLive`. Solo cuando hay live o kickoff cercano
+  # se hace 1 req al provider → cabe sobrado en el budget Pro.
+  schedule:
+    - cron: "*/2 * * * *"
   workflow_dispatch: {}
 
 jobs:
