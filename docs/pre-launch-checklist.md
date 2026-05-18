@@ -54,10 +54,10 @@ ver `docs/roadmap.md`.
 
 ## Performance y escala
 
-- [ ] **`processFinishedMatch` batch**: hoy itera user-por-user. Con
-  5k predictores en un match son 5k iteraciones secuenciales (~30-60s).
-  Si 4 matches terminan a la vez, cuello de botella real. Refactor
-  a procesado batch + commit por chunks.
+- [x] **`processFinishedMatch` batch** ✓ 2026-05-18: pre-carga batch
+  de `alreadyScored` + `streakMap` (2 queries en vez de 2×N) +
+  worker pool concurrency=25. Teórico ~150s → ~6s por match con
+  5k predictores.
 - [ ] **Performance audit pre-launch**: Lighthouse mobile, TTI, LCP.
   Especialmente con el calendario completo del Mundial (104 partidos)
   cargando en `/partidos` aunque el LIMIT 250 lo cubre.
