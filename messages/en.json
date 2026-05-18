@@ -100,7 +100,7 @@
       },
       "friends_only": {
         "title": "Friends only",
-        "desc": "Only your friends. Behaves like private until the friends system lands."
+        "desc": "Only users you've accepted as friends can see your full profile. Anyone else sees the \"Private profile\" card."
       },
       "private": {
         "title": "Private",
@@ -113,7 +113,6 @@
       "desc": "When on, visitors see your recent predictions on your profile. When off, only you do."
     },
     "status": {
-      "idle": "Ready.",
       "saving": "Saving…",
       "saved": "Saved."
     },
@@ -467,8 +466,7 @@
     "subtitle": "Visibility, notifications, and account deletion.",
     "privacyTitle": "Profile visibility",
     "privacySubtitle": "Who can open your full profile.",
-    "pushTitle": "Push notifications",
-    "dangerTitle": "Danger zone",
+    "dangerTitle":"Danger zone",
     "dangerSubtitle": "Deleting your account is irreversible."
   },
   "accountMenu": {

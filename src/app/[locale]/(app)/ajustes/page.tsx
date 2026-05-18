@@ -73,16 +73,16 @@ function AjustesLayout({
         <PrivacyForm initial={initialPrivacy} />
       </section>
 
-      {/* Push notifications (solo si VAPID está set en server) */}
+      {/* Push notifications: `<PushOptIn>` ya trae su propia card +
+          título y se auto-oculta cuando el navegador no soporta
+          Notifications (e.g. iOS Safari sin Home Screen install).
+          Antes envolvíamos en una sección extra con título duplicado,
+          que dejaba un header huérfano sin contenido en browsers
+          sin soporte. */}
       {vapidPublicKey && (
-        <section className="mb-8 rounded-2xl border-2 border-border bg-card p-5">
-          <header className="mb-4">
-            <h2 className="font-display text-[14px] uppercase tracking-[0.12em] text-gold">
-              {t("pushTitle")}
-            </h2>
-          </header>
+        <div className="mb-8">
           <PushOptIn vapidPublicKey={vapidPublicKey} />
-        </section>
+        </div>
       )}
 
       {/* Zona peligrosa: eliminar cuenta */}

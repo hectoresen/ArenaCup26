@@ -107,17 +107,20 @@ export function PrivacyForm({ initial }: Props) {
         </label>
       </fieldset>
 
-      <footer className="flex items-center justify-between rounded-xl border-2 border-border bg-card px-4 py-3 text-[11px] font-bold">
-        {error ? (
-          <span className="text-danger">{error}</span>
-        ) : isPending ? (
-          <span className="text-muted">{t("status.saving")}</span>
-        ) : savedAt ? (
-          <span className="text-success">{t("status.saved")}</span>
-        ) : (
-          <span className="text-muted">{t("status.idle")}</span>
-        )}
-      </footer>
+      {/* Status footer solo cuando hay algo que decir: guardando,
+          guardado, o error. El estado "idle" mostraba "Listo." sin
+          contexto y confundía (feedback QA 2026-05-18). */}
+      {(error || isPending || savedAt) && (
+        <footer className="flex items-center justify-between rounded-xl border-2 border-border bg-card px-4 py-3 text-[11px] font-bold">
+          {error ? (
+            <span className="text-danger">{error}</span>
+          ) : isPending ? (
+            <span className="text-muted">{t("status.saving")}</span>
+          ) : (
+            <span className="text-success">{t("status.saved")}</span>
+          )}
+        </footer>
+      )}
     </form>
   );
 }

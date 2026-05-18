@@ -100,7 +100,7 @@
       },
       "friends_only": {
         "title": "Amis seulement",
-        "desc": "Seulement tes amis. Se comporte comme privé jusqu'à l'arrivée du système d'amis."
+        "desc": "Seuls les utilisateurs que tu as acceptés comme amis voient ton profil complet. Le reste voit la carte « Profil privé »."
       },
       "private": {
         "title": "Privé",
@@ -113,7 +113,6 @@
       "desc": "Quand c'est activé, les visiteurs voient tes prédictions récentes sur ton profil. Sinon, toi seul les vois."
     },
     "status": {
-      "idle": "Prêt.",
       "saving": "Enregistrement…",
       "saved": "Enregistré."
     },
@@ -467,7 +466,6 @@
     "subtitle": "Visibilité, notifications et suppression du compte.",
     "privacyTitle": "Visibilité du profil",
     "privacySubtitle": "Qui peut ouvrir ton profil complet.",
-    "pushTitle": "Notifications push",
     "dangerTitle": "Zone dangereuse",
     "dangerSubtitle": "Supprimer ton compte est irréversible."
   },

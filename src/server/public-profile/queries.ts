@@ -25,8 +25,8 @@ export type PublicProfileResult =
  *   global siempre lleva aquí — la privacidad solo decide qué
  *   componente renderiza la página, no si la página existe.
  *
- * Cuando aterrice `add-social-friends`, la rama `friends_only` se
- * resolverá contra la tabla `friendships`.
+ * `friends_only` se resuelve contra `friendships` vía `areFriends`
+ * (sistema social activo desde 2026-05-15).
  */
 export async function getPublicProfile(
   db: Database,

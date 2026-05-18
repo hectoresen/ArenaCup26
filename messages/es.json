@@ -100,7 +100,7 @@
       },
       "friends_only": {
         "title": "Solo amigos",
-        "desc": "Solo tus amigos. Por ahora se comporta como privado mientras llega el sistema de amigos."
+        "desc": "Solo los usuarios que tienes aceptados como amigos pueden ver tu perfil completo. El resto verá el cartel \"Perfil privado\"."
       },
       "private": {
         "title": "Privado",
@@ -113,7 +113,6 @@
       "desc": "Cuando esté activado, los visitantes verán tus últimas predicciones en tu perfil. Si lo desactivas, solo tú verás tu historial."
     },
     "status": {
-      "idle": "Listo.",
       "saving": "Guardando…",
       "saved": "Guardado."
     },
@@ -467,7 +466,6 @@
     "subtitle": "Visibilidad, notificaciones y eliminación de cuenta.",
     "privacyTitle": "Visibilidad del perfil",
     "privacySubtitle": "Quién puede abrir tu perfil completo.",
-    "pushTitle": "Notificaciones push",
     "dangerTitle": "Zona peligrosa",
     "dangerSubtitle": "Eliminar la cuenta es irreversible."
   },
