@@ -1,7 +1,11 @@
 # add-competition-groups — Grupos de competición entre amigos
 
-> **Status**: análisis cerrado 2026-05-18. Pendiente luz verde para
-> implementación. Estimación: ~3-4 días de trabajo bien hecho.
+> **Status**: implementación cerrada 2026-05-19. Schema + dominio +
+> rutas + UI + tests + docs en main. Pendientes opcionales:
+>  - Tabs de grupo en `/ranking` (UX que decidimos diferir).
+>  - i18n a las otras 3 locales (la app sigue con es/en/fr/ar; solo
+>    grupos quedó en es-hardcoded por velocidad).
+>  - E2E Playwright happy paths (QA manual antes de Mundial).
 
 ## Why
 
