@@ -1,0 +1,110 @@
+name: DB backup (tournament cadence)
+
+# Backup cada 6h durante el Mundial 2026 (11 jun → 19 jul). Sube los
+# dumps con prefijo `tournament/` para identificarlos como cadencia
+# elevada y aplicarles una política de retención propia si conviene.
+#
+# Coexiste con `db-backup.yml` (diario a 03:00 UTC, prefijo `daily/`).
+# La idea es: el daily sigue siendo la base de retención larga (~30d);
+# este workflow añade granularidad fina solo mientras el torneo está
+# activo.
+#
+# **Setup** (mismos secrets que db-backup.yml):
+#   DATABASE_URL, BACKUP_S3_ENDPOINT, BACKUP_S3_BUCKET,
+#   BACKUP_S3_ACCESS_KEY, BACKUP_S3_SECRET_KEY, BACKUP_S3_REGION.
+#
+# **Bucket setup adicional**: configurar lifecycle policy en el
+# bucket para borrar `tournament/*` tras 14 días (suficiente para
+# recovery; evita que ~720 backups se acumulen indefinidamente).
+
+on:
+  schedule:
+    # Cada 6h: 00:00, 06:00, 12:00, 18:00 UTC.
+    - cron: "0 */6 * * *"
+  workflow_dispatch: {}
+
+# Fechas del Mundial 2026 (kickoff 11 jun, final 19 jul). El guard
+# de fechas vive en el primer step del job para que GitHub Actions
+# no spamee jobs vacíos fuera del torneo (cuesta cero pero contamina
+# los logs).
+env:
+  MUNDIAL_START: "2026-06-11"
+  MUNDIAL_END:   "2026-07-19"
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Date guard (skip outside Mundial window)
+        id: gate
+        run: |
+          TODAY=$(date -u +"%Y-%m-%d")
+          if [[ "$TODAY" < "$MUNDIAL_START" ]] || [[ "$TODAY" > "$MUNDIAL_END" ]]; then
+            echo "→ $TODAY fuera de la ventana del Mundial ($MUNDIAL_START..$MUNDIAL_END). Skip."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "→ $TODAY dentro de la ventana del Mundial. Continuamos."
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Install PostgreSQL client
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Install AWS CLI (S3-compatible client)
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          curl -sSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscli.zip
+          unzip -q /tmp/awscli.zip -d /tmp
+          sudo /tmp/aws/install --update
+
+      - name: Run pg_dump
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "❌ DATABASE_URL secret missing"
+            exit 1
+          fi
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
+          FILE="arenacup26-${TIMESTAMP}.sql.gz"
+          pg_dump "$DATABASE_URL" --no-owner --no-acl | gzip > "$FILE"
+          echo "Dump size: $(du -h "$FILE" | cut -f1)"
+          echo "BACKUP_FILE=$FILE" >> $GITHUB_ENV
+
+      - name: Upload to S3-compatible bucket
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
+          ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
+          BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+        run: |
+          if [ -z "$ENDPOINT" ] || [ -z "$BUCKET" ]; then
+            echo "❌ BACKUP_S3_ENDPOINT or BACKUP_S3_BUCKET secret missing"
+            exit 1
+          fi
+          aws s3 cp "$BACKUP_FILE" "s3://$BUCKET/tournament/$BACKUP_FILE" \
+            --endpoint-url "$ENDPOINT" \
+            --no-progress
+          echo "✓ Uploaded $BACKUP_FILE to s3://$BUCKET/tournament/"
+
+      - name: Verify backup integrity
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          BYTES=$(stat -c%s "$BACKUP_FILE")
+          if [ "$BYTES" -lt 1024 ]; then
+            echo "❌ Backup file suspiciously small: ${BYTES}B"
+            exit 1
+          fi
+          gzip -t "$BACKUP_FILE" && echo "✓ Gzip integrity OK"
+          if ! zcat "$BACKUP_FILE" | head -50 | grep -qE "^(SET|CREATE)"; then
+            echo "❌ Backup does not look like a valid pg_dump"
+            exit 1
+          fi
+          echo "✓ Backup verified"

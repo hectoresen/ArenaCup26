@@ -34,23 +34,16 @@ ver `docs/roadmap.md`.
 
 ## Backups durante el Mundial
 
-- [ ] **Cadencia de backups elevada durante el torneo**. Hoy es
-  diario a 03:00 UTC (workflow `db-backup.yml`). Durante junio-julio
-  con tráfico real:
-  - Decidir frecuencia: cada 6h, cada 3h en días de match, o continuo
-    via WAL streaming.
-  - Implementar workflows adicionales o cambiar el cron del existente.
-  - Validar que el bucket S3 tiene espacio para N×30 días de
-    snapshots con retención lifecycle adecuada.
-  - Documentar el procedimiento de restore step-by-step (ver
-    `docs/incident-2026-05-18-data-wipe.md` para contexto).
+- [x] **Cadencia elevada en torneo** — workflow `db-backup-tournament.yml`
+  cada 6h con date guard (11 jun → 19 jul 2026), sube a prefijo
+  `tournament/`. El daily `db-backup.yml` sigue activo en paralelo.
+- [ ] **Lifecycle policy del bucket**: configurar borrado automático
+  de `tournament/*` tras 14 días para que ~150 backups no se acumulen.
 - [ ] **Probar el restore al menos una vez** antes del kickoff. Sin
   validación, los backups son confianza ciega.
-- [ ] **Decisión sobre `point_events` como source-of-truth**: actualmente
-  `user_points` está denormalizado y puede desincronizarse de
-  `point_events` (incidente 2026-05-18). Considerar un script
-  `recompute-user-points.ts` idempotente que recalcula desde
-  `point_events` y lo corre periódicamente como verificación.
+- [x] **Script `recompute-user-points.ts`** idempotente que recalcula
+  `user_points` desde `point_events`. Action item del incidente
+  2026-05-18. Uso dry-run por defecto; `--apply` persiste.
 
 ## Entorno de staging
 
