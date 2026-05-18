@@ -1,13 +1,21 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { getRealSnapshot, getRealSnapshotForUser } from "@/lib/leaderboard/real";
+import { getLastRankingChange, isRankingEventsEnabled } from "@/lib/redis/ranking-events";
 
 // Force Node runtime — SSE necesita streaming response que el edge
 // runtime maneja distinto. Con Node + Railway funciona out-of-the-box.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const TICK_MS = 15_000;
+// Polling rápido del pointer de Redis para detectar cambios en
+// `user_points`. 1 GET/s/conexión es trivial (Upstash facturad por
+// MB de payload, no por request hasta planes free + pay-as-you-go).
+const POLL_MS = 1_000;
+// Tick periódico de fallback: si Upstash falla o no está configurado,
+// seguimos emitiendo snapshots cada 15 s para no quedar mudos. Misma
+// cadencia que el comportamiento previo a pub/sub.
+const FALLBACK_TICK_MS = 15_000;
 const HEARTBEAT_MS = 30_000;
 // Tope conservador para evitar conexiones zombies en Railway. Tras
 // 5 min el cliente reconectará automáticamente (EventSource lo hace
@@ -15,22 +23,24 @@ const HEARTBEAT_MS = 30_000;
 const MAX_DURATION_MS = 5 * 60_000;
 
 /**
- * SSE stream del ranking público. Cada `TICK_MS` (15s) emite un evento
- * `snapshot` con el shape:
+ * SSE stream del ranking público. Emite eventos `snapshot` con el
+ * shape `{ players, generatedAt, myRank }`.
  *
- *   { players, generatedAt, myRank }
+ * **Mecanismo event-driven** (desde 2026-05-18 vía Redis):
+ *  - Cada `POLL_MS` (1 s) lee el pointer
+ *    `arenacup26:ranking:last-changed` desde Upstash. Si su valor es
+ *    posterior al último emit, dispara un snapshot inmediato.
+ *  - Como fallback, cada `FALLBACK_TICK_MS` (15 s) emitimos un
+ *    snapshot aunque el pointer no haya cambiado. Cubre dos casos:
+ *      (a) Upstash no configurado (sin Redis vars) → polling es no-op.
+ *      (b) Cambio se escribió pero por algún motivo no se publicó
+ *          (best-effort en el publisher). 15 s peor caso.
+ *  - `:hb` cada `HEARTBEAT_MS` para mantener viva la conexión a
+ *    través de proxies que cierran idle.
  *
- * Donde `players` es el top TOP_LIMIT global y `myRank` es la
- * posición real del viewer logado (1-based) o `null` si está sin
- * sesión. Esto permite a `/inicio` actualizar el último punto del
- * sparkline + el "#N" de "Mi posición" en vivo, aunque el viewer
- * esté fuera del top 100.
- *
- * `:hb` cada `HEARTBEAT_MS` para mantener viva la conexión a través
- * de proxies que cierran idle.
- *
- * Limitación: push periódico, no event-driven. Mejora futura cuando
- * exista pub/sub Redis o bus en-process.
+ * `myRank` es la posición real del viewer logado (1-based) o `null`
+ * si está sin sesión. Permite a `/inicio` actualizar el "#N" de "Mi
+ * posición" en vivo aunque el viewer esté fuera del top 100.
  */
 export async function GET(req: Request) {
   // Resolvemos la sesión UNA VEZ al abrir la conexión. Aceptamos
@@ -46,14 +56,22 @@ export async function GET(req: Request) {
   // `TypeError: Controller is already closed` que floodeaba logs al
   // intentar `enqueue` sobre un controller cerrado.
   let closed = false;
-  let tickInterval: ReturnType<typeof setInterval> | null = null;
+  let pollInterval: ReturnType<typeof setInterval> | null = null;
+  let fallbackInterval: ReturnType<typeof setInterval> | null = null;
   let hbInterval: ReturnType<typeof setInterval> | null = null;
   let maxDuration: ReturnType<typeof setTimeout> | null = null;
+  // Último timestamp que vimos en el pointer de Redis. Si el pointer
+  // viene con valor mayor, sabemos que hubo cambio entre polls.
+  let lastSeenChange = 0;
+  // Timestamp del último snapshot que emitimos. El fallback emite si
+  // pasaron 15 s desde aquí (no desde el último poll-trigger).
+  let lastEmittedAt = 0;
 
   const cleanup = () => {
     if (closed) return;
     closed = true;
-    if (tickInterval) clearInterval(tickInterval);
+    if (pollInterval) clearInterval(pollInterval);
+    if (fallbackInterval) clearInterval(fallbackInterval);
     if (hbInterval) clearInterval(hbInterval);
     if (maxDuration) clearTimeout(maxDuration);
   };
@@ -95,15 +113,41 @@ export async function GET(req: Request) {
             const snapshot = await getRealSnapshot(db);
             send("snapshot", { ...snapshot, myRank: null });
           }
+          lastEmittedAt = Date.now();
         } catch (err) {
           send("error", { message: err instanceof Error ? err.message : String(err) });
         }
       };
 
-      // Snapshot inicial inmediato + ticks periódicos.
+      // Snapshot inicial inmediato (cubre el primer paint del cliente).
       await sendSnapshot();
 
-      tickInterval = setInterval(sendSnapshot, TICK_MS);
+      // Polling del pointer Redis: 1 s. Si el last-changed es más nuevo
+      // que el último que vimos, emitimos snapshot en caliente.
+      // Sin Redis configurado, `getLastRankingChange` devuelve null →
+      // este polling es no-op y el fallback de 15 s se encarga.
+      if (isRankingEventsEnabled()) {
+        pollInterval = setInterval(async () => {
+          if (closed) return;
+          const lastChange = await getLastRankingChange();
+          if (lastChange !== null && lastChange > lastSeenChange) {
+            lastSeenChange = lastChange;
+            await sendSnapshot();
+          }
+        }, POLL_MS);
+      }
+
+      // Tick fallback: emitir snapshot si pasaron 15 s desde el último
+      // emit (incluyendo los triggered por poll). Garantiza que ningún
+      // cliente quede sin update aunque Redis esté caído o la app
+      // tenga un período de inactividad sin publishes.
+      fallbackInterval = setInterval(() => {
+        if (closed) return;
+        if (Date.now() - lastEmittedAt >= FALLBACK_TICK_MS) {
+          void sendSnapshot();
+        }
+      }, FALLBACK_TICK_MS);
+
       hbInterval = setInterval(sendHeartbeat, HEARTBEAT_MS);
 
       maxDuration = setTimeout(() => {

@@ -1,5 +1,12 @@
 # add-ranking-pubsub — Ranking en vivo event-driven con Redis pub/sub
 
+> **Status**: aterrizado 2026-05-18. Implementado vía polling de
+> pointer Redis (no PUBLISH/SUBSCRIBE clásico — Upstash REST no
+> soporta suscripciones persistentes). Latencia entre cambio en BD y
+> emit a clientes: 15 s → ~1 s. Fallback de 15 s preservado si Redis
+> falla. Ver `src/lib/redis/ranking-events.ts` + cambios en
+> `src/server/scoring/pipeline.ts` y `src/app/api/leaderboard/stream/route.ts`.
+
 ## Why
 
 Hoy el SSE de `/api/leaderboard/stream` emite un snapshot cada **15s** consultando

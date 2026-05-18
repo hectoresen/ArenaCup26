@@ -67,10 +67,11 @@ ver `docs/roadmap.md`.
 
 ## Realtime mejoras
 
-- [ ] **`add-ranking-pubsub`** (OpenSpec abierto en
-  `openspec/changes/add-ranking-pubsub/`). Bajaría latencia del ranking
-  de 15s → sub-segundo. Requiere investigar si Upstash REST soporta
-  `SUBSCRIBE` o si toca polling de key con TTL corto. ½ día.
+- [x] **`add-ranking-pubsub`** ✓ 2026-05-18. Implementado vía polling
+  de pointer Redis (Upstash REST no soporta SUBSCRIBE persistente).
+  Latencia ranking en BD → UI: 15 s → ~1 s. Fallback de 15 s
+  preservado si Redis no está configurado o falla. Propuesta
+  archivada en `openspec/changes/archive/add-ranking-pubsub/`.
 
 ## Producto
 

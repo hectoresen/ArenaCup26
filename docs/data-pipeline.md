@@ -97,6 +97,26 @@ Dry-run por default; aplicar con `--apply`.
 Cuando haya tráfico orgánico que supere los placeholders, se puede
 retirar invocando `removeLeaderboardPlaceholders`.
 
+## Ranking event-driven (Upstash + pointer poll)
+
+Desde 2026-05-18 el SSE del ranking (`/api/leaderboard/stream`) usa
+un patrón **pointer-poll** para detectar cambios en cuasi-tiempo real:
+
+- Cada vez que `user_points` cambia globalmente (al final de
+  `processFinishedMatch`), el server escribe `Date.now()` en la clave
+  Redis `arenacup26:ranking:last-changed`.
+- Cada conexión SSE polla esta clave **cada 1 s**. Si su valor es más
+  reciente que el último emit del stream, dispara un snapshot
+  inmediato. Latencia "BD → UI": 15 s → ~1 s.
+- **Fallback**: si Upstash no está configurado o el GET falla, el SSE
+  emite snapshots cada 15 s como antes. Nunca queda mudo.
+
+Por qué no `SUBSCRIBE` clásico: Upstash REST no soporta suscripciones
+persistentes via HTTP. El polling de una sola clave (1 GET/s/conexión
+≈ 86 400 GETs/día/conexión, ~9 MB) cabe sobrado en el free tier
+Upstash y consigue el mismo resultado funcional. Ver
+`src/lib/redis/ranking-events.ts` para la implementación.
+
 ## Flujo end-to-end de un gol → ranking actualizado
 
 ```
@@ -111,24 +131,30 @@ retirar invocando `removeLeaderboardPlaceholders`.
    ├─ actualiza matches.homeScore/awayScore en BD
    │
    ▼ (si el match pasa a finished)
-[processFinishedMatch in-band]
+[processFinishedMatch in-band, batch concurrency=25]
    │
    ├─ recorre predicciones de ese match
    ├─ calcula puntos con scoreMatchPrediction
-   └─ UPDATE user_points (totalPoints, streak, correctCount)
+   ├─ UPDATE user_points (totalPoints, streak, correctCount)
+   └─ publishRankingChange() → Redis SETEX
    │
-   ▼ ≤15s
-[SSE /api/leaderboard/stream emite siguiente snapshot]
+   ▼ ≤1s (poll de SSE al pointer Redis)
+[SSE /api/leaderboard/stream emite snapshot a clientes conectados]
    │
    ▼ ≤30s en dashboard (LiveAutoRefresh)
 [UI muestra puntos provisionales / ranking nuevo]
 ```
 
-Latencia worst-case extremo a extremo: ~**3 min** (gol → user lo ve en
-el ranking). Aceptable para un juego de predicciones; no es un live
-broadcasting. Para bajarlo a sub-segundo haría falta Redis pub/sub +
-api-football webhooks (este último no existe — habría que cambiar a
-Sportmonks con Pusher).
+Latencia worst-case extremo a extremo:
+
+- **Gol real → BD**: ~5-15 s (provider) + 0-2 min (cron live-scoring)
+  = ~**2-3 min** en el peor caso. Cuello de botella: la cadencia del
+  cron, no nuestro código.
+- **BD → UI**: ≤1 s con Upstash configurado, ≤15 s en fallback.
+
+Para bajar el lag total a sub-segundo habría que sustituir el cron
+polling por webhooks del provider (api-football no soporta; Sportmonks
+con Pusher sí, ~€69/mes). El sub-segundo BD→UI ya está hecho.
 
 ## Configuración relevante (env vars)
 
