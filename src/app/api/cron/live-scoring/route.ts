@@ -6,6 +6,7 @@ import { createApiFootballProvider } from "@/server/match-data/providers/api-foo
 import { createMatchRepo } from "@/server/match-data/sync/repo";
 import { shouldSyncLive } from "@/server/match-data/sync/should-sync-live";
 import { syncFixtures } from "@/server/match-data/sync/sync";
+import { triggerKickoffReminders } from "@/server/notifications/kickoff-reminders";
 import { processFinishedMatch } from "@/server/scoring/pipeline";
 import { handleLiveCronRequest } from "./handler";
 
@@ -26,6 +27,16 @@ export async function POST(req: Request) {
   dlog("cron", "POST /api/cron/live-scoring received", {
     hasSecret: Boolean(env.CRON_SECRET),
   });
+
+  // Recordatorios push 30 min antes de kickoff — corre en todos los
+  // ticks (no gated por shouldSync) porque depende de tiempo, no de
+  // estado de partido. Best-effort: cualquier error se loggea pero
+  // no aborta el cron principal.
+  try {
+    await triggerKickoffReminders(db);
+  } catch (err) {
+    derr("cron", "kickoff reminders failed", err);
+  }
 
   const result = await handleLiveCronRequest(req, {
     env: {

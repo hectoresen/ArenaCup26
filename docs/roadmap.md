@@ -33,99 +33,52 @@ contradictorias (¿"sin foto" pero sí "con puntos"?). Migración
 
 ---
 
-## Bloque A — Quick wins (1 sesión)
+## Bloque A — Quick wins ✓ (2026-05-17)
 
-Cosas pequeñas pero visibles. Las hacemos primero para ganar
-tracción.
+- ~~**A1 · Link "Ver ranking completo"**~~ ✓ (MiniLeaderboard
+  filas individuales linkan a `/u/<username>`; CTA al ranking
+  completo en el header del componente).
+- ~~**A2 · Hero stats: rank + racha**~~ ✓ (`progress-cards.tsx`
+  muestra "Tu posición · #N" + chip 🔥 ×N en header).
+- ~~**A3 · Copy marketing en ranking**~~ ✓ (`leaderboard.marketingCopy`
+  en los 4 locales, visible para anon en `LeaderboardView`).
+- ~~**A4 · Link "Volver al panel" en `/u/<username>`**~~ ✓
+  (2026-05-17: link visible para todos, no solo owner).
 
-- **A1 · Link "Ver ranking completo"** (`3.3`). Botón en
-  `<MiniLeaderboard>` debe llevar a `/ranking`. Hoy no hace nada.
-- **A2 · Hero stats: rank + racha**  (`3.2`). En `/inicio`,
-  reemplazar la chip "Sin racha · 0" por "Tu posición · #N".
-  Si hay racha activa, mover el chip "🔥 ×N" al header al lado
-  de "Hola, {nombre}".
-- **A3 · Copy marketing en ranking** (`1.2`). Pequeño párrafo
-  sobre la landing/`/ranking` explicando que es gratis, que
-  predices partidos del Mundial 2026 y compites con quien
-  quieras. 2-3 líneas. Translate i18n.
-- **A4 · Link "Volver al panel" en `/u/<username>`** (`5.1`).
-  CTA discreto arriba/abajo que regrese a `/inicio` (solo cuando
-  el viewer es el dueño del perfil; los anónimos no lo necesitan).
+## Bloque B — Tie-breaking + online presence ✓ (2026-05-15+)
 
-## Bloque B — Tie-breaking + online presence
+- ~~**B1 · Última actividad + dot online**~~ ✓ (PING_THROTTLE en
+  `(app)/layout.tsx`; `isOnline` deriva en `getRealSnapshot` + se
+  expone también en perfil público desde 2026-05-17).
+- ~~**B2 · Sistema de desempate**~~ ✓ (columnas `streakMax` +
+  `simpleHits` en schema; `getRealSnapshot` ordena por puntos →
+  streakMax → simpleHits → predictions count → createdAt).
+- ~~**B3 · Docs scoring + FAQ**~~ ✓ (`docs/scoring.md` y FAQ
+  detallan el orden de desempate).
 
-Sistema de desempate definitivo + indicador online.
+## Bloque C — Profile editor ✓ (2026-05-15+)
 
-- **B1 · Última actividad** (`1.1`). Actualizar
-  `users.last_active_at = now()` en cada request server-side del
-  user logado (middleware o layout `(app)`). Indicador verde en
-  `<RankRow>` si `last_active_at >= now() - 24h`.
-- **B2 · Sistema de desempate** (`1.4` + `7`). Reordenar
-  `getRealSnapshot` con tie-break:
-    1. Total points desc *(ya hecho)*.
-    2. Rachas: `(SELECT max(racha) FROM user_points)` o si guardamos
-       `streak_max`. Necesita columna nueva `users_points.streak_max`
-       que se actualiza en `processFinishedMatch`.
-    3. "Calidad de rachas": # de hits que fueron simple vs double.
-       Nueva columna `user_points.simple_hits` (cuenta de hits con
-       `kind = 'simple'` o `'exact'`).
-    4. Participación: # de predicciones totales (count `predictions`
-       por user) — ya derivable, no necesita columna.
-  Empate 0 sigue por `createdAt asc` *(ya hecho)*.
-- **B3 · Docs scoring + FAQ** del tie-break. Actualizar
-  `docs/scoring.md` y crear una entrada en `/faq` explicando el
-  orden.
+- ~~**C1 · Cooldowns `nameChangedAt` + `avatarChangedAt`**~~ ✓
+  (server actions bloquean dentro de 48h; UI muestra hint
+  "{hours}h" desde 2026-05-18).
+- ~~**C2 · Galería de avatares pre-curados**~~ ✓ (24 emojis en
+  `src/server/profile/avatars.ts`).
+- ~~**C3 · Editor inline en `/u/<username>`**~~ ✓ (`EditableName`
+  + `AvatarPicker` con cooldown countdown).
+- ~~**C4 · Hola {nombre} editable in-place**~~ ✓ (reusa
+  `EditableName` con `display={firstName}`).
+- ~~**C5 · Caja "Últimas 5 predicciones"**~~ ✓ (`RecentPredictionsCard`
+  alimentada por `getPredictionHistory(userId, limit=5)`).
+- ~~**C6 · Stats de rachas**~~ ✓ (`StreakStatsCard` con current/
+  max/milestones).
+- ~~**C7 · Caja "Mis invitaciones"**~~ ✓ (`InvitationsPlaceholderCard`
+  enlaza a `/amigos#invitaciones`).
 
-## Bloque C — Profile editor
+## Bloque D — Cards de próximos partidos rediseñadas ✓ (2026-05-15)
 
-Editar nombre + avatar desde el perfil propio.
-
-- **C1 · `users.name_changed_at` + `users.image_changed_at`**.
-  Cooldown de 48h por columna. Migración drizzle.
-- **C2 · Galería de avatares pre-curados**. ~20 emojis grandes o
-  ilustraciones SVG (deportivos, banderas, monumentos, animales).
-  Server-side static asset; el user elige `avatar_id` (col nueva
-  en users). Si `avatar_id` es null, usar `image` de Google.
-- **C3 · `/u/<username>` editor inline** cuando viewer === owner
-  (`5.2` + `5.3`):
-   - Click en nombre → input inline + save (server action con
-     cooldown check).
-   - Click en avatar → modal con galería + opción "volver al de
-     Google".
-   - Toast 3s "Solo puedes cambiarlo cada 48h" cuando bloqueado.
-- **C4 · Hola {nombre} editable in-place** (`2.2`). En `/inicio`
-  el saludo es clickable; reusa la misma lógica de C3.
-- **C5 · Caja "Últimas 5 predicciones"** (`5.4`) en `/u/<username>`
-  propio. Sub-set de `getPredictionHistory(userId, limit=5)` con
-  "Ver más" → `/historial`.
-- **C6 · Stats de rachas** (`5.5`). Nueva caja:
-  "Mejor racha · 7" "Rachas alcanzadas · 3" "Racha actual · 2".
-  Requiere `streak_max` y un counter de rachas alcanzadas (≥3).
-- **C7 · Caja "Mis invitaciones"** (`5.6`). Placeholder con copy
-  "Aún no has invitado a nadie" + CTA "Invitar a un amigo"
-  (fase 6 → no funcional aún).
-
-## Bloque D — Cards de próximos partidos rediseñadas
-
-- **D1 · `<MatchCard>` redesign** (`3.1`):
-  Mobile-first:
-  ```
-  ┌───────────────────────────────────┐
-  │   🇪🇸 España      🇨🇴 Colombia    │
-  │   (logo nombre)   (logo nombre)   │
-  │                                   │
-  │            VS                     │
-  │          Hoy · 22:30              │
-  │                                   │
-  │              [Predecir →]         │
-  └───────────────────────────────────┘
-  ```
-  - VS centrado.
-  - Equipos a cada lado con bandera + nombre, alineados verticalmente.
-  - Fecha y hora debajo del VS.
-  - Botón "Predecir" fijo en la esquina inferior derecha (o full
-    width si la card es pequeña, depende de viewport).
-  - Mantener "Cerrado" cuando kickoffPast.
+- ~~**D1 · `<MatchCard>` redesign**~~ ✓ (componente
+  `<MatchCard>` reescrito con layout VS-centrado, banderas a cada
+  lado, fecha bajo el VS y CTA "Predecir" / "Cerrado" según estado).
 
 ## Bloque E — Partidos: dos sub-pestañas + bracket ✓ (2026-05-15)
 
@@ -214,25 +167,17 @@ Editar nombre + avatar desde el perfil propio.
 
 Sin solapamiento con el análisis de producto, siguen activos:
 
-- **Canal de contacto público (correo de soporte)** — la política
-  de privacidad y los términos de uso referencian "el canal de
-  contacto que habilitaremos cuando la plataforma se abra al
-  público". Cuando esté listo (e.g. `soporte@<dominio>` o un
-  helpdesk), hay que:
-    - Setear `VAPID_SUBJECT=mailto:<correo>` en Railway para que
-      el push system salga de noop (ver `src/server/push/client.ts`).
-    - Añadir el correo en las secciones `controller`, `rights`,
-      `contact` de `legal.privacy` y `legal.terms` en es/en/fr/ar
-      (sin nombres personales).
-    - Reflejarlo en `docs/security.md §9.5`.
-  Hasta entonces, la app puede operar sin push (queda en noop) y
-  los copys legales mencionan el canal "próximamente".
-- **CRIT-1 · Rotar credenciales filtradas**
-  (`API_FOOTBALL_KEY`, `GOOGLE_CLIENT_SECRET`). Tarea operativa
-  manual; pasos detallados en `docs/security.md §9.1`.
+- ~~**Canal de contacto público**~~ ✓ (2026-05-18:
+  `contact@arenacup26.com` añadido en legales es/en/fr/ar, footer
+  global y `VAPID_SUBJECT` en Railway).
+- ~~**CRIT-1 · Rotar credenciales filtradas**~~ ✓ (2026-05-18:
+  `API_FOOTBALL_KEY` rotada al upgrade a plan Pro $19; allowlist
+  de IPs vaciado).
 - **Activar Sentry**: crear cuenta + `SENTRY_DSN` en Railway.
   Sin esto, el monitoring sigue en noop. Pasos en
-  `docs/security.md §9.2`.
+  `docs/security.md §9.2`. (Cosmético: el `org`/`project` en
+  `next.config.ts` siguen siendo `webmundial-26`/`webmundial` y
+  conviene rebrandear al setear DSN).
 - ~~**Páginas legales** (`/privacy`, `/terms`).~~ ✓ (2026-05-15:
   `/legal/privacy` y `/legal/terms` en 4 locales, link desde
   AccountMenu).

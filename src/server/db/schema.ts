@@ -187,6 +187,21 @@ export const sessions = pgTable("sessions", {
   expires: timestamp("expires", { withTimezone: true }).notNull(),
 });
 
+/**
+ * Tabla requerida por el contrato del DrizzleAdapter de Auth.js v5
+ * para soportar el provider de email/passwordless. Hoy NO la usamos
+ * (solo Google OAuth) y permanece vacía en runtime. Se mantiene en
+ * el schema por dos razones:
+ *
+ *  1. La firma `verificationTokensTable: verificationTokens` del
+ *     adapter espera una referencia válida; quitarla obligaría a
+ *     verificar la compatibilidad con cada upgrade de Auth.js.
+ *  2. Sin staging real (1 entorno = prod), un `DROP TABLE` en
+ *     migration tiene riesgo neto > 0 para un beneficio cosmético.
+ *
+ * Si en el futuro se activa email auth (magic links), la tabla ya
+ * está lista. Si no, sigue siendo ~24 bytes de overhead y nada más.
+ */
 export const verificationTokens = pgTable(
   "verification_tokens",
   {
