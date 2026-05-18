@@ -107,6 +107,11 @@
         "desc": "Solo tú. Quien intente abrir tu perfil verá el cartel \"Perfil privado\"."
       }
     },
+    "showHistory": {
+      "legend": "Historial de predicciones",
+      "title": "Mostrar mi historial públicamente",
+      "desc": "Cuando esté activado, los visitantes verán tus últimas predicciones en tu perfil. Si lo desactivas, solo tú verás tu historial."
+    },
     "status": {
       "idle": "Listo.",
       "saving": "Guardando…",
@@ -472,6 +477,7 @@
     "menuLabel": "Menú de cuenta",
     "fallbackName": "Usuario",
     "profile": "Mi perfil",
+    "settings": "Ajustes",
     "history": "Mi historial",
     "friends": "Amigos",
     "privacy": "Privacidad",
@@ -628,6 +634,7 @@
     },
     "recentPredictions": {
       "title": "Tus últimas predicciones",
+      "titleVisitor": "Últimas predicciones",
       "seeMore": "Ver historial completo"
     },
     "invitations": {

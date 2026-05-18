@@ -81,6 +81,32 @@ export function PrivacyForm({ initial }: Props) {
         </div>
       </fieldset>
 
+      <fieldset>
+        <legend className="mb-3 font-display text-[13px] uppercase tracking-[0.12em] text-gold">
+          {t("showHistory.legend")}
+        </legend>
+        <label
+          className={`flex cursor-pointer items-center gap-3 rounded-2xl border-2 px-4 py-3 transition-colors ${
+            state.showHistory ? "border-gold bg-gold/[0.06]" : "border-border bg-card hover:border-gold/30"
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={state.showHistory}
+            onChange={(e) => update("showHistory", e.target.checked)}
+            className="accent-gold"
+          />
+          <div className="flex-1">
+            <div className="text-sm font-extrabold text-foreground">
+              {t("showHistory.title")}
+            </div>
+            <div className="mt-0.5 text-[11px] font-bold text-muted">
+              {t("showHistory.desc")}
+            </div>
+          </div>
+        </label>
+      </fieldset>
+
       <footer className="flex items-center justify-between rounded-xl border-2 border-border bg-card px-4 py-3 text-[11px] font-bold">
         {error ? (
           <span className="text-danger">{error}</span>

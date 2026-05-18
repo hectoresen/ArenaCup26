@@ -1,7 +1,6 @@
 import { TopChrome } from "@/components/layout/top-chrome";
 import { ThrottledState } from "@/components/common/throttled-state";
 import { FriendActionButton } from "@/components/friends/friend-action-button";
-import { AccountSettingsAccordion } from "@/components/profile/account-settings-accordion";
 import { InvitationsPlaceholderCard } from "@/components/profile/invitations-placeholder-card";
 import { RecentPredictionsCard } from "@/components/profile/recent-predictions-card";
 import { StreakStatsCard } from "@/components/profile/streak-stats-card";
@@ -11,15 +10,11 @@ import { ProfileHero } from "@/components/public-profile/profile-hero";
 import { StatsRow } from "@/components/public-profile/stats-row";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
-import { env } from "@/lib/env";
 import { checkPublicReadLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
-import { eq } from "drizzle-orm";
 import { db } from "@/server/db/client";
-import { users } from "@/server/db/schema";
 import { getViewerRelationWithId } from "@/server/friends/queries";
 import { getOwnerExtras } from "@/server/profile/owner-extras";
-import { normalizePrivacy } from "@/server/privacy/apply";
 import { getPublicProfile } from "@/server/public-profile/queries";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
@@ -103,19 +98,6 @@ export default async function PublicProfilePage({
   // pagan estas queries.
   const ownerExtras = isOwner && viewerId ? await getOwnerExtras(db, viewerId) : null;
 
-  // Privacidad actual del owner para inicializar el form de ajustes
-  // (solo si renderizamos el accordion — i.e. isOwner).
-  const ownerPrivacyRow = isOwner && viewerId
-    ? await db
-        .select({ privacy: users.privacy })
-        .from(users)
-        .where(eq(users.id, viewerId))
-        .limit(1)
-    : null;
-  const ownerPrivacy = ownerPrivacyRow
-    ? normalizePrivacy(ownerPrivacyRow[0]?.privacy)
-    : null;
-
   // Relación de amistad para el CTA. Solo se computa si hay viewer y
   // no es el dueño — el resto de visitantes no ven el botón.
   const friendInfo =
@@ -156,16 +138,21 @@ export default async function PublicProfilePage({
             <InvitationsPlaceholderCard count={ownerExtras.invitationsCount} />
           </>
         )}
+        {/* Historial de predicciones visible para visitantes si el
+            owner tiene el toggle `showHistory` activo. Para el owner,
+            esta caja es redundante con la del bloque ownerExtras
+            (mismas predicciones), así que la ocultamos en su vista. */}
+        {!isOwner && profile.publicHistory.length > 0 && (
+          <RecentPredictionsCard entries={profile.publicHistory} viewer="visitor" />
+        )}
         <AchievementsAccordion
           achievements={profile.achievements}
           ownerUsername={profile.identity.username}
         />
-        {isOwner && ownerPrivacy && (
-          <AccountSettingsAccordion
-            initialPrivacy={ownerPrivacy}
-            vapidPublicKey={env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null}
-          />
-        )}
+        {/* Los ajustes de cuenta viven ahora en `/ajustes`, accesible
+            desde el dropdown del avatar (top right). Antes vivían
+            aquí como acordeón pero forzaban al user a pasar por el
+            perfil para configurar push/privacy/borrar cuenta. */}
       </main>
     </>
   );

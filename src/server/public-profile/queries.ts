@@ -2,6 +2,8 @@ import { countryCodeToFlag } from "@/lib/format/country";
 import type { Database } from "@/server/db/client";
 import { userAchievements, userPoints, users } from "@/server/db/schema";
 import { areFriends } from "@/server/friends/queries";
+import { getPredictionHistory } from "@/server/history/queries";
+import type { HistoryEntry } from "@/server/history/types";
 import { canViewProfile, normalizePrivacy } from "@/server/privacy/apply";
 import { eq, sql } from "drizzle-orm";
 import { buildProfileAchievements } from "./transforms";
@@ -93,6 +95,16 @@ export async function getPublicProfile(
   const points = pointsRows[0]?.totalPoints ?? 0;
   const totalPlayers = totalRows[0]?.total ?? 0;
 
+  // Historial público: respeta el toggle `showHistory` del owner.
+  // El dueño SIEMPRE ve su propio historial (en /inicio + perfil).
+  // Visitantes solo si está activado. Cap a 5 últimas para que el
+  // perfil no se llene de cards.
+  const isViewerOwner = viewerId !== null && viewerId === user.id;
+  const historyVisible = isViewerOwner || privacy.showHistory;
+  const publicHistory: HistoryEntry[] = historyVisible
+    ? await getPredictionHistory(db, user.id, 5)
+    : [];
+
   // Ranking inamovible: todos los users tienen rank. Si el user aún
   // no tiene fila en `user_points`, lo tratamos como 0 puntos y
   // recibe el rank de la cola.
@@ -133,6 +145,7 @@ export async function getPublicProfile(
         pointsDelta: null,
       },
       achievements: buildProfileAchievements(unlockedMap),
+      publicHistory,
     },
   };
 }

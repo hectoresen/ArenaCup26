@@ -37,10 +37,18 @@ import {
  */
 export type UserPrivacy = {
   visibility: "public" | "friends_only" | "private";
+  /**
+   * Si `false`, el historial de predicciones del user NO se muestra
+   * en su perfil público — el dueño sí lo ve siempre. Default `true`
+   * (la mayoría de jugadores quiere presumir de sus aciertos).
+   * Añadido 2026-05-18 en QA bloque 2.
+   */
+  showHistory: boolean;
 };
 
 export const DEFAULT_USER_PRIVACY: UserPrivacy = {
   visibility: "public",
+  showHistory: true,
 };
 
 // ─── ENUMS ─────────────────────────────────────────────────

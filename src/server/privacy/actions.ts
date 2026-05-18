@@ -11,6 +11,7 @@ import type { UserPrivacy } from "./apply";
 
 const privacySchema = z.object({
   visibility: z.enum(["public", "friends_only", "private"]),
+  showHistory: z.boolean(),
 });
 
 export type UpdatePrivacyResult =

@@ -107,6 +107,11 @@
         "desc": "Only you. Anyone trying to open your profile sees the \"Private profile\" card."
       }
     },
+    "showHistory": {
+      "legend": "Prediction history",
+      "title": "Show my history publicly",
+      "desc": "When on, visitors see your recent predictions on your profile. When off, only you do."
+    },
     "status": {
       "idle": "Ready.",
       "saving": "Saving…",
@@ -472,6 +477,7 @@
     "menuLabel": "Account menu",
     "fallbackName": "User",
     "profile": "My profile",
+    "settings": "Settings",
     "history": "My history",
     "friends": "Friends",
     "privacy": "Privacy",
@@ -628,6 +634,7 @@
     },
     "recentPredictions": {
       "title": "Your latest predictions",
+      "titleVisitor": "Latest predictions",
       "seeMore": "See full history"
     },
     "invitations": {

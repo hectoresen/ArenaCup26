@@ -107,6 +107,11 @@
         "desc": "Seulement toi. Tout visiteur qui essaie d'ouvrir ton profil voit la carte « Profil privé »."
       }
     },
+    "showHistory": {
+      "legend": "Historique des prédictions",
+      "title": "Afficher mon historique publiquement",
+      "desc": "Quand c'est activé, les visiteurs voient tes prédictions récentes sur ton profil. Sinon, toi seul les vois."
+    },
     "status": {
       "idle": "Prêt.",
       "saving": "Enregistrement…",
@@ -472,6 +477,7 @@
     "menuLabel": "Menu du compte",
     "fallbackName": "Utilisateur",
     "profile": "Mon profil",
+    "settings": "Paramètres",
     "history": "Mon historique",
     "friends": "Amis",
     "privacy": "Confidentialité",
@@ -628,6 +634,7 @@
     },
     "recentPredictions": {
       "title": "Tes dernières prédictions",
+      "titleVisitor": "Dernières prédictions",
       "seeMore": "Voir tout l'historique"
     },
     "invitations": {

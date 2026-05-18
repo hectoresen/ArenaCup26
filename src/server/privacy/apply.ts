@@ -17,6 +17,10 @@ export function normalizePrivacy(raw: unknown): UserPrivacy {
       r.visibility === "private" || r.visibility === "friends_only"
         ? r.visibility
         : "public",
+    // Default `true` para rows pre-2026-05-18 sin este campo: la mayoría
+    // de users querría exhibir su historial; quien quiera ocultarlo
+    // tendrá que togglearlo explícitamente.
+    showHistory: r.showHistory === false ? false : true,
   };
 }
 

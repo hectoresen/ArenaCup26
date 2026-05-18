@@ -1,4 +1,5 @@
 import type { AchievementDefinition, AchievementTier } from "@/server/achievements/catalog";
+import type { HistoryEntry } from "@/server/history/types";
 
 export type ProfileIdentity = {
   /** UUID interno del owner. Necesario para acciones tipo `removeFriend`. */
@@ -60,4 +61,12 @@ export type PublicProfile = {
   identity: ProfileIdentity;
   stats: ProfileStats;
   achievements: ProfileAchievements;
+  /**
+   * Últimas N predicciones del owner. Vacío si:
+   *  - El owner desactivó `privacy.showHistory`, o
+   *  - El owner no tiene predicciones todavía.
+   * El owner SIEMPRE recibe su histórico aquí (independiente del
+   * toggle); para visitantes, depende del toggle.
+   */
+  publicHistory: HistoryEntry[];
 };

@@ -150,6 +150,28 @@ export function AccountMenu({
           )}
 
           <Link
+            href="/ajustes"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-start text-sm font-bold text-foreground transition-colors hover:bg-white/[0.05]"
+          >
+            <svg
+              className="h-4 w-4 text-muted"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="8" cy="8" r="2.5" />
+              <path d="M8 2 V4 M8 12 V14 M14 8 H12 M4 8 H2 M12.2 3.8 L10.8 5.2 M5.2 10.8 L3.8 12.2 M12.2 12.2 L10.8 10.8 M5.2 5.2 L3.8 3.8" />
+            </svg>
+            {t("settings")}
+          </Link>
+
+          <Link
             href="/historial"
             role="menuitem"
             onClick={() => setOpen(false)}
@@ -195,8 +217,9 @@ export function AccountMenu({
             {t("friends")}
           </Link>
 
-          {/* Privacy + push + delete account viven dentro del
-              acordeón "Ajustes de mi cuenta" del perfil público.
+          {/* Ajustes (privacy + push + delete) ya tienen su propio
+              link arriba ("Ajustes") hacia `/ajustes`. Antes vivían
+              como acordeón en `/u/<username>`.
               El link "Mi perfil" arriba ya lleva al user a su
               página `/u/<username>` donde encuentra todo. */}
 
