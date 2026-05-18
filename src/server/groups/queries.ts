@@ -524,6 +524,61 @@ export async function getGroupLinks(
 }
 
 /**
+ * Invitaciones salientes pending de UN grupo (vista del admin). A
+ * diferencia de `getPendingGroupInvitations` (entrantes para el user),
+ * ésta devuelve el listado para que el admin vea a quién ha invitado
+ * y pueda cancelar.
+ */
+export async function getOutboundGroupInvitations(
+  db: Database,
+  groupId: string,
+): Promise<
+  Array<{
+    invitationId: string;
+    groupId: string;
+    groupName: string;
+    groupColor: GroupColor;
+    invitedByName: string | null;
+    inviteeName: string | null;
+    inviteeUsername: string | null;
+    createdAt: Date;
+  }>
+> {
+  const invitee = alias(users, "invitee_user");
+  const rows = await db
+    .select({
+      invitationId: groupInvitations.id,
+      groupId: groupInvitations.groupId,
+      groupName: groups.name,
+      groupColor: groups.color,
+      inviteeName: invitee.name,
+      inviteeUsername: invitee.username,
+      createdAt: groupInvitations.createdAt,
+    })
+    .from(groupInvitations)
+    .innerJoin(groups, eq(groups.id, groupInvitations.groupId))
+    .leftJoin(invitee, eq(invitee.id, groupInvitations.inviteeId))
+    .where(
+      and(
+        eq(groupInvitations.groupId, groupId),
+        eq(groupInvitations.status, "pending"),
+      ),
+    )
+    .orderBy(desc(groupInvitations.createdAt));
+
+  return rows.map((r) => ({
+    invitationId: r.invitationId,
+    groupId: r.groupId,
+    groupName: r.groupName,
+    groupColor: r.groupColor as GroupColor,
+    invitedByName: null,
+    inviteeName: r.inviteeName,
+    inviteeUsername: r.inviteeUsername,
+    createdAt: r.createdAt,
+  }));
+}
+
+/**
  * Lookup de un grupo por token de link (para landing de
  * `/social/grupos/unirse/<token>`). Devuelve preview info + estado
  * del link. No persiste nada.

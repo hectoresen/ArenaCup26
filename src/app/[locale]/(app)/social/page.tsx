@@ -1,10 +1,17 @@
 import { FriendsList } from "@/components/friends/friends-list";
 import { FriendRequestsInbox } from "@/components/friends/friend-requests-inbox";
 import { AddFriendForm } from "@/components/friends/add-friend-form";
+import { GroupInvitationsInbox } from "@/components/groups/group-invitations-inbox";
+import { MyGroupsSection } from "@/components/groups/my-groups-section";
 import { InvitationsManager } from "@/components/invitations/invitations-manager";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { getFriends, getPendingFriendRequests } from "@/server/friends/queries";
+import { MAX_GROUPS_PER_USER } from "@/server/groups/caps";
+import {
+  getPendingGroupInvitations,
+  getUserGroups,
+} from "@/server/groups/queries";
 import {
   countRedeemedInvitations,
   getInvitations,
@@ -30,12 +37,15 @@ export default async function AmigosPage({
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}`);
 
-  const [requests, friends, invitations, redeemed] = await Promise.all([
-    getPendingFriendRequests(db, session.user.id),
-    getFriends(db, session.user.id),
-    getInvitations(db, session.user.id),
-    countRedeemedInvitations(db, session.user.id),
-  ]);
+  const [requests, friends, invitations, redeemed, myGroups, groupInvites] =
+    await Promise.all([
+      getPendingFriendRequests(db, session.user.id),
+      getFriends(db, session.user.id),
+      getInvitations(db, session.user.id),
+      countRedeemedInvitations(db, session.user.id),
+      getUserGroups(db, session.user.id),
+      getPendingGroupInvitations(db, session.user.id),
+    ]);
 
   return (
     <AmigosLayout
@@ -45,6 +55,8 @@ export default async function AmigosPage({
       friends={friends}
       invitations={invitations}
       redeemed={redeemed}
+      myGroups={myGroups}
+      groupInvites={groupInvites}
     />
   );
 }
@@ -56,6 +68,8 @@ function AmigosLayout({
   friends,
   invitations,
   redeemed,
+  myGroups,
+  groupInvites,
 }: {
   pendingCount: number;
   friendsCount: number;
@@ -63,6 +77,8 @@ function AmigosLayout({
   friends: Awaited<ReturnType<typeof getFriends>>;
   invitations: Awaited<ReturnType<typeof getInvitations>>;
   redeemed: number;
+  myGroups: Awaited<ReturnType<typeof getUserGroups>>;
+  groupInvites: Awaited<ReturnType<typeof getPendingGroupInvitations>>;
 }) {
   const t = useTranslations("friends");
   const tInvite = useTranslations("invite");
@@ -81,6 +97,23 @@ function AmigosLayout({
       </header>
 
       <AddFriendForm />
+
+      <MyGroupsSection groups={myGroups} maxGroups={MAX_GROUPS_PER_USER} />
+
+      {groupInvites.length > 0 && (
+        <section className="mt-7">
+          <header className="mb-3 flex items-center gap-2.5">
+            <span aria-hidden="true" className="text-[14px] leading-none text-gold">◈</span>
+            <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
+              Invitaciones de grupo
+            </h2>
+            <span className="rounded-full border-[1.5px] border-gold/30 bg-gold/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-gold">
+              {groupInvites.length}
+            </span>
+          </header>
+          <GroupInvitationsInbox invitations={groupInvites} />
+        </section>
+      )}
 
       {requests.length > 0 && (
         <section className="mt-6">
