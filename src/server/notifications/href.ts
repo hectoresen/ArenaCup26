@@ -31,5 +31,16 @@ export function resolveNotificationHref(item: NotificationItem): string | null {
       return item.matchId ? `/partidos/${item.matchId}` : null;
     case "system":
       return null;
+    case "group_invited":
+    case "group_joined":
+    case "group_left":
+    case "group_expelled":
+    case "group_admin_transferred":
+    case "group_deleted":
+      // Los kinds `group_*` llevan a la sección Social; la card que
+      // se renderiza dentro de /social hace el deep-link al grupo
+      // concreto si la noti incluye contexto. El admin transferido y
+      // los miembros van todos al hub para simplificar.
+      return "/social";
   }
 }

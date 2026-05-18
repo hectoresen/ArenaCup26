@@ -5,7 +5,13 @@ export type NotificationKind =
   | "achievement_unlocked"
   | "system"
   | "friend_request"
-  | "friend_accepted";
+  | "friend_accepted"
+  | "group_invited"
+  | "group_joined"
+  | "group_left"
+  | "group_expelled"
+  | "group_admin_transferred"
+  | "group_deleted";
 
 export type NotificationItem = {
   id: string;
