@@ -160,8 +160,8 @@ const config: NextConfig = {
  * Quedan hardcoded para evitar otra env var; cuando alguien forkee
  * el repo, los cambia o configura los suyos.
  */
-const SENTRY_ORG = "webmundial-26";
-const SENTRY_PROJECT = "webmundial";
+const SENTRY_ORG = "arenacup26";
+const SENTRY_PROJECT = "arenacup26";
 
 const nextIntlConfig = withNextIntl(config);
 
