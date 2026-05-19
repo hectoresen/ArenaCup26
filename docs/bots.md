@@ -161,23 +161,79 @@ histórico.
 
 ## Operación
 
-### Lanzar predicciones de bots antes del Mundial
+### Deploy inicial (post-merge `add-bot-users`)
 
-```bash
-# En Railway, una sola vez ~24h antes del kickoff:
-SEED_BOT_PREDICTIONS=true npm run bootstrap
+Cuando el commit con el feature llega a `main`, Railway:
+
+1. Aplica `drizzle/0014_awesome_champions.sql` (añade `is_bot` column + index).
+2. Ejecuta `npm run bootstrap`, que:
+   - Migra/borra los 7 placeholders viejos (cascade limpia sus
+     predictions/point_events).
+   - Siembra los 27 bots del catálogo con `seedBotUsers`.
+   - **NO** siembra predicciones todavía (gated por
+     `SEED_BOT_PREDICTIONS=true`).
+
+Verificar en Railway logs algo similar a:
+
+```
+✓ Achievements ready (25 rows reconciled).
+✓ Removed 7 legacy placeholder user(s).
+✓ Bots reconciled — created=27, updated=0.
+→ Skipping bot predictions seed (set SEED_BOT_PREDICTIONS=true to run).
 ```
 
-Verificar:
-- `/ranking`: 27+ entradas, podio ocupado.
-- `/u/<bot-username>`: perfil completo con 48 predicciones, puntos 0
-  (todavía no se han jugado partidos).
+A partir de aquí los 27 bots aparecen en `/ranking` y son
+navegables vía `/u/<username>` con perfiles vacíos (0 pts, sin
+predicciones todavía).
 
-### Disable temporal del cron de auto-reject
+### Setup secrets GitHub Actions (una vez)
 
-Si vemos algún problema, comentar el job en
-`.github/workflows/auto-reject-bot-requests.yml`. Sin él los requests
-quedan pending forever — la UI lo gestiona OK.
+Para que el cron `auto-reject-bot-requests` corra a las 03:30 UTC:
+
+1. `Settings → Secrets and variables → Actions` en el repo.
+2. Añadir el secret:
+   - `RAILWAY_AUTO_REJECT_URL` =
+     `https://www.arenacup26.com/api/cron/auto-reject-bot-requests`
+3. Reusar el `CRON_SECRET` ya existente (mismo valor que en Railway).
+
+### Lanzar predicciones de bots antes del Mundial
+
+Una sola vez, ~24h antes del kickoff (≈10 jun 2026):
+
+**Opción A** — env var temporal en Railway:
+
+1. Railway → Service `wmundial` → Variables → añadir
+   `SEED_BOT_PREDICTIONS=true`.
+2. Trigger redeploy (push commit vacío o "Redeploy" en UI).
+3. Verificar logs:
+   ```
+   → Bootstrap: seeding bot predictions (SEED_BOT_PREDICTIONS=true)…
+   ✓ Bot predictions — created=1296, matches=48, bots=27.
+   ```
+4. Quitar `SEED_BOT_PREDICTIONS` de Railway (no la necesitamos más
+   — el seed es idempotente, pero correrla cada deploy es ruido).
+
+**Opción B** — manual via `railway run`:
+
+```bash
+railway run --service wmundial \
+  SEED_BOT_PREDICTIONS=true \
+  npm run bootstrap
+```
+
+Esto corre el bootstrap completo dentro del shell del service sin
+necesidad de redeploy.
+
+### Verificar el seed visualmente
+
+Tras seedear predicciones:
+
+- `/ranking` con sesión: 27 entradas, podio ocupado por bots
+  (puntos en 0 hasta el primer partido scoreado).
+- `/u/diego-martinez` (cualquier bot): perfil completo con avatar
+  SVG, 48 predicciones en su historial.
+- Bot recibe friend request enviada por un user real: queda
+  `pending` hasta que el cron auto-reject la limpia ≥48h después.
 
 ### Verificar conteo real vs total
 
@@ -188,3 +244,60 @@ SELECT
   COUNT(*) AS total
 FROM users;
 ```
+
+Helpers TypeScript equivalentes en
+`src/server/bots/metrics.ts`:
+- `getRealUserCount(db)` — solo humanos.
+- `getOnboardedRealUserCount(db)` — humanos con wizard completado.
+- `getBotCount(db)` — debería ser 27.
+
+### Disable temporal del cron de auto-reject
+
+Si vemos un problema con el cron, comentar el `cron:` schedule en
+`.github/workflows/auto-reject-bot-requests.yml` y push. Sin él
+los requests dirigidos a bots quedan `pending` indefinidamente —
+la UI lo gestiona OK pero la bandeja del solicitante se ensucia.
+
+### Re-correr el seed sin tocar predicciones
+
+```bash
+# Re-aplica nombres/avatares/style del catálogo a las filas
+# existentes en BD. Idempotente. Útil tras editar el catálogo.
+railway run --service wmundial npm run bootstrap
+```
+
+`SEED_BOT_PREDICTIONS=true` solo se setea cuando explícitamente
+quieras sembrar predicciones (no se hace por defecto).
+
+### Resetear el estado completo de bots (peligroso)
+
+Si el catálogo cambia masivamente y quieres empezar limpio:
+
+```sql
+-- En Railway → DB → Query:
+DELETE FROM users WHERE is_bot = true;
+-- Cascade limpia: predictions, point_events, user_points,
+-- user_achievements, notifications, friendships, group_*, etc.
+```
+
+Después `npm run bootstrap` los re-siembra. **Pierde todo el
+historial de bots** — solo hacerlo si los nuevos bots no tienen
+nada que ver con los viejos.
+
+## Trasparencia del flag `is_bot`
+
+**`is_bot` NUNCA se filtra a la API pública**. Verificación
+manual (recomendado tras cada cambio en `src/server/`):
+
+```bash
+# Cualquier `select` que toque users debe ser select({...}) con
+# columnas explícitas, NO select() (asterisco).
+grep -rnE "from\(users\)" src/server src/app --include="*.ts" | \
+  grep -v "/bots/\|test"
+# Verificar: ninguna usa select() sin columnas.
+```
+
+Si en el futuro alguien introduce un `select().from(users)` en una
+ruta pública, este flag se expondrá — convención: SIEMPRE usar
+`select({ id: users.id, name: users.name, ... })` con columnas
+explícitas.
