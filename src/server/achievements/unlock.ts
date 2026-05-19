@@ -104,17 +104,30 @@ const PENDING_RULES = new Set([
  * No fallible: si la inserción de notif o de unlock falla, lo loguea
  * y continúa con los siguientes para no abortar todo el scoring.
  */
+/**
+ * Logros que NO están sujetos al gate global de
+ * `ACHIEVEMENTS_MIN_FINISHED_MATCHES`. Pensado para achievements de
+ * acción social que no dependen del rendimiento en partidos — el
+ * gate fue diseñado para evitar trivialidades el día 1 del Mundial
+ * (acertar una predicción suelta y llevarte el logro), pero
+ * `team-spirit` no aplica esa lógica: se gana al crear/unirse a un
+ * grupo, lo cual debe reconocerse al instante.
+ */
+const GATE_BYPASS = new Set(["team-spirit"]);
+
 export async function evaluateAndUnlock(
   db: Database,
   userId: string,
 ): Promise<string[]> {
-  // Gate global: bloqueamos los logros hasta que se hayan jugado N
-  // matches en el sistema (configurable via env). Pensado para el
-  // Mundial: queremos evitar que un user que acierte una sola
-  // predicción el día 1 se lleve achievements de forma trivial. Una
-  // vez se llegue al umbral, todos los users desbloquean
-  // retroactivamente lo que les corresponda en su siguiente unlock
-  // check (siguiente match scored). Default 0 → sin gate (QA).
+  // Gate global: bloqueamos los logros de RENDIMIENTO hasta que se
+  // hayan jugado N matches (configurable via env). Los achievements
+  // listados en `GATE_BYPASS` siguen evaluándose normalmente.
+  // Pensado para el Mundial: queremos evitar que un user que
+  // acierte una sola predicción el día 1 se lleve achievements de
+  // forma trivial. Una vez se llegue al umbral, todos los users
+  // desbloquean retroactivamente lo que les corresponda en su
+  // siguiente unlock check. Default 0 → sin gate (QA).
+  let gateActive = false;
   const minFinished = env.ACHIEVEMENTS_MIN_FINISHED_MATCHES;
   if (minFinished > 0) {
     const finishedRows = await db
@@ -123,18 +136,18 @@ export async function evaluateAndUnlock(
       .where(eq(matches.status, "finished"));
     const finishedCount = finishedRows[0]?.total ?? 0;
     if (finishedCount < minFinished) {
-      dlog("scoring", "achievements gate active — skipping unlocks", {
+      gateActive = true;
+      dlog("scoring", "achievements gate active — only GATE_BYPASS will unlock", {
         userId,
         finishedCount,
         minFinished,
       });
-      return [];
     }
   }
 
   // 1) Reunir contexto del user.
   const ctx = await loadContext(db, userId);
-  dlog("scoring", "evaluating achievements", { userId, ctx });
+  dlog("scoring", "evaluating achievements", { userId, ctx, gateActive });
 
   // 2) Ya desbloqueados — los saltamos.
   const alreadyUnlocked = new Set(
@@ -157,6 +170,8 @@ export async function evaluateAndUnlock(
   for (const [achievementId, rule] of Object.entries(UNLOCK_RULES)) {
     if (alreadyUnlocked.has(achievementId)) continue;
     if (!validIds.has(achievementId)) continue;
+    // Si el gate está activo, solo dejamos pasar los del bypass set.
+    if (gateActive && !GATE_BYPASS.has(achievementId)) continue;
     if (!rule(ctx)) continue;
 
     try {

@@ -1,3 +1,4 @@
+import { backfillTeamSpirit } from "@/server/achievements/backfill-team-spirit";
 import { seedAchievements } from "@/server/achievements/seed";
 import { db } from "@/server/db/client";
 import { seedLeaderboardPlaceholders } from "@/server/seeds/leaderboard-placeholders";
@@ -32,6 +33,10 @@ async function main() {
   console.log("→ Bootstrap: seeding leaderboard placeholder users…");
   const insertedPlaceholders = await seedLeaderboardPlaceholders(db);
   console.log(`✓ Placeholders ready (${insertedPlaceholders} users reconciled).`);
+
+  console.log("→ Bootstrap: backfilling team-spirit for users with active groups…");
+  const backfilled = await backfillTeamSpirit(db);
+  console.log(`✓ Team-spirit backfilled for ${backfilled} user(s).`);
 
   process.exit(0);
 }
