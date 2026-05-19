@@ -1,7 +1,7 @@
 import type { DashboardData } from "@/server/dashboard/types";
 import { useTranslations } from "next-intl";
 import { Hero } from "./hero";
-import { LiveAutoRefresh } from "./live-auto-refresh";
+import { LiveAutoRefresh, PreKickoffAutoRefresh } from "./live-auto-refresh";
 import { LiveSection } from "./live-section";
 import { MatchCard } from "./match-card";
 import { MiniLeaderboard, type MiniTab } from "./mini-leaderboard";
@@ -42,6 +42,14 @@ export function DashboardSections({
           scores + puntos provisionales sin que el user pulse F5.
           Cuando aterrice add-leaderboard-sse se sustituye por push. */}
       {data.live && <LiveAutoRefresh />}
+
+      {/* Si NO hay live pero el próximo partido está dentro de la
+          ventana de ±30 min, polling más lento (60s) para capturar la
+          transición scheduled → live en cuanto el cron live-scoring la
+          escriba. Evita que el usuario tenga que F5 manual. */}
+      {!data.live && data.nextMatch && (
+        <PreKickoffAutoRefresh kickoffAt={data.nextMatch.kickoffAt} />
+      )}
 
       <LiveSection live={data.live} nextMatch={data.nextMatch} />
 
