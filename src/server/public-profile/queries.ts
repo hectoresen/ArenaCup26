@@ -102,7 +102,7 @@ export async function getPublicProfile(
   const isViewerOwner = viewerId !== null && viewerId === user.id;
   const historyVisible = isViewerOwner || privacy.showHistory;
   const publicHistory: HistoryEntry[] = historyVisible
-    ? await getPredictionHistory(db, user.id, 5)
+    ? await getPredictionHistory(db, user.id, { limit: 5 })
     : [];
 
   // Ranking inamovible: todos los users tienen rank. Si el user aún

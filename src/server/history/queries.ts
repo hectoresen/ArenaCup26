@@ -6,10 +6,19 @@ import { matches, pointEvents, predictions, teams } from "@/server/db/schema";
 import type { MatchStatus, PredictionKind, PredictionWinner } from "@/server/scoring/types";
 import type { HistoryEntry } from "./types";
 
+export type HistoryOutcomeFilter = "all" | "hit" | "miss" | "pending";
+
 /**
  * Trae las predicciones del user con el estado del partido y los
  * puntos ganados. Ordenado por kickoff descendente (lo más reciente
  * primero).
+ *
+ * Filtro por outcome (server-side para que el conteo respete el
+ * filtro y la paginación funcione cuando crezca):
+ *  - `all` (default) → todas las predicciones.
+ *  - `hit` → finished con `pointsEarned > 0` (acertó).
+ *  - `miss` → finished con `pointsEarned = 0` (falló o sin event).
+ *  - `pending` → status != finished (sin scoring todavía).
  *
  * Implementación:
  *  - JOIN `predictions ↔ matches ↔ teams×2` para tener todo en una
@@ -24,8 +33,9 @@ import type { HistoryEntry } from "./types";
 export async function getPredictionHistory(
   db: Database,
   userId: string,
-  limit = 100,
+  options: { limit?: number; outcome?: HistoryOutcomeFilter } = {},
 ): Promise<HistoryEntry[]> {
+  const { limit = 100, outcome = "all" } = options;
   const homeTeam = alias(teams, "home_team");
   const awayTeam = alias(teams, "away_team");
 
@@ -65,7 +75,24 @@ export async function getPredictionHistory(
     .leftJoin(homeTeam, eq(homeTeam.id, matches.homeTeamId))
     .leftJoin(awayTeam, eq(awayTeam.id, matches.awayTeamId))
     .leftJoin(pointsByMatch, eq(pointsByMatch.matchId, predictions.matchId))
-    .where(eq(predictions.userId, userId))
+    .where(
+      and(
+        eq(predictions.userId, userId),
+        outcome === "hit"
+          ? and(
+              eq(matches.status, "finished"),
+              sql`coalesce(${pointsByMatch.total}, 0) > 0`,
+            )
+          : outcome === "miss"
+            ? and(
+                eq(matches.status, "finished"),
+                sql`coalesce(${pointsByMatch.total}, 0) = 0`,
+              )
+            : outcome === "pending"
+              ? sql`${matches.status} <> 'finished'`
+              : undefined,
+      ),
+    )
     .orderBy(desc(matches.kickoffAt))
     .limit(limit);
 

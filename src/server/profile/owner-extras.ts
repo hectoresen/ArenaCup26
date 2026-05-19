@@ -66,7 +66,7 @@ export async function getOwnerExtras(
       .select({ total: count() })
       .from(pointEvents)
       .where(and(eq(pointEvents.userId, userId), eq(pointEvents.kind, "combo"))),
-    getPredictionHistory(db, userId, 5),
+    getPredictionHistory(db, userId, { limit: 5 }),
     countRedeemedInvitations(db, userId),
     db
       .select({

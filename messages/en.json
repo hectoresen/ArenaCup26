@@ -141,6 +141,22 @@
       "postponed": "Postponed",
       "cancelled": "Cancelled"
     },
+    "kind": {
+      "exact": "Exact",
+      "simple": "1X2",
+      "double": "Double"
+    },
+    "outcome": {
+      "hit": "Hit",
+      "miss": "Missed",
+      "pending": "Pending"
+    },
+    "filters": {
+      "all": "All",
+      "hit": "Hits",
+      "miss": "Misses",
+      "pending": "Pending"
+    },
     "empty": {
       "title": "No predictions yet",
       "body": "When you submit your first prediction, it will show up here with the result and the points you earned.",

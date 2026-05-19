@@ -141,6 +141,22 @@
       "postponed": "Aplazado",
       "cancelled": "Cancelado"
     },
+    "kind": {
+      "exact": "Exacto",
+      "simple": "1X2",
+      "double": "Doble"
+    },
+    "outcome": {
+      "hit": "Acertaste",
+      "miss": "Fallaste",
+      "pending": "Pendiente"
+    },
+    "filters": {
+      "all": "Todas",
+      "hit": "Acertadas",
+      "miss": "Falladas",
+      "pending": "Pendientes"
+    },
     "empty": {
       "title": "Aún no has predicho nada",
       "body": "Cuando hagas tu primera predicción, aparecerá aquí con su resultado y los puntos que ganaste.",

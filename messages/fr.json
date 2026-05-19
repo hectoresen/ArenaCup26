@@ -141,6 +141,22 @@
       "postponed": "Reporté",
       "cancelled": "Annulé"
     },
+    "kind": {
+      "exact": "Exact",
+      "simple": "1X2",
+      "double": "Double"
+    },
+    "outcome": {
+      "hit": "Réussi",
+      "miss": "Raté",
+      "pending": "En attente"
+    },
+    "filters": {
+      "all": "Toutes",
+      "hit": "Réussies",
+      "miss": "Ratées",
+      "pending": "En attente"
+    },
     "empty": {
       "title": "Pas encore de prédictions",
       "body": "Quand tu enverras ta première prédiction, elle apparaîtra ici avec son résultat et les points que tu as gagnés.",

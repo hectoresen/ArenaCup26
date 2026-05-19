@@ -11,11 +11,12 @@ type Props = {
 };
 
 /**
- * Card de una predicción pasada con:
- *  - Equipos + marcador real (si el partido terminó).
- *  - Etiqueta de tu predicción.
- *  - Pill con puntos ganados (verde si +N, rojo si 0, gris si "Pendiente").
- *  - Click → detalle del partido.
+ * Card de una predicción pasada con feedback explícito:
+ *  - Header: fecha + hora local + status badge.
+ *  - Cuerpo: equipos + marcador real (si el partido terminó).
+ *  - Footer: tu predicción (kind+valor) + outcome (✓/✗/⏳) + puntos.
+ *
+ * Click → detalle del partido.
  */
 export function HistoryEntryCard({ entry, now }: Props) {
   const t = useTranslations("history");
@@ -72,14 +73,22 @@ export function HistoryEntryCard({ entry, now }: Props) {
         />
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-2.5">
-        <span className="text-[11px] font-bold text-muted">
-          <span className="text-foreground">{t("yourPrediction")}: </span>
-          <span className="text-foreground/90">
-            {formatPredictionLabel(entry.prediction, t)}
-          </span>
-        </span>
-        <PointsBadge points={entry.pointsEarned} t={t} />
+      <div className="mt-3 grid grid-cols-[1fr_auto] gap-3 border-t border-border pt-2.5">
+        <div className="min-w-0">
+          <div className="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted">
+            {t("yourPrediction")}
+          </div>
+          <div className="mt-0.5 flex items-center gap-1.5">
+            <KindBadge kind={entry.prediction.kind} />
+            <span className="truncate text-[13px] font-bold text-foreground">
+              {formatPredictionLabel(entry.prediction, t)}
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col items-end justify-center gap-1">
+          <OutcomeBadge entry={entry} />
+          <PointsBadge points={entry.pointsEarned} t={t} />
+        </div>
       </div>
     </Link>
   );
@@ -118,6 +127,56 @@ function StatusBadge({ status }: { status: HistoryEntry["status"] }) {
   return (
     <span className="rounded-full border-[1.5px] border-gold/25 bg-gold/[0.06] px-2 py-px text-[9px] font-black text-gold/90">
       {t("scheduled")}
+    </span>
+  );
+}
+
+function KindBadge({ kind }: { kind: HistoryEntry["prediction"]["kind"] }) {
+  const t = useTranslations("history.kind");
+  let label: string;
+  let cls: string;
+  if (kind === "exact") {
+    label = t("exact");
+    cls = "border-info/30 bg-info/10 text-info";
+  } else if (kind === "simple") {
+    label = t("simple");
+    cls = "border-border bg-card-hover text-muted";
+  } else {
+    label = t("double");
+    cls = "border-warm/30 bg-warm/10 text-warm";
+  }
+  return (
+    <span
+      className={`shrink-0 rounded-md border px-1.5 py-px text-[9px] font-black uppercase tracking-[0.08em] ${cls}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+/**
+ * Feedback explícito: acertaste / fallaste / pendiente. De un vistazo
+ * el user sabe cómo le fue sin tener que comparar números.
+ */
+function OutcomeBadge({ entry }: { entry: HistoryEntry }) {
+  const t = useTranslations("history.outcome");
+  if (entry.pointsEarned === null) {
+    return (
+      <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted">
+        ⏳ {t("pending")}
+      </span>
+    );
+  }
+  if (entry.pointsEarned > 0) {
+    return (
+      <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-success">
+        ✓ {t("hit")}
+      </span>
+    );
+  }
+  return (
+    <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-danger">
+      ✗ {t("miss")}
     </span>
   );
 }
