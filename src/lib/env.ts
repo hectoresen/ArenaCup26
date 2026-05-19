@@ -105,6 +105,18 @@ const baseSchema = z.object({
   // triviales. El gate aplica solo en `evaluateAndUnlock`.
   ACHIEVEMENTS_MIN_FINISHED_MATCHES: z.coerce.number().int().nonnegative().default(0),
 
+  // E2E test bypass. Cuando ambas envs están set en
+  // dev/test/CI, se habilita el endpoint `/api/test/auth-as` que
+  // permite a Playwright crear sesiones sin pasar por Google OAuth.
+  // Hard-gated por `NODE_ENV !== "production"` en runtime. En
+  // producción Railway no setea estas vars y el endpoint devuelve
+  // 404 aunque alguien encontrara la URL.
+  E2E_AUTH_ENABLED: z
+    .string()
+    .optional()
+    .transform((v) => v === "true" || v === "1"),
+  E2E_AUTH_SECRET: z.string().min(16).optional(),
+
   // Runtime
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
