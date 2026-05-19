@@ -85,6 +85,9 @@ function buildInMemoryRepo(
       teamMap.set(team.externalId, id);
       return id;
     },
+    // El repo en memoria no modela predicciones; el sweep self-healing
+    // se valida en el integration test, no aquí.
+    findUnscoredFinishedMatchIds: async () => [],
   };
 }
 
@@ -240,6 +243,79 @@ describe("syncFixtures", () => {
       leagueId: 42,
       season: 2026,
     });
+  });
+
+  it("self-healing: fires onMatchFinished for matches with orphan predictions (no point_events)", async () => {
+    // Cero snapshots — solo el sweep debería disparar el hook.
+    const provider = buildProvider([]);
+    const repo = buildInMemoryRepo({ teams: TEAM_MAP });
+    repo.findUnscoredFinishedMatchIds = async () => ["uuid-orphan-1", "uuid-orphan-2"];
+
+    const calls: string[] = [];
+    const report = await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 1, season: 2022 },
+      onMatchFinished: async (matchId) => {
+        calls.push(matchId);
+      },
+    });
+
+    expect(calls).toEqual(["uuid-orphan-1", "uuid-orphan-2"]);
+    expect(report.errors).toEqual([]);
+  });
+
+  it("self-healing: skips matches already pushed via finishedTransitions (no doble-fire)", async () => {
+    const initial: CurrentMatchRow = {
+      id: "uuid-match-1",
+      status: "live",
+      homeScore: 1,
+      awayScore: 0,
+      homeScoreExtra: null,
+      awayScoreExtra: null,
+      penaltyWinnerTeamId: null,
+      kickoffAt: new Date("2022-12-18T15:00:00Z"),
+    };
+    const repo = buildInMemoryRepo({
+      teams: TEAM_MAP,
+      matches: new Map([["fix-1", "uuid-match-1"]]),
+      matchRows: new Map([["uuid-match-1", initial]]),
+    });
+    // El sweep devuelve EL MISMO id que la transición live→finished;
+    // no debe disparar el hook dos veces.
+    repo.findUnscoredFinishedMatchIds = async () => ["uuid-match-1"];
+    const provider = buildProvider([buildSnapshot()]);
+
+    const calls: string[] = [];
+    await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 1, season: 2022 },
+      onMatchFinished: async (matchId) => {
+        calls.push(matchId);
+      },
+    });
+
+    expect(calls).toEqual(["uuid-match-1"]);
+  });
+
+  it("self-healing: errors from the sweep land in report.errors but don't abort", async () => {
+    const provider = buildProvider([]);
+    const repo = buildInMemoryRepo({ teams: TEAM_MAP });
+    repo.findUnscoredFinishedMatchIds = async () => {
+      throw new Error("connection lost");
+    };
+
+    const report = await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 1, season: 2022 },
+      onMatchFinished: async () => {},
+    });
+
+    expect(report.errors).toEqual([
+      { externalId: "<self-heal>", reason: "unscored_sweep_failed", detail: "connection lost" },
+    ]);
   });
 
   it("inserts within the same batch are visible to subsequent snapshots (matchMap copy is mutated)", async () => {

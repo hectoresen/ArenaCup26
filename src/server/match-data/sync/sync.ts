@@ -179,6 +179,32 @@ export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport
     finishedTransitions: finishedTransitions.length,
   });
 
+  // Self-healing sweep: detecta matches `finished` con predicciones sin
+  // `point_events` y los re-encola para `onMatchFinished`. Cubre el caso
+  // silent-failure donde un sync anterior marcó el match como finished
+  // pero el scoring no llegó a correr (cron caído mid-handler, etc.).
+  // `processFinishedMatch` es idempotente — los users ya scoreados se
+  // saltan internamente.
+  if (onMatchFinished) {
+    try {
+      const orphaned = await repo.findUnscoredFinishedMatchIds();
+      const already = new Set(finishedTransitions);
+      const orphanToProcess = orphaned.filter((id) => !already.has(id));
+      if (orphanToProcess.length > 0) {
+        dlog("sync", "self-healing: re-encolando matches con scoring huérfano", {
+          count: orphanToProcess.length,
+        });
+        finishedTransitions.push(...orphanToProcess);
+      }
+    } catch (err) {
+      report.errors.push({
+        externalId: "<self-heal>",
+        reason: "unscored_sweep_failed",
+        detail: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+
   // Disparar el hook de finished tras el batch. Fallos aquí se
   // capturan como `report.errors` para no abortar.
   if (onMatchFinished && finishedTransitions.length > 0) {

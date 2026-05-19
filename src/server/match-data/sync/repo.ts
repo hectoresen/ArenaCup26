@@ -1,6 +1,13 @@
 import type { Database } from "@/server/db/client";
-import { matchExternalIds, matches, teamExternalIds, teams } from "@/server/db/schema";
-import { and, eq } from "drizzle-orm";
+import {
+  matchExternalIds,
+  matches,
+  pointEvents,
+  predictions,
+  teamExternalIds,
+  teams,
+} from "@/server/db/schema";
+import { and, eq, sql } from "drizzle-orm";
 import type {
   CurrentMatchRow,
   DbMatchStatus,
@@ -104,6 +111,32 @@ export function createMatchRepo(db: Database): MatchRepo {
         .update(matches)
         .set({ ...patch, updatedAt: new Date() })
         .where(eq(matches.id, matchId));
+    },
+
+    async findUnscoredFinishedMatchIds() {
+      // Matches `finished` con AL MENOS una predicción que NO tiene fila
+      // en `point_events` para ese `(userId, matchId)`. Usamos `exists`
+      // sobre un anti-join para que Postgres pueda parar al primer match
+      // que cumpla — más barato que `GROUP BY` + `HAVING`.
+      const rows = await db
+        .select({ matchId: matches.id })
+        .from(matches)
+        .where(
+          and(
+            eq(matches.status, "finished"),
+            sql`exists (
+              select 1
+              from ${predictions} p
+              where p.match_id = ${matches.id}
+                and not exists (
+                  select 1 from ${pointEvents} pe
+                  where pe.match_id = p.match_id
+                    and pe.user_id = p.user_id
+                )
+            )`,
+          ),
+        );
+      return rows.map((r) => r.matchId);
     },
 
     async upsertTeamFromProvider(team: ProviderTeamUpsert, source: string) {

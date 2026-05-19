@@ -143,4 +143,14 @@ export type MatchRepo = {
     team: ProviderTeamUpsert,
     source: string,
   ) => Promise<string>;
+  /**
+   * Devuelve IDs de matches en `status='finished'` que tienen al menos
+   * una predicción sin su correspondiente fila en `point_events`. Es el
+   * indicador de "scoring huérfano": el match se cerró pero el scoring
+   * no llegó a correr (cron caído entre la transición, fallo silencioso
+   * en `processFinishedMatch`, etc.). El sweep al final de `syncFixtures`
+   * los reprocesa vía `onMatchFinished` — `processFinishedMatch` es
+   * idempotente, así que reintentar es seguro.
+   */
+  findUnscoredFinishedMatchIds: () => Promise<string[]>;
 };
