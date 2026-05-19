@@ -12,9 +12,14 @@ import { setRequestLocale } from "next-intl/server";
  * (el `<AppShell>` del route group `(app)` ya monta nav + avatar +
  * bell).
  *
- * Cuando el viewer pertenece a algún grupo, se renderiza
- * `<RankingScopeTabs>` arriba con el control [Global][Grupo X]...
- * Si no tiene grupos, el control NO se monta (página igual que antes).
+ * Siempre se renderiza `<RankingScopeTabs>` arriba para que la
+ * feature de grupos sea descubrible:
+ *  - Con grupos → tabs `[Global][Grupo X]...` + CTA "+ Nuevo".
+ *  - Sin grupos → solo `[Global]` + CTA "+ Crear grupo" linking a
+ *    `/social/grupos/nuevo`.
+ *
+ * Solo se omite cuando no hay sesión (visitante anónimo no debería
+ * ver controles de grupos en absoluto).
  *
  * Dataset real: query a `userPoints` mezclada con 3 placeholders fijos
  * para que el ranking no se vea vacío durante la fase de pruebas.
@@ -49,7 +54,7 @@ export default async function RankingPage({
 
   return (
     <section className="-mx-5 -mt-5 flex justify-center px-5 pt-5">
-      {groupTabs.length > 0 ? (
+      {viewerId ? (
         <RankingScopeTabs
           globalContent={globalContent}
           groups={groupTabs}

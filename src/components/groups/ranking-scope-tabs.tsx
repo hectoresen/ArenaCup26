@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GroupRankingList } from "@/components/groups/group-ranking-list";
+import { Link } from "@/i18n/navigation";
 import { GROUP_COLOR_STYLES } from "@/lib/group-colors";
 import type { GroupColor } from "@/server/db/schema";
 import type { GroupRankingEntry } from "@/server/groups/types";
@@ -25,9 +26,12 @@ type Props = {
 
 /**
  * Selector horizontal arriba de `/ranking` para alternar entre el
- * ranking global y los rankings de los grupos del viewer. Si el
- * viewer no tiene grupos, este componente no se renderiza (decisión
- * del server para no encarecer la página con un control vacío).
+ * ranking global y los rankings de los grupos del viewer.
+ *
+ * - Si el viewer tiene grupos → tabs `[Global][Grupo X][Grupo Y]…`.
+ * - Si no tiene grupos → solo `[Global]` + CTA `+ Crear grupo` que
+ *   linka a `/social/grupos/nuevo`. Así la feature es **descubrible**
+ *   sin necesidad de que el user llegue por casualidad a /social.
  *
  * Las "tabs" son scrolleables horizontalmente en móvil (overflow-x).
  * Cada tab de grupo se pinta con el color del grupo cuando está
@@ -64,6 +68,12 @@ export function RankingScopeTabs({ globalContent, groups, viewerUserId }: Props)
               </button>
             );
           })}
+          <Link
+            href={groups.length === 0 ? "/social/grupos/nuevo" : "/social"}
+            className="shrink-0 rounded-full border-2 border-dashed border-gold/50 bg-gold/[0.06] px-3.5 py-1.5 text-[12px] font-black uppercase tracking-[0.1em] text-gold hover:bg-gold/[0.12]"
+          >
+            {groups.length === 0 ? "+ Crear grupo" : "+ Nuevo / unirse"}
+          </Link>
         </div>
       </div>
 
