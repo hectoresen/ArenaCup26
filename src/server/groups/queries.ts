@@ -6,8 +6,6 @@ import {
   inArray,
   isNull,
   isNotNull,
-  lte,
-  ne,
   or,
   sql,
 } from "drizzle-orm";
@@ -369,7 +367,15 @@ export async function getGroupRanking(
   //      c) la posición resultante = rank-en-grupo histórico.
   //    Si un miembro no tiene snapshot a esa fecha (user nuevo o
   //    ex-miembro), su delta queda null.
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  // postgres-js no acepta `Date` para columnas `withTimezone: false`
+  // (lanza "argument must be of type string"). Convertimos a string
+  // ISO sin zona (`YYYY-MM-DD HH:MM:SS`) que es lo que Postgres parsea
+  // como `timestamp without time zone`. Truncamos a 19 chars para
+  // omitir la `Z` final.
+  const sevenDaysAgoISO = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .replace("T", " ")
+    .slice(0, 19);
   const memberUserIds = merged.map((m) => m.userId);
   const snapshotRows = await db
     .select({
@@ -380,7 +386,7 @@ export async function getGroupRanking(
     .where(
       and(
         inArray(rankingSnapshots.userId, memberUserIds),
-        lte(rankingSnapshots.snapshotDate, sevenDaysAgo),
+        sql`${rankingSnapshots.snapshotDate} <= ${sevenDaysAgoISO}`,
       ),
     )
     .orderBy(desc(rankingSnapshots.snapshotDate));
