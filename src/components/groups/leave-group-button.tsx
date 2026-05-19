@@ -10,22 +10,25 @@ type Props = {
 };
 
 /**
- * Botón "Abandonar grupo" + diálogo con la opción de mantener perfil
- * congelado en el ranking. Si el viewer es admin, esta UI NO se
- * muestra (la action bloquea con `is_admin_cannot_leave`) — el panel
- * admin tiene el flujo de transferir-o-borrar.
+ * Botón "Abandonar grupo" + confirm. Regla de negocio (2026-05-19):
+ * SIEMPRE congela el perfil — el ex-miembro queda visible en el
+ * ranking del grupo con sus puntos al momento de irse y badge "ha
+ * salido". Si vuelve a ser invitado, recupera historial.
+ *
+ * Si el viewer es admin, esta UI NO se renderiza (el server bloquea
+ * con `is_admin_cannot_leave`) — el panel admin tiene el flujo de
+ * transferir-o-borrar.
  */
 export function LeaveGroupButton({ groupId, groupName }: Props) {
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
-  const [freezeProfile, setFreezeProfile] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function leave() {
     setError(null);
     startTransition(async () => {
-      const res = await leaveGroup({ groupId, freezeProfile });
+      const res = await leaveGroup({ groupId });
       if (res.ok) {
         router.push("/social");
         router.refresh();
@@ -53,21 +56,13 @@ export function LeaveGroupButton({ groupId, groupName }: Props) {
 
   return (
     <div className="rounded-2xl border-2 border-red-500/40 bg-red-500/10 p-3">
-      <p className="mb-3 text-[12px] font-bold text-foreground">
+      <p className="mb-2 text-[12px] font-bold text-foreground">
         ¿Abandonar "{groupName}"?
       </p>
-      <label className="mb-3 flex cursor-pointer items-start gap-2 rounded-xl border border-border bg-card px-3 py-2">
-        <input
-          type="checkbox"
-          checked={freezeProfile}
-          onChange={(e) => setFreezeProfile(e.target.checked)}
-          className="mt-0.5 accent-gold"
-        />
-        <span className="text-[12px] font-bold text-foreground">
-          Mantener mi perfil congelado en el ranking del grupo (con mis puntos
-          actuales). Si lo desactivas, desaparecerás completamente.
-        </span>
-      </label>
+      <p className="mb-3 text-[11px] font-bold leading-snug text-muted">
+        Quedarás con tus puntos actuales como ex-miembro en el ranking del
+        grupo. Si te vuelven a invitar, recuperas tu historial completo.
+      </p>
       {error && (
         <div className="mb-2 rounded-xl border border-red-500/40 bg-red-500/20 px-3 py-1.5 text-[12px] font-bold text-red-300">
           {error}

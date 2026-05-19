@@ -17,29 +17,27 @@ import { buildGroupInviteUrl } from "./tokens";
 import type { GroupActionResult } from "./types";
 
 /**
- * Member abandona el grupo. El admin NO puede usar esta función
- * directamente — bloqueado por `code: 'is_admin_cannot_leave'`. Debe
- * primero transferir admin o borrar el grupo.
+ * Member abandona el grupo. Regla de negocio (2026-05-19): SIEMPRE
+ * congelamos el perfil — el ex-miembro aparece en el ranking del
+ * grupo con sus puntos al momento de irse y badge "ha salido". Si
+ * vuelve a ser invitado y acepta, la misma fila se reactiva
+ * (`left_at = null`, frozen_* = null) y conserva su historial: no
+ * entra como perfil nuevo.
  *
- * Si `freezeProfile = true`, mantiene la membership con `left_at` set
- * + snapshot de `user_points` actuales en `frozen_*`. Si `false`,
- * borra la membership entera.
+ * El admin NO puede usar esta función directamente — bloqueado por
+ * `is_admin_cannot_leave`. Debe transferir admin o borrar el grupo.
  */
 export async function leaveGroup(input: {
   groupId: string;
-  freezeProfile: boolean;
 }): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
   const userId = session.user.id;
 
-  const schema = z.object({
-    groupId: z.string().uuid(),
-    freezeProfile: z.boolean(),
-  });
+  const schema = z.object({ groupId: z.string().uuid() });
   const parsed = schema.safeParse(input);
   if (!parsed.success) return { ok: false, code: "invalid_input" };
-  const { groupId, freezeProfile } = parsed.data;
+  const { groupId } = parsed.data;
 
   const rows = await db
     .select({
@@ -57,37 +55,29 @@ export async function leaveGroup(input: {
   if (row.leftAt !== null) return { ok: false, code: "not_member" };
   if (row.role === "admin") return { ok: false, code: "is_admin_cannot_leave" };
 
-  if (freezeProfile) {
-    // Snapshot de `user_points` en el momento de salir.
-    const pts = await db
-      .select({
-        totalPoints: userPoints.totalPoints,
-        streakMax: userPoints.streakMax,
-        simpleHits: userPoints.simpleHits,
-      })
-      .from(userPoints)
-      .where(eq(userPoints.userId, userId))
-      .limit(1);
-    const p = pts[0] ?? { totalPoints: 0, streakMax: 0, simpleHits: 0 };
-    await db
-      .update(groupMemberships)
-      .set({
-        leftAt: new Date(),
-        frozenPoints: p.totalPoints,
-        frozenStreakMax: p.streakMax,
-        frozenSimpleHits: p.simpleHits,
-      })
-      .where(
-        and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, userId)),
-      );
-  } else {
-    // Borrado total — el user desaparece del grupo sin rastro.
-    await db
-      .delete(groupMemberships)
-      .where(
-        and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, userId)),
-      );
-  }
+  // Snapshot de `user_points` actuales → frozen_*. Si el user no
+  // tiene fila en user_points (nunca puntuó), congelamos a 0.
+  const pts = await db
+    .select({
+      totalPoints: userPoints.totalPoints,
+      streakMax: userPoints.streakMax,
+      simpleHits: userPoints.simpleHits,
+    })
+    .from(userPoints)
+    .where(eq(userPoints.userId, userId))
+    .limit(1);
+  const p = pts[0] ?? { totalPoints: 0, streakMax: 0, simpleHits: 0 };
+  await db
+    .update(groupMemberships)
+    .set({
+      leftAt: new Date(),
+      frozenPoints: p.totalPoints,
+      frozenStreakMax: p.streakMax,
+      frozenSimpleHits: p.simpleHits,
+    })
+    .where(
+      and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, userId)),
+    );
 
   // Notificar al admin que un miembro abandonó.
   try {
@@ -117,7 +107,7 @@ export async function leaveGroup(input: {
     derr("ranking", "leaveGroup admin notify failed", { groupId, userId, err });
   }
 
-  dlog("ranking", "user left group", { groupId, userId, freezeProfile });
+  dlog("ranking", "user left group (frozen)", { groupId, userId });
 
   revalidatePath("/social");
   revalidatePath(`/social/grupos/${groupId}`);
@@ -126,10 +116,14 @@ export async function leaveGroup(input: {
 }
 
 /**
- * Admin expulsa a un miembro. La membership se borra (no se
- * congela — el admin no respeta la preferencia del expulsado). El
- * expulsado recibe push notification con un copy claro; el resto de
- * miembros recibe in-app sin push (no es time-sensitive para ellos).
+ * Admin expulsa a un miembro. Regla de negocio (2026-05-19): mismo
+ * tratamiento que `leaveGroup` — soft-leave con freeze. El ex-miembro
+ * aparece en el ranking con sus puntos al momento del expulsado y un
+ * badge "ha salido". Si lo re-invitan y acepta, recupera historial
+ * (no se reinicia su perfil).
+ *
+ * Push activo al expulsado (es time-sensitive para él), in-app
+ * silencioso al resto del grupo.
  */
 export async function expelMember(input: {
   groupId: string;
@@ -175,8 +169,26 @@ export async function expelMember(input: {
   if (!target) return { ok: false, code: "not_member" };
   if (target.leftAt !== null) return { ok: false, code: "not_member" };
 
+  // Snapshot de puntos del expulsado en frozen_* — mismo flujo que
+  // leaveGroup. Esto le mantiene visible en el ranking con badge.
+  const expelledPts = await db
+    .select({
+      totalPoints: userPoints.totalPoints,
+      streakMax: userPoints.streakMax,
+      simpleHits: userPoints.simpleHits,
+    })
+    .from(userPoints)
+    .where(eq(userPoints.userId, memberUserId))
+    .limit(1);
+  const ep = expelledPts[0] ?? { totalPoints: 0, streakMax: 0, simpleHits: 0 };
   await db
-    .delete(groupMemberships)
+    .update(groupMemberships)
+    .set({
+      leftAt: new Date(),
+      frozenPoints: ep.totalPoints,
+      frozenStreakMax: ep.streakMax,
+      frozenSimpleHits: ep.simpleHits,
+    })
     .where(
       and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, memberUserId)),
     );

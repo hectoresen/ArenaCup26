@@ -16,7 +16,20 @@ function deltaClass(delta: number) {
   return "opacity-0";
 }
 
-export function RankRow({ player, index = 0 }: { player: Player; index?: number }) {
+export function RankRow({
+  player,
+  index = 0,
+  nameSuffix,
+}: {
+  player: Player;
+  index?: number;
+  /**
+   * Slot opcional renderizado a la derecha del nombre. Útil para
+   * etiquetar al jugador con contexto extra (ej. "Ha salido" cuando
+   * el ranking del grupo muestra ex-miembros congelados).
+   */
+  nameSuffix?: React.ReactNode;
+}) {
   const t = useTranslations("leaderboard.row");
   const delta = player.previousRank - player.rank;
   const hot = player.streak >= 3;
@@ -67,6 +80,7 @@ export function RankRow({ player, index = 0 }: { player: Player; index?: number 
             )}
           </span>
           <span className="truncate">{player.name}</span>
+          {nameSuffix}
         </div>
         <div className="mt-0.5 flex items-center gap-2">
           <span className={`text-[11px] font-bold ${hot ? "text-warm" : "text-muted"}`}>

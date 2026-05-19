@@ -93,13 +93,31 @@ export function GroupLeaderboardView({ entries, title, countLabel }: Props) {
           <ol className="flex flex-col gap-1.5">
             {rest.map((entry, i) => (
               <li key={entry.userId} className={entry.frozen ? "opacity-70" : ""}>
-                <RankRow player={toPlayer(entry)} index={i} />
+                <RankRow
+                  player={toPlayer(entry)}
+                  index={i}
+                  nameSuffix={entry.frozen ? <LeftBadge /> : null}
+                />
               </li>
             ))}
           </ol>
         </>
       )}
     </div>
+  );
+}
+
+/**
+ * Badge "Ha salido" que se renderiza junto al nombre del miembro
+ * congelado en el ranking del grupo. Pequeño, no agresivo. Si el
+ * ex-miembro vuelve a entrar (vía re-invitación), `frozen` pasa a
+ * `false` y el badge desaparece automáticamente.
+ */
+function LeftBadge() {
+  return (
+    <span className="ml-1 shrink-0 rounded-full border border-warm/40 bg-warm/[0.08] px-1.5 py-px text-[9px] font-black uppercase tracking-[0.1em] text-warm">
+      Ha salido
+    </span>
   );
 }
 

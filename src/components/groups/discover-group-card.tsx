@@ -10,21 +10,23 @@ type Props = {
 };
 
 /**
- * Card de grupo en `/social/grupos/descubrir`. Distingue dos casos:
+ * Card de grupo en `/social/grupos/descubrir`. Tres casos visuales
+ * según membership y visibility:
  *
- *  - **Público**: render como `<Link>` normal a `/social/grupos/<id>`.
- *  - **Privado**: render como `<button>` con candado. Al click,
- *    muestra un toast "Solo se puede acceder por invitación" — mismo
- *    estilo que el toast de cooldown en `editable-name.tsx`.
+ *  1. **Miembro activo** (cualquier visibility) → render como
+ *     `<Link>` a `/social/grupos/<id>` + badge "Ya eres miembro".
+ *  2. **No miembro + público** → `<Link>` a `/social/grupos/<id>`
+ *     + badge "Público".
+ *  3. **No miembro + privado** → `<button>` con candado. Click
+ *     muestra toast estilo cooldown: "es privado, pide invitación
+ *     al admin".
  *
- * Pinta `visibility` siempre como badge (Público / Privado) para que
- * el usuario sepa qué tipo es desde el primer vistazo. El badge
- * "Privado" lleva el icono de candado para refuerzo visual.
+ * El toast usa la misma estética que el de cambio de nombre
+ * (fixed top, border warm, fade-up, auto-dismiss 3s).
  */
 export function DiscoverGroupCard({ group }: Props) {
   const [toast, setToast] = useState<string | null>(null);
 
-  // Auto-dismiss del toast después de 3s.
   useEffect(() => {
     if (!toast) return;
     const id = setTimeout(() => setToast(null), 3000);
@@ -32,6 +34,10 @@ export function DiscoverGroupCard({ group }: Props) {
   }, [toast]);
 
   const isPrivate = group.visibility === "private";
+  const isMember = group.viewerRole !== null;
+  // Si el viewer ya es miembro (o ex-miembro reactivable), siempre puede
+  // entrar. Solo el caso "privado + no soy miembro" muestra candado.
+  const lockMode = isPrivate && !isMember;
 
   const inner = (
     <>
@@ -41,7 +47,11 @@ export function DiscoverGroupCard({ group }: Props) {
           <span className="truncate font-display text-[15px] leading-tight text-foreground">
             {group.name}
           </span>
-          {isPrivate ? (
+          {isMember ? (
+            <span className="rounded-full border border-gold/40 bg-gold/10 px-1.5 py-px text-[9px] font-black uppercase tracking-[0.12em] text-gold">
+              {group.viewerRole === "admin" ? "Eres admin" : "Ya eres miembro"}
+            </span>
+          ) : isPrivate ? (
             <span
               className="inline-flex items-center gap-1 rounded-full border border-warm/40 bg-warm/10 px-1.5 py-px text-[9px] font-black uppercase tracking-[0.12em] text-warm"
               aria-label="Grupo privado"
@@ -61,9 +71,9 @@ export function DiscoverGroupCard({ group }: Props) {
       </div>
       <span
         aria-hidden="true"
-        className={`font-display text-base ${isPrivate ? "text-warm/70" : "text-muted"} transition-transform group-hover:translate-x-0.5`}
+        className={`font-display text-base ${lockMode ? "text-warm/70" : "text-muted"} transition-transform group-hover:translate-x-0.5`}
       >
-        {isPrivate ? "🔒" : "›"}
+        {lockMode ? "🔒" : "›"}
       </span>
     </>
   );
@@ -73,7 +83,7 @@ export function DiscoverGroupCard({ group }: Props) {
 
   return (
     <>
-      {isPrivate ? (
+      {lockMode ? (
         <button
           type="button"
           onClick={() =>

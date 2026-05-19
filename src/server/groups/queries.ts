@@ -92,15 +92,20 @@ export async function getUserGroups(db: Database, userId: string): Promise<Group
 }
 
 /**
- * Lista grupos no-borrados (públicos + privados) para `/descubrir`.
- * Los privados aparecen en los resultados con la `visibility` set
- * para que la UI pinte el candado y bloquee el click — el usuario
- * sabe que existe el grupo pero no puede unirse sin invitación. Esto
- * le da vida al buscador (decisión UX 2026-05-19): es una pista de
- * "tu colega tiene un grupo aquí" sin filtrar miembros ni ranking.
+ * Lista TODOS los grupos no-borrados para `/descubrir` — sean
+ * públicos, privados, donde el viewer es miembro o no. Distintos
+ * casos visuales (decisión UX 2026-05-19):
+ *  - Público + no-miembro → card clicable, lleva al detalle.
+ *  - Privado + no-miembro → card con candado; click muestra popup
+ *    "solo por invitación" y bloquea navegación.
+ *  - Cualquier visibility + viewer es miembro → card con badge
+ *    "Ya eres miembro", clicable hacia el detalle.
  *
- * Excluye los que el viewer ya es miembro (no tiene sentido descubrir
- * lo que ya tienes). Paginación simple por offset.
+ * El `viewerRole` lo resolvemos con una segunda query (cheap) y se
+ * empaqueta en el `GroupSummary`. La UI decide el render.
+ *
+ * Paginación simple por offset; suficiente mientras los grupos sean
+ * ≤ 1000.
  */
 export async function getDiscoverableGroups(
   db: Database,
@@ -135,26 +140,30 @@ export async function getDiscoverableGroups(
 
   const rows = await baseQuery;
 
-  // Filtro client-side de "soy miembro": más simple que un NOT EXISTS
-  // anidado en Drizzle. Para listings de ≤30 elementos es trivial.
-  let filtered = rows;
+  // Resolver viewerRole de cada grupo. Antes filtrábamos los grupos
+  // donde el viewer era miembro, pero la regla 2026-05-19 es
+  // mostrarlos todos con un badge "Ya eres miembro" para que el
+  // /descubrir sea verdaderamente un catálogo completo.
+  let roleMap = new Map<string, "admin" | "member">();
   if (viewerId) {
     const memberRows = await db
-      .selectDistinct({ groupId: groupMemberships.groupId })
+      .select({
+        groupId: groupMemberships.groupId,
+        role: groupMemberships.role,
+      })
       .from(groupMemberships)
       .where(and(eq(groupMemberships.userId, viewerId), isNull(groupMemberships.leftAt)));
-    const memberSet = new Set(memberRows.map((m) => m.groupId));
-    filtered = rows.filter((r) => !memberSet.has(r.id));
+    roleMap = new Map(memberRows.map((m) => [m.groupId, m.role]));
   }
 
-  return filtered.map((r) => ({
+  return rows.map((r) => ({
     id: r.id,
     name: r.name,
     color: r.color as GroupColor,
     visibility: r.visibility,
     maxMembers: r.maxMembers,
     memberCount: r.memberCount,
-    viewerRole: null,
+    viewerRole: roleMap.get(r.id) ?? null,
   }));
 }
 
