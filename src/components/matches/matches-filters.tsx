@@ -9,23 +9,26 @@ type Props = {
 };
 
 /**
- * Chips de filtro para `/partidos` (vista "Todos"). Cada chip cambia
- * el querystring `?` y vuelve a renderizar la página server-side —
- * sin estado cliente, back/forward del navegador funcionan y se
- * puede compartir un link con los filtros aplicados.
+ * Filtros de `/partidos` (vista "Todos"). Cambian el querystring `?` y
+ * re-renderizan server-side — sin estado cliente, back/forward del
+ * navegador funciona y los links con filtros son compartibles.
  *
- * Grupos:
- *  - **Estado**: Todos / En vivo / Pronto / Acabados.
- *  - **Fase**: Todos / Grupos / Eliminatoria.
- *  - **Predicciones**: Todos / Solo predichos.
+ * UI actual (rediseño 2026-05-19):
+ *  - **Estado** (radio): Todos / En vivo / Pronto / Acabados.
+ *  - **Mis predicciones** (toggle): ON/OFF. Filtro adicional sobre
+ *    el estado seleccionado. Cuando ON, la URL lleva `?mias=true`.
  *
- * El total resultante (`count`) aparece como mini-badge a la derecha.
+ * El filtro de **fase** (Grupos/Eliminatoria) está temporalmente
+ * oculto — el dominio sigue soportándolo en `MatchesFilters` para
+ * re-activarlo sin migración cuando el Mundial alcance octavos.
+ *
+ * El total resultante (`count`) aparece como mini-badge al final.
  */
 export function MatchesFiltersBar({ active, count }: Props) {
   const t = useTranslations("matches.filters");
 
   return (
-    <div className="mb-5 space-y-2">
+    <div className="mb-5 space-y-3">
       <FilterGroup
         label={t("statusLegend")}
         options={[
@@ -38,27 +41,9 @@ export function MatchesFiltersBar({ active, count }: Props) {
         param="status"
         current={active}
       />
-      <FilterGroup
-        label={t("stageLegend")}
-        options={[
-          { value: "all", label: t("stage.all") },
-          { value: "group", label: t("stage.group") },
-          { value: "knockout", label: t("stage.knockout") },
-        ]}
-        active={active.stage}
-        param="stage"
-        current={active}
-      />
-      <FilterGroup
-        label={t("predictedLegend")}
-        options={[
-          { value: "false", label: t("predicted.all") },
-          { value: "true", label: t("predicted.yes") },
-        ]}
-        active={active.predictedOnly ? "true" : "false"}
-        param="mias"
-        current={active}
-      />
+
+      <PredictedToggle active={active.predictedOnly} current={active} />
+
       <div className="pt-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-muted">
         {t("resultCount", { count })}
       </div>
@@ -76,7 +61,7 @@ function FilterGroup({
   label: string;
   options: { value: string; label: string }[];
   active: string;
-  param: "status" | "stage" | "mias";
+  param: "status" | "stage";
   current: MatchesFilters;
 }) {
   return (
@@ -105,6 +90,45 @@ function FilterGroup({
         })}
       </div>
     </fieldset>
+  );
+}
+
+/**
+ * Toggle único "Mis predicciones". Distinct visually del grupo
+ * `Estado` para comunicar "esto es un filtro EXTRA, no una pestaña
+ * exclusiva". Cuando está ON muestra check `✓`; cuando está OFF,
+ * círculo vacío.
+ */
+function PredictedToggle({
+  active,
+  current,
+}: {
+  active: boolean;
+  current: MatchesFilters;
+}) {
+  const t = useTranslations("matches.filters");
+  const href = buildHref("mias", active ? "false" : "true", current);
+  return (
+    <Link
+      href={href as never}
+      role="switch"
+      aria-checked={active}
+      className={`inline-flex cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] no-underline transition-colors ${
+        active
+          ? "border-gold bg-gold/15 text-gold"
+          : "border-border bg-card text-muted hover:border-gold/30 hover:text-foreground"
+      }`}
+    >
+      <span
+        aria-hidden="true"
+        className={`inline-flex h-4 w-4 items-center justify-center rounded-full border-[1.5px] text-[10px] leading-none ${
+          active ? "border-gold bg-gold text-background" : "border-border bg-card"
+        }`}
+      >
+        {active ? "✓" : ""}
+      </span>
+      {t("predictedToggle")}
+    </Link>
   );
 }
 

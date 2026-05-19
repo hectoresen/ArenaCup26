@@ -13,24 +13,23 @@ function buildFilters(overrides: Partial<MatchesFilters> = {}): MatchesFilters {
 }
 
 describe("<MatchesFiltersBar>", () => {
-  it("renders the 3 filter groups with their options", () => {
+  it("renders the 4 status chips + the predicted toggle", () => {
     renderWithProviders(<MatchesFiltersBar active={buildFilters()} count={42} />);
-    // "Todos" aparece en 2 grupos (status + stage) — usamos
-    // getAllByRole para ambos y verificamos que uno de cada está.
-    const todosLinks = screen.getAllByRole("link", { name: "Todos" });
-    expect(todosLinks.length).toBeGreaterThanOrEqual(2);
-    // Status group (chips únicos)
+    expect(screen.getByRole("link", { name: "Todos" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "En vivo" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Pronto" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Acabados" })).toBeInTheDocument();
-    // Stage group (chips únicos)
-    expect(screen.getByRole("link", { name: "Grupos" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Eliminatoria" })).toBeInTheDocument();
-    // Predicted group
-    expect(screen.getByRole("link", { name: "Solo mis predicciones" })).toBeInTheDocument();
+    // Toggle único (role=switch) "Mis predicciones".
+    expect(screen.getByRole("switch", { name: /Mis predicciones/i })).toBeInTheDocument();
   });
 
-  it("marks the active chip with aria-current=page", () => {
+  it("hides the stage filter group (Fase) — deferred to post-octavos", () => {
+    renderWithProviders(<MatchesFiltersBar active={buildFilters()} count={42} />);
+    expect(screen.queryByRole("link", { name: "Grupos" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Eliminatoria" })).not.toBeInTheDocument();
+  });
+
+  it("marks the active status chip with aria-current=page", () => {
     renderWithProviders(
       <MatchesFiltersBar active={buildFilters({ status: "live" })} count={3} />,
     );
@@ -40,28 +39,49 @@ describe("<MatchesFiltersBar>", () => {
     );
   });
 
-  it("omits defaults from the href (clean URL)", () => {
+  it("toggle exposes aria-checked according to predictedOnly", () => {
     renderWithProviders(<MatchesFiltersBar active={buildFilters()} count={0} />);
-    const todos = screen.getAllByRole("link", { name: "Todos" });
-    // Ambos "Todos" (status y stage) apuntan a la URL limpia cuando
-    // todos los filtros están en default.
-    for (const link of todos) {
-      expect(link.getAttribute("href")).toMatch(/\/partidos$/);
-    }
+    expect(screen.getByRole("switch")).toHaveAttribute("aria-checked", "false");
+
+    renderWithProviders(
+      <MatchesFiltersBar active={buildFilters({ predictedOnly: true })} count={0} />,
+    );
+    const switches = screen.getAllByRole("switch");
+    // El segundo render es el que está active.
+    expect(switches[switches.length - 1]).toHaveAttribute("aria-checked", "true");
   });
 
-  it("preserves other active filters when changing one", () => {
+  it("toggle href flips ON → OFF when active", () => {
+    renderWithProviders(
+      <MatchesFiltersBar active={buildFilters({ predictedOnly: true })} count={1} />,
+    );
+    // Cuando está ON, click va a OFF (sin param).
+    const sw = screen.getByRole("switch");
+    expect(sw.getAttribute("href")).toMatch(/\/partidos$/);
+  });
+
+  it("toggle href flips OFF → ON when inactive", () => {
+    renderWithProviders(<MatchesFiltersBar active={buildFilters()} count={1} />);
+    const sw = screen.getByRole("switch");
+    expect(sw.getAttribute("href")).toContain("mias=true");
+  });
+
+  it("omits defaults from status hrefs (clean URL)", () => {
+    renderWithProviders(<MatchesFiltersBar active={buildFilters()} count={0} />);
+    const todos = screen.getByRole("link", { name: "Todos" });
+    expect(todos.getAttribute("href")).toMatch(/\/partidos$/);
+  });
+
+  it("preserves the predicted toggle state when switching status", () => {
     renderWithProviders(
       <MatchesFiltersBar
-        active={buildFilters({ status: "live", predictedOnly: true })}
+        active={buildFilters({ status: "all", predictedOnly: true })}
         count={1}
       />,
     );
-    // Click on stage=knockout should keep status=live and mias=true.
-    const knockout = screen.getByRole("link", { name: "Eliminatoria" });
-    const href = knockout.getAttribute("href") ?? "";
+    const liveLink = screen.getByRole("link", { name: "En vivo" });
+    const href = liveLink.getAttribute("href") ?? "";
     expect(href).toContain("status=live");
-    expect(href).toContain("stage=knockout");
     expect(href).toContain("mias=true");
   });
 

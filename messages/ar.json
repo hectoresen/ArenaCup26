@@ -241,6 +241,7 @@
         "all": "الكل",
         "yes": "ما توقعتُه فقط"
       },
+      "predictedToggle": "توقعاتي",
       "resultCount": "{count, plural, =0 {لا نتائج} =1 {نتيجة واحدة} other {# نتائج}}"
     },
     "predictionStub": {
