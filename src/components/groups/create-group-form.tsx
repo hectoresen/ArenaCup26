@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { GROUP_COLORS, type GroupColor } from "@/server/db/schema";
 import { GROUP_COLOR_STYLES } from "@/lib/group-colors";
 import { createGroup } from "@/server/groups/actions";
@@ -11,19 +12,10 @@ import {
   GROUP_MEMBERS_MIN,
 } from "@/server/groups/caps";
 
-/**
- * Formulario controlado de creación de grupo. Lleva los 4 inputs:
- *  - Nombre (3-40 chars).
- *  - Color (paleta 8).
- *  - Visibility (public / private).
- *  - Cap de miembros (slider 5-100, default 25).
- *
- * Sin SSR — usamos client state porque el color es una grid visual y
- * queremos feedback instantáneo. La action se llama vía `useTransition`
- * y redirige a `/social/grupos/<id>` al éxito.
- */
 export function CreateGroupForm() {
   const router = useRouter();
+  const t = useTranslations("groups.create");
+  const tColor = useTranslations("groups.colors");
   const [name, setName] = useState("");
   const [color, setColor] = useState<GroupColor>("gold");
   const [visibility, setVisibility] = useState<"public" | "private">("private");
@@ -40,13 +32,13 @@ export function CreateGroupForm() {
     startTransition(async () => {
       const res = await createGroup({ name: name.trim(), color, visibility, maxMembers });
       if (!res.ok) {
-        setError(
+        const key =
           res.code === "cap_groups_reached"
-            ? "Ya estás en el máximo de grupos activos"
+            ? "error.capReached"
             : res.code === "unauthorized"
-              ? "Necesitas iniciar sesión"
-              : "No se pudo crear el grupo",
-        );
+              ? "error.unauthorized"
+              : "error.generic";
+        setError(t(key));
         return;
       }
       if (res.groupId) {
@@ -60,7 +52,7 @@ export function CreateGroupForm() {
     <form onSubmit={submit} className="space-y-6">
       <label className="block">
         <span className="mb-2 block font-display text-[12px] uppercase tracking-[0.12em] text-gold">
-          Nombre
+          {t("name")}
         </span>
         <input
           type="text"
@@ -68,17 +60,17 @@ export function CreateGroupForm() {
           onChange={(e) => setName(e.target.value)}
           maxLength={40}
           required
-          placeholder="Familia, oficina, peñistas…"
+          placeholder={t("namePlaceholder")}
           className="w-full rounded-2xl border-2 border-border bg-card px-4 py-3 text-[15px] text-foreground placeholder:text-muted focus:border-gold focus:outline-none"
         />
         <span className="mt-1 block text-[11px] font-bold text-muted">
-          {name.trim().length}/40
+          {t("nameCount", { count: name.trim().length })}
         </span>
       </label>
 
       <fieldset>
         <legend className="mb-2 font-display text-[12px] uppercase tracking-[0.12em] text-gold">
-          Color
+          {t("colorLegend")}
         </legend>
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
           {GROUP_COLORS.map((c) => {
@@ -88,7 +80,7 @@ export function CreateGroupForm() {
               <button
                 key={c}
                 type="button"
-                aria-label={styles.label}
+                aria-label={tColor(c)}
                 aria-pressed={selected}
                 onClick={() => setColor(c)}
                 className={`h-11 w-11 cursor-pointer rounded-full ${styles.bg} ${selected ? "ring-4 ring-foreground/80 ring-offset-2 ring-offset-background" : "opacity-80 hover:opacity-100"}`}
@@ -100,7 +92,7 @@ export function CreateGroupForm() {
 
       <fieldset>
         <legend className="mb-2 font-display text-[12px] uppercase tracking-[0.12em] text-gold">
-          Visibilidad
+          {t("visibilityLegend")}
         </legend>
         <div className="space-y-2">
           <label className="flex cursor-pointer items-start gap-3 rounded-2xl border-2 border-border bg-card px-3 py-3 hover:border-gold/40 has-[input:checked]:border-gold/60 has-[input:checked]:bg-gold/[0.06]">
@@ -112,10 +104,8 @@ export function CreateGroupForm() {
               className="mt-1 accent-gold"
             />
             <div>
-              <div className="font-display text-[14px] text-foreground">Privado</div>
-              <div className="text-[12px] font-bold text-muted">
-                Solo se entra con invitación o link compartido.
-              </div>
+              <div className="font-display text-[14px] text-foreground">{t("private")}</div>
+              <div className="text-[12px] font-bold text-muted">{t("privateHint")}</div>
             </div>
           </label>
           <label className="flex cursor-pointer items-start gap-3 rounded-2xl border-2 border-border bg-card px-3 py-3 hover:border-gold/40 has-[input:checked]:border-gold/60 has-[input:checked]:bg-gold/[0.06]">
@@ -127,10 +117,8 @@ export function CreateGroupForm() {
               className="mt-1 accent-gold"
             />
             <div>
-              <div className="font-display text-[14px] text-foreground">Público</div>
-              <div className="text-[12px] font-bold text-muted">
-                Aparece en "Descubrir grupos" y cualquiera puede unirse.
-              </div>
+              <div className="font-display text-[14px] text-foreground">{t("public")}</div>
+              <div className="text-[12px] font-bold text-muted">{t("publicHint")}</div>
             </div>
           </label>
         </div>
@@ -138,7 +126,7 @@ export function CreateGroupForm() {
 
       <label className="block">
         <span className="mb-2 flex items-baseline justify-between font-display text-[12px] uppercase tracking-[0.12em] text-gold">
-          Cap de miembros
+          {t("membersCap")}
           <span className="text-foreground">{maxMembers}</span>
         </span>
         <input
@@ -150,7 +138,7 @@ export function CreateGroupForm() {
           className="w-full accent-gold"
         />
         <span className="mt-1 block text-[11px] font-bold text-muted">
-          Entre {GROUP_MEMBERS_MIN} y {GROUP_MEMBERS_MAX}. Puedes ajustarlo después.
+          {t("membersCapHint", { min: GROUP_MEMBERS_MIN, max: GROUP_MEMBERS_MAX })}
         </span>
       </label>
 
@@ -165,7 +153,7 @@ export function CreateGroupForm() {
         disabled={!nameOk || isPending}
         className="cursor-pointer w-full rounded-full bg-gold py-3 font-display text-[13px] uppercase tracking-[0.12em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isPending ? "Creando…" : "Crear grupo"}
+        {isPending ? t("submitPending") : t("submit")}
       </button>
     </form>
   );

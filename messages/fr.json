@@ -890,5 +890,210 @@
         }
       }
     }
+  },
+  "groups": {
+    "backToSocial": "← Retour à Social",
+    "members": {
+      "one": "membre",
+      "many": "membres"
+    },
+    "players": {
+      "one": "joueur",
+      "many": "joueurs"
+    },
+    "capLabel": "cap {max}",
+    "badge": {
+      "admin": "Admin",
+      "youAdmin": "Tu es admin",
+      "youMember": "Déjà membre",
+      "public": "Public",
+      "private": "Privé",
+      "exMember": "Ex-membre",
+      "you": "Toi",
+      "leftMember": "Parti"
+    },
+    "colors": {
+      "gold": "Or",
+      "blue": "Bleu",
+      "purple": "Violet",
+      "green": "Vert",
+      "orange": "Orange",
+      "red": "Rouge",
+      "teal": "Turquoise",
+      "pink": "Rose"
+    },
+    "mySection": {
+      "title": "Mes groupes",
+      "count": "{count}/{max}",
+      "emptyCopy": "Affronte tes amis dans des groupes privés. Crée-en un ou rejoins-en via un lien d'invitation.",
+      "create": "+ Créer un groupe",
+      "discover": "Découvrir",
+      "newShort": "+ Nouveau",
+      "discoverPublic": "Découvrir les groupes publics",
+      "atCap": "Tu es au maximum de {max} groupes actifs. Quitte-en un avant de rejoindre un autre."
+    },
+    "invitationsInbox": {
+      "title": "Invitations de groupe",
+      "invitedBy": "Invité par {name}",
+      "accept": "Accepter",
+      "reject": "Refuser",
+      "error": {
+        "groupFull": "Le groupe \"{name}\" est plein",
+        "capReached": "Tu as atteint la limite de groupes actifs",
+        "groupDeleted": "Ce groupe n'existe plus",
+        "acceptFailed": "Impossible d'accepter l'invitation",
+        "rejectFailed": "Impossible de refuser l'invitation"
+      }
+    },
+    "create": {
+      "headerTitle": "Créer un groupe",
+      "headerSubtitle": "Affronte tes amis dans un classement privé. Les points sont les mêmes que ceux du tournoi — le groupe filtre seulement qui tu vois.",
+      "atCap": "Tu es déjà dans {count} groupes actifs (maximum {max}). Quitte-en un avant d'en créer un autre.",
+      "name": "Nom",
+      "namePlaceholder": "Famille, bureau, ta bande…",
+      "nameCount": "{count}/40",
+      "colorLegend": "Couleur",
+      "visibilityLegend": "Visibilité",
+      "private": "Privé",
+      "privateHint": "Accessible uniquement sur invitation ou lien partagé.",
+      "public": "Public",
+      "publicHint": "Apparaît dans « Découvrir les groupes » et tout le monde peut rejoindre.",
+      "membersCap": "Limite de membres",
+      "membersCapHint": "Entre {min} et {max}. Tu peux ajuster plus tard.",
+      "submit": "Créer le groupe",
+      "submitPending": "Création…",
+      "error": {
+        "capReached": "Tu es déjà au maximum de groupes actifs",
+        "unauthorized": "Tu dois te connecter",
+        "generic": "Impossible de créer le groupe"
+      }
+    },
+    "discover": {
+      "headerTitle": "Découvrir les groupes",
+      "headerSubtitle": "Explore les groupes existants. Tu peux ouvrir et rejoindre librement les publics. Les privés apparaissent avec un cadenas — tu y accèdes seulement sur invitation ou via un lien partagé.",
+      "searchPlaceholder": "Chercher par nom…",
+      "searchEmpty": "Aucun résultat pour \"{q}\". Essaie un autre terme.",
+      "empty": "Pas encore de groupes. Sois le premier à en créer un.",
+      "privatePopup": {
+        "title": "Groupe privé",
+        "body": "\"{name}\" est un groupe privé. Accessible uniquement sur invitation ou via un lien partagé par l'admin.",
+        "ariaCard": "Groupe privé : {name}. Sur invitation uniquement.",
+        "ariaIcon": "Groupe privé"
+      }
+    },
+    "joinLink": {
+      "ofMax": "{count} sur {max} membres",
+      "blurb": "En rejoignant, tu verras un classement privé uniquement avec les membres de ce groupe. Tes points sont les mêmes que ceux du tournoi.",
+      "join": "Rejoindre le groupe",
+      "joining": "Connexion…",
+      "cancel": "Annuler",
+      "invalid": "Lien d'invitation invalide",
+      "revoked": "Ce lien a été révoqué",
+      "exhausted": "Ce lien n'a plus d'utilisations disponibles",
+      "groupDeleted": "Le groupe de ce lien n'existe plus",
+      "askAdmin": "Demande à l'admin du groupe de t'en générer un nouveau.",
+      "backToSocial": "Retour à Social",
+      "error": {
+        "capReached": "Tu es déjà au maximum de groupes actifs",
+        "groupFull": "Ce groupe est plein",
+        "revoked": "Ce lien a été révoqué par l'admin",
+        "exhausted": "Ce lien n'a plus d'utilisations",
+        "groupDeleted": "Ce groupe n'existe plus",
+        "generic": "Impossible de rejoindre le groupe"
+      }
+    },
+    "leave": {
+      "trigger": "Quitter le groupe",
+      "confirmTitle": "Quitter \"{name}\" ?",
+      "confirmBody": "Tu resteras dans le classement du groupe comme ex-membre avec tes points actuels. Si tu es réinvité, tu récupères tout ton historique.",
+      "submit": "Quitter",
+      "cancel": "Annuler",
+      "error": {
+        "adminBlocked": "En tant qu'admin tu dois transférer ou supprimer le groupe avant de partir",
+        "generic": "Impossible de quitter le groupe"
+      }
+    },
+    "noGroupsEmpty": {
+      "title": "Tu n'as pas encore de groupe de compétition",
+      "body": "Crée un groupe privé pour affronter tes amis. Vous aurez un classement entre vous — avec les mêmes points du tournoi.",
+      "cta": "+ Créer un groupe",
+      "ctaSecondary": "ou explore les groupes publics →"
+    },
+    "ranking": {
+      "scopeAria": "Changer le périmètre du classement",
+      "tabGlobal": "Global",
+      "tabFriends": "Amis",
+      "tabGroups": "Groupes",
+      "newShort": "+ Nouveau",
+      "friendsTitle": "Classement entre amis",
+      "groupRankingTitle": "Classement du groupe",
+      "emptyMembers": "Aucun membre dans le classement. Ils apparaîtront quand quelqu'un marquera une prédiction.",
+      "podium": {
+        "place1": "1er",
+        "place2": "2e",
+        "place3": "3e",
+        "labelFree": "libre",
+        "ariaFree": "Position {place} libre — {copy}",
+        "free1": "Tu te vois au sommet ?",
+        "free2": "L'argent attend...",
+        "free3": "Il y a de la place !"
+      }
+    },
+    "admin": {
+      "panelTitle": "Panneau admin",
+      "invite": {
+        "header": "Inviter des amis",
+        "pendingCount": "{count} en attente",
+        "emptyFriends": "Tu n'as pas d'amis disponibles à inviter. Partage un lien d'invitation avec qui tu veux.",
+        "pendingHeader": "En attente",
+        "noName": "Sans nom",
+        "submit": "Inviter",
+        "cancel": "Annuler"
+      },
+      "links": {
+        "header": "Liens d'invitation",
+        "countActive": "{count}/{max} actifs",
+        "maxUsesLabel": "Utilisations max (0 = illimité)",
+        "generate": "Générer un lien",
+        "atCap": "Tu as atteint la limite de {max} liens actifs. Révoque-en un pour en créer un autre.",
+        "empty": "Pas de liens d'invitation. Génère-en un pour partager.",
+        "copy": "Copier",
+        "revoke": "Révoquer",
+        "meta": "{uses} utilisations · {capLabel}",
+        "metaUnlimited": "illimité",
+        "metaCap": "cap {max}",
+        "statusRevoked": " · révoqué",
+        "statusExhausted": " · épuisé"
+      },
+      "members": {
+        "header": "Gérer les membres",
+        "empty": "Pas encore de membres.",
+        "makeAdmin": "Nommer admin",
+        "expel": "Expulser",
+        "confirmExpelTitle": "Expulser ce membre ? Il recevra une notification.",
+        "expelConfirm": "Expulser",
+        "transferTitle": "Nommer ce membre admin ? Tu deviendras un membre normal.",
+        "transfer": "Transférer",
+        "cancel": "Annuler"
+      },
+      "settings": {
+        "header": "Réglages & fermeture",
+        "edit": "Modifier nom / visibilité / cap",
+        "nameLabel": "Nom",
+        "visibilityLabel": "Visibilité",
+        "visibilityPrivate": "Privé",
+        "visibilityPublic": "Public",
+        "capLabel": "Limite membres",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer le groupe",
+        "confirmDeleteTitle": "Supprimer le groupe \"{name}\" ? Cette action est irréversible. Tous les membres recevront une notification.",
+        "deleteConfirm": "Supprimer définitivement",
+        "error": {
+          "capBelowCount": "Le cap ne peut pas être inférieur au nombre actuel de membres",
+          "generic": "Impossible de mettre à jour le groupe"
+        }
+      }
+    }
   }
 }

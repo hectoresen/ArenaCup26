@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { GroupSummary } from "@/server/groups/types";
 import { Link } from "@/i18n/navigation";
 import { GroupCard } from "./group-card";
@@ -11,12 +12,10 @@ type Props = {
 /**
  * Sección "Mis grupos" en `/social`. Lista las cards de los grupos
  * activos del viewer + CTA para crear uno nuevo (si no está al cap).
- *
- * Si no tiene grupos, muestra empty state explicativo con CTA. Esto
- * fue una decisión consciente: queremos que la sección sea
- * descubrible aunque el user no tenga ningún grupo (Mundial pre-ramp).
+ * Empty state explicativo si no tiene ninguno.
  */
 export function MyGroupsSection({ groups, maxGroups }: Props) {
+  const t = useTranslations("groups.mySection");
   const atCap = groups.length >= maxGroups;
 
   return (
@@ -26,31 +25,30 @@ export function MyGroupsSection({ groups, maxGroups }: Props) {
           ◈
         </span>
         <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
-          Mis grupos
+          {t("title")}
         </h2>
         <span className="rounded-full border-[1.5px] border-gold/30 bg-gold/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-gold">
-          {groups.length}/{maxGroups}
+          {t("count", { count: groups.length, max: maxGroups })}
         </span>
       </header>
 
       {groups.length === 0 ? (
         <div className="rounded-2xl border-2 border-dashed border-border bg-card/40 px-4 py-5 text-center">
           <p className="mb-3 text-[12px] font-bold text-muted">
-            Compite contra tus amigos en grupos privados. Crea uno o únete
-            con un link de invitación.
+            {t("emptyCopy")}
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             <Link
               href="/social/grupos/nuevo"
               className="rounded-full bg-gold px-4 py-2 text-[12px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep"
             >
-              + Crear grupo
+              {t("create")}
             </Link>
             <Link
               href="/social/grupos/descubrir"
               className="rounded-full border-2 border-border bg-card px-4 py-2 text-[12px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
             >
-              Descubrir
+              {t("discover")}
             </Link>
           </div>
         </div>
@@ -65,20 +63,19 @@ export function MyGroupsSection({ groups, maxGroups }: Props) {
                 href="/social/grupos/nuevo"
                 className="rounded-full bg-gold px-3.5 py-1.5 text-[12px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep"
               >
-                + Nuevo
+                {t("newShort")}
               </Link>
             )}
             <Link
               href="/social/grupos/descubrir"
               className="rounded-full border-2 border-border bg-card px-3.5 py-1.5 text-[12px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
             >
-              Descubrir grupos públicos
+              {t("discoverPublic")}
             </Link>
           </div>
           {atCap && (
             <p className="pt-1 text-[11px] font-bold text-muted">
-              Estás en el máximo de {maxGroups} grupos activos. Abandona uno
-              antes de unirte a otro.
+              {t("atCap", { max: maxGroups })}
             </p>
           )}
         </div>

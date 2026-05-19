@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { joinGroupViaLink } from "@/server/groups/membership";
 
 type Props = {
@@ -9,13 +10,9 @@ type Props = {
   groupId: string;
 };
 
-/**
- * Botón "Unirme" en la landing del invite link. Llama al action y al
- * éxito redirige a la página de detalle del grupo. Muestra error
- * inline si la action falla (cap reached, group full, etc).
- */
 export function JoinViaLinkButton({ token, groupId }: Props) {
   const router = useRouter();
+  const t = useTranslations("groups.joinLink");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -24,19 +21,19 @@ export function JoinViaLinkButton({ token, groupId }: Props) {
     startTransition(async () => {
       const res = await joinGroupViaLink(token);
       if (!res.ok) {
-        setError(
+        const key =
           res.code === "cap_groups_reached"
-            ? "Ya estás en el máximo de grupos activos"
+            ? "error.capReached"
             : res.code === "group_full"
-              ? "Este grupo está lleno"
+              ? "error.groupFull"
               : res.code === "link_revoked"
-                ? "Este link ha sido revocado por el admin"
+                ? "error.revoked"
                 : res.code === "link_exhausted"
-                  ? "Este link ha agotado sus usos"
+                  ? "error.exhausted"
                   : res.code === "group_deleted"
-                    ? "Este grupo ya no existe"
-                    : "No se pudo unirse al grupo",
-        );
+                    ? "error.groupDeleted"
+                    : "error.generic";
+        setError(t(key));
         return;
       }
       router.push(`/social/grupos/${groupId}`);
@@ -52,7 +49,7 @@ export function JoinViaLinkButton({ token, groupId }: Props) {
         disabled={isPending}
         className="cursor-pointer w-full rounded-full bg-gold py-3 font-display text-[13px] uppercase tracking-[0.12em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isPending ? "Uniéndome…" : "Unirme al grupo"}
+        {isPending ? t("joining") : t("join")}
       </button>
       {error && (
         <div className="mt-3 rounded-2xl border-2 border-red-500/40 bg-red-500/10 px-3 py-2 text-[12px] font-bold text-red-300">

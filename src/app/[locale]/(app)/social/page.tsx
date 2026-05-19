@@ -82,6 +82,7 @@ function AmigosLayout({
 }) {
   const t = useTranslations("friends");
   const tInvite = useTranslations("invite");
+  const tGroups = useTranslations("groups.invitationsInbox");
   return (
     <>
       <header className="mb-5">
@@ -105,7 +106,7 @@ function AmigosLayout({
           <header className="mb-3 flex items-center gap-2.5">
             <span aria-hidden="true" className="text-[14px] leading-none text-gold">◈</span>
             <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
-              Invitaciones de grupo
+              {tGroups("title")}
             </h2>
             <span className="rounded-full border-[1.5px] border-gold/30 bg-gold/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-gold">
               {groupInvites.length}

@@ -14,7 +14,7 @@ import {
 } from "@/server/groups/queries";
 import { getFriendsAvailableToInvite } from "@/server/groups/invitations";
 import { GROUP_COLOR_STYLES } from "@/lib/group-colors";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 
 /**
@@ -34,6 +34,9 @@ export default async function GrupoDetailPage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "groups" });
+  const tr = await getTranslations({ locale, namespace: "groups.ranking" });
+  const tb = await getTranslations({ locale, namespace: "groups.badge" });
 
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}`);
@@ -54,7 +57,7 @@ export default async function GrupoDetailPage({
   return (
     <>
       <Link href="/social" className="text-[12px] font-bold text-muted hover:text-foreground">
-        ← Volver a Social
+        {t("backToSocial")}
       </Link>
 
       <header
@@ -67,18 +70,18 @@ export default async function GrupoDetailPage({
           </h1>
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-muted">
             <span>
-              {detail.memberCount}/{detail.maxMembers} miembros
+              {detail.memberCount}/{detail.maxMembers} {detail.memberCount === 1 ? t("members.one") : t("members.many")}
             </span>
             <span>·</span>
-            <span>{detail.visibility === "public" ? "Público" : "Privado"}</span>
+            <span>{detail.visibility === "public" ? tb("public") : tb("private")}</span>
             {detail.viewerIsAdmin && (
               <span className="ml-1 rounded-full border border-gold/40 bg-gold/10 px-1.5 py-px text-[9px] font-black uppercase tracking-[0.12em] text-gold">
-                Admin
+                {tb("admin")}
               </span>
             )}
             {detail.viewerIsFrozen && (
               <span className="ml-1 rounded-full border border-border bg-card-hover/60 px-1.5 py-px text-[9px] font-black uppercase tracking-[0.12em] text-muted">
-                Ex-miembro
+                {tb("exMember")}
               </span>
             )}
           </div>
@@ -89,7 +92,7 @@ export default async function GrupoDetailPage({
         <header className="mb-3 flex items-center gap-2.5">
           <span aria-hidden="true" className="text-[14px] leading-none text-gold">◈</span>
           <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
-            Ranking del grupo
+            {tr("groupRankingTitle")}
           </h2>
         </header>
         <GroupLeaderboardView entries={ranking} />

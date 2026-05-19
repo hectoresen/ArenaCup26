@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   deleteGroup,
   transferAdmin,
@@ -26,27 +27,12 @@ type Friend = {
 
 type Props = {
   group: GroupDetail;
-  /** Miembros activos (incluido admin). */
   members: GroupMemberRow[];
-  /** Invitaciones pending salientes. */
   pendingInvitations: Array<GroupInvitationRow & { inviteeName: string | null; inviteeUsername: string | null }>;
-  /** Links de invitación (incluye revocados para histórico). */
   links: GroupLinkRow[];
-  /** Friends del viewer que se pueden invitar (no son ya members ni pending). */
   invitableFriends: Friend[];
-}
+};
 
-/**
- * Panel admin del grupo. Solo se renderiza si `group.viewerIsAdmin`.
- * Agrupa todas las acciones que el admin puede hacer en accordion
- * para no saturar la pantalla:
- *  - Invitar amigos (modal con lista).
- *  - Generar / revocar links de invitación.
- *  - Expulsar miembros.
- *  - Transferir admin.
- *  - Editar nombre/color/visibility/maxMembers.
- *  - Borrar grupo (con confirm).
- */
 export function GroupAdminPanel({
   group,
   members,
@@ -54,12 +40,13 @@ export function GroupAdminPanel({
   links,
   invitableFriends,
 }: Props) {
+  const t = useTranslations("groups.admin");
   return (
     <section className="mt-6 space-y-3">
       <header className="flex items-center gap-2.5">
         <span aria-hidden="true" className="text-[14px] leading-none text-gold">◈</span>
         <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
-          Panel admin
+          {t("panelTitle")}
         </h2>
       </header>
 
@@ -81,6 +68,7 @@ function InvitePanel({
   pending: Array<GroupInvitationRow & { inviteeName: string | null; inviteeUsername: string | null }>;
 }) {
   const router = useRouter();
+  const t = useTranslations("groups.admin.invite");
   const [open, setOpen] = useState(false);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
@@ -111,18 +99,17 @@ function InvitePanel({
   return (
     <details open={open} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)} className="rounded-2xl border-2 border-border bg-card">
       <summary className="cursor-pointer list-none px-4 py-3 font-display text-[14px] text-foreground">
-        Invitar amigos
+        {t("header")}
         {pending.length > 0 && (
           <span className="ml-2 rounded-full bg-card-hover px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.1em] text-muted">
-            {pending.length} pending
+            {t("pendingCount", { count: pending.length })}
           </span>
         )}
       </summary>
       <div className="space-y-3 border-t border-border px-4 py-4">
         {friends.length === 0 ? (
           <p className="text-[12px] font-bold text-muted">
-            No tienes amigos disponibles para invitar. Comparte un link
-            de invitación con quien quieras.
+            {t("emptyFriends")}
           </p>
         ) : (
           <ul className="space-y-1.5">
@@ -130,7 +117,7 @@ function InvitePanel({
               <li key={f.id} className="flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[14px] font-bold text-foreground">
-                    {f.name ?? f.username ?? "Sin nombre"}
+                    {f.name ?? f.username ?? t("noName")}
                   </div>
                   {f.username && (
                     <div className="text-[11px] text-muted">@{f.username}</div>
@@ -142,7 +129,7 @@ function InvitePanel({
                   disabled={pendingIds.has(f.id) || isPending}
                   className="cursor-pointer rounded-full bg-gold px-3 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Invitar
+                  {t("submit")}
                 </button>
               </li>
             ))}
@@ -151,13 +138,13 @@ function InvitePanel({
         {pending.length > 0 && (
           <div className="border-t border-border pt-3">
             <h3 className="mb-2 text-[11px] font-black uppercase tracking-[0.1em] text-muted">
-              Pending
+              {t("pendingHeader")}
             </h3>
             <ul className="space-y-1.5">
               {pending.map((p) => (
                 <li key={p.invitationId} className="flex items-center justify-between gap-3">
                   <div className="min-w-0 flex-1 truncate text-[13px] font-bold text-foreground">
-                    {p.inviteeName ?? p.inviteeUsername ?? "Sin nombre"}
+                    {p.inviteeName ?? p.inviteeUsername ?? t("noName")}
                   </div>
                   <button
                     type="button"
@@ -165,7 +152,7 @@ function InvitePanel({
                     disabled={isPending}
                     className="cursor-pointer rounded-full border border-border bg-card-hover px-3 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    Cancelar
+                    {t("cancel")}
                   </button>
                 </li>
               ))}
@@ -179,6 +166,7 @@ function InvitePanel({
 
 function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[] }) {
   const router = useRouter();
+  const t = useTranslations("groups.admin.links");
   const [isPending, startTransition] = useTransition();
   const [maxUses, setMaxUses] = useState(0);
   const activeLinks = links.filter((l) => !l.revokedAt);
@@ -192,7 +180,7 @@ function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[]
         try {
           await navigator.clipboard?.writeText(res.url);
         } catch {
-          // ignore — el link estará visible en la lista igualmente
+          // ignore
         }
         router.refresh();
       }
@@ -209,16 +197,16 @@ function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[]
   return (
     <details className="rounded-2xl border-2 border-border bg-card">
       <summary className="cursor-pointer list-none px-4 py-3 font-display text-[14px] text-foreground">
-        Links de invitación
+        {t("header")}
         <span className="ml-2 rounded-full bg-card-hover px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.1em] text-muted">
-          {activeLinks.length}/{MAX_LINKS_PER_GROUP} activos
+          {t("countActive", { count: activeLinks.length, max: MAX_LINKS_PER_GROUP })}
         </span>
       </summary>
       <div className="space-y-3 border-t border-border px-4 py-4">
         <div className="flex flex-wrap items-end gap-2">
           <label className="flex-1">
             <span className="mb-1 block text-[11px] font-black uppercase tracking-[0.1em] text-muted">
-              Usos máximos (0 = ilimitado)
+              {t("maxUsesLabel")}
             </span>
             <input
               type="number"
@@ -235,23 +223,22 @@ function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[]
             disabled={atCap || isPending}
             className="cursor-pointer rounded-full bg-gold px-4 py-2 text-[12px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Generar link
+            {t("generate")}
           </button>
         </div>
         {atCap && (
           <p className="text-[11px] font-bold text-warm">
-            Has alcanzado el cap de {MAX_LINKS_PER_GROUP} links activos.
-            Revoca uno para crear otro.
+            {t("atCap", { max: MAX_LINKS_PER_GROUP })}
           </p>
         )}
         {links.length === 0 ? (
-          <p className="text-[12px] font-bold text-muted">
-            No tienes links de invitación. Genera uno para compartir.
-          </p>
+          <p className="text-[12px] font-bold text-muted">{t("empty")}</p>
         ) : (
           <ul className="space-y-2">
             {links.map((l) => {
               const exhausted = l.maxUses > 0 && l.uses >= l.maxUses;
+              const capLabel =
+                l.maxUses === 0 ? t("metaUnlimited") : t("metaCap", { max: l.maxUses });
               return (
                 <li key={l.linkId} className="rounded-xl border border-border bg-card-hover/40 px-3 py-2.5">
                   <div className="flex items-center justify-between gap-2">
@@ -264,7 +251,7 @@ function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[]
                         onClick={() => navigator.clipboard?.writeText(l.url)}
                         className="cursor-pointer rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
                       >
-                        Copiar
+                        {t("copy")}
                       </button>
                       {!l.revokedAt && (
                         <button
@@ -273,14 +260,14 @@ function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[]
                           disabled={isPending}
                           className="cursor-pointer rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          Revocar
+                          {t("revoke")}
                         </button>
                       )}
                     </div>
                   </div>
                   <div className="mt-1 text-[10px] font-bold text-muted">
-                    {l.uses} usos · {l.maxUses === 0 ? "ilimitado" : `cap ${l.maxUses}`}
-                    {l.revokedAt ? " · revocado" : exhausted ? " · agotado" : ""}
+                    {t("meta", { uses: l.uses, capLabel })}
+                    {l.revokedAt ? t("statusRevoked") : exhausted ? t("statusExhausted") : ""}
                   </div>
                 </li>
               );
@@ -294,7 +281,6 @@ function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[]
 
 function MembersPanel({
   groupId,
-  groupName,
   members,
 }: {
   groupId: string;
@@ -302,6 +288,8 @@ function MembersPanel({
   members: GroupMemberRow[];
 }) {
   const router = useRouter();
+  const t = useTranslations("groups.admin.members");
+  const tb = useTranslations("groups.badge");
   const [isPending, startTransition] = useTransition();
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [transferId, setTransferId] = useState<string | null>(null);
@@ -329,11 +317,11 @@ function MembersPanel({
   return (
     <details className="rounded-2xl border-2 border-border bg-card">
       <summary className="cursor-pointer list-none px-4 py-3 font-display text-[14px] text-foreground">
-        Gestionar miembros
+        {t("header")}
       </summary>
       <div className="space-y-2 border-t border-border px-4 py-4">
         {members.length === 0 ? (
-          <p className="text-[12px] font-bold text-muted">Sin miembros aún.</p>
+          <p className="text-[12px] font-bold text-muted">{t("empty")}</p>
         ) : (
           members.map((m) => (
             <div key={m.userId} className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card-hover/40 px-3 py-2">
@@ -342,7 +330,7 @@ function MembersPanel({
                   {m.name}
                   {m.role === "admin" && (
                     <span className="ml-1.5 rounded-full border border-gold/40 bg-gold/10 px-1.5 py-px text-[9px] font-black uppercase tracking-[0.1em] text-gold">
-                      Admin
+                      {tb("admin")}
                     </span>
                   )}
                 </div>
@@ -357,14 +345,14 @@ function MembersPanel({
                     onClick={() => setTransferId(m.userId)}
                     className="cursor-pointer rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
                   >
-                    Hacer admin
+                    {t("makeAdmin")}
                   </button>
                   <button
                     type="button"
                     onClick={() => setConfirmId(m.userId)}
                     className="cursor-pointer rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground"
                   >
-                    Expulsar
+                    {t("expel")}
                   </button>
                 </div>
               )}
@@ -375,7 +363,7 @@ function MembersPanel({
         {confirmId && (
           <div className="rounded-2xl border-2 border-red-500/40 bg-red-500/10 p-3">
             <p className="mb-2 text-[12px] font-bold text-foreground">
-              ¿Expulsar a este miembro? Recibirá una notificación.
+              {t("confirmExpelTitle")}
             </p>
             <div className="flex gap-2">
               <button
@@ -384,14 +372,14 @@ function MembersPanel({
                 disabled={isPending}
                 className="cursor-pointer rounded-full bg-red-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Expulsar
+                {t("expelConfirm")}
               </button>
               <button
                 type="button"
                 onClick={() => setConfirmId(null)}
                 className="cursor-pointer rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
               >
-                Cancelar
+                {t("cancel")}
               </button>
             </div>
           </div>
@@ -400,7 +388,7 @@ function MembersPanel({
         {transferId && (
           <div className="rounded-2xl border-2 border-gold/40 bg-gold/[0.06] p-3">
             <p className="mb-2 text-[12px] font-bold text-foreground">
-              ¿Hacer admin a este miembro? Tú pasarás a ser miembro normal.
+              {t("transferTitle")}
             </p>
             <div className="flex gap-2">
               <button
@@ -409,14 +397,14 @@ function MembersPanel({
                 disabled={isPending}
                 className="cursor-pointer rounded-full bg-gold px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Transferir
+                {t("transfer")}
               </button>
               <button
                 type="button"
                 onClick={() => setTransferId(null)}
                 className="cursor-pointer rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
               >
-                Cancelar
+                {t("cancel")}
               </button>
             </div>
           </div>
@@ -428,6 +416,7 @@ function MembersPanel({
 
 function DangerZone({ group }: { group: GroupDetail }) {
   const router = useRouter();
+  const t = useTranslations("groups.admin.settings");
   const [isPending, startTransition] = useTransition();
   const [confirming, setConfirming] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -451,8 +440,8 @@ function DangerZone({ group }: { group: GroupDetail }) {
       } else {
         setError(
           res.code === "max_members_below_count"
-            ? "El cap no puede ser menor que el número actual de miembros"
-            : "No se pudo actualizar el grupo",
+            ? t("error.capBelowCount")
+            : t("error.generic"),
         );
       }
     });
@@ -471,7 +460,7 @@ function DangerZone({ group }: { group: GroupDetail }) {
   return (
     <details className="rounded-2xl border-2 border-border bg-card">
       <summary className="cursor-pointer list-none px-4 py-3 font-display text-[14px] text-foreground">
-        Ajustes & cierre
+        {t("header")}
       </summary>
       <div className="space-y-3 border-t border-border px-4 py-4">
         {!editing ? (
@@ -480,12 +469,12 @@ function DangerZone({ group }: { group: GroupDetail }) {
             onClick={() => setEditing(true)}
             className="cursor-pointer rounded-full border-2 border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
           >
-            Editar nombre / visibilidad / cap
+            {t("edit")}
           </button>
         ) : (
           <div className="space-y-3">
             <label className="block">
-              <span className="mb-1 block text-[11px] font-black uppercase tracking-[0.1em] text-muted">Nombre</span>
+              <span className="mb-1 block text-[11px] font-black uppercase tracking-[0.1em] text-muted">{t("nameLabel")}</span>
               <input
                 type="text"
                 value={name}
@@ -495,19 +484,19 @@ function DangerZone({ group }: { group: GroupDetail }) {
               />
             </label>
             <fieldset>
-              <legend className="mb-1 block text-[11px] font-black uppercase tracking-[0.1em] text-muted">Visibilidad</legend>
+              <legend className="mb-1 block text-[11px] font-black uppercase tracking-[0.1em] text-muted">{t("visibilityLabel")}</legend>
               <select
                 value={visibility}
                 onChange={(e) => setVisibility(e.target.value as "public" | "private")}
                 className="w-full rounded-xl border-2 border-border bg-card-hover px-3 py-2 text-[14px] text-foreground"
               >
-                <option value="private">Privado</option>
-                <option value="public">Público</option>
+                <option value="private">{t("visibilityPrivate")}</option>
+                <option value="public">{t("visibilityPublic")}</option>
               </select>
             </fieldset>
             <label className="block">
               <span className="mb-1 flex items-baseline justify-between text-[11px] font-black uppercase tracking-[0.1em] text-muted">
-                Cap miembros <span className="text-foreground">{maxMembers}</span>
+                {t("capLabel")} <span className="text-foreground">{maxMembers}</span>
               </span>
               <input
                 type="range"
@@ -530,7 +519,7 @@ function DangerZone({ group }: { group: GroupDetail }) {
                 disabled={isPending}
                 className="cursor-pointer rounded-full bg-gold px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Guardar
+                {t("save")}
               </button>
               <button
                 type="button"
@@ -543,7 +532,7 @@ function DangerZone({ group }: { group: GroupDetail }) {
                 }}
                 className="cursor-pointer rounded-full border border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
               >
-                Cancelar
+                {t("cancel")}
               </button>
             </div>
           </div>
@@ -556,13 +545,12 @@ function DangerZone({ group }: { group: GroupDetail }) {
               onClick={() => setConfirming(true)}
               className="cursor-pointer rounded-full border-2 border-red-500/40 bg-red-500/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-red-300 hover:bg-red-500/20"
             >
-              Borrar grupo
+              {t("delete")}
             </button>
           ) : (
             <div className="rounded-2xl border-2 border-red-500/40 bg-red-500/10 p-3">
               <p className="mb-2 text-[12px] font-bold text-foreground">
-                ¿Borrar el grupo "{group.name}"? Esta acción no se puede deshacer.
-                Todos los miembros recibirán una notificación.
+                {t("confirmDeleteTitle", { name: group.name })}
               </p>
               <div className="flex gap-2">
                 <button
@@ -571,14 +559,14 @@ function DangerZone({ group }: { group: GroupDetail }) {
                   disabled={isPending}
                   className="cursor-pointer rounded-full bg-red-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Borrar definitivamente
+                  {t("deleteConfirm")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirming(false)}
                   className="cursor-pointer rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
                 >
-                  Cancelar
+                  {t("cancel")}
                 </button>
               </div>
             </div>

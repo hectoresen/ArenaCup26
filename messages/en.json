@@ -890,5 +890,210 @@
         }
       }
     }
+  },
+  "groups": {
+    "backToSocial": "← Back to Social",
+    "members": {
+      "one": "member",
+      "many": "members"
+    },
+    "players": {
+      "one": "player",
+      "many": "players"
+    },
+    "capLabel": "cap {max}",
+    "badge": {
+      "admin": "Admin",
+      "youAdmin": "You're admin",
+      "youMember": "Already a member",
+      "public": "Public",
+      "private": "Private",
+      "exMember": "Ex-member",
+      "you": "You",
+      "leftMember": "Left"
+    },
+    "colors": {
+      "gold": "Gold",
+      "blue": "Blue",
+      "purple": "Purple",
+      "green": "Green",
+      "orange": "Orange",
+      "red": "Red",
+      "teal": "Teal",
+      "pink": "Pink"
+    },
+    "mySection": {
+      "title": "My groups",
+      "count": "{count}/{max}",
+      "emptyCopy": "Compete with your friends in private groups. Create one or join via an invite link.",
+      "create": "+ Create group",
+      "discover": "Discover",
+      "newShort": "+ New",
+      "discoverPublic": "Discover public groups",
+      "atCap": "You're at the maximum of {max} active groups. Leave one before joining another."
+    },
+    "invitationsInbox": {
+      "title": "Group invitations",
+      "invitedBy": "Invited by {name}",
+      "accept": "Accept",
+      "reject": "Reject",
+      "error": {
+        "groupFull": "The group \"{name}\" is full",
+        "capReached": "You've reached the active groups cap",
+        "groupDeleted": "That group no longer exists",
+        "acceptFailed": "Couldn't accept the invitation",
+        "rejectFailed": "Couldn't reject the invitation"
+      }
+    },
+    "create": {
+      "headerTitle": "Create group",
+      "headerSubtitle": "Compete with your friends in a private ranking. Points are the same as the tournament — the group just filters who you see.",
+      "atCap": "You're already in {count} active groups (maximum {max}). Leave one from its page before creating another.",
+      "name": "Name",
+      "namePlaceholder": "Family, office, your crew…",
+      "nameCount": "{count}/40",
+      "colorLegend": "Color",
+      "visibilityLegend": "Visibility",
+      "private": "Private",
+      "privateHint": "Only joinable via invitation or shared link.",
+      "public": "Public",
+      "publicHint": "Appears in \"Discover groups\" and anyone can join.",
+      "membersCap": "Members cap",
+      "membersCapHint": "Between {min} and {max}. You can adjust later.",
+      "submit": "Create group",
+      "submitPending": "Creating…",
+      "error": {
+        "capReached": "You're already at the maximum of active groups",
+        "unauthorized": "You need to sign in",
+        "generic": "Couldn't create the group"
+      }
+    },
+    "discover": {
+      "headerTitle": "Discover groups",
+      "headerSubtitle": "Explore existing groups. You can open and join the public ones freely. Private ones appear locked — you can only access them via invitation or shared link.",
+      "searchPlaceholder": "Search by name…",
+      "searchEmpty": "No results for \"{q}\". Try another term.",
+      "empty": "No groups yet. Be the first to create one.",
+      "privatePopup": {
+        "title": "Private group",
+        "body": "\"{name}\" is a private group. You can only join via invitation or a shared link from the admin.",
+        "ariaCard": "Private group: {name}. Invitation only.",
+        "ariaIcon": "Private group"
+      }
+    },
+    "joinLink": {
+      "ofMax": "{count} of {max} members",
+      "blurb": "When you join you'll see a private ranking only with the members of this group. Your points are the same as the tournament.",
+      "join": "Join group",
+      "joining": "Joining…",
+      "cancel": "Cancel",
+      "invalid": "Invalid invitation link",
+      "revoked": "This link has been revoked",
+      "exhausted": "This link has no remaining uses",
+      "groupDeleted": "The group for this link no longer exists",
+      "askAdmin": "Ask the group admin to generate a new one for you.",
+      "backToSocial": "Back to Social",
+      "error": {
+        "capReached": "You're already at the maximum of active groups",
+        "groupFull": "This group is full",
+        "revoked": "This link has been revoked by the admin",
+        "exhausted": "This link has no remaining uses",
+        "groupDeleted": "This group no longer exists",
+        "generic": "Couldn't join the group"
+      }
+    },
+    "leave": {
+      "trigger": "Leave group",
+      "confirmTitle": "Leave \"{name}\"?",
+      "confirmBody": "You'll stay in the group ranking as ex-member with your current points. If you're re-invited, you recover your full history.",
+      "submit": "Leave",
+      "cancel": "Cancel",
+      "error": {
+        "adminBlocked": "As admin you must transfer or delete the group before leaving",
+        "generic": "Couldn't leave the group"
+      }
+    },
+    "noGroupsEmpty": {
+      "title": "You don't have any competition groups yet",
+      "body": "Create a private group to compete with your friends. You'll have a ranking just among yourselves — with the same tournament points.",
+      "cta": "+ Create group",
+      "ctaSecondary": "or explore public groups →"
+    },
+    "ranking": {
+      "scopeAria": "Change ranking scope",
+      "tabGlobal": "Global",
+      "tabFriends": "Friends",
+      "tabGroups": "Groups",
+      "newShort": "+ New",
+      "friendsTitle": "Ranking among friends",
+      "groupRankingTitle": "Group ranking",
+      "emptyMembers": "No members in the ranking yet. They'll appear here once someone scores a prediction.",
+      "podium": {
+        "place1": "1st",
+        "place2": "2nd",
+        "place3": "3rd",
+        "labelFree": "free",
+        "ariaFree": "Position {place} free — {copy}",
+        "free1": "Can you see yourself at the top?",
+        "free2": "Silver is waiting...",
+        "free3": "Room here!"
+      }
+    },
+    "admin": {
+      "panelTitle": "Admin panel",
+      "invite": {
+        "header": "Invite friends",
+        "pendingCount": "{count} pending",
+        "emptyFriends": "You don't have friends available to invite. Share an invitation link with anyone.",
+        "pendingHeader": "Pending",
+        "noName": "No name",
+        "submit": "Invite",
+        "cancel": "Cancel"
+      },
+      "links": {
+        "header": "Invitation links",
+        "countActive": "{count}/{max} active",
+        "maxUsesLabel": "Max uses (0 = unlimited)",
+        "generate": "Generate link",
+        "atCap": "You've reached the cap of {max} active links. Revoke one to create another.",
+        "empty": "No invitation links. Generate one to share.",
+        "copy": "Copy",
+        "revoke": "Revoke",
+        "meta": "{uses} uses · {capLabel}",
+        "metaUnlimited": "unlimited",
+        "metaCap": "cap {max}",
+        "statusRevoked": " · revoked",
+        "statusExhausted": " · exhausted"
+      },
+      "members": {
+        "header": "Manage members",
+        "empty": "No members yet.",
+        "makeAdmin": "Make admin",
+        "expel": "Expel",
+        "confirmExpelTitle": "Expel this member? They will receive a notification.",
+        "expelConfirm": "Expel",
+        "transferTitle": "Make this member admin? You will become a regular member.",
+        "transfer": "Transfer",
+        "cancel": "Cancel"
+      },
+      "settings": {
+        "header": "Settings & close",
+        "edit": "Edit name / visibility / cap",
+        "nameLabel": "Name",
+        "visibilityLabel": "Visibility",
+        "visibilityPrivate": "Private",
+        "visibilityPublic": "Public",
+        "capLabel": "Members cap",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete group",
+        "confirmDeleteTitle": "Delete the group \"{name}\"? This cannot be undone. All members will receive a notification.",
+        "deleteConfirm": "Delete permanently",
+        "error": {
+          "capBelowCount": "Cap cannot be lower than the current member count",
+          "generic": "Couldn't update the group"
+        }
+      }
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   acceptGroupInvitation,
   rejectGroupInvitation,
@@ -13,16 +14,9 @@ type Props = {
   invitations: GroupInvitationRow[];
 };
 
-/**
- * Bandeja de invitaciones de grupo recibidas. Optimistic remove: la
- * fila desaparece al instante; si la action falla, restauramos y
- * mostramos error inline.
- *
- * Para `accept`, además de remover la fila, navegamos al grupo recién
- * unido — flujo que reduce fricción ("me uno y veo qué hay dentro").
- */
 export function GroupInvitationsInbox({ invitations: initial }: Props) {
   const router = useRouter();
+  const t = useTranslations("groups.invitationsInbox");
   const [items, setItems] = useState(initial);
   const [errored, setErrored] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -37,12 +31,12 @@ export function GroupInvitationsInbox({ invitations: initial }: Props) {
         setItems(previous);
         setErrored(
           res.code === "group_full"
-            ? `El grupo "${inv.groupName}" está lleno`
+            ? t("error.groupFull", { name: inv.groupName })
             : res.code === "cap_groups_reached"
-              ? "Has alcanzado el cap de grupos activos"
+              ? t("error.capReached")
               : res.code === "group_deleted"
-                ? "Ese grupo ya no existe"
-                : "No se pudo aceptar la invitación",
+                ? t("error.groupDeleted")
+                : t("error.acceptFailed"),
         );
         return;
       }
@@ -59,7 +53,7 @@ export function GroupInvitationsInbox({ invitations: initial }: Props) {
       const res = await rejectGroupInvitation({ invitationId: inv.invitationId });
       if (!res.ok) {
         setItems(previous);
-        setErrored("No se pudo rechazar la invitación");
+        setErrored(t("error.rejectFailed"));
       }
     });
   }
@@ -85,7 +79,7 @@ export function GroupInvitationsInbox({ invitations: initial }: Props) {
             </div>
             {inv.invitedByName && (
               <div className="text-[11px] font-bold text-muted">
-                Te invitó {inv.invitedByName}
+                {t("invitedBy", { name: inv.invitedByName })}
               </div>
             )}
           </div>
@@ -96,7 +90,7 @@ export function GroupInvitationsInbox({ invitations: initial }: Props) {
               disabled={isPending}
               className="cursor-pointer rounded-full border-2 border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Rechazar
+              {t("reject")}
             </button>
             <button
               type="button"
@@ -104,7 +98,7 @@ export function GroupInvitationsInbox({ invitations: initial }: Props) {
               disabled={isPending}
               className="cursor-pointer rounded-full bg-gold px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Aceptar
+              {t("accept")}
             </button>
           </div>
         </div>

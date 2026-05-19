@@ -13,7 +13,7 @@ import { db } from "@/server/db/client";
 import { getFriends, getFriendsRanking } from "@/server/friends/queries";
 import { getGroupRanking, getUserGroups } from "@/server/groups/queries";
 import type { GroupRankingEntry } from "@/server/groups/types";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 /**
  * Ranking público dentro del área logada. Tres ámbitos seleccionables
@@ -37,6 +37,8 @@ export default async function RankingPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const tr = await getTranslations({ locale, namespace: "groups.ranking" });
+  const tg = await getTranslations({ locale, namespace: "groups" });
 
   const { scope: scopeParam, g: groupParam } = await searchParams;
   const scope: RankingScope =
@@ -122,8 +124,10 @@ export default async function RankingPage({
       {effectiveScope === "amigos" && (
         <GroupLeaderboardView
           entries={friendsRanking}
-          title="Ranking entre amigos"
-          countLabel={`${friendsRanking.length} ${friendsRanking.length === 1 ? "jugador" : "jugadores"}`}
+          title={tr("friendsTitle")}
+          countLabel={`${friendsRanking.length} ${
+            friendsRanking.length === 1 ? tg("players.one") : tg("players.many")
+          }`}
         />
       )}
 
@@ -137,8 +141,10 @@ export default async function RankingPage({
             activeGroupId && (
               <GroupLeaderboardView
                 entries={groupRanking}
-                title={myGroups.find((g) => g.id === activeGroupId)?.name ?? "Grupo"}
-                countLabel={`${groupRanking.length} ${groupRanking.length === 1 ? "miembro" : "miembros"}`}
+                title={myGroups.find((g) => g.id === activeGroupId)?.name ?? tr("groupRankingTitle")}
+                countLabel={`${groupRanking.length} ${
+                  groupRanking.length === 1 ? tg("members.one") : tg("members.many")
+                }`}
               />
             )
           )}
@@ -154,31 +160,33 @@ export default async function RankingPage({
  * empty states del resto del producto (border-dashed + texto explicativo
  * en `text-muted`).
  */
-function NoGroupsEmptyState() {
+async function NoGroupsEmptyState() {
+  // Server component child: getTranslations es síncrono dentro de async page.
+  // Para mantener consistencia, lo invocamos a partir del locale activo.
+  const t = await getTranslations("groups.noGroupsEmpty");
   return (
     <div className="rounded-2xl border-2 border-dashed border-gold/30 bg-gold/[0.04] px-5 py-8 text-center">
       <div aria-hidden="true" className="mb-3 text-[34px]">
         👥
       </div>
       <h3 className="mb-2 font-display text-[16px] text-foreground">
-        Aún no tienes grupos de competición
+        {t("title")}
       </h3>
       <p className="mx-auto mb-5 max-w-[340px] text-[13px] font-bold leading-relaxed text-muted">
-        Crea un grupo privado para competir contra tus amigos. Tendréis
-        un ranking solo entre vosotros — con los mismos puntos del torneo.
+        {t("body")}
       </p>
       <Link
         href="/social/grupos/nuevo"
         className="inline-block rounded-full bg-gold px-5 py-2.5 font-display text-[12px] uppercase tracking-[0.12em] text-background hover:bg-gold-deep"
       >
-        + Crear grupo
+        {t("cta")}
       </Link>
       <div className="mt-3">
         <Link
           href="/social/grupos/descubrir"
           className="text-[11px] font-bold text-muted hover:text-foreground"
         >
-          o explora grupos públicos →
+          {t("ctaSecondary")}
         </Link>
       </div>
     </div>

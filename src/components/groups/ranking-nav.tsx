@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import type { GroupColor } from "@/server/db/schema";
 
 export type RankingScope = "global" | "amigos" | "grupos";
@@ -18,44 +19,30 @@ type Props = {
 };
 
 /**
- * Nav principal de `/ranking` con 3 tabs: `Global · Amigos · Grupos`.
- * Cuando `scope === "grupos"`, se renderiza un sub-nav debajo con
- * pills por cada grupo del viewer + CTA `+ Nuevo`.
- *
- * Pattern URL-driven (mismo que `mini-leaderboard`):
- *  - `/ranking` (default) → Global.
- *  - `/ranking?scope=amigos` → Amigos.
- *  - `/ranking?scope=grupos` → primer grupo del viewer (o empty
- *    state si no tiene).
- *  - `/ranking?scope=grupos&g=<groupId>` → grupo concreto.
- *
- * Los links no resetean scroll (`scroll={false}`) — la lista del
- * ranking está abajo y queremos preservar el scroll cuando el user
- * cambia entre tabs.
- *
- * Si el viewer no tiene amigos, la pestaña `Amigos` se oculta — sin
- * fricción para users sin red social (mismo principio que el
- * mini-leaderboard de /inicio).
+ * Nav principal de `/ranking` con 3 tabs: Global · Amigos · Grupos.
+ * Cuando `scope === "grupos"` se renderiza un sub-nav con pills por
+ * cada grupo del viewer + CTA "+ Nuevo". Labels en i18n.
  */
 export function RankingNav({ scope, activeGroupId, groups, hasFriends }: Props) {
+  const t = useTranslations("groups.ranking");
   return (
     <div className="mb-4 w-full">
       <nav
-        aria-label="Cambiar ámbito del ranking"
+        aria-label={t("scopeAria")}
         className="inline-flex items-center gap-1 rounded-full border-2 border-border bg-card p-1"
       >
-        <NavPill href="/ranking" active={scope === "global"} label="Global" />
+        <NavPill href="/ranking" active={scope === "global"} label={t("tabGlobal")} />
         {hasFriends && (
           <NavPill
             href="/ranking?scope=amigos"
             active={scope === "amigos"}
-            label="Amigos"
+            label={t("tabFriends")}
           />
         )}
         <NavPill
           href="/ranking?scope=grupos"
           active={scope === "grupos"}
-          label="Grupos"
+          label={t("tabGroups")}
         />
       </nav>
 
@@ -83,7 +70,7 @@ export function RankingNav({ scope, activeGroupId, groups, hasFriends }: Props) 
               href="/social/grupos/nuevo"
               className="shrink-0 rounded-full border-2 border-dashed border-gold/50 bg-gold/[0.06] px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.08em] text-gold no-underline hover:bg-gold/[0.12]"
             >
-              + Nuevo
+              {t("newShort")}
             </Link>
           </div>
         </div>

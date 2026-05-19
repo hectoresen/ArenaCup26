@@ -3,16 +3,9 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { getDiscoverableGroups } from "@/server/groups/queries";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 
-/**
- * Página de descubrimiento de grupos públicos. Soporta búsqueda
- * por nombre vía query param `?q=...` (form GET, server-render del
- * resultado). Paginación simple con `?offset=` (not exposed in UI
- * yet — los listings serán pocos durante Mundial, +30 elementos
- * cabe en una página).
- */
 export default async function DescubrirGruposPage({
   params,
   searchParams,
@@ -22,6 +15,8 @@ export default async function DescubrirGruposPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "groups" });
+  const td = await getTranslations({ locale, namespace: "groups.discover" });
 
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}`);
@@ -40,26 +35,24 @@ export default async function DescubrirGruposPage({
     <>
       <header className="mb-5">
         <Link href="/social" className="text-[12px] font-bold text-muted hover:text-foreground">
-          ← Volver a Social
+          {t("backToSocial")}
         </Link>
         <h1 className="mt-2 font-display text-[26px] leading-none text-foreground">
-          Descubrir grupos
+          {td("headerTitle")}
         </h1>
         <p className="mt-1 text-[13px] font-bold text-muted">
-          Explora los grupos existentes. Los públicos los puedes abrir y
-          unirte libremente. Los privados aparecen con candado — solo
-          puedes acceder con invitación o link compartido.
+          {td("headerSubtitle")}
         </p>
       </header>
 
       <form method="GET" className="mb-5">
         <label className="block">
-          <span className="sr-only">Buscar por nombre</span>
+          <span className="sr-only">{td("searchPlaceholder")}</span>
           <input
             type="search"
             name="q"
             defaultValue={search}
-            placeholder="Buscar por nombre…"
+            placeholder={td("searchPlaceholder")}
             className="w-full rounded-2xl border-2 border-border bg-card px-4 py-3 text-[15px] text-foreground placeholder:text-muted focus:border-gold focus:outline-none"
           />
         </label>
@@ -67,9 +60,7 @@ export default async function DescubrirGruposPage({
 
       {items.length === 0 ? (
         <div className="rounded-2xl border-2 border-dashed border-border bg-card/40 px-4 py-6 text-center text-[13px] font-bold text-muted">
-          {search
-            ? `Sin resultados para "${search}". Prueba otro término.`
-            : "Aún no hay grupos. Sé el primero en crear uno."}
+          {search ? td("searchEmpty", { q: search }) : td("empty")}
         </div>
       ) : (
         <div className="space-y-2">

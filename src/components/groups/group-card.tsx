@@ -1,5 +1,8 @@
+"use client";
+
 import type { GroupSummary } from "@/server/groups/types";
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { GroupAvatar } from "./group-avatar";
 
 type Props = {
@@ -9,10 +12,13 @@ type Props = {
 /**
  * Tarjeta clicable que enlaza al detalle del grupo. Muestra avatar
  * con color, nombre, count de miembros y badge si el viewer es admin.
- * Usado en `/social` (sección "Mis grupos") y en `/social/grupos/descubrir`
- * (sin badge admin, esos siempre son externos).
+ * Usado en `/social` (sección "Mis grupos"). Para `/descubrir` ver
+ * `DiscoverGroupCard` que añade la rama del candado para privados.
  */
 export function GroupCard({ group }: Props) {
+  const t = useTranslations("groups");
+  const memberLabel =
+    group.memberCount === 1 ? t("members.one") : t("members.many");
   return (
     <Link
       href={`/social/grupos/${group.id}`}
@@ -26,18 +32,18 @@ export function GroupCard({ group }: Props) {
           </span>
           {group.viewerRole === "admin" && (
             <span className="rounded-full border border-gold/40 bg-gold/10 px-1.5 py-px text-[9px] font-black uppercase tracking-[0.12em] text-gold">
-              Admin
+              {t("badge.admin")}
             </span>
           )}
           {group.visibility === "public" && group.viewerRole === null && (
             <span className="rounded-full border border-border bg-card-hover/60 px-1.5 py-px text-[9px] font-black uppercase tracking-[0.12em] text-muted">
-              Público
+              {t("badge.public")}
             </span>
           )}
         </div>
         <div className="text-[12px] font-bold text-muted">
-          {group.memberCount} {group.memberCount === 1 ? "miembro" : "miembros"}
-          {group.maxMembers ? ` · cap ${group.maxMembers}` : ""}
+          {group.memberCount} {memberLabel}
+          {group.maxMembers ? ` · ${t("capLabel", { max: group.maxMembers })}` : ""}
         </div>
       </div>
       <span aria-hidden="true" className="font-display text-base text-muted transition-transform group-hover:translate-x-0.5">

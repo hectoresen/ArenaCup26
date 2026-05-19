@@ -890,5 +890,210 @@
         }
       }
     }
+  },
+  "groups": {
+    "backToSocial": "← Volver a Social",
+    "members": {
+      "one": "miembro",
+      "many": "miembros"
+    },
+    "players": {
+      "one": "jugador",
+      "many": "jugadores"
+    },
+    "capLabel": "cap {max}",
+    "badge": {
+      "admin": "Admin",
+      "youAdmin": "Eres admin",
+      "youMember": "Ya eres miembro",
+      "public": "Público",
+      "private": "Privado",
+      "exMember": "Ex-miembro",
+      "you": "Tú",
+      "leftMember": "Ha salido"
+    },
+    "colors": {
+      "gold": "Oro",
+      "blue": "Azul",
+      "purple": "Morado",
+      "green": "Verde",
+      "orange": "Naranja",
+      "red": "Rojo",
+      "teal": "Turquesa",
+      "pink": "Rosa"
+    },
+    "mySection": {
+      "title": "Mis grupos",
+      "count": "{count}/{max}",
+      "emptyCopy": "Compite contra tus amigos en grupos privados. Crea uno o únete con un link de invitación.",
+      "create": "+ Crear grupo",
+      "discover": "Descubrir",
+      "newShort": "+ Nuevo",
+      "discoverPublic": "Descubrir grupos públicos",
+      "atCap": "Estás en el máximo de {max} grupos activos. Abandona uno antes de unirte a otro."
+    },
+    "invitationsInbox": {
+      "title": "Invitaciones de grupo",
+      "invitedBy": "Te invitó {name}",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "error": {
+        "groupFull": "El grupo \"{name}\" está lleno",
+        "capReached": "Has alcanzado el cap de grupos activos",
+        "groupDeleted": "Ese grupo ya no existe",
+        "acceptFailed": "No se pudo aceptar la invitación",
+        "rejectFailed": "No se pudo rechazar la invitación"
+      }
+    },
+    "create": {
+      "headerTitle": "Crear grupo",
+      "headerSubtitle": "Compite con tus amigos en un ranking privado. Los puntos son los mismos del torneo — el grupo solo filtra a quién ves.",
+      "atCap": "Ya estás en {count} grupos activos (máximo {max}). Abandona uno desde su página antes de crear otro.",
+      "name": "Nombre",
+      "namePlaceholder": "Familia, oficina, peñistas…",
+      "nameCount": "{count}/40",
+      "colorLegend": "Color",
+      "visibilityLegend": "Visibilidad",
+      "private": "Privado",
+      "privateHint": "Solo se entra con invitación o link compartido.",
+      "public": "Público",
+      "publicHint": "Aparece en \"Descubrir grupos\" y cualquiera puede unirse.",
+      "membersCap": "Cap de miembros",
+      "membersCapHint": "Entre {min} y {max}. Puedes ajustarlo después.",
+      "submit": "Crear grupo",
+      "submitPending": "Creando…",
+      "error": {
+        "capReached": "Ya estás en el máximo de grupos activos",
+        "unauthorized": "Necesitas iniciar sesión",
+        "generic": "No se pudo crear el grupo"
+      }
+    },
+    "discover": {
+      "headerTitle": "Descubrir grupos",
+      "headerSubtitle": "Explora los grupos existentes. Los públicos los puedes abrir y unirte libremente. Los privados aparecen con candado — solo puedes acceder con invitación o link compartido.",
+      "searchPlaceholder": "Buscar por nombre…",
+      "searchEmpty": "Sin resultados para \"{q}\". Prueba otro término.",
+      "empty": "Aún no hay grupos. Sé el primero en crear uno.",
+      "privatePopup": {
+        "title": "Grupo privado",
+        "body": "\"{name}\" es un grupo privado. Solo se entra por invitación o link compartido del admin.",
+        "ariaCard": "Grupo privado: {name}. Solo por invitación.",
+        "ariaIcon": "Grupo privado"
+      }
+    },
+    "joinLink": {
+      "ofMax": "{count} de {max} miembros",
+      "blurb": "Al unirte verás un ranking privado solo con los miembros de este grupo. Tus puntos son los mismos del torneo.",
+      "join": "Unirme al grupo",
+      "joining": "Uniéndome…",
+      "cancel": "Cancelar",
+      "invalid": "Link de invitación inválido",
+      "revoked": "Este link ha sido revocado",
+      "exhausted": "Este link ya no tiene usos disponibles",
+      "groupDeleted": "El grupo de este link ya no existe",
+      "askAdmin": "Pídele al admin del grupo que te genere uno nuevo.",
+      "backToSocial": "Volver a Social",
+      "error": {
+        "capReached": "Ya estás en el máximo de grupos activos",
+        "groupFull": "Este grupo está lleno",
+        "revoked": "Este link ha sido revocado por el admin",
+        "exhausted": "Este link ha agotado sus usos",
+        "groupDeleted": "Este grupo ya no existe",
+        "generic": "No se pudo unirse al grupo"
+      }
+    },
+    "leave": {
+      "trigger": "Abandonar grupo",
+      "confirmTitle": "¿Abandonar \"{name}\"?",
+      "confirmBody": "Quedarás con tus puntos actuales como ex-miembro en el ranking del grupo. Si te vuelven a invitar, recuperas tu historial completo.",
+      "submit": "Abandonar",
+      "cancel": "Cancelar",
+      "error": {
+        "adminBlocked": "Como admin debes transferir o borrar el grupo antes de salir",
+        "generic": "No se pudo abandonar el grupo"
+      }
+    },
+    "noGroupsEmpty": {
+      "title": "Aún no tienes grupos de competición",
+      "body": "Crea un grupo privado para competir contra tus amigos. Tendréis un ranking solo entre vosotros — con los mismos puntos del torneo.",
+      "cta": "+ Crear grupo",
+      "ctaSecondary": "o explora grupos públicos →"
+    },
+    "ranking": {
+      "scopeAria": "Cambiar ámbito del ranking",
+      "tabGlobal": "Global",
+      "tabFriends": "Amigos",
+      "tabGroups": "Grupos",
+      "newShort": "+ Nuevo",
+      "friendsTitle": "Ranking entre amigos",
+      "groupRankingTitle": "Ranking del grupo",
+      "emptyMembers": "Aún no hay miembros en el ranking. Cuando alguien acierte una predicción aparecerá aquí.",
+      "podium": {
+        "place1": "1º",
+        "place2": "2º",
+        "place3": "3º",
+        "labelFree": "libre",
+        "ariaFree": "Posición {place} libre — {copy}",
+        "free1": "¿Te ves en la cima?",
+        "free2": "La plata espera...",
+        "free3": "¡Hay sitio aquí!"
+      }
+    },
+    "admin": {
+      "panelTitle": "Panel admin",
+      "invite": {
+        "header": "Invitar amigos",
+        "pendingCount": "{count} pending",
+        "emptyFriends": "No tienes amigos disponibles para invitar. Comparte un link de invitación con quien quieras.",
+        "pendingHeader": "Pending",
+        "noName": "Sin nombre",
+        "submit": "Invitar",
+        "cancel": "Cancelar"
+      },
+      "links": {
+        "header": "Links de invitación",
+        "countActive": "{count}/{max} activos",
+        "maxUsesLabel": "Usos máximos (0 = ilimitado)",
+        "generate": "Generar link",
+        "atCap": "Has alcanzado el cap de {max} links activos. Revoca uno para crear otro.",
+        "empty": "No tienes links de invitación. Genera uno para compartir.",
+        "copy": "Copiar",
+        "revoke": "Revocar",
+        "meta": "{uses} usos · {capLabel}",
+        "metaUnlimited": "ilimitado",
+        "metaCap": "cap {max}",
+        "statusRevoked": " · revocado",
+        "statusExhausted": " · agotado"
+      },
+      "members": {
+        "header": "Gestionar miembros",
+        "empty": "Sin miembros aún.",
+        "makeAdmin": "Hacer admin",
+        "expel": "Expulsar",
+        "confirmExpelTitle": "¿Expulsar a este miembro? Recibirá una notificación.",
+        "expelConfirm": "Expulsar",
+        "transferTitle": "¿Hacer admin a este miembro? Tú pasarás a ser miembro normal.",
+        "transfer": "Transferir",
+        "cancel": "Cancelar"
+      },
+      "settings": {
+        "header": "Ajustes & cierre",
+        "edit": "Editar nombre / visibilidad / cap",
+        "nameLabel": "Nombre",
+        "visibilityLabel": "Visibilidad",
+        "visibilityPrivate": "Privado",
+        "visibilityPublic": "Público",
+        "capLabel": "Cap miembros",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Borrar grupo",
+        "confirmDeleteTitle": "¿Borrar el grupo \"{name}\"? Esta acción no se puede deshacer. Todos los miembros recibirán una notificación.",
+        "deleteConfirm": "Borrar definitivamente",
+        "error": {
+          "capBelowCount": "El cap no puede ser menor que el número actual de miembros",
+          "generic": "No se pudo actualizar el grupo"
+        }
+      }
+    }
   }
 }
