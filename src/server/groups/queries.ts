@@ -82,10 +82,15 @@ export async function getUserGroups(db: Database, userId: string): Promise<Group
 }
 
 /**
- * Lista grupos PÚBLICOS no-borrados para la página descubrir. Excluye
- * los que el viewer ya es miembro (no tiene sentido descubrir lo que
- * ya tienes). Paginación simple por offset; suficiente mientras los
- * grupos sean ≤ 1000.
+ * Lista grupos no-borrados (públicos + privados) para `/descubrir`.
+ * Los privados aparecen en los resultados con la `visibility` set
+ * para que la UI pinte el candado y bloquee el click — el usuario
+ * sabe que existe el grupo pero no puede unirse sin invitación. Esto
+ * le da vida al buscador (decisión UX 2026-05-19): es una pista de
+ * "tu colega tiene un grupo aquí" sin filtrar miembros ni ranking.
+ *
+ * Excluye los que el viewer ya es miembro (no tiene sentido descubrir
+ * lo que ya tienes). Paginación simple por offset.
  */
 export async function getDiscoverableGroups(
   db: Database,
@@ -94,10 +99,7 @@ export async function getDiscoverableGroups(
 ): Promise<GroupSummary[]> {
   const { limit = 30, offset = 0, search } = options;
 
-  const conds = [
-    eq(groups.visibility, "public" as const),
-    isNull(groups.deletedAt),
-  ];
+  const conds = [isNull(groups.deletedAt)];
   if (search && search.trim().length > 0) {
     conds.push(sql`${groups.name} ILIKE ${"%" + search.trim() + "%"}`);
   }

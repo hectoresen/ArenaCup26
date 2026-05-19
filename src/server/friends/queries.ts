@@ -1,7 +1,8 @@
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { Database } from "@/server/db/client";
-import { friendships, userPoints, users } from "@/server/db/schema";
+import { friendships, predictions, userPoints, users } from "@/server/db/schema";
+import type { GroupRankingEntry } from "@/server/groups/types";
 import type { Friend, FriendRequest, ViewerRelation } from "./types";
 
 /**
@@ -132,6 +133,105 @@ export async function getFriends(db: Database, userId: string): Promise<Friend[]
     avatarId: row.otherAvatarId,
     points: row.points ?? 0,
     acceptedAt: row.decidedAt ?? new Date(0),
+  }));
+}
+
+/**
+ * Ranking "Amigos" para `/ranking?scope=amigos`. Conjunto: el propio
+ * viewer + sus amigos aceptados. Mismo tie-break que el global:
+ * points → streakMax → simpleHits → predictionsTotal → createdAt.
+ *
+ * Reutilizamos el tipo `GroupRankingEntry` para que `<GroupRankingList>`
+ * lo renderice sin cambios. El flag `frozen` siempre es `false` aquí
+ * (no aplica la lógica de ex-miembros).
+ *
+ * Si el user no tiene amigos, devuelve un array de 1 elemento (solo
+ * el viewer). La UI decide qué copy mostrar.
+ */
+export async function getFriendsRanking(
+  db: Database,
+  viewerId: string,
+): Promise<GroupRankingEntry[]> {
+  // 1) IDs del subset: viewer + amigos.
+  const friendRows = await db
+    .select({
+      requester: friendships.requesterId,
+      addressee: friendships.addresseeId,
+    })
+    .from(friendships)
+    .where(
+      and(
+        eq(friendships.status, "accepted"),
+        or(eq(friendships.requesterId, viewerId), eq(friendships.addresseeId, viewerId)),
+      ),
+    );
+
+  const friendIds = friendRows.map((r) =>
+    r.requester === viewerId ? r.addressee : r.requester,
+  );
+  const subsetIds = [viewerId, ...friendIds];
+
+  // 2) Datos de cada miembro + puntos.
+  const userRows = await db
+    .select({
+      userId: users.id,
+      username: users.username,
+      name: users.name,
+      country: users.country,
+      avatarId: users.avatarId,
+      image: users.image,
+      createdAt: users.createdAt,
+      points: userPoints.totalPoints,
+      streak: userPoints.streak,
+      streakMax: userPoints.streakMax,
+      simpleHits: userPoints.simpleHits,
+      correctCount: userPoints.correctCount,
+    })
+    .from(users)
+    .leftJoin(userPoints, eq(userPoints.userId, users.id))
+    .where(sql`${users.id} = ANY(${subsetIds})`);
+
+  // 3) Conteo de predicciones (tie-break 4º).
+  const predRows = await db
+    .select({
+      userId: predictions.userId,
+      total: sql<number>`count(*)::int`,
+    })
+    .from(predictions)
+    .where(sql`${predictions.userId} = ANY(${subsetIds})`)
+    .groupBy(predictions.userId);
+  const predMap = new Map(predRows.map((p) => [p.userId, p.total]));
+
+  // 4) Sort con tie-break completo.
+  const sorted = [...userRows].sort((a, b) => {
+    const ap = a.points ?? 0;
+    const bp = b.points ?? 0;
+    if (ap !== bp) return bp - ap;
+    const asm = a.streakMax ?? 0;
+    const bsm = b.streakMax ?? 0;
+    if (asm !== bsm) return bsm - asm;
+    const ash = a.simpleHits ?? 0;
+    const bsh = b.simpleHits ?? 0;
+    if (ash !== bsh) return bsh - ash;
+    const ap2 = predMap.get(a.userId) ?? 0;
+    const bp2 = predMap.get(b.userId) ?? 0;
+    if (ap2 !== bp2) return bp2 - ap2;
+    return a.createdAt.getTime() - b.createdAt.getTime();
+  });
+
+  return sorted.map((r, i) => ({
+    userId: r.userId,
+    username: r.username,
+    name: r.name?.trim() || "Jugador",
+    countryCode: r.country,
+    avatarId: r.avatarId,
+    image: r.image,
+    points: r.points ?? 0,
+    streak: r.streak ?? 0,
+    correctCount: r.correctCount ?? 0,
+    frozen: false,
+    rank: i + 1,
+    rankDelta: null,
   }));
 }
 

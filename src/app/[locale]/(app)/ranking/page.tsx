@@ -1,68 +1,179 @@
+import { GroupRankingList } from "@/components/groups/group-ranking-list";
+import {
+  type GroupNavEntry,
+  RankingNav,
+  type RankingScope,
+} from "@/components/groups/ranking-nav";
 import { LeaderboardView } from "@/components/leaderboard/leaderboard-view";
-import { RankingScopeTabs, type GroupTabData } from "@/components/groups/ranking-scope-tabs";
+import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { getRealSnapshot } from "@/lib/leaderboard/real";
 import { db } from "@/server/db/client";
+import { getFriends, getFriendsRanking } from "@/server/friends/queries";
 import { getGroupRanking, getUserGroups } from "@/server/groups/queries";
 import { setRequestLocale } from "next-intl/server";
 
 /**
- * Ranking público dentro del área logada. Reusa el mismo
- * `LeaderboardView` que la landing pero sin su propio `<TopChrome>`
- * (el `<AppShell>` del route group `(app)` ya monta nav + avatar +
- * bell).
+ * Ranking público dentro del área logada. Tres ámbitos seleccionables
+ * vía `?scope=`:
  *
- * Siempre se renderiza `<RankingScopeTabs>` arriba para que la
- * feature de grupos sea descubrible:
- *  - Con grupos → tabs `[Global][Grupo X]...` + CTA "+ Nuevo".
- *  - Sin grupos → solo `[Global]` + CTA "+ Crear grupo" linking a
- *    `/social/grupos/nuevo`.
+ *  - **Global** (default, sin param): mismo top 100 que la landing.
+ *    Usa `<LeaderboardView>` con SSE.
+ *  - **Amigos**: viewer + amigos aceptados. Mismo tie-break que global.
+ *  - **Grupos**: requiere `?g=<groupId>`. Si no se pasa, se elige el
+ *    primero del viewer. Si no tiene grupos, empty state + CTA.
  *
- * Solo se omite cuando no hay sesión (visitante anónimo no debería
- * ver controles de grupos en absoluto).
- *
- * Dataset real: query a `userPoints` mezclada con 3 placeholders fijos
- * para que el ranking no se vea vacío durante la fase de pruebas.
- * Cuando aterrice `add-leaderboard-sse` se reemplaza por suscripción
- * push sin cambiar el componente.
+ * URL-driven (mismo patrón que `mini-leaderboard` de /inicio) para
+ * que cada vista sea compartible y el back del browser funcione.
  */
 export default async function RankingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ scope?: string; g?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  const { scope: scopeParam, g: groupParam } = await searchParams;
+  const scope: RankingScope =
+    scopeParam === "amigos"
+      ? "amigos"
+      : scopeParam === "grupos"
+        ? "grupos"
+        : "global";
+
   const [snapshot, session] = await Promise.all([getRealSnapshot(db), auth()]);
-
   const viewerId = session?.user?.id ?? null;
-  const myGroups = viewerId ? await getUserGroups(db, viewerId) : [];
-  const groupTabs: GroupTabData[] = myGroups.length
-    ? await Promise.all(
-        myGroups.map(async (g) => ({
-          groupId: g.id,
-          groupName: g.name,
-          groupColor: g.color,
-          ranking: await getGroupRanking(db, g.id),
-        })),
-      )
-    : [];
 
-  const globalContent = (
-    <LeaderboardView snapshot={snapshot} user={session?.user ?? null} withChrome={false} />
-  );
+  // Visitante sin sesión → solo ven el global, sin nav (no aplica).
+  if (!viewerId) {
+    return (
+      <section className="-mx-5 -mt-5 flex justify-center px-5 pt-5">
+        <LeaderboardView snapshot={snapshot} user={null} withChrome={false} />
+      </section>
+    );
+  }
+
+  const [friends, myGroups] = await Promise.all([
+    getFriends(db, viewerId),
+    getUserGroups(db, viewerId),
+  ]);
+  const hasFriends = friends.length > 0;
+  const groupsForNav: GroupNavEntry[] = myGroups.map((g) => ({
+    groupId: g.id,
+    groupName: g.name,
+    groupColor: g.color,
+  }));
+
+  // Si el user pidió `?scope=amigos` pero no tiene amigos, fallback a global.
+  const effectiveScope: RankingScope =
+    scope === "amigos" && !hasFriends ? "global" : scope;
+
+  // Resolver grupo activo cuando scope = grupos.
+  const activeGroupId =
+    effectiveScope === "grupos"
+      ? groupParam && myGroups.some((g) => g.id === groupParam)
+        ? groupParam
+        : (myGroups[0]?.id ?? null)
+      : null;
+
+  // Carga del ranking del scope seleccionado.
+  const friendsRanking =
+    effectiveScope === "amigos" ? await getFriendsRanking(db, viewerId) : [];
+  const groupRanking =
+    effectiveScope === "grupos" && activeGroupId
+      ? await getGroupRanking(db, activeGroupId)
+      : [];
 
   return (
-    <section className="-mx-5 -mt-5 flex justify-center px-5 pt-5">
-      {viewerId ? (
-        <RankingScopeTabs
-          globalContent={globalContent}
-          groups={groupTabs}
-          viewerUserId={viewerId}
-        />
-      ) : (
-        globalContent
+    <section className="-mx-5 -mt-5 flex flex-col items-stretch px-5 pt-5">
+      <RankingNav
+        scope={effectiveScope}
+        activeGroupId={activeGroupId}
+        groups={groupsForNav}
+        hasFriends={hasFriends}
+      />
+
+      {effectiveScope === "global" && (
+        <LeaderboardView snapshot={snapshot} user={session?.user ?? null} withChrome={false} />
+      )}
+
+      {effectiveScope === "amigos" && (
+        <div className="mx-auto w-full max-w-[510px]">
+          <header className="mb-3 flex items-center justify-between">
+            <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
+              Ranking entre amigos
+            </h2>
+            <span className="text-[11px] font-bold text-muted">
+              {friendsRanking.length}{" "}
+              {friendsRanking.length === 1 ? "jugador" : "jugadores"}
+            </span>
+          </header>
+          <GroupRankingList entries={friendsRanking} viewerUserId={viewerId} />
+        </div>
+      )}
+
+      {effectiveScope === "grupos" && (
+        <div className="mx-auto w-full max-w-[510px]">
+          {myGroups.length === 0 ? (
+            <NoGroupsEmptyState />
+          ) : (
+            activeGroupId && (
+              <>
+                <header className="mb-3 flex items-center justify-between">
+                  <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
+                    {myGroups.find((g) => g.id === activeGroupId)?.name ?? "Grupo"}
+                  </h2>
+                  <span className="text-[11px] font-bold text-muted">
+                    {groupRanking.length}{" "}
+                    {groupRanking.length === 1 ? "miembro" : "miembros"}
+                  </span>
+                </header>
+                <GroupRankingList entries={groupRanking} viewerUserId={viewerId} />
+              </>
+            )
+          )}
+        </div>
       )}
     </section>
+  );
+}
+
+/**
+ * Empty state cuando el viewer pulsó "Grupos" sin tener ninguno. Copy
+ * + CTA grande a `/social/grupos/nuevo`. Diseño consistente con los
+ * empty states del resto del producto (border-dashed + texto explicativo
+ * en `text-muted`).
+ */
+function NoGroupsEmptyState() {
+  return (
+    <div className="rounded-2xl border-2 border-dashed border-gold/30 bg-gold/[0.04] px-5 py-8 text-center">
+      <div aria-hidden="true" className="mb-3 text-[34px]">
+        👥
+      </div>
+      <h3 className="mb-2 font-display text-[16px] text-foreground">
+        Aún no tienes grupos de competición
+      </h3>
+      <p className="mx-auto mb-5 max-w-[340px] text-[13px] font-bold leading-relaxed text-muted">
+        Crea un grupo privado para competir contra tus amigos. Tendréis
+        un ranking solo entre vosotros — con los mismos puntos del torneo.
+      </p>
+      <Link
+        href="/social/grupos/nuevo"
+        className="inline-block rounded-full bg-gold px-5 py-2.5 font-display text-[12px] uppercase tracking-[0.12em] text-background hover:bg-gold-deep"
+      >
+        + Crear grupo
+      </Link>
+      <div className="mt-3">
+        <Link
+          href="/social/grupos/descubrir"
+          className="text-[11px] font-bold text-muted hover:text-foreground"
+        >
+          o explora grupos públicos →
+        </Link>
+      </div>
+    </div>
   );
 }

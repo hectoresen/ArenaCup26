@@ -1,4 +1,4 @@
-import { GroupCard } from "@/components/groups/group-card";
+import { DiscoverGroupCard } from "@/components/groups/discover-group-card";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
@@ -46,8 +46,9 @@ export default async function DescubrirGruposPage({
           Descubrir grupos
         </h1>
         <p className="mt-1 text-[13px] font-bold text-muted">
-          Grupos públicos a los que puedes unirte libremente. Si no encuentras
-          el que buscas, pide al admin un link de invitación.
+          Explora los grupos existentes. Los públicos los puedes abrir y
+          unirte libremente. Los privados aparecen con candado — solo
+          puedes acceder con invitación o link compartido.
         </p>
       </header>
 
@@ -68,12 +69,12 @@ export default async function DescubrirGruposPage({
         <div className="rounded-2xl border-2 border-dashed border-border bg-card/40 px-4 py-6 text-center text-[13px] font-bold text-muted">
           {search
             ? `Sin resultados para "${search}". Prueba otro término.`
-            : "Aún no hay grupos públicos. Sé el primero en crear uno."}
+            : "Aún no hay grupos. Sé el primero en crear uno."}
         </div>
       ) : (
         <div className="space-y-2">
           {items.map((g) => (
-            <GroupCard key={g.id} group={g} />
+            <DiscoverGroupCard key={g.id} group={g} />
           ))}
         </div>
       )}
