@@ -1,8 +1,9 @@
 name: DB backup
 
 # Backup diario de Postgres a un bucket S3-compatible (Backblaze B2 o
-# Cloudflare R2). Mantiene retención automática a 30 días vía
-# lifecycle policy del bucket.
+# Cloudflare R2). Retención SMART aplicada en el propio workflow (ver
+# step "Smart retention" más abajo): borra backups de >10 días siempre
+# y cuando existan ≥2 más recientes — así nunca quedamos sin cobertura.
 #
 # **Setup en GitHub Secrets**:
 #   - `DATABASE_URL` → la URL completa de Railway Postgres (incluye
@@ -15,9 +16,9 @@ name: DB backup
 #
 # **Setup en el bucket (una vez)**:
 #  1. Crear bucket privado.
-#  2. Configurar lifecycle: borrar objetos con prefijo `daily/` tras
-#     30 días.
-#  3. Generar Application Key con scope solo-este-bucket.
+#  2. Generar Application Key con scope solo-este-bucket.
+#     (NO se requiere lifecycle policy — la retención la maneja
+#     este workflow.)
 
 on:
   schedule:
@@ -98,3 +99,61 @@ jobs:
             exit 1
           fi
           echo "✓ Backup verified"
+
+      - name: Smart retention (delete >10d only if ≥2 newer exist)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
+          ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
+          BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+        run: |
+          # Reglas: para borrar un backup, deben existir ≥2 más recientes.
+          # Implementación equivalente: ordenar todos por fecha desc,
+          # saltarse los 2 primeros (que SIEMPRE se conservan), y de los
+          # restantes borrar los que tengan >10 días.
+          #
+          # Esto garantiza: como mínimo siempre 2 backups (los más
+          # recientes) y cualquier backup <= 10d. No depende del
+          # lifecycle del bucket, así que funciona contra cualquier
+          # S3-compatible (B2, R2, MinIO, etc.).
+          aws s3api list-objects-v2 \
+            --endpoint-url "$ENDPOINT" \
+            --bucket "$BUCKET" \
+            --prefix "daily/" \
+            --query "sort_by(Contents, &LastModified)[*].[Key,LastModified]" \
+            --output text > /tmp/backups.txt || true
+
+          if [ ! -s /tmp/backups.txt ]; then
+            echo "→ No hay backups en daily/, nada que retener."
+            exit 0
+          fi
+
+          # `sort_by` con `&LastModified` lo deja ascendente (oldest first).
+          # Reverse para tener newest first.
+          tac /tmp/backups.txt > /tmp/backups-desc.txt
+
+          TOTAL=$(wc -l < /tmp/backups-desc.txt)
+          echo "→ $TOTAL backups en daily/"
+          if [ "$TOTAL" -le 2 ]; then
+            echo "→ ≤2 backups, conservamos todos por la regla \"≥2 posteriores\"."
+            exit 0
+          fi
+
+          # Skip los 2 más recientes; de los restantes, borrar >10d.
+          NOW_TS=$(date -u +%s)
+          THRESHOLD_TS=$((NOW_TS - 10*24*3600))
+          DELETED=0
+          KEPT=0
+          tail -n +3 /tmp/backups-desc.txt | while IFS=$'\t' read -r KEY LASTMOD; do
+            # LASTMOD viene como ISO 8601 UTC, e.g. "2026-05-09T03:00:42+00:00".
+            MOD_TS=$(date -u -d "$LASTMOD" +%s 2>/dev/null || echo 0)
+            if [ "$MOD_TS" -lt "$THRESHOLD_TS" ]; then
+              aws s3 rm "s3://$BUCKET/$KEY" --endpoint-url "$ENDPOINT" --quiet
+              echo "  deleted (>10d): $KEY"
+              DELETED=$((DELETED + 1))
+            else
+              KEPT=$((KEPT + 1))
+            fi
+          done
+          echo "→ Retención completa. Conservados (top 2 + recientes): kept=$KEPT del bucket, eliminados=$DELETED"

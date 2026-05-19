@@ -13,9 +13,10 @@ name: DB backup (tournament cadence)
 #   DATABASE_URL, BACKUP_S3_ENDPOINT, BACKUP_S3_BUCKET,
 #   BACKUP_S3_ACCESS_KEY, BACKUP_S3_SECRET_KEY, BACKUP_S3_REGION.
 #
-# **Bucket setup adicional**: configurar lifecycle policy en el
-# bucket para borrar `tournament/*` tras 14 días (suficiente para
-# recovery; evita que ~720 backups se acumulen indefinidamente).
+# **Retención**: el step "Smart retention" al final aplica la regla
+# "borra >10d siempre que existan ≥2 más recientes" sobre `tournament/`.
+# Con cadencia 6h en ventana de 38 días, estabiliza en ~40 backups
+# (los últimos 10 días = 4×24/6×10 ≈ 40 dumps).
 
 on:
   schedule:
@@ -108,3 +109,52 @@ jobs:
             exit 1
           fi
           echo "✓ Backup verified"
+
+      - name: Smart retention (delete >10d only if ≥2 newer exist)
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
+          ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
+          BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+        run: |
+          # Misma regla que `db-backup.yml` pero aplicada al prefix
+          # `tournament/`. Cada 6h durante el Mundial → ~120 backups
+          # totales; con la regla "borra >10d si hay ≥2 más recientes"
+          # se estabiliza en ~40-45 entradas (los últimos 10 días).
+          aws s3api list-objects-v2 \
+            --endpoint-url "$ENDPOINT" \
+            --bucket "$BUCKET" \
+            --prefix "tournament/" \
+            --query "sort_by(Contents, &LastModified)[*].[Key,LastModified]" \
+            --output text > /tmp/backups.txt || true
+
+          if [ ! -s /tmp/backups.txt ]; then
+            echo "→ No hay backups en tournament/, nada que retener."
+            exit 0
+          fi
+
+          tac /tmp/backups.txt > /tmp/backups-desc.txt
+          TOTAL=$(wc -l < /tmp/backups-desc.txt)
+          echo "→ $TOTAL backups en tournament/"
+          if [ "$TOTAL" -le 2 ]; then
+            echo "→ ≤2 backups, conservamos todos."
+            exit 0
+          fi
+
+          NOW_TS=$(date -u +%s)
+          THRESHOLD_TS=$((NOW_TS - 10*24*3600))
+          DELETED=0
+          KEPT=0
+          tail -n +3 /tmp/backups-desc.txt | while IFS=$'\t' read -r KEY LASTMOD; do
+            MOD_TS=$(date -u -d "$LASTMOD" +%s 2>/dev/null || echo 0)
+            if [ "$MOD_TS" -lt "$THRESHOLD_TS" ]; then
+              aws s3 rm "s3://$BUCKET/$KEY" --endpoint-url "$ENDPOINT" --quiet
+              echo "  deleted (>10d): $KEY"
+              DELETED=$((DELETED + 1))
+            else
+              KEPT=$((KEPT + 1))
+            fi
+          done
+          echo "→ Retención completa. kept=$KEPT, deleted=$DELETED"
