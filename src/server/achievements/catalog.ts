@@ -83,6 +83,19 @@ export const ACHIEVEMENT_CATALOG: AchievementDefinition[] = [
     iconId: "ico-five-exact",
     sortOrder: 6,
   },
+  {
+    id: "team-spirit",
+    title: "Espíritu de Equipo",
+    description: "Crea o únete a tu primer grupo de competición.",
+    tier: "common",
+    isShareable: false,
+    iconId: "ico-team",
+    // sortOrder 25 → render al final del tier común (el orden global
+    // por sortOrder se reagrupa por tier en el UI; este logro entra
+    // como séptimo común). No usamos 6.5 fraccional para mantener la
+    // numeración entera del resto del catálogo.
+    sortOrder: 25,
+  },
 
   // ───── Poco común (4) ─────
   {

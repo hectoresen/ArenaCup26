@@ -13,6 +13,7 @@ import {
   groups,
   users,
 } from "@/server/db/schema";
+import { evaluateAndUnlock } from "@/server/achievements/unlock";
 import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import { canJoinAnotherGroup, hasRoomForOneMore } from "./caps";
 import type { GroupActionResult } from "./types";
@@ -242,6 +243,16 @@ export async function acceptGroupInvitation(
       groupId: inv.groupId,
       userId,
       err,
+    });
+  }
+
+  // Logro `team-spirit` (común): el invitee se ha unido a su primer grupo.
+  try {
+    await evaluateAndUnlock(db, userId);
+  } catch (err) {
+    derr("ranking", "acceptGroupInvitation achievement eval failed", {
+      userId,
+      err: err instanceof Error ? err.message : String(err),
     });
   }
 

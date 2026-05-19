@@ -7,6 +7,7 @@ import { dlog, derr } from "@/lib/debug-log";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { groupMemberships, groups, userPoints } from "@/server/db/schema";
+import { evaluateAndUnlock } from "@/server/achievements/unlock";
 import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import {
   canJoinAnotherGroup,
@@ -287,6 +288,16 @@ export async function joinPublicGroup(groupId: string): Promise<GroupActionResul
 
   dlog("ranking", "joined public group", { groupId, userId });
 
+  // Logro `team-spirit` (común): primer grupo del user.
+  try {
+    await evaluateAndUnlock(db, userId);
+  } catch (err) {
+    derr("ranking", "joinPublicGroup achievement eval failed", {
+      userId,
+      err: err instanceof Error ? err.message : String(err),
+    });
+  }
+
   revalidatePath("/social");
   revalidatePath(`/social/grupos/${groupId}`);
   revalidatePath("/ranking");
@@ -379,6 +390,16 @@ export async function joinGroupViaLink(token: string): Promise<GroupActionResult
     .where(eq(groupLinks.id, r.linkId));
 
   dlog("ranking", "joined via link", { groupId: r.groupId, userId, linkId: r.linkId });
+
+  // Logro `team-spirit` (común): primer grupo del user.
+  try {
+    await evaluateAndUnlock(db, userId);
+  } catch (err) {
+    derr("ranking", "joinGroupViaLink achievement eval failed", {
+      userId,
+      err: err instanceof Error ? err.message : String(err),
+    });
+  }
 
   revalidatePath("/social");
   revalidatePath(`/social/grupos/${r.groupId}`);

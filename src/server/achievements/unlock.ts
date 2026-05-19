@@ -1,9 +1,11 @@
-import { and, eq, isNotNull, sql } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { dlog } from "@/lib/debug-log";
 import { env } from "@/lib/env";
 import type { Database } from "@/server/db/client";
 import {
   achievementDefinitions,
+  groupMemberships,
+  groups,
   invitationRedemptions,
   matches,
   pointEvents,
@@ -38,6 +40,12 @@ type UnlockContext = {
    * logro `better-with-friends` se desbloquea al llegar a 1.
    */
   referredFirstHits: number;
+  /**
+   * Número de grupos activos (memberships con `left_at IS NULL` y
+   * grupo no borrado) en los que el user participa. El logro
+   * `team-spirit` se desbloquea al llegar a 1.
+   */
+  activeGroupCount: number;
 };
 
 const UNLOCK_RULES: Record<string, (ctx: UnlockContext) => boolean> = {
@@ -47,6 +55,7 @@ const UNLOCK_RULES: Record<string, (ctx: UnlockContext) => boolean> = {
   "first-hundred": (c) => c.totalPoints >= 100,
   "five-of-five": (c) => c.exactCount >= 5,
   "better-with-friends": (c) => c.referredFirstHits >= 1,
+  "team-spirit": (c) => c.activeGroupCount >= 1,
 
   // ───── Poco común ─────
   "power-200": (c) => c.totalPoints >= 200,
@@ -240,6 +249,23 @@ async function loadContext(db: Database, userId: string): Promise<UnlockContext>
     );
   const referredFirstHits = referredFirstHitsRow[0]?.total ?? 0;
 
+  // Grupos activos del user (membership con `left_at IS NULL` + grupo
+  // no borrado). Solo cuentan los grupos vivos: si abandonas todos,
+  // el logro YA quedaría desbloqueado para siempre (no se revoca),
+  // pero la métrica refleja la realidad actual.
+  const groupCountRow = await db
+    .select({ total: sql<number>`count(*)::int` })
+    .from(groupMemberships)
+    .innerJoin(groups, eq(groups.id, groupMemberships.groupId))
+    .where(
+      and(
+        eq(groupMemberships.userId, userId),
+        isNull(groupMemberships.leftAt),
+        isNull(groups.deletedAt),
+      ),
+    );
+  const activeGroupCount = groupCountRow[0]?.total ?? 0;
+
   return {
     totalPoints: points?.totalPoints ?? 0,
     streak: points?.streak ?? 0,
@@ -248,6 +274,7 @@ async function loadContext(db: Database, userId: string): Promise<UnlockContext>
     rank,
     totalUsers,
     referredFirstHits,
+    activeGroupCount,
   };
 }
 

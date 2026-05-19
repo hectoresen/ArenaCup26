@@ -19,6 +19,7 @@ type Ctx = {
   exactCount: number;
   rank: number | null;
   referredFirstHits: number;
+  activeGroupCount: number;
 };
 
 const RULES: Record<string, (c: Ctx) => boolean> = {
@@ -27,6 +28,7 @@ const RULES: Record<string, (c: Ctx) => boolean> = {
   "first-hundred": (c) => c.totalPoints >= 100,
   "five-of-five": (c) => c.exactCount >= 5,
   "better-with-friends": (c) => c.referredFirstHits >= 1,
+  "team-spirit": (c) => c.activeGroupCount >= 1,
   "power-200": (c) => c.totalPoints >= 200,
   "on-fire": (c) => c.streak >= 5,
   "exact-shot": (c) => c.exactCount >= 1,
@@ -48,6 +50,7 @@ function ctx(overrides: Partial<Ctx> = {}): Ctx {
     exactCount: 0,
     rank: null,
     referredFirstHits: 0,
+    activeGroupCount: 0,
     ...overrides,
   };
 }
@@ -75,6 +78,12 @@ describe("achievement unlock rules", () => {
     expect(RULES["better-with-friends"]?.(ctx({ referredFirstHits: 0 }))).toBe(false);
     expect(RULES["better-with-friends"]?.(ctx({ referredFirstHits: 1 }))).toBe(true);
     expect(RULES["better-with-friends"]?.(ctx({ referredFirstHits: 5 }))).toBe(true);
+  });
+
+  it("team-spirit triggers on first active group membership", () => {
+    expect(RULES["team-spirit"]?.(ctx({ activeGroupCount: 0 }))).toBe(false);
+    expect(RULES["team-spirit"]?.(ctx({ activeGroupCount: 1 }))).toBe(true);
+    expect(RULES["team-spirit"]?.(ctx({ activeGroupCount: 3 }))).toBe(true);
   });
 
   it("exact-shot/five-of-five/elite-shooter/seer scale with exactCount", () => {
@@ -107,9 +116,9 @@ describe("achievement unlock rules", () => {
     expect(RULES["king-of-the-moment"]?.(ctx({ rank: 2 }))).toBe(false);
   });
 
-  it("rules covers 16 evaluable achievements (rest are pending)", () => {
-    // 16 = 15 originales + better-with-friends (añadido 2026-05-16
-    // al aterrizar F4 invitations). PENDING_RULES bajó de 9 a 8.
-    expect(Object.keys(RULES)).toHaveLength(16);
+  it("rules covers 17 evaluable achievements (rest are pending)", () => {
+    // 17 = 15 originales + better-with-friends (2026-05-16) + team-spirit
+    // (2026-05-19, al aterrizar grupos). PENDING_RULES sigue en 8.
+    expect(Object.keys(RULES)).toHaveLength(17);
   });
 });

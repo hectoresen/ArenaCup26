@@ -67,6 +67,20 @@ export function AchievementsIconSprite() {
           <line x1="21" y1="23" x2="33" y2="23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
         </symbol>
 
+        {/* TEAM — team-spirit (common). Tres figuras juntas
+            representando un grupo de competición. */}
+        <symbol id="ach-team" viewBox="0 0 36 36">
+          {/* Figura central, más grande (admin). */}
+          <circle cx="18" cy="10" r="4" fill="none" stroke="currentColor" strokeWidth="1.7" />
+          <path d="M10 30 C10 22 13.5 18 18 18 C22.5 18 26 22 26 30" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+          {/* Figura izquierda, más pequeña. */}
+          <circle cx="7" cy="13" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M2 30 C2 24 4 20 7 20 C8.5 20 10 20.8 11 22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          {/* Figura derecha, más pequeña. */}
+          <circle cx="29" cy="13" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M25 22 C26 20.8 27.5 20 29 20 C32 20 34 24 34 30" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </symbol>
+
         {/* FIVE EXACT — five-of-five (common) */}
         <symbol id="ach-five-exact" viewBox="0 0 36 36">
           <circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" strokeWidth="1.4" />

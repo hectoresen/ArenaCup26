@@ -2,17 +2,19 @@ import { describe, expect, it } from "vitest";
 import { ACHIEVEMENT_CATALOG } from "./catalog";
 
 describe("ACHIEVEMENT_CATALOG", () => {
-  it("contains exactly 24 achievements", () => {
-    expect(ACHIEVEMENT_CATALOG).toHaveLength(24);
+  it("contains exactly 25 achievements", () => {
+    // 24 originales + team-spirit (común, añadido 2026-05-19 con
+    // la feature de grupos de competición).
+    expect(ACHIEVEMENT_CATALOG).toHaveLength(25);
   });
 
-  it("has the expected tier distribution (6/4/6/4/3/1)", () => {
+  it("has the expected tier distribution (7/4/6/4/3/1)", () => {
     const counts: Record<string, number> = {};
     for (const def of ACHIEVEMENT_CATALOG) {
       counts[def.tier] = (counts[def.tier] ?? 0) + 1;
     }
     expect(counts).toEqual({
-      common: 6,
+      common: 7,
       rare: 4,
       epic: 6,
       legendary: 4,
@@ -26,11 +28,15 @@ describe("ACHIEVEMENT_CATALOG", () => {
     expect(ids.size).toBe(ACHIEVEMENT_CATALOG.length);
   });
 
-  it("uses sequential sortOrder from 1 to 24", () => {
-    const sorted = [...ACHIEVEMENT_CATALOG].sort((a, b) => a.sortOrder - b.sortOrder);
-    sorted.forEach((def, index) => {
-      expect(def.sortOrder).toBe(index + 1);
-    });
+  it("uses unique sortOrder values; sequence 1-24 + team-spirit at 25", () => {
+    // El catálogo se construyó originalmente con sortOrder secuencial
+    // 1..24. `team-spirit` (común, añadido 2026-05-19) ocupa el slot
+    // 25 fuera del rango ordenado — el agrupado por tier en el UI
+    // lo coloca al final del bloque común.
+    const sortOrders = ACHIEVEMENT_CATALOG.map((d) => d.sortOrder);
+    expect(new Set(sortOrders).size).toBe(sortOrders.length);
+    expect(Math.min(...sortOrders)).toBe(1);
+    expect(Math.max(...sortOrders)).toBe(25);
   });
 
   it("marks legendary, mythic and goat tiers as shareable; lower tiers not", () => {
@@ -63,6 +69,9 @@ describe("ACHIEVEMENT_CATALOG", () => {
     expect(goat).toBeDefined();
     if (!goat) return;
     expect(goat.id).toBe("the-goat");
+    // `team-spirit` ocupa el sortOrder 25 (al final), por encima del
+    // goat. Esto es OK porque dentro de cada tier solo importa el
+    // orden relativo, y el goat sigue siendo el único de su tier.
     expect(goat.sortOrder).toBe(24);
     expect(goat.isShareable).toBe(true);
   });

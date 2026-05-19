@@ -11,6 +11,7 @@ import {
   groupMemberships,
   groups,
 } from "@/server/db/schema";
+import { evaluateAndUnlock } from "@/server/achievements/unlock";
 import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import {
   GROUP_MEMBERS_DEFAULT,
@@ -91,6 +92,17 @@ export async function createGroup(input: CreateGroupInput): Promise<GroupActionR
   });
 
   dlog("ranking", "group created", { groupId: group.id, userId });
+
+  // Logro `team-spirit` (común): crear o unirse al primer grupo.
+  // Fire-and-forget — un fallo aquí no debe abortar la creación.
+  try {
+    await evaluateAndUnlock(db, userId);
+  } catch (err) {
+    derr("ranking", "createGroup: achievement evaluation failed", {
+      userId,
+      err: err instanceof Error ? err.message : String(err),
+    });
+  }
 
   revalidatePath("/social");
   revalidatePath("/ranking");
