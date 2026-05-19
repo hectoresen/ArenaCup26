@@ -1,6 +1,6 @@
 import { GroupAdminPanel } from "@/components/groups/group-admin-panel";
 import { GroupAvatar } from "@/components/groups/group-avatar";
-import { GroupRankingList } from "@/components/groups/group-ranking-list";
+import { GroupLeaderboardView } from "@/components/groups/group-leaderboard-view";
 import { LeaveGroupButton } from "@/components/groups/leave-group-button";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
@@ -92,7 +92,7 @@ export default async function GrupoDetailPage({
             Ranking del grupo
           </h2>
         </header>
-        <GroupRankingList entries={ranking} viewerUserId={session.user.id} />
+        <GroupLeaderboardView entries={ranking} />
       </section>
 
       {detail.viewerIsAdmin && (

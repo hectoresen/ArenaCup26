@@ -450,7 +450,13 @@
           "achievement_unlocked": "Logro desbloqueado",
           "system": "Sistema",
           "friend_request": "Solicitud de amistad",
-          "friend_accepted": "Solicitud aceptada"
+          "friend_accepted": "Solicitud aceptada",
+          "group_invited": "Invitación a grupo",
+          "group_joined": "Nuevo miembro en grupo",
+          "group_left": "Un miembro ha salido",
+          "group_expelled": "Expulsión de grupo",
+          "group_admin_transferred": "Eres admin de un grupo",
+          "group_deleted": "Grupo cerrado"
         }
       }
     },

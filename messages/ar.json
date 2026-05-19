@@ -450,7 +450,13 @@
           "achievement_unlocked": "تم فتح إنجاز",
           "system": "النظام",
           "friend_request": "طلب صداقة",
-          "friend_accepted": "تم قبول الطلب"
+          "friend_accepted": "تم قبول الطلب",
+          "group_invited": "دعوة إلى مجموعة",
+          "group_joined": "عضو جديد في المجموعة",
+          "group_left": "غادر عضو المجموعة",
+          "group_expelled": "تم الطرد من المجموعة",
+          "group_admin_transferred": "أنت الآن مشرف المجموعة",
+          "group_deleted": "تم إغلاق المجموعة"
         }
       }
     },

@@ -1,4 +1,4 @@
-import { GroupRankingList } from "@/components/groups/group-ranking-list";
+import { GroupLeaderboardView } from "@/components/groups/group-leaderboard-view";
 import {
   type GroupNavEntry,
   RankingNav,
@@ -120,41 +120,29 @@ export default async function RankingPage({
       )}
 
       {effectiveScope === "amigos" && (
-        <div className="mx-auto w-full max-w-[510px]">
-          <header className="mb-3 flex items-center justify-between">
-            <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
-              Ranking entre amigos
-            </h2>
-            <span className="text-[11px] font-bold text-muted">
-              {friendsRanking.length}{" "}
-              {friendsRanking.length === 1 ? "jugador" : "jugadores"}
-            </span>
-          </header>
-          <GroupRankingList entries={friendsRanking} viewerUserId={viewerId} />
-        </div>
+        <GroupLeaderboardView
+          entries={friendsRanking}
+          title="Ranking entre amigos"
+          countLabel={`${friendsRanking.length} ${friendsRanking.length === 1 ? "jugador" : "jugadores"}`}
+        />
       )}
 
       {effectiveScope === "grupos" && (
-        <div className="mx-auto w-full max-w-[510px]">
+        <>
           {myGroups.length === 0 ? (
-            <NoGroupsEmptyState />
+            <div className="mx-auto w-full max-w-[510px]">
+              <NoGroupsEmptyState />
+            </div>
           ) : (
             activeGroupId && (
-              <>
-                <header className="mb-3 flex items-center justify-between">
-                  <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
-                    {myGroups.find((g) => g.id === activeGroupId)?.name ?? "Grupo"}
-                  </h2>
-                  <span className="text-[11px] font-bold text-muted">
-                    {groupRanking.length}{" "}
-                    {groupRanking.length === 1 ? "miembro" : "miembros"}
-                  </span>
-                </header>
-                <GroupRankingList entries={groupRanking} viewerUserId={viewerId} />
-              </>
+              <GroupLeaderboardView
+                entries={groupRanking}
+                title={myGroups.find((g) => g.id === activeGroupId)?.name ?? "Grupo"}
+                countLabel={`${groupRanking.length} ${groupRanking.length === 1 ? "miembro" : "miembros"}`}
+              />
             )
           )}
-        </div>
+        </>
       )}
     </section>
   );

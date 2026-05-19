@@ -450,7 +450,13 @@
           "achievement_unlocked": "Achievement unlocked",
           "system": "System",
           "friend_request": "Friend request",
-          "friend_accepted": "Request accepted"
+          "friend_accepted": "Request accepted",
+          "group_invited": "Group invitation",
+          "group_joined": "New group member",
+          "group_left": "Member left",
+          "group_expelled": "Group expulsion",
+          "group_admin_transferred": "You are now group admin",
+          "group_deleted": "Group closed"
         }
       }
     },

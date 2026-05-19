@@ -141,9 +141,9 @@ export async function getFriends(db: Database, userId: string): Promise<Friend[]
  * viewer + sus amigos aceptados. Mismo tie-break que el global:
  * points → streakMax → simpleHits → predictionsTotal → createdAt.
  *
- * Reutilizamos el tipo `GroupRankingEntry` para que `<GroupRankingList>`
- * lo renderice sin cambios. El flag `frozen` siempre es `false` aquí
- * (no aplica la lógica de ex-miembros).
+ * Reutilizamos el tipo `GroupRankingEntry` para que
+ * `<GroupLeaderboardView>` lo renderice sin cambios. El flag `frozen`
+ * siempre es `false` aquí (no aplica la lógica de ex-miembros).
  *
  * Si el user no tiene amigos, devuelve un array de 1 elemento (solo
  * el viewer). La UI decide qué copy mostrar.
