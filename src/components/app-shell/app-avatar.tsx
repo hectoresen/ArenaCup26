@@ -48,7 +48,6 @@ export function AppAvatar({ user, size = "md" }: Props) {
 
   const outer = size === "sm" ? "h-8 w-8 p-[2px]" : "h-9 w-9 p-[2px]";
   const inner = size === "sm" ? "h-6 w-6 text-[10px]" : "h-7 w-7 text-[11px]";
-  const emojiSize = size === "sm" ? "text-[14px]" : "text-[16px]";
 
   return (
     <span
@@ -60,8 +59,10 @@ export function AppAvatar({ user, size = "md" }: Props) {
         className={`${inner} inline-flex items-center justify-center overflow-hidden rounded-full border-2 border-black/25 bg-[radial-gradient(135deg,#ffe066,#c8900a)] font-display text-[#1a1000]`}
       >
         {galleryAvatar ? (
-          <span className={`${emojiSize} leading-none`}>{galleryAvatar.emoji}</span>
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={galleryAvatar.src} alt="" className="h-full w-full object-cover" />
         ) : user.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={user.image} alt="" className="h-full w-full object-cover" />
         ) : (
           initials

@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <clipPath id="cc3"><circle cx="128" cy="128" r="128"/></clipPath>
+    <linearGradient id="bg3c" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#0d1830"/>
+      <stop offset="100%" stop-color="#060e1e"/>
+    </linearGradient>
+    <linearGradient id="pod1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#f5c842"/>
+      <stop offset="100%" stop-color="#c88800"/>
+    </linearGradient>
+    <linearGradient id="pod2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#c8d8f0"/>
+      <stop offset="100%" stop-color="#8090b0"/>
+    </linearGradient>
+    <linearGradient id="pod3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#e8834a"/>
+      <stop offset="100%" stop-color="#a04820"/>
+    </linearGradient>
+    <radialGradient id="stageLit" cx="50%" cy="0%" r="80%">
+      <stop offset="0%"   stop-color="rgba(245,200,66,0.18)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+  <g clip-path="url(#cc3)">
+
+    <!-- BG -->
+    <rect width="256" height="256" fill="url(#bg3c)"/>
+    <ellipse cx="128" cy="50" rx="140" ry="120" fill="url(#stageLit)"/>
+
+    <!-- Confetti -->
+    <circle cx="28"  cy="35"  r="4"   fill="#ff6b9d" opacity="0.8"/>
+    <circle cx="225" cy="28"  r="3.5" fill="#34d97b" opacity="0.8"/>
+    <circle cx="42"  cy="80"  r="3"   fill="#4fc3f7" opacity="0.7"/>
+    <circle cx="210" cy="72"  r="4"   fill="#f5c842" opacity="0.75"/>
+    <rect x="185" y="40" width="8" height="5" rx="1" fill="#c084fc" opacity="0.7" transform="rotate(30 189 42)"/>
+    <rect x="58"  y="50" width="7" height="4" rx="1" fill="#ff8c42" opacity="0.7" transform="rotate(-22 61 52)"/>
+    <rect x="220" y="100" width="7" height="4" rx="1" fill="#34d97b" opacity="0.65" transform="rotate(18 223 102)"/>
+    <rect x="28"  y="108" width="7" height="4" rx="1" fill="#ff6b9d" opacity="0.65" transform="rotate(-15 31 110)"/>
+
+    <!-- ── PODIUM BLOCKS ── -->
+    <!-- 2nd place (left) -->
+    <rect x="22"  y="178" width="74" height="52" rx="6" fill="url(#pod2)" stroke="#607090" stroke-width="2.5"/>
+    <text x="59"  y="212" text-anchor="middle" font-family="Fredoka One, cursive" font-size="22" fill="#0d1830">2</text>
+
+    <!-- 1st place (center, taller) -->
+    <rect x="92"  y="152" width="72" height="78" rx="6" fill="url(#pod1)" stroke="#c88800" stroke-width="2.5"/>
+    <text x="128" y="210" text-anchor="middle" font-family="Fredoka One, cursive" font-size="22" fill="#3a2000">1</text>
+    <!-- Gold shimmer stripe -->
+    <rect x="92"  y="152" width="24" height="78" rx="6" fill="rgba(255,255,255,0.12)"/>
+
+    <!-- 3rd place (right) -->
+    <rect x="160" y="192" width="74" height="38" rx="6" fill="url(#pod3)" stroke="#804020" stroke-width="2.5"/>
+    <text x="197" y="218" text-anchor="middle" font-family="Fredoka One, cursive" font-size="22" fill="#2a1000">3</text>
+
+    <!-- ── CHARACTER #1 (gold, center, with trophy) ── -->
+    <!-- Body -->
+    <rect x="106" y="106" width="44" height="50" rx="12" fill="#f5c842" stroke="#c88800" stroke-width="2.5"/>
+    <rect x="118" y="106" width="16" height="50" rx="5" fill="rgba(255,255,255,0.2)"/>
+    <!-- Arms up holding trophy -->
+    <rect x="84"  y="100" width="24" height="12" rx="6" fill="#f5c842" stroke="#c88800" stroke-width="2" transform="rotate(-40 96 106)"/>
+    <rect x="148" y="100" width="24" height="12" rx="6" fill="#f5c842" stroke="#c88800" stroke-width="2" transform="rotate(40 160 106)"/>
+    <!-- Legs -->
+    <rect x="109" y="150" width="12" height="18" rx="5" fill="#c88800" stroke="#a06000" stroke-width="2"/>
+    <rect x="135" y="150" width="12" height="18" rx="5" fill="#c88800" stroke="#a06000" stroke-width="2"/>
+    <!-- Boots -->
+    <ellipse cx="115" cy="168" rx="9" ry="6" fill="#1a1000" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="141" cy="168" rx="9" ry="6" fill="#1a1000" stroke="#333" stroke-width="1.5"/>
+    <!-- Head -->
+    <circle cx="128" cy="90" r="22" fill="#f0d0a0" stroke="#c89060" stroke-width="2.5"/>
+    <!-- Hair -->
+    <path d="M107 82 C109 66 128 58 146 70 L146 84 C140 74 112 74 110 84 Z" fill="#f5c842"/>
+    <!-- Crown on head -->
+    <polygon points="113,74 117,63 121,74" fill="#f5c842" stroke="#c88800" stroke-width="1.5"/>
+    <polygon points="124,74 128,58 132,74" fill="#f5c842" stroke="#c88800" stroke-width="1.5"/>
+    <polygon points="135,74 139,63 143,74" fill="#f5c842" stroke="#c88800" stroke-width="1.5"/>
+    <rect x="113" y="74" width="30" height="12" rx="3" fill="#f5c842" stroke="#c88800" stroke-width="1.5"/>
+    <!-- Eyes (happy) -->
+    <path d="M119 92 Q122 96 126 92" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <path d="M130 92 Q133 96 137 92" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <!-- Smile -->
+    <path d="M119 100 Q128 108 137 100" fill="none" stroke="#a06030" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Mini trophy held up -->
+    <rect x="115" y="58" width="26" height="6" rx="3" fill="#f5c842" stroke="#c88800" stroke-width="1.5"/>
+    <path d="M121 46 C118 46 115 48 115 53 C115 58 119 62 124 64 L128 65 L132 64 C137 62 141 58 141 53 C141 48 138 46 135 46 Z" fill="#f5c842" stroke="#c88800" stroke-width="1.5"/>
+    <path d="M121 49 C118 49 116 51 117 55" fill="none" stroke="#c88800" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M135 49 C138 49 140 51 139 55" fill="none" stroke="#c88800" stroke-width="1.2" stroke-linecap="round"/>
+
+    <!-- ── CHARACTER #2 (silver, left) ── -->
+    <rect x="30"  y="138" width="36" height="44" rx="10" fill="#c8d8f0" stroke="#8090b0" stroke-width="2.5"/>
+    <rect x="48"  y="138" width="12" height="44" rx="4" fill="rgba(255,255,255,0.2)"/>
+    <rect x="16"  y="142" width="16" height="10" rx="5" fill="#c8d8f0" stroke="#8090b0" stroke-width="2" transform="rotate(15 24 147)"/>
+    <rect x="70"  y="140" width="18" height="10" rx="5" fill="#c8d8f0" stroke="#8090b0" stroke-width="2" transform="rotate(-20 79 145)"/>
+    <rect x="33"  y="176" width="10" height="16" rx="4" fill="#607090" stroke="#405060" stroke-width="1.5"/>
+    <rect x="53"  y="176" width="10" height="16" rx="4" fill="#607090" stroke="#405060" stroke-width="1.5"/>
+    <ellipse cx="38"  cy="192" rx="8" ry="5" fill="#222" stroke="#333" stroke-width="1.2"/>
+    <ellipse cx="58"  cy="192" rx="8" ry="5" fill="#222" stroke="#333" stroke-width="1.2"/>
+    <circle cx="48" cy="126" r="17" fill="#f0d0a0" stroke="#c89060" stroke-width="2.5"/>
+    <path d="M32 120 C34 108 48 102 62 110 L62 122 C58 114 36 114 34 122 Z" fill="#8B4513"/>
+    <circle cx="43" cy="126" r="3" fill="#222"/>
+    <circle cx="53" cy="126" r="3" fill="#222"/>
+    <path d="M43 133 Q48 137 53 133" fill="none" stroke="#a06030" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- ── CHARACTER #3 (bronze, right) ── -->
+    <rect x="168" y="152" width="36" height="44" rx="10" fill="#e8834a" stroke="#a04820" stroke-width="2.5"/>
+    <rect x="186" y="152" width="12" height="44" rx="4" fill="rgba(255,255,255,0.2)"/>
+    <rect x="156" y="156" width="16" height="10" rx="5" fill="#e8834a" stroke="#a04820" stroke-width="2" transform="rotate(20 164 161)"/>
+    <rect x="202" y="155" width="18" height="10" rx="5" fill="#e8834a" stroke="#a04820" stroke-width="2" transform="rotate(-15 211 160)"/>
+    <rect x="171" y="190" width="10" height="16" rx="4" fill="#7a3010" stroke="#501a00" stroke-width="1.5"/>
+    <rect x="191" y="190" width="10" height="16" rx="4" fill="#7a3010" stroke="#501a00" stroke-width="1.5"/>
+    <ellipse cx="176" cy="206" rx="8" ry="5" fill="#222" stroke="#333" stroke-width="1.2"/>
+    <ellipse cx="196" cy="206" rx="8" ry="5" fill="#222" stroke="#333" stroke-width="1.2"/>
+    <circle cx="186" cy="140" r="17" fill="#f0d0a0" stroke="#c89060" stroke-width="2.5"/>
+    <path d="M170 134 C172 122 186 116 200 124 L200 136 C196 128 174 128 172 136 Z" fill="#222"/>
+    <circle cx="181" cy="140" r="3" fill="#222"/>
+    <circle cx="191" cy="140" r="3" fill="#222"/>
+    <path d="M181 147 Q186 151 191 147" fill="none" stroke="#a06030" stroke-width="2" stroke-linecap="round"/>
+
+  </g>
+</svg>

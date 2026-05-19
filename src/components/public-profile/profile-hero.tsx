@@ -43,7 +43,13 @@ export function ProfileHero({ identity, isOwner = false, cooldowns }: Props) {
       >
         <span className="inline-flex h-full w-full items-center justify-center overflow-hidden rounded-full border-[3px] border-black/25 bg-[radial-gradient(135deg,#ffe066,#c8900a)] font-display text-[34px] text-[#1a1000]">
           {galleryAvatar ? (
-            <span className="text-[44px] leading-none">{galleryAvatar.emoji}</span>
+            // biome-ignore lint/performance/noImgElement: small avatar
+            // biome-ignore lint/a11y/useAltText: alt resolved by parent label
+            <img
+              src={galleryAvatar.src}
+              alt=""
+              className="h-full w-full rounded-full object-cover"
+            />
           ) : identity.image ? (
             // biome-ignore lint/performance/noImgElement: small avatar
             // biome-ignore lint/a11y/useAltText: alt resolved by parent label

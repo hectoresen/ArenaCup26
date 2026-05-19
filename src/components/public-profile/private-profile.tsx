@@ -35,7 +35,13 @@ export function PrivateProfile({ identity }: Props) {
           className="inline-flex h-20 w-20 items-center justify-center rounded-full border-[3px] border-border bg-card-hover font-display text-[28px] text-muted opacity-70"
         >
           {galleryAvatar ? (
-            <span className="text-[36px] leading-none opacity-80">{galleryAvatar.emoji}</span>
+            // biome-ignore lint/performance/noImgElement: small avatar
+            // biome-ignore lint/a11y/useAltText: alt resolved by parent label
+            <img
+              src={galleryAvatar.src}
+              alt=""
+              className="h-full w-full rounded-full object-cover opacity-60"
+            />
           ) : identity.image ? (
             // biome-ignore lint/performance/noImgElement: small avatar
             // biome-ignore lint/a11y/useAltText: alt resolved by parent label

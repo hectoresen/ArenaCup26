@@ -94,7 +94,9 @@ function FriendRow({ friend: f, onRemove }: { friend: Friend; onRemove: () => vo
         className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-gold/30 bg-card-hover font-display text-base text-foreground"
       >
         {galleryAvatar ? (
-          <span className="text-[20px] leading-none">{galleryAvatar.emoji}</span>
+          // biome-ignore lint/performance/noImgElement: small avatar
+          // biome-ignore lint/a11y/useAltText: alt resolved by parent label
+          <img src={galleryAvatar.src} alt="" className="h-full w-full rounded-full object-cover" />
         ) : f.image ? (
           // biome-ignore lint/performance/noImgElement: small avatar
           // biome-ignore lint/a11y/useAltText: alt resolved by parent label

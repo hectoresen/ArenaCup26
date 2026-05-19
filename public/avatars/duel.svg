@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <clipPath id="cc2"><circle cx="128" cy="128" r="128"/></clipPath>
+    <linearGradient id="bgTop2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#1a0820"/>
+      <stop offset="100%" stop-color="#2d1040"/>
+    </linearGradient>
+    <linearGradient id="pitch2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#1a5c20"/>
+      <stop offset="100%" stop-color="#0d3a12"/>
+    </linearGradient>
+    <radialGradient id="spotlight" cx="50%" cy="0%" r="80%">
+      <stop offset="0%"   stop-color="rgba(245,200,66,0.22)"/>
+      <stop offset="100%" stop-color="rgba(245,200,66,0)"/>
+    </radialGradient>
+  </defs>
+  <g clip-path="url(#cc2)">
+
+    <!-- BG sky -->
+    <rect width="256" height="200" fill="url(#bgTop2)"/>
+    <!-- Pitch ground -->
+    <rect x="0" y="185" width="256" height="71" fill="url(#pitch2)"/>
+    <!-- Pitch line -->
+    <rect x="0" y="183" width="256" height="6" rx="0" fill="#2a7a30"/>
+    <!-- Spotlight from above -->
+    <ellipse cx="128" cy="0" rx="140" ry="200" fill="url(#spotlight)"/>
+    <!-- Centre pitch line -->
+    <line x1="128" y1="183" x2="128" y2="256" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+
+    <!-- Crowd silhouettes top left -->
+    <ellipse cx="30"  cy="158" rx="12" ry="16" fill="#2a1040" opacity="0.8"/>
+    <ellipse cx="55"  cy="152" rx="11" ry="18" fill="#2a1040" opacity="0.75"/>
+    <ellipse cx="78"  cy="158" rx="10" ry="15" fill="#2a1040" opacity="0.7"/>
+    <!-- Crowd silhouettes top right -->
+    <ellipse cx="178" cy="158" rx="10" ry="15" fill="#2a1040" opacity="0.7"/>
+    <ellipse cx="201" cy="152" rx="11" ry="18" fill="#2a1040" opacity="0.75"/>
+    <ellipse cx="226" cy="158" rx="12" ry="16" fill="#2a1040" opacity="0.8"/>
+
+    <!-- VS lightning bolt in middle -->
+    <polygon points="128,100 120,135 130,135 122,170 136,135 126,135" fill="#f5c842" stroke="#c88000" stroke-width="2.5" stroke-linejoin="round"/>
+
+    <!-- ── LEFT PLAYER (blue kit) ── -->
+    <!-- Body -->
+    <rect x="52" y="170" width="30" height="40" rx="8" fill="#4fc3f7" stroke="#0080b0" stroke-width="2.5"/>
+    <!-- Jersey stripe -->
+    <rect x="62" y="170" width="10" height="40" rx="3" fill="rgba(255,255,255,0.25)"/>
+    <!-- Left leg -->
+    <rect x="55" y="205" width="11" height="28" rx="5" fill="#1a3060" stroke="#0a1840" stroke-width="2"/>
+    <!-- Right leg -->
+    <rect x="70" y="205" width="11" height="28" rx="5" fill="#1a3060" stroke="#0a1840" stroke-width="2"/>
+    <!-- Boot left -->
+    <ellipse cx="60" cy="233" rx="9" ry="6" fill="#f5c842" stroke="#c88800" stroke-width="1.5"/>
+    <!-- Boot right -->
+    <ellipse cx="76" cy="233" rx="9" ry="6" fill="#f5c842" stroke="#c88800" stroke-width="1.5"/>
+    <!-- Left arm (raised toward ball) -->
+    <rect x="36" y="172" width="18" height="10" rx="5" fill="#4fc3f7" stroke="#0080b0" stroke-width="2" transform="rotate(20 45 177)"/>
+    <!-- Right arm (back) -->
+    <rect x="80" y="172" width="16" height="9"  rx="4" fill="#4fc3f7" stroke="#0080b0" stroke-width="2" transform="rotate(-15 88 176)"/>
+    <!-- Head -->
+    <circle cx="67" cy="158" r="20" fill="#f0d0a0" stroke="#c89060" stroke-width="2.5"/>
+    <!-- Hair -->
+    <path d="M48 150 C50 136 67 130 82 140 L82 152 C76 144 52 144 50 152 Z" fill="#222"/>
+    <!-- Eyes -->
+    <circle cx="61" cy="158" r="3.5" fill="white"/>
+    <circle cx="73" cy="158" r="3.5" fill="white"/>
+    <circle cx="62" cy="159" r="2"   fill="#222"/>
+    <circle cx="74" cy="159" r="2"   fill="#222"/>
+    <!-- Angry eyebrows -->
+    <line x1="57" y1="152" x2="65" y2="155" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="69" y1="155" x2="77" y2="152" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Mouth -->
+    <path d="M61 167 Q67 163 73 167" fill="none" stroke="#a06030" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- ── RIGHT PLAYER (red kit) ── -->
+    <!-- Body -->
+    <rect x="174" y="170" width="30" height="40" rx="8" fill="#ff4d6d" stroke="#c00030" stroke-width="2.5"/>
+    <!-- Jersey stripe -->
+    <rect x="184" y="170" width="10" height="40" rx="3" fill="rgba(255,255,255,0.25)"/>
+    <!-- Left leg -->
+    <rect x="177" y="205" width="11" height="28" rx="5" fill="#6a0018" stroke="#400010" stroke-width="2"/>
+    <!-- Right leg -->
+    <rect x="192" y="205" width="11" height="28" rx="5" fill="#6a0018" stroke="#400010" stroke-width="2"/>
+    <!-- Boot left -->
+    <ellipse cx="182" cy="233" rx="9" ry="6" fill="#f5c842" stroke="#c88800" stroke-width="1.5"/>
+    <!-- Boot right -->
+    <ellipse cx="198" cy="233" rx="9" ry="6" fill="#f5c842" stroke="#c88800" stroke-width="1.5"/>
+    <!-- Left arm (back) -->
+    <rect x="160" y="172" width="16" height="9"  rx="4" fill="#ff4d6d" stroke="#c00030" stroke-width="2" transform="rotate(15 168 176)"/>
+    <!-- Right arm (raised) -->
+    <rect x="202" y="172" width="18" height="10" rx="5" fill="#ff4d6d" stroke="#c00030" stroke-width="2" transform="rotate(-20 211 177)"/>
+    <!-- Head -->
+    <circle cx="189" cy="158" r="20" fill="#f0d0a0" stroke="#c89060" stroke-width="2.5"/>
+    <!-- Hair -->
+    <path d="M170 150 C172 136 189 130 204 140 L204 152 C198 144 174 144 172 152 Z" fill="#8B4513"/>
+    <!-- Eyes -->
+    <circle cx="183" cy="158" r="3.5" fill="white"/>
+    <circle cx="195" cy="158" r="3.5" fill="white"/>
+    <circle cx="184" cy="159" r="2"   fill="#222"/>
+    <circle cx="196" cy="159" r="2"   fill="#222"/>
+    <!-- Angry eyebrows -->
+    <line x1="179" y1="152" x2="187" y2="155" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="191" y1="155" x2="199" y2="152" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Mouth (gritted) -->
+    <path d="M183 167 Q189 163 195 167" fill="none" stroke="#a06030" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Football between them -->
+    <circle cx="128" cy="222" r="22" fill="white" stroke="#222" stroke-width="3"/>
+    <path d="M128 202 L135 208 L133 218 L123 218 L121 208 Z" fill="#222"/>
+    <path d="M112 211 L121 208 L123 218 L117 224 L108 220 Z" fill="#222"/>
+    <path d="M144 211 L135 208 L133 218 L139 224 L148 220 Z" fill="#222"/>
+    <!-- Ball shine -->
+    <ellipse cx="120" cy="209" rx="6" ry="4" fill="white" opacity="0.5" transform="rotate(-20 120 209)"/>
+
+    <!-- "VS" text -->
+    <text x="128" y="146" text-anchor="middle" font-family="Fredoka One, cursive" font-size="22" fill="#f5c842" stroke="#c88000" stroke-width="3" paint-order="stroke">VS</text>
+
+  </g>
+</svg>

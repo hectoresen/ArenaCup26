@@ -143,7 +143,7 @@ export function AvatarPicker({
             <div
               role="radiogroup"
               aria-label={t("avatarPickerTitle")}
-              className="grid grid-cols-6 gap-2 max-[420px]:grid-cols-4"
+              className="grid grid-cols-2 gap-3 sm:grid-cols-4"
             >
               {AVATAR_GALLERY.map((a) => (
                 <button
@@ -154,13 +154,24 @@ export function AvatarPicker({
                   aria-label={a.label}
                   onClick={() => setDraft(a.id)}
                   disabled={isPending}
-                  className={`flex aspect-square cursor-pointer items-center justify-center rounded-2xl border-2 text-3xl transition-all disabled:cursor-wait disabled:opacity-60 ${
+                  className={`group/avatar flex flex-col items-center gap-1.5 rounded-2xl border-2 p-2.5 transition-all disabled:cursor-wait disabled:opacity-60 ${
                     draft === a.id
-                      ? "border-gold bg-gold/[0.12] scale-105"
-                      : "border-border bg-card-hover hover:border-gold/40 hover:scale-105"
+                      ? "border-gold bg-gold/[0.12] scale-[1.02] cursor-pointer"
+                      : "border-border bg-card-hover hover:border-gold/40 hover:scale-[1.02] cursor-pointer"
                   }`}
                 >
-                  {a.emoji}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={a.src}
+                    alt=""
+                    width={96}
+                    height={96}
+                    className="h-full w-full max-w-[96px] rounded-full"
+                    loading="lazy"
+                  />
+                  <span className="font-display text-[11px] uppercase tracking-[0.08em] text-foreground">
+                    {a.label}
+                  </span>
                 </button>
               ))}
             </div>
