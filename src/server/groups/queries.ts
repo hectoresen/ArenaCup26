@@ -6,6 +6,7 @@ import {
   inArray,
   isNull,
   isNotNull,
+  lte,
   ne,
   or,
   sql,
@@ -379,7 +380,7 @@ export async function getGroupRanking(
     .where(
       and(
         inArray(rankingSnapshots.userId, memberUserIds),
-        sql`${rankingSnapshots.snapshotDate} <= ${sevenDaysAgo}`,
+        lte(rankingSnapshots.snapshotDate, sevenDaysAgo),
       ),
     )
     .orderBy(desc(rankingSnapshots.snapshotDate));
