@@ -1,4 +1,4 @@
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { Database } from "@/server/db/client";
 import { friendships, predictions, userPoints, users } from "@/server/db/schema";
@@ -189,7 +189,7 @@ export async function getFriendsRanking(
     })
     .from(users)
     .leftJoin(userPoints, eq(userPoints.userId, users.id))
-    .where(sql`${users.id} = ANY(${subsetIds})`);
+    .where(inArray(users.id, subsetIds));
 
   // 3) Conteo de predicciones (tie-break 4º).
   const predRows = await db
@@ -198,7 +198,7 @@ export async function getFriendsRanking(
       total: sql<number>`count(*)::int`,
     })
     .from(predictions)
-    .where(sql`${predictions.userId} = ANY(${subsetIds})`)
+    .where(inArray(predictions.userId, subsetIds))
     .groupBy(predictions.userId);
   const predMap = new Map(predRows.map((p) => [p.userId, p.total]));
 

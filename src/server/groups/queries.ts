@@ -1,4 +1,15 @@
-import { and, asc, desc, eq, isNull, isNotNull, ne, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  isNull,
+  isNotNull,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { Database } from "@/server/db/client";
 import {
@@ -63,7 +74,7 @@ export async function getUserGroups(db: Database, userId: string): Promise<Group
     .from(groupMemberships)
     .where(
       and(
-        sql`${groupMemberships.groupId} = ANY(${groupIds})`,
+        inArray(groupMemberships.groupId, groupIds),
         isNull(groupMemberships.leftAt),
       ),
     )
@@ -269,7 +280,7 @@ export async function getGroupRanking(
           simpleHits: userPoints.simpleHits,
         })
         .from(userPoints)
-        .where(sql`${userPoints.userId} = ANY(${activeUserIds})`)
+        .where(inArray(userPoints.userId, activeUserIds))
     : [];
   const pointsMap = new Map(pointsRows.map((p) => [p.userId, p]));
 
@@ -280,7 +291,7 @@ export async function getGroupRanking(
       total: sql<number>`count(*)::int`,
     })
     .from(predictions)
-    .where(sql`${predictions.userId} = ANY(${memberRows.map((m) => m.userId)})`)
+    .where(inArray(predictions.userId, memberRows.map((m) => m.userId)))
     .groupBy(predictions.userId);
   const predMap = new Map(predRows.map((p) => [p.userId, p.total]));
 
@@ -367,7 +378,7 @@ export async function getGroupRanking(
     .from(rankingSnapshots)
     .where(
       and(
-        sql`${rankingSnapshots.userId} = ANY(${memberUserIds})`,
+        inArray(rankingSnapshots.userId, memberUserIds),
         sql`${rankingSnapshots.snapshotDate} <= ${sevenDaysAgo}`,
       ),
     )
