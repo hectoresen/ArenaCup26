@@ -191,9 +191,21 @@ export const users = pgTable(
     avatarChangedAt: timestamp("avatar_changed_at", { withTimezone: true }),
     lastActiveAt: timestamp("last_active_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    /**
+     * Bot flag — sintético poblado por el seed (`add-bot-users`,
+     * 2026-05-19). `true` significa que esta fila NO es un humano:
+     * sin email real, sin OAuth account, sin push subscriptions.
+     * Reusa toda la infra para poblar el ranking durante cold-start.
+     * NUNCA se expone en API pública ni se muestra en UI — un user
+     * real no distingue un bot de un humano.
+     */
+    isBot: boolean("is_bot").notNull().default(false),
   },
   (table) => ({
     usernameIdx: uniqueIndex("users_username_idx").on(table.username),
+    // Index parcial: acelera filtros internos `WHERE is_bot=true`
+    // (admin/analytics) sin penalizar reads de users reales.
+    isBotIdx: index("users_is_bot_idx").on(table.isBot).where(sql`${table.isBot} = true`),
   }),
 );
 

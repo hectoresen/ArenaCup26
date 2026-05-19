@@ -95,8 +95,11 @@ async function main() {
   console.log("✓ matches borrados (cascade aplicó a predictions + point_events).");
 
   console.log("→ Reseteando user_points de usuarios reales...");
-  // Solo los users NO-placeholder: los placeholders se re-aplican
-  // con `seedLeaderboardPlaceholders` en el siguiente deploy.
+  // Reset de todos los user_points: bots y humanos. Los bots
+  // recuperan sus puntos cuando `processFinishedMatch` corra sobre
+  // sus predicciones sembradas. Tras `add-bot-users` (2026-05-19)
+  // ya no hay `seedLeaderboardPlaceholders` que aplique puntos
+  // hardcoded — todos los puntos vienen del scoring real.
   await db
     .update(userPoints)
     .set({

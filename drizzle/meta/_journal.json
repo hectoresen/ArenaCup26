@@ -99,6 +99,13 @@
       "when": 1779140106325,
       "tag": "0013_colorful_arachne",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1779217500458,
+      "tag": "0014_awesome_champions",
+      "breakpoints": true
     }
   ]
 }

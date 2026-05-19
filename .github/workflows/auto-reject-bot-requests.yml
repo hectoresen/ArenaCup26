@@ -1,0 +1,52 @@
+name: Auto-reject bot requests
+
+# Llama a /api/cron/auto-reject-bot-requests una vez al día. Marca
+# como `rejected` los friend requests y group invitations dirigidos
+# a bots con > 48h en `pending`. Limpia la bandeja del solicitante
+# (que de otro modo veria "pending forever" si invita a un bot).
+#
+# **Setup en GitHub** antes de que esto funcione:
+#   1. Settings → Secrets and variables → Actions.
+#   2. Añadir `RAILWAY_AUTO_REJECT_URL`
+#      (https://<dominio>/api/cron/auto-reject-bot-requests).
+#   3. Reusar `CRON_SECRET` (mismo valor que en Railway).
+#
+# Idempotente: si no hay pending > 48h, la respuesta es
+# `{friendshipsRejected: 0, groupInvitationsRejected: 0}` y termina.
+
+on:
+  schedule:
+    # 03:30 UTC todos los días. Hueco entre snapshot (00:05) y los
+    # backups (03:00). Sin solapamientos con otros crons.
+    - cron: "30 3 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  auto-reject:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger auto-reject endpoint
+        env:
+          URL: ${{ secrets.RAILWAY_AUTO_REJECT_URL }}
+          SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$URL" ]; then
+            echo "❌ RAILWAY_AUTO_REJECT_URL secret not configured."
+            exit 1
+          fi
+          if [ -n "$SECRET" ]; then
+            HEADERS=(-H "Authorization: Bearer $SECRET")
+          else
+            HEADERS=()
+          fi
+          response=$(curl -sS -w "\n%{http_code}" -X POST "${HEADERS[@]}" "$URL")
+          body=$(echo "$response" | head -n -1)
+          status=$(echo "$response" | tail -n 1)
+          echo "Status: $status"
+          echo "Body: $body"
+          if [ "$status" -ge 400 ]; then
+            echo "❌ auto-reject endpoint returned error status"
+            exit 1
+          fi
+          echo "✓ Auto-reject OK"
