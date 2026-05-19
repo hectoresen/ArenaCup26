@@ -45,6 +45,12 @@ jobs:
             echo "❌ RAILWAY_LIVE_URL secret not configured."
             exit 1
           fi
+          # Diagnóstico defensivo del secret (no se imprime el valor —
+          # solo el host extraído y la longitud). Cubre el caso típico de
+          # secret con whitespace/CR oculto o protocolo equivocado.
+          HOST=$(echo "$URL" | sed -E 's,https?://([^/]+).*,\1,')
+          BYTES=$(printf '%s' "$URL" | wc -c)
+          echo "Target host: '$HOST' (URL bytes: $BYTES)"
           if [ -n "$SECRET" ]; then
             HEADERS=(-H "Authorization: Bearer $SECRET")
           else
