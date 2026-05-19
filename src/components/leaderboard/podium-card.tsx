@@ -2,6 +2,7 @@ import { CountryFlag } from "@/components/common/country-flag";
 import { Link } from "@/i18n/navigation";
 import { formatPointsEs } from "@/lib/format/number";
 import type { Player } from "@/lib/leaderboard/types";
+import { getAvatar } from "@/server/profile/avatars";
 import { useTranslations } from "next-intl";
 
 type Place = 1 | 2 | 3;
@@ -82,9 +83,20 @@ export function PodiumCard({ player, place }: { player: Player; place: Place }) 
         {tone.label}
       </span>
       <div
-        className={`mx-auto mb-1.5 flex h-12 w-12 items-center justify-center rounded-full border-[3px] border-black/35 font-display text-lg ${tone.avatar}`}
+        className={`mx-auto mb-1.5 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-[3px] border-black/35 font-display text-lg ${tone.avatar}`}
       >
-        {initials(player.name)}
+        {(() => {
+          const gallery = getAvatar(player.avatarId);
+          if (gallery) {
+            // eslint-disable-next-line @next/next/no-img-element
+            return <img src={gallery.src} alt="" className="h-full w-full object-cover" />;
+          }
+          if (player.image) {
+            // eslint-disable-next-line @next/next/no-img-element
+            return <img src={player.image} alt="" className="h-full w-full object-cover" />;
+          }
+          return initials(player.name);
+        })()}
       </div>
       <div className="mb-1 flex justify-center">
         <CountryFlag

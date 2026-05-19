@@ -22,6 +22,14 @@ export type Player = {
    * Usado para el "puntito verde" en `<RankRow>`.
    */
   isOnline: boolean;
+  /**
+   * ID del avatar elegido de la galería SVG (`/public/avatars`). Si
+   * está set y resuelve, `<RankRow>` y `<PodiumCard>` muestran el
+   * SVG. Si es null, fallback a `image` (Google) o iniciales.
+   */
+  avatarId: string | null;
+  /** Imagen de Google del user. Fallback si `avatarId` no resuelve. */
+  image: string | null;
 };
 
 export type LeaderboardSnapshot = {

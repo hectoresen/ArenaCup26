@@ -16,6 +16,8 @@ const basePlayer: Player = {
   rank: 4,
   previousRank: 4,
   isOnline: false,
+  avatarId: null,
+  image: null,
 };
 
 describe("RankRow", () => {

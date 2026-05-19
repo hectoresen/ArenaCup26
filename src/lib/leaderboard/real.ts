@@ -53,6 +53,8 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
       name: users.name,
       country: users.country,
       lastActiveAt: users.lastActiveAt,
+      avatarId: users.avatarId,
+      image: users.image,
       points: userPoints.totalPoints,
       streak: userPoints.streak,
       streakMax: userPoints.streakMax,
@@ -98,6 +100,8 @@ export async function getRealSnapshot(db: Database): Promise<LeaderboardSnapshot
       rank: i + 1,
       previousRank: i + 1,
       isOnline,
+      avatarId: row.avatarId,
+      image: row.image,
     };
   });
 

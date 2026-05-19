@@ -2,6 +2,7 @@ import { CountryFlag } from "@/components/common/country-flag";
 import { Link } from "@/i18n/navigation";
 import { formatPointsEs } from "@/lib/format/number";
 import type { Player } from "@/lib/leaderboard/types";
+import { getAvatar } from "@/server/profile/avatars";
 import { useTranslations } from "next-intl";
 
 function arrow(delta: number) {
@@ -45,7 +46,9 @@ export function RankRow({
   const correctAria = `, ${t("ariaCorrect", { count: player.correctCount })}`;
 
   const cursorClass = player.username ? "cursor-pointer" : "cursor-default";
-  const cardClass = `group relative grid grid-cols-[44px_1fr_auto] items-center gap-2.5 overflow-hidden rounded-[13px] border-2 border-border bg-card px-3.5 py-[11px] opacity-0 transition-[transform,border-color,background-color] duration-200 animate-[slideIn_0.5s_cubic-bezier(0.34,1.56,0.64,1)_forwards] hover:translate-x-1 hover:border-gold/20 hover:bg-card-hover no-underline text-inherit ${cursorClass}`;
+  const cardClass = `group relative grid grid-cols-[44px_36px_1fr_auto] items-center gap-2.5 overflow-hidden rounded-[13px] border-2 border-border bg-card px-3.5 py-[11px] opacity-0 transition-[transform,border-color,background-color] duration-200 animate-[slideIn_0.5s_cubic-bezier(0.34,1.56,0.64,1)_forwards] hover:translate-x-1 hover:border-gold/20 hover:bg-card-hover no-underline text-inherit ${cursorClass}`;
+
+  const galleryAvatar = getAvatar(player.avatarId);
 
   const inner = (
     <>
@@ -62,23 +65,34 @@ export function RankRow({
           {arrow(delta)}
         </span>
       </div>
+      {/* Avatar circle 32px. SVG si avatarId resuelve, foto Google si
+          no, fallback a iniciales. Indicador online se pega abajo. */}
+      <span className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-card-hover font-display text-[10px] text-muted">
+        {galleryAvatar ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={galleryAvatar.src} alt="" className="h-full w-full object-cover" />
+        ) : player.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={player.image} alt="" className="h-full w-full object-cover" />
+        ) : (
+          (player.name?.[0] ?? "?").toUpperCase()
+        )}
+        {player.isOnline && (
+          <span
+            aria-label="Online"
+            title="Online"
+            className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-card bg-success"
+          />
+        )}
+      </span>
       <div className="min-w-0">
         <div className="flex items-center gap-1.5 truncate text-sm font-extrabold text-foreground">
-          <span className="relative flex-shrink-0">
-            <CountryFlag
-              code={player.countryCode}
-              name={player.countryName}
-              size={18}
-              className="rounded-sm"
-            />
-            {player.isOnline && (
-              <span
-                aria-label="Online"
-                title="Online"
-                className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-card bg-success"
-              />
-            )}
-          </span>
+          <CountryFlag
+            code={player.countryCode}
+            name={player.countryName}
+            size={14}
+            className="flex-shrink-0 rounded-sm"
+          />
           <span className="truncate">{player.name}</span>
           {nameSuffix}
         </div>
