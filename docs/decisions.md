@@ -450,6 +450,21 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
 - **Contexto**: el gate `ACHIEVEMENTS_MIN_FINISHED_MATCHES` (decisión 14.8) bloqueaba TODOS los logros hasta jugar N partidos. Pero `team-spirit` (crear/unirse a grupo) es una acción social, no rendimiento — debería desbloquearse al instante.
 - **Decisión**: nueva lista `GATE_BYPASS` en `evaluateAndUnlock` con los logros exentos del gate. Por ahora solo `team-spirit`. `evaluateAndUnlock` ya no retorna `[]` con el gate activo: marca `gateActive=true` y filtra rule a rule. `scripts/bootstrap.ts` corre `backfillTeamSpirit` en cada pre-deploy (idempotente, sin notificaciones) para reconciliar usuarios con grupos pre-existentes a los que el bug del gate les había impedido recibir el logro.
 
+## 14.18 Bots para poblar el cold-start del Mundial (2026-05-19, propuesto)
+
+- **Contexto**: día 1 del Mundial podemos abrir con ~5-20 usuarios reales. Con tan pocos, el ranking se ve abandonado, los logros (`top-100`, `runner-up`, `king-of-the-moment`) son triviales, y un user nuevo no siente que "supere" a nadie. Hoy parcheamos con 7 placeholders cosméticos hardcoded (sin historial real, sin perfil completo).
+- **Decisión**: reemplazar los 7 placeholders por **27 "bots"** — usuarios sintéticos en `users` con `is_bot=true` que reusan TODA la infra (scoring, ranking, achievements, perfil público). Predicen aleatoriamente fase de grupos al activarse y "mueren" naturalmente en octavos (no predicen eliminatorias), permitiendo que users reales les superen orgánicamente.
+- **Reglas duras**:
+  - `is_bot` flag interno, NUNCA expuesto en API/UI.
+  - Bots no inician sesión (email sintético + no `accounts` row).
+  - Bots no entran en grupos privados (catálogo no los inscribe).
+  - Bots no reciben push (sin `push_subscriptions`).
+  - Personalidades de predicción: 70% simple, 20% mixed, 10% daredevil — distribuye naturalmente el ranking.
+  - Friend/group requests a bots → cron diario las auto-rechaza tras 48h.
+- **Migración**: los 7 placeholders previos se convierten en los primeros 7 bots del catálogo. `seedLeaderboardPlaceholders` se elimina.
+- **Trasparencia**: NO se anuncia públicamente la existencia de bots. Patrón estándar de cold-start. Si un user descubre y pregunta, respuesta honesta — no negar pero tampoco promocionar.
+- Detalles en [`docs/bots.md`](bots.md) y la propuesta `add-bot-users`.
+
 ## 14.17 Notificaciones de grupo: routing y push opt-in (2026-05-19)
 
 - **Contexto**: 6 kinds nuevos para grupos (`group_invited`, `group_joined`, `group_left`, `group_expelled`, `group_admin_transferred`, `group_deleted`).

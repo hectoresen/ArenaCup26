@@ -139,3 +139,51 @@ La fila NO se borra.
 
 - **Bloqueado** (`max_members_below_count`). No permitimos
   auto-expulsiones implícitas por bajar el cap.
+
+## Bots — usuarios sintéticos (cold-start)
+
+> Propuesta `add-bot-users` (2026-05-19). Doc detallado en
+> [`bots.md`](bots.md). Esta sección recoge solo las reglas de
+> negocio "duras".
+
+### Identidad
+
+- 27 bots fijos en catálogo hardcoded.
+- Flag `is_bot=true` en `users`. **NUNCA se expone en API o UI**:
+  un user real no puede distinguir un bot de un humano.
+- Email sintético `<username>@bots.arenacup26.com` — no resuelve,
+  nadie puede loguear como bot.
+- Avatar SVG del catálogo + nombre + país + username, todo
+  reusable como cualquier humano.
+
+### Comportamiento
+
+- Predicen **una sola vez**, antes del Mundial, todos los partidos
+  de fase de grupos disponibles. Predicciones aleatorias según su
+  `style` (simple / mixed / daredevil).
+- **No predicen eliminatorias**. Después de la fase de grupos
+  quedan estáticos — sus puntos no crecen más.
+- Su scoring usa el mismo `processFinishedMatch` que los humanos.
+  Sin caminos paralelos.
+- Reciben friend requests + group invitations, **NO responden**.
+  Cron diario auto-rechaza tras 48h.
+- Reciben in-app notifications (filas que nadie lee). **No
+  reciben push** — no tienen `push_subscriptions`.
+
+### No interacción
+
+- Bots no entran en grupos privados. Si una lógica futura
+  intentara inscribir un bot en `group_memberships`, es un bug.
+- Bots no escriben en ningún canal social (no hay messaging hoy,
+  pero queda como invariante de diseño).
+- Bots no editan su nombre/avatar. Cooldown no aplica.
+
+### Trust y transparencia
+
+- No se anuncia públicamente la existencia de bots. Es patrón
+  estándar de cold-start.
+- Si un user descubre y pregunta directamente, asumimos
+  respuesta honesta — no se niega pero tampoco se promociona.
+- Los bots **no se borran post-Mundial**. Quedan como histórico
+  del torneo. El ranking final del Mundial 2026 los incluye
+  como parte del registro.

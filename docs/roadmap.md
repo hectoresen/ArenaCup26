@@ -193,6 +193,33 @@ contradictorias (¿"sin foto" pero sí "con puntos"?). Migración
   - E2E Playwright happy paths (`test.skip` actuales) cuando exista
     auth-bypass de testing.
 
+## Bloque I — Bots para cold-start del Mundial (propuesta 2026-05-19)
+
+> Propuesta `add-bot-users`. Doc detallado en [`bots.md`](bots.md).
+> ADR en [`decisions.md#1418-bots-para-poblar-el-cold-start-del-mundial-2026-05-19-propuesto`](decisions.md).
+> Estimación: ~1 día de trabajo.
+
+- **I1 · Schema**: añadir `is_bot BOOLEAN NOT NULL DEFAULT false` +
+  índice parcial en `users`.
+- **I2 · Catálogo (27 entries)**: `src/server/bots/catalog.ts` con
+  username, name, country, avatarId, style, createdAtOffsetDays.
+  Distribución 70% simple, 20% mixed, 10% daredevil.
+- **I3 · Predict engine**: `generatePrediction(style, match, random)`
+  pure function. Tests con seed fijo.
+- **I4 · Seed scripts**: `seedBotUsers` (siempre) +
+  `seedBotPredictions` (one-shot pre-Mundial vía
+  `SEED_BOT_PREDICTIONS=true`).
+- **I5 · Migración placeholders**: los 7 placeholders previos
+  se convierten en los 7 primeros bots. `seedLeaderboardPlaceholders`
+  se elimina.
+- **I6 · Auto-reject cron**: workflow diario que marca como
+  rejected los friend/group requests a bots > 48h pending.
+- **I7 · Tests + docs**: ya redactados (proposal + spec.md +
+  bots.md + ADR + arch + business-rules).
+
+**Rollout**: merge → bootstrap reconcilia los 27 bots. Manual
+trigger `SEED_BOT_PREDICTIONS=true` antes del kickoff (10 jun).
+
 ## Bloque G — País por IP (decisión)
 
 - **G1 · Análisis RGPD/cookies** (`2.1`):
