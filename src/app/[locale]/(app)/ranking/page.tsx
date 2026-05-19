@@ -5,12 +5,14 @@ import {
   type RankingScope,
 } from "@/components/groups/ranking-nav";
 import { LeaderboardView } from "@/components/leaderboard/leaderboard-view";
+import { derr } from "@/lib/debug-log";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { getRealSnapshot } from "@/lib/leaderboard/real";
 import { db } from "@/server/db/client";
 import { getFriends, getFriendsRanking } from "@/server/friends/queries";
 import { getGroupRanking, getUserGroups } from "@/server/groups/queries";
+import type { GroupRankingEntry } from "@/server/groups/types";
 import { setRequestLocale } from "next-intl/server";
 
 /**
@@ -79,12 +81,29 @@ export default async function RankingPage({
         : (myGroups[0]?.id ?? null)
       : null;
 
-  // Carga del ranking del scope seleccionado.
-  const friendsRanking =
-    effectiveScope === "amigos" ? await getFriendsRanking(db, viewerId) : [];
-  const groupRanking =
+  // Carga del ranking del scope seleccionado. Defensive: si la query
+  // del scope no-Global falla por cualquier motivo (BD lenta, columna
+  // nueva no migrada, error de drizzle…), degradamos a empty state en
+  // vez de matar toda la página. El log nos avisa por Sentry.
+  const friendsRanking: GroupRankingEntry[] =
+    effectiveScope === "amigos"
+      ? await getFriendsRanking(db, viewerId).catch((err: unknown) => {
+          derr("ranking", "getFriendsRanking failed in /ranking", {
+            viewerId,
+            err: err instanceof Error ? err.message : String(err),
+          });
+          return [];
+        })
+      : [];
+  const groupRanking: GroupRankingEntry[] =
     effectiveScope === "grupos" && activeGroupId
-      ? await getGroupRanking(db, activeGroupId)
+      ? await getGroupRanking(db, activeGroupId).catch((err: unknown) => {
+          derr("ranking", "getGroupRanking failed in /ranking", {
+            groupId: activeGroupId,
+            err: err instanceof Error ? err.message : String(err),
+          });
+          return [];
+        })
       : [];
 
   return (
