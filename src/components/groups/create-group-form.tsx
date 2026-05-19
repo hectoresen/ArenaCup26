@@ -91,7 +91,7 @@ export function CreateGroupForm() {
                 aria-label={styles.label}
                 aria-pressed={selected}
                 onClick={() => setColor(c)}
-                className={`h-11 w-11 rounded-full ${styles.bg} ${selected ? "ring-4 ring-foreground/80 ring-offset-2 ring-offset-background" : "opacity-80 hover:opacity-100"}`}
+                className={`h-11 w-11 cursor-pointer rounded-full ${styles.bg} ${selected ? "ring-4 ring-foreground/80 ring-offset-2 ring-offset-background" : "opacity-80 hover:opacity-100"}`}
               />
             );
           })}
@@ -163,7 +163,7 @@ export function CreateGroupForm() {
       <button
         type="submit"
         disabled={!nameOk || isPending}
-        className="w-full rounded-full bg-gold py-3 font-display text-[13px] uppercase tracking-[0.12em] text-background hover:bg-gold-deep disabled:opacity-50"
+        className="cursor-pointer w-full rounded-full bg-gold py-3 font-display text-[13px] uppercase tracking-[0.12em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isPending ? "Creando…" : "Crear grupo"}
       </button>

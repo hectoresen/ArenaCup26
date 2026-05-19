@@ -69,7 +69,7 @@ export function DiscoverGroupCard({ group }: Props) {
   );
 
   const baseCls =
-    "group flex w-full items-center gap-3 rounded-2xl border-2 border-border bg-card px-3 py-3 transition-colors hover:border-gold/40 hover:bg-card-hover";
+    "group flex w-full cursor-pointer items-center gap-3 rounded-2xl border-2 border-border bg-card px-3 py-3 transition-colors hover:border-gold/40 hover:bg-card-hover";
 
   return (
     <>

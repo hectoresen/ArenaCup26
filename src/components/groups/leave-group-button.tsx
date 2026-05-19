@@ -44,7 +44,7 @@ export function LeaveGroupButton({ groupId, groupName }: Props) {
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        className="rounded-full border-2 border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground"
+        className="cursor-pointer rounded-full border-2 border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground"
       >
         Abandonar grupo
       </button>
@@ -78,7 +78,7 @@ export function LeaveGroupButton({ groupId, groupName }: Props) {
           type="button"
           onClick={leave}
           disabled={isPending}
-          className="rounded-full bg-red-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-white hover:bg-red-600 disabled:opacity-50"
+          className="cursor-pointer rounded-full bg-red-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Abandonar
         </button>
@@ -88,7 +88,7 @@ export function LeaveGroupButton({ groupId, groupName }: Props) {
             setConfirming(false);
             setError(null);
           }}
-          className="rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
+          className="cursor-pointer rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
         >
           Cancelar
         </button>

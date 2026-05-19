@@ -50,7 +50,7 @@ export function JoinViaLinkButton({ token, groupId }: Props) {
         type="button"
         onClick={handle}
         disabled={isPending}
-        className="w-full rounded-full bg-gold py-3 font-display text-[13px] uppercase tracking-[0.12em] text-background hover:bg-gold-deep disabled:opacity-50"
+        className="cursor-pointer w-full rounded-full bg-gold py-3 font-display text-[13px] uppercase tracking-[0.12em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isPending ? "Uniéndome…" : "Unirme al grupo"}
       </button>

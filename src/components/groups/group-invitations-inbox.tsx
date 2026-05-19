@@ -94,7 +94,7 @@ export function GroupInvitationsInbox({ invitations: initial }: Props) {
               type="button"
               onClick={() => handleReject(inv)}
               disabled={isPending}
-              className="rounded-full border-2 border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground disabled:opacity-50"
+              className="cursor-pointer rounded-full border-2 border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               Rechazar
             </button>
@@ -102,7 +102,7 @@ export function GroupInvitationsInbox({ invitations: initial }: Props) {
               type="button"
               onClick={() => handleAccept(inv)}
               disabled={isPending}
-              className="rounded-full bg-gold px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:opacity-50"
+              className="cursor-pointer rounded-full bg-gold px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
             >
               Aceptar
             </button>

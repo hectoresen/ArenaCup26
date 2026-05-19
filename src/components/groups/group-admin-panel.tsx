@@ -140,7 +140,7 @@ function InvitePanel({
                   type="button"
                   onClick={() => invite(f.id)}
                   disabled={pendingIds.has(f.id) || isPending}
-                  className="rounded-full bg-gold px-3 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:opacity-50"
+                  className="cursor-pointer rounded-full bg-gold px-3 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Invitar
                 </button>
@@ -163,7 +163,7 @@ function InvitePanel({
                     type="button"
                     onClick={() => cancel(p.invitationId)}
                     disabled={isPending}
-                    className="rounded-full border border-border bg-card-hover px-3 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground disabled:opacity-50"
+                    className="cursor-pointer rounded-full border border-border bg-card-hover px-3 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Cancelar
                   </button>
@@ -233,7 +233,7 @@ function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[]
             type="button"
             onClick={generate}
             disabled={atCap || isPending}
-            className="rounded-full bg-gold px-4 py-2 text-[12px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:opacity-50"
+            className="cursor-pointer rounded-full bg-gold px-4 py-2 text-[12px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
           >
             Generar link
           </button>
@@ -262,7 +262,7 @@ function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[]
                       <button
                         type="button"
                         onClick={() => navigator.clipboard?.writeText(l.url)}
-                        className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
+                        className="cursor-pointer rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
                       >
                         Copiar
                       </button>
@@ -271,7 +271,7 @@ function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[]
                           type="button"
                           onClick={() => revoke(l.linkId)}
                           disabled={isPending}
-                          className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground disabled:opacity-50"
+                          className="cursor-pointer rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           Revocar
                         </button>
@@ -355,14 +355,14 @@ function MembersPanel({
                   <button
                     type="button"
                     onClick={() => setTransferId(m.userId)}
-                    className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
+                    className="cursor-pointer rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
                   >
                     Hacer admin
                   </button>
                   <button
                     type="button"
                     onClick={() => setConfirmId(m.userId)}
-                    className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground"
+                    className="cursor-pointer rounded-full border border-border bg-card px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-muted hover:border-red-500/40 hover:text-foreground"
                   >
                     Expulsar
                   </button>
@@ -382,14 +382,14 @@ function MembersPanel({
                 type="button"
                 onClick={() => expel(confirmId)}
                 disabled={isPending}
-                className="rounded-full bg-red-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-white hover:bg-red-600 disabled:opacity-50"
+                className="cursor-pointer rounded-full bg-red-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Expulsar
               </button>
               <button
                 type="button"
                 onClick={() => setConfirmId(null)}
-                className="rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
+                className="cursor-pointer rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
               >
                 Cancelar
               </button>
@@ -407,14 +407,14 @@ function MembersPanel({
                 type="button"
                 onClick={() => transfer(transferId)}
                 disabled={isPending}
-                className="rounded-full bg-gold px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:opacity-50"
+                className="cursor-pointer rounded-full bg-gold px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Transferir
               </button>
               <button
                 type="button"
                 onClick={() => setTransferId(null)}
-                className="rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
+                className="cursor-pointer rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
               >
                 Cancelar
               </button>
@@ -478,7 +478,7 @@ function DangerZone({ group }: { group: GroupDetail }) {
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="rounded-full border-2 border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
+            className="cursor-pointer rounded-full border-2 border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground hover:border-gold/40"
           >
             Editar nombre / visibilidad / cap
           </button>
@@ -528,7 +528,7 @@ function DangerZone({ group }: { group: GroupDetail }) {
                 type="button"
                 onClick={save}
                 disabled={isPending}
-                className="rounded-full bg-gold px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:opacity-50"
+                className="cursor-pointer rounded-full bg-gold px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-background hover:bg-gold-deep disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Guardar
               </button>
@@ -541,7 +541,7 @@ function DangerZone({ group }: { group: GroupDetail }) {
                   setMaxMembers(group.maxMembers);
                   setError(null);
                 }}
-                className="rounded-full border border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
+                className="cursor-pointer rounded-full border border-border bg-card-hover px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
               >
                 Cancelar
               </button>
@@ -554,7 +554,7 @@ function DangerZone({ group }: { group: GroupDetail }) {
             <button
               type="button"
               onClick={() => setConfirming(true)}
-              className="rounded-full border-2 border-red-500/40 bg-red-500/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-red-300 hover:bg-red-500/20"
+              className="cursor-pointer rounded-full border-2 border-red-500/40 bg-red-500/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-red-300 hover:bg-red-500/20"
             >
               Borrar grupo
             </button>
@@ -569,14 +569,14 @@ function DangerZone({ group }: { group: GroupDetail }) {
                   type="button"
                   onClick={destroy}
                   disabled={isPending}
-                  className="rounded-full bg-red-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-white hover:bg-red-600 disabled:opacity-50"
+                  className="cursor-pointer rounded-full bg-red-500 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Borrar definitivamente
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirming(false)}
-                  className="rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
+                  className="cursor-pointer rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-foreground"
                 >
                   Cancelar
                 </button>
