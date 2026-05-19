@@ -117,6 +117,60 @@ Cada gap merece su propia PR con tests + (si hace falta) refactor que extraiga l
 - **No usar `setTimeout` para esperar a un effect.** Usa `await screen.findByText(...)` o `waitFor(...)`.
 - **No probar implementation details.** "Que se llame a este método interno" no es un test válido. El contrato observable (return value, DOM, side effect) sí.
 
+## E2E (Playwright)
+
+> Setup en `playwright.config.ts`. Suite en `e2e/`. Corre contra el
+> `next dev`/`next start` levantado por el `webServer` config.
+
+### Suites
+
+- **`e2e/public-pages.spec.ts`** — smoke contra páginas públicas
+  (landing, faq, legal, status). No requiere sesión.
+- **`e2e/groups-smoke.spec.ts`** — smoke unauthenticated + happy
+  paths autenticados de grupos. Los happy paths se skipean si
+  `E2E_AUTH_SECRET` no está set (mantiene la suite verde en local
+  sin DB / sin envs de testing).
+
+### Auth bypass para E2E
+
+`/api/test/auth-as` permite a Playwright crear sesiones sin pasar
+por Google OAuth. **Solo activo fuera de producción + con feature
+flag + secret header**. Ver detalle completo en
+[`security.md` §9.6](security.md#96-e2e-auth-bypass-apitestauth-as--2026-05-19).
+
+Setup local:
+
+```bash
+# .env.local
+E2E_AUTH_ENABLED=true
+E2E_AUTH_SECRET=$(openssl rand -hex 24)
+
+# Mismo valor cuando lanzas la suite:
+E2E_AUTH_SECRET=<el mismo> pnpm exec playwright test
+```
+
+Fixture en `e2e/fixtures.ts` exporta:
+- `loginAs(page, username)` — helper imperativo.
+- `test` (Playwright extend) con fixture `authedPage` pre-logueado
+  como `carlos-mendoza` placeholder.
+
+### Lighthouse CI
+
+`.github/workflows/lighthouse.yml` corre Lighthouse contra rutas
+públicas en cada push a `main` (espera 90s al deploy de Railway,
+luego audita).
+
+Thresholds en `.lighthouserc.json`:
+- perf ≥ 0.75 (warning)
+- a11y ≥ 0.9
+- LCP ≤ 2.5s, TBT ≤ 300ms, CLS ≤ 0.1
+
+Reportes HTML+JSON como artifacts del workflow, retención 90 días.
+
+Rutas autenticadas (`/inicio`, `/ranking`, etc) NO están en este
+audit — Chrome en CI no tiene sesión. Auditar a mano con Chrome
+DevTools en local apuntando a prod con cookie de sesión.
+
 ## Cuando un test falla en CI
 
 1. Lee el mensaje de error completo. La mayoría de las veces es claro (assertion fallida, prop faltante, mock mal configurado).

@@ -425,6 +425,46 @@ El service worker está en `public/sw.js` y se registra dinámicamente cuando el
 
 ---
 
+## 9.6 E2E auth bypass (`/api/test/auth-as`) — 2026-05-19
+
+Endpoint solo-test para que Playwright autentique sin pasar por Google OAuth. **Nunca debe ser alcanzable en producción**.
+
+### Triple gate (todos deben pasar; cualquier fallo → 404)
+
+1. `process.env.NODE_ENV !== "production"`. Railway prod siempre es `production`.
+2. `env.E2E_AUTH_ENABLED === true` (feature flag explícito).
+3. Header `x-e2e-secret` matching `env.E2E_AUTH_SECRET` (compare timing-safe).
+
+En producción Railway las E2E_* envs NO se setean. Aunque alguien encontrara la URL, el primer gate ya devuelve 404 silenciosamente.
+
+### Setup local
+
+```bash
+# .env.local
+E2E_AUTH_ENABLED=true
+E2E_AUTH_SECRET=$(openssl rand -hex 24)
+
+# Mismo valor cuando lanzas Playwright:
+E2E_AUTH_SECRET=<el mismo> pnpm exec playwright test
+```
+
+### Setup en CI (GitHub Actions)
+
+- Añadir `E2E_AUTH_SECRET` como secret del repo.
+- El workflow lo inyecta tanto al webServer (que arranca next dev/start con la env) como al runner de Playwright.
+
+### Lo que el endpoint NO hace
+
+- No expone listar/crear users — solo loguea como user que YA existe.
+- No bypasea rate-limiting de actions internas.
+- No persiste el secret en logs (solo se compara timing-safe).
+
+### Helpers de Playwright
+
+`e2e/fixtures.ts` exporta:
+- `loginAs(page, username?)`: helper imperativo.
+- `test` (Playwright base extendido) con fixture `authedPage` pre-logueado como `carlos-mendoza` (placeholder seedeado).
+
 ## 10. TODOs (pendientes en propuestas abiertas)
 
 - `add-rate-limiting` — Upstash en submit, cron, signup, reads.

@@ -37,8 +37,10 @@ ver `docs/roadmap.md`.
 - [x] **Cadencia elevada en torneo** — workflow `db-backup-tournament.yml`
   cada 6h con date guard (11 jun → 19 jul 2026), sube a prefijo
   `tournament/`. El daily `db-backup.yml` sigue activo en paralelo.
-- [ ] **Lifecycle policy del bucket**: configurar borrado automático
-  de `tournament/*` tras 14 días para que ~150 backups no se acumulen.
+- [x] **Smart retention** — ambos workflows aplican la regla "borra
+  un backup >10d **solo si existen ≥2 más recientes**" como step
+  final. Garantiza mínimo 2 backups + cobertura de los últimos 10
+  días. No requiere lifecycle policy en el bucket.
 - [ ] **Probar el restore al menos una vez** antes del kickoff. Sin
   validación, los backups son confianza ciega.
 - [x] **Script `recompute-user-points.ts`** idempotente que recalcula
@@ -58,9 +60,17 @@ ver `docs/roadmap.md`.
   de `alreadyScored` + `streakMap` (2 queries en vez de 2×N) +
   worker pool concurrency=25. Teórico ~150s → ~6s por match con
   5k predictores.
-- [ ] **Performance audit pre-launch**: Lighthouse mobile, TTI, LCP.
-  Especialmente con el calendario completo del Mundial (104 partidos)
-  cargando en `/partidos` aunque el LIMIT 250 lo cubre.
+- [x] **Lighthouse CI workflow** (`.github/workflows/lighthouse.yml`):
+  audita rutas públicas (landing es, faq, legal) en cada push a main
+  + manual via `workflow_dispatch`. Config en `.lighthouserc.json`
+  con thresholds warning: perf ≥ 0.75, a11y ≥ 0.9, LCP ≤ 2.5s,
+  CLS ≤ 0.1, TBT ≤ 300ms. Reportes como artifacts 90 días.
+- [ ] **Lighthouse manual de rutas autenticadas**: `/inicio`,
+  `/ranking`, `/partidos`, `/u/<username>` necesitan sesión, no
+  cubiertas por el CI. Auditar a mano con Chrome DevTools en local
+  apuntando a prod, con sesión activa. Revisión: TTI < 3.5s,
+  LCP < 2.5s, JS bundle de cada ruta razonable (`.next/static`
+  inspectable en build output).
 - [ ] **CDN para assets estáticos**: revisar si Railway sirve `/icon.svg`,
   `/pwa-icon.svg`, OG image con cache adecuado. Si no, considerar
   Cloudflare delante.

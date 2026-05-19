@@ -1,0 +1,72 @@
+name: Lighthouse CI
+
+# Audit de performance contra producción. Corre:
+#  - en push a main (smoke check tras cada deploy)
+#  - manualmente via workflow_dispatch
+#
+# Audita las rutas PÚBLICAS (no requieren login). Las autenticadas
+# (/inicio, /ranking, /partidos, /u/<username>) hay que auditarlas a
+# mano vía Chrome DevTools en local conectado a prod con sesión.
+#
+# Output: HTML + JSON reports como artifacts (90 días retención).
+# Thresholds documentados en `docs/pre-launch-checklist.md`.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Cancel runs en flight si llega un push nuevo a main.
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for Railway deploy
+        # Pequeño delay para que el último deploy esté live cuando
+        # auditamos. Railway suele tardar 60-90s tras push a main.
+        run: sleep 90
+
+      - name: Lighthouse audit
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            https://www.arenacup26.com/
+            https://www.arenacup26.com/es
+            https://www.arenacup26.com/es/faq
+            https://www.arenacup26.com/legal/privacy
+            https://www.arenacup26.com/legal/terms
+          # Mobile (emulado), simulated network throttling, 3 runs por
+          # URL (mediana). Standard preset de Lighthouse.
+          configPath: ./.lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: false
+
+      - name: Summarize scores
+        # Si lighthouse-ci-action produce reportes, esta step extrae los
+        # scores clave y los muestra en el log de GH Actions para
+        # revisión rápida sin descargar artifacts.
+        if: always()
+        run: |
+          if [ -d "./.lighthouseci" ]; then
+            for f in ./.lighthouseci/lhr-*.json; do
+              [ -f "$f" ] || continue
+              URL=$(jq -r '.finalUrl' "$f")
+              PERF=$(jq -r '.categories.performance.score' "$f")
+              A11Y=$(jq -r '.categories.accessibility.score' "$f")
+              BP=$(jq -r '.categories["best-practices"].score' "$f")
+              SEO=$(jq -r '.categories.seo.score' "$f")
+              LCP=$(jq -r '.audits["largest-contentful-paint"].numericValue' "$f")
+              CLS=$(jq -r '.audits["cumulative-layout-shift"].numericValue' "$f")
+              TBT=$(jq -r '.audits["total-blocking-time"].numericValue' "$f")
+              echo "→ $URL"
+              echo "  perf=$PERF a11y=$A11Y bp=$BP seo=$SEO"
+              echo "  LCP=${LCP}ms TBT=${TBT}ms CLS=$CLS"
+            done
+          fi
