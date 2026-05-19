@@ -1,3 +1,4 @@
+import { PodiumPlaceholder } from "@/components/groups/podium-placeholder";
 import { PodiumCard } from "@/components/leaderboard/podium-card";
 import { RankRow } from "@/components/leaderboard/rank-row";
 import { countryCodeToFlag } from "@/lib/format/country";
@@ -6,43 +7,43 @@ import type { GroupRankingEntry } from "@/server/groups/types";
 
 type Props = {
   entries: GroupRankingEntry[];
-  /** Si se pasa, se renderiza arriba como `<header>` (nombre del grupo
-   * o "Ranking entre amigos"). Si no, solo el contenido. */
   title?: string;
   countLabel?: string;
 };
 
 /**
- * Vista del ranking dentro de `/ranking?scope=amigos` o
- * `?scope=grupos`. Mismo look-and-feel que el ranking global:
- *  - Top-3 como podio (con corona, plata, bronce).
- *  - Resto como filas con rachas, badge de aciertos y delta rank.
+ * Vista del ranking dentro de `/ranking?scope=amigos`,
+ * `?scope=grupos` y `/social/grupos/[id]`. Mismo look-and-feel que el
+ * ranking global:
+ *  - **Siempre** las 3 tarjetas del podio arriba. Si una posición no
+ *    tiene ocupante (grupo con < 3 miembros activos), `<PodiumPlaceholder>`
+ *    renderiza copy juguetón con animación de blink invitando a ocupar
+ *    el puesto.
+ *  - Resto de miembros como `<RankRow>` con rachas, badge de aciertos
+ *    y flechas de delta.
  *
- * Convierte `GroupRankingEntry` → `Player` para reutilizar
- * `<PodiumCard>` y `<RankRow>` sin duplicar diseño.
- *
- * Ex-miembros congelados (`frozen: true`) NO se promueven al podio
- * aunque tengan los puntos suficientes — sería confuso pintarlos como
- * top con corona. Quedan como filas normales con badge "Ex".
+ * Reglas de la podio:
+ *  - Solo miembros ACTIVOS pueden ocupar el podio. Los ex-miembros
+ *    congelados aparecen en filas con `opacity-70`, nunca en las 3
+ *    tarjetas (sería incoherente "celebrar" a alguien que abandonó).
+ *  - Si hay menos de 3 activos, los slots vacíos se rellenan con
+ *    placeholders. El primero en aparecer es el más alto disponible.
  */
 export function GroupLeaderboardView({ entries, title, countLabel }: Props) {
-  if (entries.length === 0) {
-    return (
-      <div className="rounded-2xl border-2 border-dashed border-border bg-card/40 px-4 py-6 text-center text-[12px] font-bold text-muted">
-        Aún no hay miembros en el ranking. Cuando alguien acierte una
-        predicción aparecerá aquí.
-      </div>
-    );
-  }
+  // Partición: activos vs congelados. Solo activos optan al podio.
+  const active = entries.filter((e) => !e.frozen);
+  const frozen = entries.filter((e) => e.frozen);
 
-  const players = entries.map(toPlayer);
-  // Top-3 solo si NO son frozen (no premiamos ex-miembros en el podio).
-  const podiumCandidates = entries.slice(0, 3);
-  const allTop3Active = podiumCandidates.length === 3 && podiumCandidates.every((e) => !e.frozen);
-  const showPodium = allTop3Active;
-  const podiumPlayers = showPodium ? players.slice(0, 3) : [];
-  const restStart = showPodium ? 3 : 0;
-  const restPlayers = players.slice(restStart);
+  const podiumSlots: Array<GroupRankingEntry | null> = [
+    active[0] ?? null,
+    active[1] ?? null,
+    active[2] ?? null,
+  ];
+
+  // El resto: activos a partir del 4º + todos los congelados al final.
+  // Mantenemos el rank original de cada entry (viene precomputado del
+  // server) para que la columna "#" y el orden coincidan con la fila.
+  const rest = [...active.slice(3), ...frozen];
 
   return (
     <div className="mx-auto w-full max-w-[510px]">
@@ -59,58 +60,60 @@ export function GroupLeaderboardView({ entries, title, countLabel }: Props) {
         </header>
       )}
 
-      {showPodium && (
-        <div className="mb-4 grid grid-cols-[1fr_1.1fr_1fr] items-end gap-2 opacity-0 [animation:popIn_0.6s_cubic-bezier(0.34,1.56,0.64,1)_0.18s_forwards]">
-          <PodiumCard player={podiumPlayers[1]!} place={2} />
-          <PodiumCard player={podiumPlayers[0]!} place={1} />
-          <PodiumCard player={podiumPlayers[2]!} place={3} />
-        </div>
-      )}
+      {/* Podio siempre visible — 2º (izquierda), 1º (centro), 3º (derecha). */}
+      <div className="mb-4 grid grid-cols-[1fr_1.1fr_1fr] items-end gap-2 opacity-0 [animation:popIn_0.6s_cubic-bezier(0.34,1.56,0.64,1)_0.18s_forwards]">
+        {podiumSlots[1] ? (
+          <PodiumCard player={toPlayer(podiumSlots[1])} place={2} />
+        ) : (
+          <PodiumPlaceholder place={2} />
+        )}
+        {podiumSlots[0] ? (
+          <PodiumCard player={toPlayer(podiumSlots[0])} place={1} />
+        ) : (
+          <PodiumPlaceholder place={1} />
+        )}
+        {podiumSlots[2] ? (
+          <PodiumCard player={toPlayer(podiumSlots[2])} place={3} />
+        ) : (
+          <PodiumPlaceholder place={3} />
+        )}
+      </div>
 
-      {showPodium && restPlayers.length > 0 && (
-        <div
-          aria-hidden="true"
-          className="my-3.5 flex items-center gap-2.5 opacity-0 [animation:fadeUp_0.4s_ease_0.3s_forwards]"
-        >
-          <div className="h-px flex-1 bg-border" />
-          <span className="text-sm opacity-50">⚽</span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
-      )}
+      {rest.length > 0 && (
+        <>
+          <div
+            aria-hidden="true"
+            className="my-3.5 flex items-center gap-2.5 opacity-0 [animation:fadeUp_0.4s_ease_0.3s_forwards]"
+          >
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-sm opacity-50">⚽</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
 
-      {restPlayers.length > 0 && (
-        <ol className="flex flex-col gap-1.5">
-          {restPlayers.map((player, i) => {
-            const original = entries[restStart + i]!;
-            return (
-              <li key={player.id} className={original.frozen ? "opacity-70" : ""}>
-                {original.frozen ? (
-                  <div className="pointer-events-none">
-                    <RankRow player={player} index={i} />
-                  </div>
-                ) : (
-                  <RankRow player={player} index={i} />
-                )}
+          <ol className="flex flex-col gap-1.5">
+            {rest.map((entry, i) => (
+              <li key={entry.userId} className={entry.frozen ? "opacity-70" : ""}>
+                <RankRow player={toPlayer(entry)} index={i} />
               </li>
-            );
-          })}
-        </ol>
+            ))}
+          </ol>
+        </>
       )}
     </div>
   );
 }
 
 /**
- * Adapter de `GroupRankingEntry` → `Player` para reusar los
- * componentes de leaderboard. Los campos que el `Player` shape exige
- * y `GroupRankingEntry` no tiene:
- *  - `countryName`: usamos el código como fallback (no tenemos los
- *    nombres traducidos a mano aquí).
- *  - `flag`: emoji bandera derivado del country code; vacío si null.
- *  - `previousRank`: si tenemos `rankDelta`, lo derivamos
- *    (`rank + rankDelta`); si no, igual al rank actual (sin flecha).
- *  - `isOnline`: false. No tracking de online en este shape — si
- *    es importante, lo añadimos al server query.
+ * Adapter de `GroupRankingEntry` → `Player`. Reutilizamos los
+ * componentes del leaderboard global sin tocarlos.
+ *
+ * - `countryName`: usamos el código como fallback (i18n de países
+ *   queda para iteración aparte; el código mostrado es ISO-2).
+ * - `flag`: emoji bandera derivado del country code.
+ * - `previousRank`: si tenemos `rankDelta`, lo derivamos
+ *   (`rank + rankDelta`); si no, igual al rank actual (sin flecha).
+ * - `isOnline`: false. Si en el futuro queremos puntito verde, se
+ *   añade el campo al server query.
  */
 function toPlayer(e: GroupRankingEntry): Player {
   return {
