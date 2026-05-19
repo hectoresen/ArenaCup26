@@ -23,16 +23,17 @@ La paleta está alineada con `docs/leaderboard-reference.html` y el mockup en `d
 
 ## Catálogo
 
-### Común (6)
+### Común (7)
 
 | ID                     | Título              | Trigger                                                                    | Shareable |
 | ---------------------- | ------------------- | -------------------------------------------------------------------------- | :-------: |
 | `first-hit`            | Primer Acierto      | Acertar la primera predicción del torneo (simple, exacto o doble).         |    no     |
 | `good-eye`             | Buen Ojo            | Acumular 10 aciertos (cualquier tipo) a lo largo del torneo.               |    no     |
-| `group-analyst`        | Analista de Grupos  | Predecir al menos 10 partidos de la fase de grupos.                        |    no     |
+| `group-analyst`        | Analista de Grupos  | Predecir al menos 10 partidos de la fase de grupos (del torneo).           |    no     |
 | `first-hundred`        | Primer Centenar     | Acumular 100 puntos oficiales.                                             |    no     |
-| `better-with-friends`  | Mejor con Amigos    | Un usuario referido acierta su primera predicción.                         |    no     |
+| `better-with-friends`  | Mejor con Amigos    | Un usuario referido (vía link de invite a la app) acierta su primera predicción. |    no     |
 | `five-of-five`         | Cinco de Cinco      | Acertar el marcador exacto en 5 partidos distintos.                        |    no     |
+| `team-spirit`          | Espíritu de Equipo  | Crear o unirse a tu primer grupo de competición. **Bypass al gate de partidos** (acción social, no rendimiento). |    no     |
 
 ### Poco común (4)
 
@@ -77,7 +78,29 @@ La paleta está alineada con `docs/leaderboard-reference.html` y el mockup en `d
 | ------------- | ----------------- | ---------------------------------------------------------------- | :-------: |
 | `the-goat`    | El Mayor de Todos | Terminar el Mundial 2026 como **#1 absoluto** del ranking.       |    sí     |
 
-**Total: 24 logros.**
+**Total: 25 logros** (24 originales + `team-spirit` añadido 2026-05-19
+con la feature de grupos de competición).
+
+### Gate global de partidos
+
+Los logros de **rendimiento** (puntos, racha, aciertos, ranking
+position) están sujetos al gate `ACHIEVEMENTS_MIN_FINISHED_MATCHES`
+(env var, default 0 en dev / 5 en prod). Mientras el gate esté
+activo, `evaluateAndUnlock` no desbloquea logros de rendimiento
+para evitar trivialidades del día 1 ("acerté una sola predicción
+y ya tengo `first-hit`").
+
+Los logros de **acción social** (hoy solo `team-spirit`) están en
+la lista `GATE_BYPASS` y se evalúan ignorando el gate — son
+acciones explícitas del user, no producto de un único resultado de
+partido. La lista se mantiene en
+`src/server/achievements/unlock.ts`.
+
+Cuando el gate cae (≥ N partidos finalizados), todos los users
+desbloquean retroactivamente sus logros pendientes en su siguiente
+unlock check (siguiente match scored). Para `team-spirit` hay un
+**backfill** en `scripts/bootstrap.ts` que se corre en cada
+pre-deploy: idempotente, sin notificaciones spam.
 
 ## Modelo de datos preliminar
 

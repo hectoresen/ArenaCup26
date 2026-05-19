@@ -48,10 +48,18 @@ Cuando el partido pasa a estado `FINISHED` (vía API o admin manual) → resulta
 - `prediction-flow` — UI y persistencia de predicciones (incluye doble predicción 1X / X2 / 12).
 - `scoring-engine` — cálculo de puntos al cerrar un partido.
 - `dashboard` — panel privado por usuario (próximos partidos, mis predicciones, mis puntos).
-- `notifications` — feedback in-app: toasts, feed de actividad, badge de campana con contador. Web Push y email diferidos a fase 2.
-- `achievements` — catálogo de **24 logros en 6 tiers** (común, poco común, épico, legendario, mítico, GOAT). Evaluación al cierre oficial de partido (no con provisionales). Catálogo formal en `docs/achievements.md`.
+- `notifications` — bell dropdown in-app + Web Push opt-in. 13 kinds:
+  `prediction_sent`, `prediction_locked`, `match_finished`,
+  `achievement_unlocked`, `system`, `friend_request`, `friend_accepted`,
+  y 6 de grupos (`group_invited`, `group_joined`, `group_left`,
+  `group_expelled`, `group_admin_transferred`, `group_deleted`).
+  Push activo solo para kinds time-sensitive (invites, expulsiones,
+  recordatorios de kickoff). VAPID keys en Railway.
+- `achievements` — catálogo de **25 logros en 6 tiers** (común, poco común, épico, legendario, mítico, GOAT). Evaluación al cierre oficial de partido (no con provisionales) + gate `ACHIEVEMENTS_MIN_FINISHED_MATCHES` para los de rendimiento. `team-spirit` (común) está en `GATE_BYPASS` — se desbloquea al instante sin esperar al gate. Catálogo formal en `docs/achievements.md`.
 - `public-profile` — página `/u/<username>` con identidad, stats básicas, bandera opcional y catálogo completo de logros. Accesible sin login. Ver `docs/public-profile.md`.
-- `match-data` — fuente de fixture, resultados y **eventos en vivo** (goles, prórrogas, penaltis). Diseñada con **redundancia de dos APIs en paralelo** (failover). Decisión crítica pendiente: ver `docs/match-data-research.md`.
+- `groups` — **grupos de competición** (`add-competition-groups`, 2026-05-19). Ranking privado entre amigos como **filtro+reorder sobre `user_points` global** (cero divergencia de scoring). Caps: 3 grupos/user, 5–100 miembros/grupo, 5 links/grupo. Ver `docs/groups.md`.
+- `social` — hub en `/social`: amigos, invitaciones (a app + a grupos), grupos. Reúne todas las relaciones del usuario en una sola ruta. La vieja ruta `/amigos` redirige a `/social`.
+- `match-data` — fuente de fixture, resultados y **eventos en vivo** (goles, prórrogas, penaltis). Diseñada con **redundancia de dos APIs en paralelo** (failover). Plan Pro de api-football $19/mes en producción.
 
 ## Modelo de datos preliminar
 

@@ -392,9 +392,12 @@ VAPID (RFC 8292, *Voluntary Application Server Identification for Web Push*) es 
 
 | Kind del notification | Origen en código | URL al hacer click |
 | --------------------- | ----------------- | ----------------- |
-| `friend_request` | `friends/actions.ts::sendFriendRequest` | `/amigos` |
-| `friend_accepted` (manual) | `friends/actions.ts::acceptFriendRequest` | `/amigos` |
-| `friend_accepted` (invitación) | `invitations/redemption.ts::redeemInvitationForUser` | `/amigos` |
+| `friend_request` | `friends/actions.ts::sendFriendRequest` | `/social` |
+| `friend_accepted` (manual) | `friends/actions.ts::acceptFriendRequest` | `/social` |
+| `friend_accepted` (invitación) | `invitations/redemption.ts::redeemInvitationForUser` | `/social` |
+| `group_invited` | `groups/invitations.ts::createGroupInvitation` | `/social` |
+| `group_expelled` | `groups/membership.ts::expelMember` | `/social` |
+| `group_admin_transferred` | `groups/actions.ts::transferAdmin` | `/social` |
 | `achievement_unlocked` | `achievements/unlock.ts::evaluateAndUnlock` | `/logros` |
 | `match_finished` | `scoring/pipeline.ts::processFinishedMatch` | `/partidos/<matchId>` |
 

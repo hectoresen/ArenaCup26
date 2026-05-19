@@ -81,3 +81,61 @@ profile, terms, privacy, help, about, root, www, support
 - Su perfil público (`/u/<username>`) devuelve 404.
 - Si el Mundial ya terminó, los **registros congelados** (ej. quién fue el GOAT histórico) se mantienen, pero el nombre del usuario eliminado se sustituye por "Usuario eliminado" en cualquier vista pública.
 - Cumple RGPD sin ambigüedad (derecho al olvido satisfecho).
+
+## Grupos de competición
+
+> Feature `add-competition-groups` shipped 2026-05-19. Doc detallado
+> en [`groups.md`](groups.md). Esta sección recoge solo las reglas
+> de negocio "duras" — el dominio no permite negociarlas.
+
+### Caps
+
+- **3 grupos activos por user** (admin + member juntos).
+- **5–100 miembros por grupo**, default 25 (configurable por admin).
+- **5 links de invitación activos por grupo**.
+
+### Roles
+
+- **Siempre exactamente 1 admin por grupo**. Transferible vía
+  `transferAdmin`. El admin puede invitar, expulsar, generar/revocar
+  links, editar y borrar.
+- **Admin no puede abandonar** (`is_admin_cannot_leave`). Debe
+  transferir el admin o borrar el grupo.
+
+### Leave / Expel: siempre congela
+
+Tanto `leaveGroup` como `expelMember` aplican la misma transición:
+`left_at = now()` + snapshot de `user_points` actuales a `frozen_*`.
+La fila NO se borra.
+
+- El ex-miembro queda visible en el ranking del grupo con sus puntos
+  al momento de irse y badge "Ha salido" junto al nombre.
+- Si vuelve a ser invitado y acepta (o entra de nuevo a un grupo
+  público al que ya había pertenecido), la misma fila se reactiva
+  (`left_at = NULL`, `frozen_* = NULL`) y conserva todo su
+  historial.
+
+### Privacidad de grupos privados
+
+- Los grupos `private` SÍ aparecen en `/social/grupos/descubrir` con
+  candado. Click → popup "Solo por invitación". Da vida al buscador
+  sin filtrar miembros ni ranking.
+- Acceso directo por URL al detalle (`/social/grupos/<id>`) donde no
+  eres miembro → 404 (no 403 — no filtramos la existencia del grupo).
+
+### Borrado
+
+- Soft-delete (`deleted_at`). Las memberships persisten para que el
+  ranking congelado mantenga su referencia. El grupo desaparece de
+  todos los listados y queries activas.
+
+### Scoring
+
+- **Idéntico al global**. El ranking del grupo es un filtro+reorder
+  sobre el mismo `user_points`. Cero rama paralela, cero divergencia
+  posible entre global y grupos.
+
+### Reducir `max_members` por debajo del count actual
+
+- **Bloqueado** (`max_members_below_count`). No permitimos
+  auto-expulsiones implícitas por bajar el cap.

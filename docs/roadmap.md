@@ -147,6 +147,52 @@ contradictorias (¿"sin foto" pero sí "con puntos"?). Migración
     `referredFirstHits >= 1`).
   - i18n namespace `invite` en es/en/fr/ar.
 
+## Bloque H — Grupos de competición ✓ (2026-05-19)
+
+> Propuesta `add-competition-groups`. Doc detallado en
+> [`groups.md`](groups.md). Decisiones ADR en
+> [`decisions.md#1412-grupos-de-competición-2026-05-19`](decisions.md#1412-grupos-de-competición-2026-05-19).
+
+- **H1 · Schema + dominio**: ✓ aterrizado 2026-05-18.
+  - 4 tablas (`groups`, `group_memberships`, `group_invitations`,
+    `group_links`) + 6 valores nuevos en `notification_kind`.
+  - Caps: 3 grupos/user, 5–100 miembros/grupo (default 25), 5
+    links/grupo.
+  - Server actions: createGroup, updateGroup, deleteGroup,
+    transferAdmin, leaveGroup, expelMember, joinPublicGroup,
+    joinGroupViaLink, createGroupInvitation, acceptGroupInvitation,
+    rejectGroupInvitation, cancelGroupInvitation, createGroupLink,
+    revokeGroupLink. Validación Zod en todas.
+
+- **H2 · Rutas + UI**: ✓ aterrizado 2026-05-19.
+  - `/social/grupos/{nuevo,[id],descubrir,unirse/[token]}`.
+  - Hub en `/social` con "Mis grupos" + bandeja de invitaciones.
+  - Panel admin con accordions: invitar, links, miembros, ajustes.
+  - `GroupLeaderboardView` reusa `PodiumCard` y `RankRow` del
+    leaderboard global → mismo look-and-feel.
+
+- **H3 · Ranking nav redesign**: ✓ aterrizado 2026-05-19.
+  - `/ranking` con 3 tabs URL-driven (`?scope=` Global / Amigos / Grupos).
+  - Sub-nav con cada grupo del viewer + CTA "+ Nuevo".
+  - `getFriendsRanking` query con mismo tie-break que el global.
+
+- **H4 · Logro `team-spirit`**: ✓ aterrizado 2026-05-19.
+  - Logro común. Trigger: ≥1 membership activa.
+  - `GATE_BYPASS` en unlock.ts permite el desbloqueo sin esperar al
+    gate de partidos. Backfill idempotente en `bootstrap.ts`.
+
+- **H5 · Reglas post-launch consolidadas**: ✓ aterrizado 2026-05-19.
+  - Leave/Expel siempre congela (sin opción de borrado total).
+  - Re-invitación reactiva la misma fila preservando historial.
+  - Grupos privados visibles en `/descubrir` con candado + popup.
+  - Badge "Ha salido" junto al nombre del ex-miembro en filas.
+
+- **H-pendiente** (post-Mundial, no bloqueante):
+  - i18n: las vistas de grupos están en es-hardcoded; migrar a
+    `groups.*` namespace de next-intl para en/fr/ar.
+  - E2E Playwright happy paths (`test.skip` actuales) cuando exista
+    auth-bypass de testing.
+
 ## Bloque G — País por IP (decisión)
 
 - **G1 · Análisis RGPD/cookies** (`2.1`):

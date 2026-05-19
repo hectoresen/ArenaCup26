@@ -87,8 +87,14 @@ Dry-run por default; aplicar con `--apply`.
 
 `scripts/bootstrap.ts` se ejecuta en cada deploy. Idempotente:
 
-- **`seedAchievements`** → inserta/actualiza el catálogo de 24 logros
+- **`seedAchievements`** → inserta/actualiza el catálogo de 25 logros
   en `achievement_definitions`.
+- **`backfillTeamSpirit`** → reconcilia el logro `team-spirit` para
+  usuarios con ≥1 membership activa que no lo tienen aún. Idempotente,
+  sin notificaciones. Necesario porque el gate global
+  (`ACHIEVEMENTS_MIN_FINISHED_MATCHES`) impedía el unlock en flujos de
+  group action; ahora el gate tiene `GATE_BYPASS` pero pre-existentes
+  necesitan backfill.
 - **`seedLeaderboardPlaceholders`** → mete los 7 placeholders (Maya
   Petrova, Kenji Yamamoto, etc.) con puntos, racha, `lastActiveAt` y
   algunos logros desbloqueados, para que el ranking no luzca vacío

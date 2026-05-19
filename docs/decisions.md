@@ -421,6 +421,45 @@ Documento vivo. Cada vez que una capability nueva cierra una decisión técnica 
 
 ---
 
+## 14.12 Grupos de competición (2026-05-19)
+
+- **Contexto**: ArenaCup26 tenía solo un ranking global único; jugar contra "mi cuñado y mi peña" era el caso de uso obvio pero invisible. Reescribir el scoring por grupo era inaceptable: complicaba la BD y abría divergencias entre puntos globales y de grupo.
+- **Decisión**: el ranking de un grupo es un **filtro + reorder** sobre el mismo `user_points` que alimenta el global. Cuatro tablas nuevas (`groups`, `group_memberships`, `group_invitations`, `group_links`) + 6 valores nuevos en `notification_kind` + el logro `team-spirit` añadido al catálogo. Caps: 3 grupos/user, 5–100 miembros/grupo, 5 links/grupo.
+
+## 14.13 Leave/Expel siempre congela el perfil (2026-05-19)
+
+- **Contexto**: la implementación inicial de `leaveGroup` exponía un toggle "Mantener mi perfil congelado". Resultaba confuso y rompía la coherencia del ranking histórico. `expelMember` directamente borraba la fila, lo que impedía mostrar al ex-miembro como referencia.
+- **Decisión**: ambos flujos hacen lo mismo — `left_at = now()` + snapshot de `user_points` a `frozen_*`. Eliminado el toggle de UI. Si el user vuelve a ser invitado, la misma fila se reactiva (`left_at = NULL`, `frozen_* = NULL`) y conserva todo el historial. Badge "Ha salido" junto al nombre mientras esté frozen, desaparece al re-incorporarse.
+
+## 14.14 Grupos privados aparecen en descubrir con candado (2026-05-19)
+
+- **Contexto**: la implementación inicial filtraba los privados de `/descubrir`. Resultado: el buscador estaba mayormente vacío.
+- **Decisión**: ahora `/descubrir` muestra TODOS los grupos no borrados (privados + públicos + en los que ya eres miembro). Los privados aparecen con candado 🔒; click → popup "solo por invitación o link del admin". Da vida al buscador como "pista" social sin filtrar miembros ni ranking. Acceso directo por URL al detalle de un privado sigue dando 404.
+
+## 14.15 Ranking nav redesign — Global / Amigos / Grupos (2026-05-19)
+
+- **Contexto**: `/ranking` mostraba solo el global. La feature de grupos quedaba escondida en `/social`.
+- **Decisión**: `/ranking` ahora tiene 3 tabs URL-driven (`?scope=`):
+  - `?` (default) → Global, SSE-powered.
+  - `?scope=amigos` → viewer + amigos aceptados (tab oculta si no tienes amigos).
+  - `?scope=grupos&g=<id>` → sub-nav con cada grupo del viewer + CTA "+ Nuevo". Empty state si no tienes grupos.
+- Reutiliza `PodiumCard` y `RankRow` del módulo global. El podio siempre se renderiza con placeholders animados si hay <3 miembros activos. Ex-miembros congelados nunca al podio.
+
+## 14.16 Gate de logros con bypass para acciones sociales (2026-05-19)
+
+- **Contexto**: el gate `ACHIEVEMENTS_MIN_FINISHED_MATCHES` (decisión 14.8) bloqueaba TODOS los logros hasta jugar N partidos. Pero `team-spirit` (crear/unirse a grupo) es una acción social, no rendimiento — debería desbloquearse al instante.
+- **Decisión**: nueva lista `GATE_BYPASS` en `evaluateAndUnlock` con los logros exentos del gate. Por ahora solo `team-spirit`. `evaluateAndUnlock` ya no retorna `[]` con el gate activo: marca `gateActive=true` y filtra rule a rule. `scripts/bootstrap.ts` corre `backfillTeamSpirit` en cada pre-deploy (idempotente, sin notificaciones) para reconciliar usuarios con grupos pre-existentes a los que el bug del gate les había impedido recibir el logro.
+
+## 14.17 Notificaciones de grupo: routing y push opt-in (2026-05-19)
+
+- **Contexto**: 6 kinds nuevos para grupos (`group_invited`, `group_joined`, `group_left`, `group_expelled`, `group_admin_transferred`, `group_deleted`).
+- **Decisión**:
+  - Todos resuelven a `/social` en `resolveNotificationHref` (no a deep-link al grupo) para mantener UI consistente con el hub. La card en `/social` hace el deep-link concreto.
+  - Push ACTIVO solo para time-sensitive: `group_invited` (te invitan), `group_expelled` (te echan), `group_admin_transferred` (eres el nuevo admin).
+  - El resto (joins, leaves, deletes) son in-app silenciosos — eventos de baja prioridad que no merecen interrumpir.
+
+---
+
 ## 15. Roadmap diferido (no decidido todavía)
 
 Estas son capabilities propuestas pero **no abiertas** todavía. Se documenta solo el alcance esperado para que cuando llegue el momento de drafter la propuesta haya un contexto previo.
