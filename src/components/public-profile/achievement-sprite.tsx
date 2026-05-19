@@ -67,18 +67,38 @@ export function AchievementsIconSprite() {
           <line x1="21" y1="23" x2="33" y2="23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
         </symbol>
 
-        {/* TEAM — team-spirit (common). Tres figuras juntas
-            representando un grupo de competición. */}
+        {/* TEAM — team-spirit (common). Escudo con balón al centro
+            + 3 estrellas en la parte superior, simbolizando equipo
+            unido. Visualmente distinto del icono `dart` (que es
+            diana concéntrica con flecha) y del `invite` (silueta +).
+            Stroke-only para consistir con el resto del sprite. */}
         <symbol id="ach-team" viewBox="0 0 36 36">
-          {/* Figura central, más grande (admin). */}
-          <circle cx="18" cy="10" r="4" fill="none" stroke="currentColor" strokeWidth="1.7" />
-          <path d="M10 30 C10 22 13.5 18 18 18 C22.5 18 26 22 26 30" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-          {/* Figura izquierda, más pequeña. */}
-          <circle cx="7" cy="13" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M2 30 C2 24 4 20 7 20 C8.5 20 10 20.8 11 22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          {/* Figura derecha, más pequeña. */}
-          <circle cx="29" cy="13" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M25 22 C26 20.8 27.5 20 29 20 C32 20 34 24 34 30" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          {/* Escudo silueta — punta inferior + hombros redondeados. */}
+          <path
+            d="M18 4 L30 8 L30 18 C30 25 25 30 18 32.5 C11 30 6 25 6 18 L6 8 Z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinejoin="round"
+          />
+          {/* Tres estrellitas pequeñas en la parte superior (banda),
+              representando los miembros del grupo. */}
+          <circle cx="12" cy="11" r="1.1" fill="currentColor" />
+          <circle cx="18" cy="10.2" r="1.1" fill="currentColor" />
+          <circle cx="24" cy="11" r="1.1" fill="currentColor" />
+          {/* Balón de fútbol al centro: hexágono central + pentágonos
+              alrededor, simplificado para 36×36 viewBox. */}
+          <circle cx="18" cy="22" r="5.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
+          <path
+            d="M18 17.5 L21.2 19.8 L20 23.5 L16 23.5 L14.8 19.8 Z"
+            fill="currentColor"
+            opacity="0.85"
+          />
+          <line x1="18" y1="16.5" x2="18" y2="17.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+          <line x1="22.5" y1="20.5" x2="21.2" y2="19.8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+          <line x1="13.5" y1="20.5" x2="14.8" y2="19.8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+          <line x1="20" y1="23.5" x2="21" y2="26.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+          <line x1="16" y1="23.5" x2="15" y2="26.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
         </symbol>
 
         {/* FIVE EXACT — five-of-five (common) */}
@@ -302,6 +322,7 @@ export function achSymbolHref(iconId: string): string {
     "ico-podium2",
     "ico-crown",
     "ico-goat",
+    "ico-team",
   ]);
   if (!knownIds.has(iconId)) return "#ach-dart";
   return `#ach-${iconId.replace(/^ico-/, "")}`;
