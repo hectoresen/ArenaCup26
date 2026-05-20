@@ -50,7 +50,17 @@ export function LeaderboardView({
     <>
       {withChrome && <FloatingBalls count={7} />}
       {withChrome && <TopChrome user={user} />}
-      <div className="relative z-10 mx-auto w-full max-w-[510px]">
+      {/* `withChrome` (landing pública / standalone) trae los slots
+          fijos arriba — `LanguageSwitcher` y `JoinCta` / `AccountMenu`.
+          Reservamos `pt-16 sm:pt-20` para que el trofeo y el "26" no
+          se solapen con ellos en el viewport. Cuando `withChrome` es
+          `false` (el ranking embebido en `/ranking`), el AppShell ya
+          aporta su propio padding. */}
+      <div
+        className={`relative z-10 mx-auto w-full max-w-[510px] ${
+          withChrome ? "pt-16 sm:pt-20" : ""
+        }`}
+      >
         <header className="mb-6 text-center opacity-0 [animation:popIn_0.7s_cubic-bezier(0.34,1.56,0.64,1)_forwards]">
           <div className="mb-2.5 flex items-center justify-center gap-3.5">
             <TrophyLogo className="animate-[trophyFloat_3.5s_ease-in-out_infinite] drop-shadow-[0_4px_20px_rgba(245,200,66,0.45)]" />
