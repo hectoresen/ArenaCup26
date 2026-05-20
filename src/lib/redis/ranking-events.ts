@@ -1,5 +1,6 @@
 import { Redis } from "@upstash/redis";
 import { env } from "@/lib/env";
+import { REDIS_TIMEOUT_MS, withTimeout } from "@/lib/redis/with-timeout";
 
 /**
  * Canal lógico de eventos del ranking. Patrón **last-change pointer**:
@@ -47,7 +48,15 @@ export async function publishRankingChange(): Promise<void> {
     // SETEX con TTL 300s para que la key no quede zombie si el
     // service se reinicia y nadie publica durante un rato. 5 min cubre
     // cualquier brecha realista entre publishes en producción.
-    await redis.setex(KEY, 300, Date.now());
+    //
+    // `withTimeout` evita que un Upstash colgado bloquee
+    // `processFinishedMatch` (que llama aquí al final). El SSE seguirá
+    // emitiendo snapshots cada 15 s aunque Redis no responda.
+    await withTimeout(
+      Promise.resolve(redis.setex(KEY, 300, Date.now())),
+      REDIS_TIMEOUT_MS,
+      "publishRankingChange",
+    );
   } catch {
     // Silencioso. Ver comentario en el módulo: caer al fallback de 15s
     // es aceptable; loggear cada fallo solo añade ruido.
@@ -63,7 +72,14 @@ export async function publishRankingChange(): Promise<void> {
 export async function getLastRankingChange(): Promise<number | null> {
   if (!redis) return null;
   try {
-    const raw = await redis.get<string | number>(KEY);
+    // `withTimeout` evita que un Upstash colgado tumbe el polling del
+    // SSE. Si la lectura tarda más que el `POLL_MS` (1 s), nos
+    // saltamos este tick y caemos al fallback de 15 s automáticamente.
+    const raw = await withTimeout(
+      redis.get<string | number>(KEY),
+      REDIS_TIMEOUT_MS,
+      "getLastRankingChange",
+    );
     if (raw === null || raw === undefined) return null;
     const n = typeof raw === "number" ? raw : Number(raw);
     return Number.isFinite(n) ? n : null;

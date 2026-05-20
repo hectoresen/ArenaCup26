@@ -1,5 +1,6 @@
 import { Redis } from "@upstash/redis";
 import { dlog } from "@/lib/debug-log";
+import { REDIS_TIMEOUT_MS, withTimeout } from "@/lib/redis/with-timeout";
 
 // Leemos `process.env` directamente en lugar de importar `env` de
 // `@/lib/env` para evitar el side-effect de la validación zod cuando
@@ -86,6 +87,10 @@ export type RateLimitResult = {
  * En el primer hit del bucket hace `INCR` (→1) y `EXPIRE` con el
  * tamaño exacto de la ventana, así la clave se autodestruye cuando
  * cierra. Re-hits incrementan sin tocar el TTL.
+ *
+ * **Fail-open con timeout** (≤ REDIS_TIMEOUT_MS): si Redis tarda
+ * más de lo esperado o lanza, devolvemos `ok:true` para no bloquear
+ * la request.
  */
 async function check(
   scope: LimiterConfig["name"],
@@ -105,11 +110,23 @@ async function check(
   const bucketEnd = (bucketIndex + 1) * config.windowSec * 1000;
 
   try {
-    const count = await redis.incr(key);
+    const count = await withTimeout(redis.incr(key), REDIS_TIMEOUT_MS, "rl_incr");
     if (count === 1) {
       // Primera vez en este bucket → fijar TTL al cierre de la
       // ventana. Re-hits no tocan el TTL (clave se autodestruye).
-      await redis.expire(key, config.windowSec);
+      // Fire-and-forget: si EXPIRE falla, la key se queda sin TTL
+      // y caduca cuando Redis hace su LRU eviction. No bloqueamos
+      // el path crítico esperando este ack.
+      void withTimeout(
+        Promise.resolve(redis.expire(key, config.windowSec)),
+        REDIS_TIMEOUT_MS,
+        "rl_expire",
+      ).catch((err) => {
+        dlog("ranking", "rl_expire_failed", {
+          scope,
+          err: err instanceof Error ? err.message : String(err),
+        });
+      });
     }
     const ok = count <= config.limit;
     if (!ok) {
