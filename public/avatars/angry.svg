@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <clipPath id="cl2"><circle cx="128" cy="128" r="128"/></clipPath>
+    <radialGradient id="bgA" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#2a0808"/>
+      <stop offset="100%" stop-color="#100404"/>
+    </radialGradient>
+    <radialGradient id="ballA" cx="35%" cy="28%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#e8e8e8"/>
+      <stop offset="100%" stop-color="#c8c8c8"/>
+    </radialGradient>
+    <radialGradient id="angerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(255,77,109,0.3)"/>
+      <stop offset="100%" stop-color="rgba(255,77,109,0)"/>
+    </radialGradient>
+    <filter id="sdA" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="rgba(200,0,0,0.4)"/>
+    </filter>
+    <filter id="glowA" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <filter id="veinGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+  </defs>
+  <g clip-path="url(#cl2)">
+
+    <!-- BG -->
+    <rect width="256" height="256" fill="url(#bgA)"/>
+    <!-- Anger aura -->
+    <circle cx="128" cy="128" r="115" fill="url(#angerGlow)"/>
+    <!-- Radial anger lines -->
+    <line x1="128" y1="128" x2="12"  y2="28"  stroke="rgba(255,77,109,0.12)" stroke-width="2"/>
+    <line x1="128" y1="128" x2="244" y2="28"  stroke="rgba(255,77,109,0.12)" stroke-width="2"/>
+    <line x1="128" y1="128" x2="12"  y2="228" stroke="rgba(255,77,109,0.12)" stroke-width="2"/>
+    <line x1="128" y1="128" x2="244" y2="228" stroke="rgba(255,77,109,0.12)" stroke-width="2"/>
+    <line x1="128" y1="128" x2="128" y2="10"  stroke="rgba(255,77,109,0.1)" stroke-width="2"/>
+    <line x1="128" y1="128" x2="128" y2="246" stroke="rgba(255,77,109,0.1)" stroke-width="2"/>
+    <line x1="128" y1="128" x2="10"  y2="128" stroke="rgba(255,77,109,0.1)" stroke-width="2"/>
+    <line x1="128" y1="128" x2="246" y2="128" stroke="rgba(255,77,109,0.1)" stroke-width="2"/>
+
+    <!-- Anger symbols floating -->
+    <!-- Top left -->
+    <text x="28" y="52" font-family="Fredoka One, cursive" font-size="28" fill="#ff4d6d" opacity="0.9" transform="rotate(-15 28 52)">!</text>
+    <!-- Top right -->
+    <text x="212" y="48" font-family="Fredoka One, cursive" font-size="28" fill="#ff4d6d" opacity="0.9" transform="rotate(12 212 48)">!</text>
+    <!-- Anger marks (manga style) -->
+    <!-- Left anger mark -->
+    <g transform="translate(38,80) rotate(-10)" opacity="0.9">
+      <rect x="0"   y="0" width="6" height="20" rx="3" fill="#ff4d6d"/>
+      <rect x="9"   y="0" width="6" height="20" rx="3" fill="#ff4d6d"/>
+      <rect x="0"   y="22" width="15" height="6" rx="3" fill="#ff4d6d"/>
+    </g>
+    <!-- Right anger mark -->
+    <g transform="translate(200,76) rotate(10)" opacity="0.9">
+      <rect x="0"   y="0" width="6" height="20" rx="3" fill="#ff4d6d"/>
+      <rect x="9"   y="0" width="6" height="20" rx="3" fill="#ff4d6d"/>
+      <rect x="0"   y="22" width="15" height="6" rx="3" fill="#ff4d6d"/>
+    </g>
+
+    <!-- ── BALL BODY ── -->
+    <circle cx="128" cy="134" r="96" fill="#ff4d6d" opacity="0.08" filter="url(#glowA)"/>
+    <circle cx="128" cy="134" r="88" fill="url(#ballA)" stroke="#222" stroke-width="4" filter="url(#sdA)"/>
+    <!-- Patches -->
+    <path d="M128 52  L146 66  L140 88  L116 88  L110 66  Z" fill="#1a1a1a"/>
+    <path d="M88  70  L110 66  L116 88  L100 104 L78  96  Z" fill="#1a1a1a"/>
+    <path d="M168 70  L146 66  L140 88  L156 104 L178 96  Z" fill="#1a1a1a"/>
+    <path d="M74  108 L100 104 L116 88  L116 108 L100 120 Z" fill="#1a1a1a"/>
+    <path d="M182 108 L156 104 L140 88  L140 108 L156 120 Z" fill="#1a1a1a"/>
+    <!-- Ball shine -->
+    <ellipse cx="102" cy="82" rx="18" ry="12" fill="rgba(255,255,255,0.55)" transform="rotate(-20 102 82)"/>
+    <ellipse cx="96"  cy="74" rx="8"  ry="5"  fill="rgba(255,255,255,0.7)"  transform="rotate(-20 96 74)"/>
+
+    <!-- ── ANGRY FACE ── -->
+    <!-- Angry blush cheeks (red) -->
+    <ellipse cx="74"  cy="160" rx="22" ry="14" fill="#ff4d6d" opacity="0.3"/>
+    <ellipse cx="182" cy="160" rx="22" ry="14" fill="#ff4d6d" opacity="0.3"/>
+
+    <!-- Eyes (ANGRY — thick downward slanting brows, squinting eyes) -->
+    <!-- Left eye white -->
+    <ellipse cx="98"  cy="148" rx="18" ry="14" fill="white" stroke="#222" stroke-width="2.5"/>
+    <!-- Right eye white -->
+    <ellipse cx="158" cy="148" rx="18" ry="14" fill="white" stroke="#222" stroke-width="2.5"/>
+    <!-- Left pupil (shifted inward) -->
+    <circle cx="102" cy="150" r="9" fill="#111"/>
+    <circle cx="104" cy="147" r="3.5" fill="white" opacity="0.6"/>
+    <!-- Right pupil (shifted inward) -->
+    <circle cx="154" cy="150" r="9" fill="#111"/>
+    <circle cx="156" cy="147" r="3.5" fill="white" opacity="0.6"/>
+    <!-- Eye veins (anger) -->
+    <line x1="82"  y1="140" x2="90"  y2="148" stroke="#ff4d6d" stroke-width="1.5" opacity="0.7"/>
+    <line x1="80"  y1="148" x2="88"  y2="150" stroke="#ff4d6d" stroke-width="1.2" opacity="0.6"/>
+    <line x1="170" y1="140" x2="178" y2="148" stroke="#ff4d6d" stroke-width="1.5" opacity="0.7"/>
+    <line x1="170" y1="148" x2="178" y2="148" stroke="#ff4d6d" stroke-width="1.2" opacity="0.6"/>
+
+    <!-- ANGRY EYEBROWS (thick, deep V shape) -->
+    <path d="M76 128 L104 142" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round"/>
+    <path d="M180 128 L152 142" stroke="#1a1a1a" stroke-width="10" stroke-linecap="round"/>
+    <!-- Brow highlight -->
+    <path d="M77 126 L103 140" stroke="rgba(255,255,255,0.12)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M179 126 L153 140" stroke="rgba(255,255,255,0.12)" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- MOUTH (gritted, snarling) -->
+    <path d="M88 188 Q128 176 168 188" fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/>
+    <!-- Teeth (gritted) -->
+    <path d="M100 184 Q128 178 156 184 L156 192 Q128 198 100 192 Z" fill="white" stroke="#1a1a1a" stroke-width="2"/>
+    <!-- Tooth dividers -->
+    <line x1="116" y1="184" x2="116" y2="192" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="128" y1="184" x2="128" y2="192" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="140" y1="184" x2="140" y2="192" stroke="#ddd" stroke-width="1.5"/>
+
+    <!-- Sweat drops (anger sweat) -->
+    <path d="M58 118 C56 108 62 102 64 110 C66 116 62 122 58 118Z" fill="#4fc3f7" opacity="0.8"/>
+    <path d="M44 140 C42 132 47 127 48 134 C50 140 46 144 44 140Z" fill="#4fc3f7" opacity="0.65"/>
+
+  </g>
+</svg>

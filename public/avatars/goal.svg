@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <clipPath id="cl"><circle cx="128" cy="128" r="128"/></clipPath>
+    <radialGradient id="bgG" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#0d2040"/>
+      <stop offset="100%" stop-color="#060e1e"/>
+    </radialGradient>
+    <radialGradient id="ballG" cx="35%" cy="28%" r="65%">
+      <stop offset="0%" stop-color="#fff5a0"/>
+      <stop offset="50%" stop-color="#f5c842"/>
+      <stop offset="100%" stop-color="#c88000"/>
+    </radialGradient>
+    <radialGradient id="netGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(245,200,66,0.25)"/>
+      <stop offset="100%" stop-color="rgba(245,200,66,0)"/>
+    </radialGradient>
+    <filter id="bshadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/>
+    </filter>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+    <filter id="starGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+  <g clip-path="url(#cl)">
+
+    <!-- BG -->
+    <rect width="256" height="256" fill="url(#bgG)"/>
+    <!-- Pitch ground -->
+    <rect x="0" y="188" width="256" height="68" fill="#1a4a20"/>
+    <rect x="0" y="186" width="256" height="6" fill="#20582a"/>
+    <!-- Ground stripes -->
+    <rect x="0"   y="188" width="42" height="68" fill="rgba(255,255,255,0.03)"/>
+    <rect x="84"  y="188" width="42" height="68" fill="rgba(255,255,255,0.03)"/>
+    <rect x="170" y="188" width="42" height="68" fill="rgba(255,255,255,0.03)"/>
+
+    <!-- ── SPOTLIGHT ── -->
+    <ellipse cx="128" cy="0" rx="130" ry="180" fill="rgba(245,200,66,0.07)"/>
+
+    <!-- ── GOAL FRAME ── -->
+    <!-- Goal shadow -->
+    <rect x="34" y="100" width="188" height="92" rx="4" fill="rgba(0,0,0,0.3)" transform="translate(3,4)"/>
+    <!-- Left post -->
+    <rect x="34" y="98" width="12" height="96" rx="6" fill="#e8e8f0" stroke="#a0a0b0" stroke-width="2"/>
+    <!-- Right post -->
+    <rect x="210" y="98" width="12" height="96" rx="6" fill="#e8e8f0" stroke="#a0a0b0" stroke-width="2"/>
+    <!-- Crossbar -->
+    <rect x="34" y="98" width="188" height="12" rx="6" fill="#e8e8f0" stroke="#a0a0b0" stroke-width="2"/>
+    <!-- Post shine -->
+    <rect x="38" y="102" width="4" height="88" rx="2" fill="rgba(255,255,255,0.4)"/>
+    <rect x="214" y="102" width="4" height="88" rx="2" fill="rgba(255,255,255,0.4)"/>
+
+    <!-- ── NET ── -->
+    <!-- Net glow -->
+    <ellipse cx="128" cy="160" rx="80" ry="46" fill="url(#netGlow)"/>
+    <!-- Net grid vertical -->
+    <line x1="60"  y1="110" x2="56"  y2="190" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <line x1="80"  y1="110" x2="76"  y2="190" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <line x1="100" y1="110" x2="96"  y2="190" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <line x1="120" y1="110" x2="116" y2="190" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <line x1="140" y1="110" x2="140" y2="190" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <line x1="160" y1="110" x2="162" y2="190" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <line x1="180" y1="110" x2="182" y2="190" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <line x1="200" y1="110" x2="204" y2="190" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <!-- Net grid horizontal -->
+    <line x1="46"  y1="122" x2="210" y2="122" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <line x1="46"  y1="138" x2="210" y2="138" stroke="rgba(255,255,255,0.14)" stroke-width="1"/>
+    <line x1="46"  y1="154" x2="210" y2="154" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="46"  y1="170" x2="210" y2="170" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <line x1="46"  y1="186" x2="210" y2="186" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+    <!-- ── BALL (golden, inside goal) ── -->
+    <!-- Ball glow -->
+    <circle cx="118" cy="148" r="44" fill="#f5c842" opacity="0.2" filter="url(#glow)"/>
+    <!-- Ball body -->
+    <circle cx="118" cy="148" r="38" fill="url(#ballG)" stroke="#c88000" stroke-width="3" filter="url(#bshadow)"/>
+    <!-- Patches -->
+    <path d="M118 114 L129 122 L125 135 L111 135 L107 122 Z" fill="#1a0e00" opacity="0.75"/>
+    <path d="M95 124 L107 122 L111 135 L103 143 L92 138 Z" fill="#1a0e00" opacity="0.6"/>
+    <path d="M141 124 L129 122 L125 135 L133 143 L144 138 Z" fill="#1a0e00" opacity="0.6"/>
+    <path d="M92 150 L103 143 L111 135 L111 147 L102 154 Z" fill="#1a0e00" opacity="0.5"/>
+    <path d="M144 150 L133 143 L125 135 L125 147 L134 154 Z" fill="#1a0e00" opacity="0.5"/>
+    <!-- Ball shine -->
+    <ellipse cx="104" cy="130" rx="12" ry="8" fill="rgba(255,255,255,0.45)" transform="rotate(-20 104 130)"/>
+    <!-- Motion lines (ball entering goal) -->
+    <line x1="168" y1="128" x2="210" y2="118" stroke="#f5c842" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <line x1="166" y1="143" x2="212" y2="138" stroke="#f5c842" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+    <line x1="165" y1="158" x2="210" y2="158" stroke="#f5c842" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+
+    <!-- ── 3 STARS (podium style) ── -->
+    <!-- Star glow -->
+    <circle cx="90"  cy="55" r="18" fill="#c8d8f0" opacity="0.15" filter="url(#glow)"/>
+    <circle cx="128" cy="44" r="22" fill="#f5c842" opacity="0.2" filter="url(#glow)"/>
+    <circle cx="166" cy="55" r="18" fill="#e8834a" opacity="0.15" filter="url(#glow)"/>
+
+    <!-- Silver star (#2) -->
+    <polygon points="90,36 93.5,46 104,46 96,53 99,63 90,57 81,63 84,53 76,46 86.5,46"
+             fill="#c8d8f0" stroke="#8090b0" stroke-width="2" stroke-linejoin="round" filter="url(#bshadow)"/>
+    <polygon points="90,38 92.5,46 100,46 94,51 96.5,59 90,55 83.5,59 86,51 80,46 87.5,46"
+             fill="rgba(255,255,255,0.4)"/>
+    <!-- Gold star (#1, bigger centre) -->
+    <polygon points="128,20 132.5,34 148,34 136,43 140,57 128,49 116,57 120,43 108,34 123.5,34"
+             fill="#f5c842" stroke="#c88000" stroke-width="2.5" stroke-linejoin="round" filter="url(#bshadow)"/>
+    <polygon points="128,23 131.5,34 143,34 134,42 137,53 128,47 119,53 122,42 113,34 124.5,34"
+             fill="rgba(255,255,255,0.4)"/>
+    <!-- Bronze star (#3) -->
+    <polygon points="166,36 169.5,46 180,46 172,53 175,63 166,57 157,63 160,53 152,46 162.5,46"
+             fill="#e8834a" stroke="#a04820" stroke-width="2" stroke-linejoin="round" filter="url(#bshadow)"/>
+    <polygon points="166,38 168.5,46 176,46 170,51 172.5,59 166,55 159.5,59 162,51 156,46 163.5,46"
+             fill="rgba(255,255,255,0.35)"/>
+
+    <!-- Rank numbers on stars -->
+    <text x="90"  y="54" text-anchor="middle" font-family="Fredoka One, cursive" font-size="10" fill="#0d1830">2</text>
+    <text x="128" y="45" text-anchor="middle" font-family="Fredoka One, cursive" font-size="13" fill="#3a2000">1</text>
+    <text x="166" y="54" text-anchor="middle" font-family="Fredoka One, cursive" font-size="10" fill="#2a1000">3</text>
+
+    <!-- GOAAAL text -->
+    <text x="128" y="222" text-anchor="middle" font-family="Fredoka One, cursive" font-size="22" fill="#f5c842" stroke="#c88000" stroke-width="3" paint-order="stroke" letter-spacing="1">¡GOOOL!</text>
+
+  </g>
+</svg>

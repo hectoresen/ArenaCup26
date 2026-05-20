@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <clipPath id="cl3"><circle cx="128" cy="128" r="128"/></clipPath>
+    <radialGradient id="bgS" cx="45%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#1a1430"/>
+      <stop offset="100%" stop-color="#080610"/>
+    </radialGradient>
+    <radialGradient id="ballS" cx="32%" cy="25%" r="68%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#eeeef8"/>
+      <stop offset="100%" stop-color="#c8c8e0"/>
+    </radialGradient>
+    <radialGradient id="smugAura" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="rgba(192,132,252,0.2)"/>
+      <stop offset="100%" stop-color="rgba(192,132,252,0)"/>
+    </radialGradient>
+    <filter id="sdS" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="rgba(100,0,200,0.3)"/>
+    </filter>
+    <filter id="glowS" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+    <filter id="sparkleF" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+  </defs>
+  <g clip-path="url(#cl3)">
+
+    <!-- BG -->
+    <rect width="256" height="256" fill="url(#bgS)"/>
+    <!-- Smug aura -->
+    <circle cx="128" cy="128" r="112" fill="url(#smugAura)"/>
+    <!-- Sparkle stars floating around (vain) -->
+    <!-- Gold sparkles -->
+    <g filter="url(#sparkleF)">
+      <polygon points="32,55 34.5,63 43,63 36.5,68 39,76 32,71 25,76 27.5,68 21,63 29.5,63" fill="#f5c842" opacity="0.85" transform="scale(0.55) translate(30,44)"/>
+      <polygon points="220,40 222,47 230,47 224,52 226,59 220,55 214,59 216,52 210,47 218,47" fill="#f5c842" opacity="0.8" transform="scale(0.5) translate(216,38)"/>
+      <polygon points="55,200 57,207 65,207 59,212 61,219 55,215 49,219 51,212 45,207 53,207" fill="#f5c842" opacity="0.7" transform="scale(0.5) translate(50,190)"/>
+      <polygon points="205,195 207,202 215,202 209,207 211,214 205,210 199,214 201,207 195,202 203,202" fill="#c084fc" opacity="0.75" transform="scale(0.5) translate(200,184)"/>
+    </g>
+    <!-- Shine dots -->
+    <circle cx="42"  cy="82"  r="4" fill="#f5c842" opacity="0.7" filter="url(#sparkleF)"/>
+    <circle cx="214" cy="75"  r="3" fill="#c084fc" opacity="0.65" filter="url(#sparkleF)"/>
+    <circle cx="35"  cy="172" r="3" fill="#f5c842" opacity="0.6" filter="url(#sparkleF)"/>
+    <circle cx="222" cy="168" r="3.5" fill="#f5c842" opacity="0.65" filter="url(#sparkleF)"/>
+
+    <!-- ── SUNGLASSES / Cool rays ── -->
+    <line x1="128" y1="0" x2="60"  y2="70" stroke="rgba(245,200,66,0.1)" stroke-width="18"/>
+    <line x1="128" y1="0" x2="128" y2="80" stroke="rgba(245,200,66,0.08)" stroke-width="18"/>
+    <line x1="128" y1="0" x2="196" y2="70" stroke="rgba(245,200,66,0.1)" stroke-width="18"/>
+
+    <!-- ── BALL BODY ── -->
+    <circle cx="128" cy="136" r="90" fill="url(#smugAura)" filter="url(#glowS)"/>
+    <circle cx="128" cy="136" r="86" fill="url(#ballS)" stroke="#2a2a3a" stroke-width="4" filter="url(#sdS)"/>
+    <!-- Patches -->
+    <path d="M128 58  L145 71  L139 92  L117 92  L111 71  Z" fill="#2a2a3a"/>
+    <path d="M90  70  L111 71  L117 92  L102 107 L81  99  Z" fill="#2a2a3a"/>
+    <path d="M166 70  L145 71  L139 92  L154 107 L175 99  Z" fill="#2a2a3a"/>
+    <path d="M77  110 L102 107 L117 92  L117 112 L102 122 Z" fill="#2a2a3a"/>
+    <path d="M179 110 L154 107 L139 92  L139 112 L154 122 Z" fill="#2a2a3a"/>
+    <!-- Ball shine -->
+    <ellipse cx="100" cy="84" rx="20" ry="12" fill="rgba(255,255,255,0.6)" transform="rotate(-22 100 84)"/>
+    <ellipse cx="93"  cy="75" rx="9"  ry="6"  fill="rgba(255,255,255,0.75)" transform="rotate(-22 93 75)"/>
+
+    <!-- ── SMUG FACE ── -->
+
+    <!-- SUNGLASSES (the smuggest accessory) -->
+    <!-- Frame bridge -->
+    <rect x="116" y="144" width="16" height="5" rx="2.5" fill="#1a1a2e"/>
+    <!-- Left lens -->
+    <rect x="70"  y="136" width="44" height="28" rx="12" fill="#1a1a2e" stroke="#c084fc" stroke-width="2.5"/>
+    <!-- Right lens -->
+    <rect x="142" y="136" width="44" height="28" rx="12" fill="#1a1a2e" stroke="#c084fc" stroke-width="2.5"/>
+    <!-- Lens reflections (cocky glint) -->
+    <ellipse cx="88"  cy="144" rx="10" ry="6" fill="rgba(192,132,252,0.35)" transform="rotate(-10 88 144)"/>
+    <ellipse cx="160" cy="144" rx="10" ry="6" fill="rgba(192,132,252,0.35)" transform="rotate(-10 160 144)"/>
+    <!-- Glint stars on glasses -->
+    <circle cx="104" cy="140" r="4" fill="white" opacity="0.6"/>
+    <circle cx="178" cy="140" r="4" fill="white" opacity="0.6"/>
+    <!-- Side arms of glasses -->
+    <line x1="70"  y1="150" x2="48"  y2="145" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round"/>
+    <line x1="186" y1="150" x2="208" y2="145" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- EYEBROWS (raised, one slightly raised = smugness) -->
+    <path d="M74  130 Q92  122 110 128" stroke="#2a2a3a" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <path d="M146 125 Q164 116 182 122" stroke="#2a2a3a" stroke-width="7" stroke-linecap="round" fill="none"/>
+
+    <!-- SMUG MOUTH (asymmetric smirk, one corner way up) -->
+    <path d="M90 188 Q115 200 152 182" fill="#2a2a3a" stroke="#2a2a3a" stroke-width="2"/>
+    <!-- Smirk visible teeth -->
+    <path d="M136 182 Q152 178 162 186 L162 192 Q152 196 136 192 Z" fill="white" stroke="#ddd" stroke-width="1"/>
+    <!-- Smirk dimple -->
+    <circle cx="162" cy="188" r="4" fill="rgba(0,0,0,0.1)"/>
+    <!-- Other corner curved down slightly -->
+    <path d="M88 188 Q84 192 86 196" fill="none" stroke="#2a2a3a" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Confident blush (soft, not embarrassed, "naturally glowing") -->
+    <ellipse cx="72"  cy="180" rx="20" ry="12" fill="#ffb6c1" opacity="0.2"/>
+    <ellipse cx="184" cy="174" rx="20" ry="12" fill="#ffb6c1" opacity="0.2"/>
+
+    <!-- Crown floating above (self-appointed) -->
+    <polygon points="128,32 132,44 136,36 140,48 144,38 148,50 128,50 108,50 112,38 116,48 120,36 124,44" fill="#f5c842" stroke="#c88000" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="108" y="48" width="40" height="12" rx="4" fill="#f5c842" stroke="#c88000" stroke-width="2"/>
+    <!-- Crown gems -->
+    <circle cx="118" cy="54" r="4" fill="#ff4d6d" stroke="#c00030" stroke-width="1"/>
+    <circle cx="128" cy="54" r="4" fill="#c084fc" stroke="#8000c0" stroke-width="1"/>
+    <circle cx="138" cy="54" r="4" fill="#4fc3f7" stroke="#0080b0" stroke-width="1"/>
+
+    <!-- "I'M THE BEST" badge -->
+    <rect x="74" y="214" width="108" height="26" rx="10" fill="#c084fc" stroke="#8040b0" stroke-width="2"/>
+    <text x="128" y="231" text-anchor="middle" font-family="Fredoka One, cursive" font-size="13" fill="white">EL MEJOR 😎</text>
+
+  </g>
+</svg>

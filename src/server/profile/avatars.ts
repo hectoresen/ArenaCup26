@@ -1,12 +1,15 @@
 /**
- * Galería de avatares — **personajes SVG ilustrados** (2026-05-19).
+ * Galería de avatares — **personajes SVG ilustrados**.
  *
- * Reemplazo de la galería de emojis previa por SVGs estilizados,
- * cada uno con una temática del producto:
+ * Galería de personajes con temática futbolera:
  *  - `champion` — corona + balón + confetti (campeón).
- *  - `duel` — dos jugadores cara a cara (competición).
- *  - `podium` — tres personajes en el podio (logros).
- *  - `oracle` — bola de cristal con balón dentro (predictor).
+ *  - `duel`     — dos jugadores cara a cara (competición).
+ *  - `podium`   — tres personajes en el podio (logros).
+ *  - `oracle`   — bola de cristal con balón dentro (predictor).
+ *  - `goal`     — celebración tras marcar (la euforia del acierto).
+ *  - `smug`     — sonrisa engreída (el listillo que las clava todas).
+ *  - `ref`      — árbitro con silbato (el legalista del grupo).
+ *  - `angry`    — cara cabreada (el que se enrabieta cuando falla).
  *
  * Cada SVG es 256×256, ya clipeado a círculo internamente
  * (`clipPath`), así que se renderiza directo sin máscara externa.
@@ -55,6 +58,30 @@ export const AVATAR_GALLERY: Avatar[] = [
     src: "/avatars/oracle.svg",
     label: "Oráculo",
     description: "Bola de cristal y balón. Para los que predicen sin fallo.",
+  },
+  {
+    id: "goal",
+    src: "/avatars/goal.svg",
+    label: "Gol",
+    description: "La euforia tras marcar. Para celebrar cada acierto.",
+  },
+  {
+    id: "smug",
+    src: "/avatars/smug.svg",
+    label: "Chulito",
+    description: "La sonrisa del que sabía que iba a acertar.",
+  },
+  {
+    id: "ref",
+    src: "/avatars/ref.svg",
+    label: "Árbitro",
+    description: "Silbato en mano. El que conoce todas las reglas.",
+  },
+  {
+    id: "angry",
+    src: "/avatars/angry.svg",
+    label: "Cabreado",
+    description: "Cuando el VAR te roba un acierto cantado.",
   },
 ];
 
