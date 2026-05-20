@@ -151,6 +151,15 @@ export async function GET(req: Request) {
       hbInterval = setInterval(sendHeartbeat, HEARTBEAT_MS);
 
       maxDuration = setTimeout(() => {
+        // Cierre limpio: avisamos al cliente con un evento `bye` ANTES
+        // de cerrar el controller. Sin esto, los browsers loguean
+        // `ERR_CONNECTION_RESET` aunque EventSource reconecte solo
+        // (ruido en consola que confunde durante debug).
+        try {
+          safeEnqueue(`event: bye\ndata: {"reason":"max_duration"}\n\n`);
+        } catch {
+          // controller ya cerrado por cancel — no-op.
+        }
         cleanup();
         try {
           controller.close();

@@ -85,16 +85,14 @@ export default async function LocaleLayout({
     <html lang={locale} dir={dir} className={`${fredokaOne.variable} ${nunito.variable}`}>
       <head>
         {/*
-          Noto Color Emoji desde Google Fonts. En Windows, los emojis de
-          bandera (regional indicator pairs) no rinden por defecto; este
-          fallback garantiza que se vean en cualquier SO.
+          Antes cargábamos Noto Color Emoji desde Google Fonts para
+          renderizar banderas en Windows (regional indicator pairs no
+          rinden por defecto). Ahora las banderas usan `<CountryFlag>`
+          con PNGs de flagcdn.com — la fuente externa ya no aporta y
+          forzaba relajar la CSP. Los emojis residuales (🌍, 📊…) son
+          codepoints estándar que rinden con la fuente nativa del SO
+          (Apple Color Emoji, Segoe UI Emoji, etc.).
         */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap"
-        />
         {/*
           Plausible analytics (privacy-friendly, sin cookies, sin PII).
           Solo se inyecta si NEXT_PUBLIC_PLAUSIBLE_DOMAIN está set —
