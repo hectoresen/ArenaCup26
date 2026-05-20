@@ -255,6 +255,8 @@ export async function getGroupRanking(
   groupId: string,
 ): Promise<GroupRankingEntry[]> {
   // 1) Memberships del grupo (activos + congelados) con datos del user.
+  //    `lastActiveAt` viaja hasta la fila final para que el ranking de
+  //    grupo muestre el mismo "puntito verde" que el global.
   const memberRows = await db
     .select({
       userId: groupMemberships.userId,
@@ -268,6 +270,7 @@ export async function getGroupRanking(
       avatarId: users.avatarId,
       image: users.image,
       createdAt: users.createdAt,
+      lastActiveAt: users.lastActiveAt,
     })
     .from(groupMemberships)
     .innerJoin(users, eq(users.id, groupMemberships.userId))
@@ -318,6 +321,7 @@ export async function getGroupRanking(
     simpleHits: number;
     predictionsTotal: number;
     createdAt: Date;
+    lastActiveAt: Date | null;
     frozen: boolean;
   };
   const merged: Row[] = memberRows.map((m) => {
@@ -337,6 +341,7 @@ export async function getGroupRanking(
         simpleHits: m.frozenSimpleHits ?? 0,
         predictionsTotal: predMap.get(m.userId) ?? 0,
         createdAt: m.createdAt,
+        lastActiveAt: m.lastActiveAt,
         frozen: true,
       };
     }
@@ -355,6 +360,7 @@ export async function getGroupRanking(
       simpleHits: p?.simpleHits ?? 0,
       predictionsTotal: predMap.get(m.userId) ?? 0,
       createdAt: m.createdAt,
+      lastActiveAt: m.lastActiveAt,
       frozen: false,
     };
   });
@@ -416,10 +422,18 @@ export async function getGroupRanking(
   const snapRanked = [...lastSnapByUser].sort((a, b) => a.rank - b.rank);
   const rankInSnapByUser = new Map(snapRanked.map((s, i) => [s.userId, i + 1]));
 
+  // Mismo umbral (24h) que `getRealSnapshot` para que el puntito verde
+  // sea coherente entre ranking global y ranking de grupo.
+  const now = Date.now();
+  const ONLINE_WINDOW_MS = 24 * 60 * 60 * 1000;
+
   return merged.map((m, i) => {
     const currentRank = i + 1;
     const snapRank = rankInSnapByUser.get(m.userId);
     const rankDelta = snapRank ? snapRank - currentRank : null;
+    const isOnline = m.lastActiveAt
+      ? now - m.lastActiveAt.getTime() <= ONLINE_WINDOW_MS
+      : false;
     return {
       userId: m.userId,
       username: m.username,
@@ -431,6 +445,7 @@ export async function getGroupRanking(
       streak: m.streak,
       correctCount: m.correctCount,
       frozen: m.frozen,
+      isOnline,
       rank: currentRank,
       rankDelta,
     };

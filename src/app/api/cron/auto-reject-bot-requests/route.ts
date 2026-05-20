@@ -5,6 +5,7 @@ import { checkCronLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { db } from "@/server/db/client";
 import { autoRejectStaleBotRequests } from "@/server/bots/auto-reject";
+import { refreshLiveBotPresence } from "@/server/bots/presence";
 
 /**
  * Cron diario que marca como `rejected` los friend requests y group
@@ -39,9 +40,17 @@ export async function POST(req: Request) {
 
   try {
     const report = await autoRejectStaleBotRequests(db);
+    // Piggy-back: el mismo cron diario refresca el `lastActiveAt` de
+    // los bots "live" para que sigan luciendo con puntito verde en el
+    // ranking. Es no-op pasado el cutoff (`LIVE_BOTS_END_DATE`).
+    const liveBotsRefreshed = await refreshLiveBotPresence(db);
     const elapsed = Date.now() - startedAt;
-    dlog("cron", "auto-reject-bot-requests done", { ...report, elapsedMs: elapsed });
-    return NextResponse.json(report, { status: 200 });
+    dlog("cron", "auto-reject-bot-requests done", {
+      ...report,
+      liveBotsRefreshed,
+      elapsedMs: elapsed,
+    });
+    return NextResponse.json({ ...report, liveBotsRefreshed }, { status: 200 });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     derr("cron", "auto-reject-bot-requests failed", { err: message });

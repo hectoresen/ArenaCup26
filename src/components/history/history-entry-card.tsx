@@ -81,7 +81,12 @@ export function HistoryEntryCard({ entry, now }: Props) {
           <div className="mt-0.5 flex items-center gap-1.5">
             <KindBadge kind={entry.prediction.kind} />
             <span className="truncate text-[13px] font-bold text-foreground">
-              {formatPredictionLabel(entry.prediction, t)}
+              {formatPredictionLabel(
+                entry.prediction,
+                entry.homeTeam.name,
+                entry.awayTeam.name,
+                t,
+              )}
             </span>
           </div>
         </div>
@@ -209,22 +214,35 @@ function PointsBadge({
   );
 }
 
+/**
+ * Convierte una predicción en una frase legible nombrando equipos
+ * concretos en lugar de los términos genéricos "Local" / "Visitante"
+ * (que no resuenan en un torneo entre selecciones). Ejemplos:
+ *  - simple+home → "Argentina"
+ *  - simple+draw → "Empate"
+ *  - double-1x   → "Argentina o empate"
+ *  - double-x2   → "Empate o Brasil"
+ *  - double-12   → "Argentina o Brasil"
+ *  - exact       → "3-1"
+ */
 function formatPredictionLabel(
   p: HistoryEntry["prediction"],
+  homeName: string,
+  awayName: string,
   t: ReturnType<typeof useTranslations<"history">>,
 ): string {
   switch (p.kind) {
     case "exact":
       return `${p.predictedHomeScore ?? 0}-${p.predictedAwayScore ?? 0}`;
     case "simple":
-      if (p.predictedWinner === "home") return t("predLocal");
-      if (p.predictedWinner === "away") return t("predAway");
+      if (p.predictedWinner === "home") return homeName;
+      if (p.predictedWinner === "away") return awayName;
       return t("predDraw");
     case "double-1x":
-      return t("predDouble1x");
+      return t("predHomeOrDraw", { team: homeName });
     case "double-x2":
-      return t("predDoubleX2");
+      return t("predDrawOrAway", { team: awayName });
     case "double-12":
-      return t("predDouble12");
+      return t("predHomeOrAway", { home: homeName, away: awayName });
   }
 }

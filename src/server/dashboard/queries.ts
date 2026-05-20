@@ -413,13 +413,21 @@ export async function getProgress(db: Database, userId: string): Promise<Progres
   };
 }
 
+/**
+ * Threshold para el puntito verde — el mismo del leaderboard global
+ * (`src/lib/leaderboard/real.ts`). Mantener en sync entre ambas
+ * superficies; si cambia uno, cambia el otro.
+ */
+const MINI_ONLINE_WINDOW_MS = 24 * 60 * 60 * 1000;
+
 export async function getMiniLeaderboard(
   db: Database,
   userId: string,
   topCount: number,
 ): Promise<MiniLeaderboardView> {
   // Top N por puntos descendente. Incluimos username para que la
-  // fila pueda enlazar a `/u/<username>`.
+  // fila pueda enlazar a `/u/<username>` y `lastActiveAt` para que
+  // el puntito verde aparezca también en `/inicio`.
   const topRows = await db
     .select({
       userId: userPoints.userId,
@@ -427,11 +435,16 @@ export async function getMiniLeaderboard(
       name: users.name,
       username: users.username,
       country: users.country,
+      lastActiveAt: users.lastActiveAt,
     })
     .from(userPoints)
     .innerJoin(users, eq(users.id, userPoints.userId))
     .orderBy(desc(userPoints.totalPoints), asc(userPoints.userId))
     .limit(topCount);
+
+  const now = Date.now();
+  const isOnlineFor = (lastActiveAt: Date | null) =>
+    lastActiveAt ? now - lastActiveAt.getTime() <= MINI_ONLINE_WINDOW_MS : false;
 
   const top: LeaderboardEntry[] = topRows.map((row, idx) => ({
     userId: row.userId,
@@ -440,6 +453,7 @@ export async function getMiniLeaderboard(
     countryCode: row.country,
     points: row.points,
     rank: idx + 1,
+    isOnline: isOnlineFor(row.lastActiveAt),
   }));
 
   // Fila del user con su rank real.
@@ -449,6 +463,7 @@ export async function getMiniLeaderboard(
       name: users.name,
       username: users.username,
       country: users.country,
+      lastActiveAt: users.lastActiveAt,
     })
     .from(userPoints)
     .innerJoin(users, eq(users.id, userPoints.userId))
@@ -469,6 +484,7 @@ export async function getMiniLeaderboard(
       countryCode: meData.country,
       points: meData.points,
       rank: (meAheadRows[0]?.ahead ?? 0) + 1,
+      isOnline: isOnlineFor(meData.lastActiveAt),
     };
   }
 
@@ -524,13 +540,15 @@ export async function getFriendsMiniLeaderboard(
 
   // Top N entre el grupo. LEFT JOIN para incluir users sin
   // user_points (cuentas nuevas). Incluimos username para que la
-  // fila pueda enlazar a `/u/<username>`.
+  // fila pueda enlazar a `/u/<username>` y `lastActiveAt` para el
+  // puntito verde (mismo umbral que el global).
   const topRows = await db
     .select({
       userId: users.id,
       name: users.name,
       username: users.username,
       country: users.country,
+      lastActiveAt: users.lastActiveAt,
       points: userPoints.totalPoints,
     })
     .from(users)
@@ -539,6 +557,10 @@ export async function getFriendsMiniLeaderboard(
     .orderBy(desc(sql`coalesce(${userPoints.totalPoints}, 0)`), asc(users.id))
     .limit(topCount);
 
+  const now = Date.now();
+  const isOnlineFor = (lastActiveAt: Date | null) =>
+    lastActiveAt ? now - lastActiveAt.getTime() <= MINI_ONLINE_WINDOW_MS : false;
+
   const top: LeaderboardEntry[] = topRows.map((row, idx) => ({
     userId: row.userId,
     name: row.name?.trim() || "Jugador",
@@ -546,6 +568,7 @@ export async function getFriendsMiniLeaderboard(
     countryCode: row.country,
     points: row.points ?? 0,
     rank: idx + 1,
+    isOnline: isOnlineFor(row.lastActiveAt),
   }));
 
   // ¿El user ya aparece en el top? Si sí, `me` queda null para no
@@ -561,6 +584,7 @@ export async function getFriendsMiniLeaderboard(
       name: users.name,
       username: users.username,
       country: users.country,
+      lastActiveAt: users.lastActiveAt,
       points: userPoints.totalPoints,
     })
     .from(users)
@@ -588,6 +612,7 @@ export async function getFriendsMiniLeaderboard(
     countryCode: meData.country,
     points: myPoints,
     rank: (aheadInGroup[0]?.n ?? 0) + 1,
+    isOnline: isOnlineFor(meData.lastActiveAt),
   };
   return { top, me, friendsCount };
 }

@@ -63,6 +63,7 @@ function buildData(overrides: Partial<DashboardData> = {}): DashboardData {
             countryCode: "SA",
             points: 4610,
             rank: 1,
+            isOnline: false,
           },
         ],
         me: {
@@ -72,6 +73,7 @@ function buildData(overrides: Partial<DashboardData> = {}): DashboardData {
           countryCode: "MX",
           points: 1840,
           rank: 42,
+          isOnline: false,
         },
       },
       friends: { top: [], me: null, friendsCount: 0 },

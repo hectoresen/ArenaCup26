@@ -15,6 +15,7 @@ function entry(rank: number, userId: string, points = 5000 - rank * 100): Leader
     countryCode: "MX",
     points,
     rank,
+    isOnline: false,
   };
 }
 

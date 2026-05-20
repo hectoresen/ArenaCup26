@@ -115,6 +115,12 @@ export type LeaderboardEntry = {
   countryCode: string | null;
   points: number;
   rank: number;
+  /**
+   * `true` si el user estuvo activo en las últimas 24h
+   * (`users.last_active_at`). Mismo umbral que el ranking global —
+   * dispara el puntito verde al lado del nombre.
+   */
+  isOnline: boolean;
 };
 
 export type MiniLeaderboardView = {

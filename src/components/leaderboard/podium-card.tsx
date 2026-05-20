@@ -83,7 +83,7 @@ export function PodiumCard({ player, place }: { player: Player; place: Place }) 
         {tone.label}
       </span>
       <div
-        className={`mx-auto mb-1.5 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-[3px] border-black/35 font-display text-lg ${tone.avatar}`}
+        className={`relative mx-auto mb-1.5 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-[3px] border-black/35 font-display text-lg ${tone.avatar}`}
       >
         {(() => {
           const gallery = getAvatar(player.avatarId);
@@ -97,6 +97,16 @@ export function PodiumCard({ player, place }: { player: Player; place: Place }) 
           }
           return initials(player.name);
         })()}
+        {/* Puntito de "activo en 24h" anclado al avatar del podio.
+            Coherente con `<RankRow>`; el borde negro del avatar lo
+            destaca sobre cualquier tono (oro/plata/bronce). */}
+        {player.isOnline && (
+          <span
+            aria-label="Online"
+            title="Online"
+            className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-black/40 bg-success"
+          />
+        )}
       </div>
       <div className="mb-1 flex justify-center">
         <CountryFlag

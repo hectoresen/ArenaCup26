@@ -109,6 +109,7 @@ function entry(rank: number, userId: string): LeaderboardEntry {
     countryCode: null,
     points: 5000 - rank * 100,
     rank,
+    isOnline: false,
   };
 }
 

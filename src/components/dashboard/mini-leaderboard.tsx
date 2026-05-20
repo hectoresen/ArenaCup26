@@ -139,6 +139,17 @@ function Row({ entry, isMe }: { entry: LeaderboardEntry; isMe: boolean }) {
             />
           )}
           <span className="truncate">{entry.name}</span>
+          {/* Puntito verde de "activo en 24h" — mismo significado y umbral
+              que en `<RankRow>` (`src/components/leaderboard/rank-row.tsx`).
+              Aquí no hay avatar circle al que pegarse, así que vive
+              inline entre el nombre y el `(tú)` / los puntos. */}
+          {entry.isOnline && (
+            <span
+              aria-label="Online"
+              title="Online"
+              className="inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-success"
+            />
+          )}
           {isMe && (
             <span className="ms-1.5 text-[10px] font-extrabold uppercase tracking-[0.06em] text-gold/70">
               {t("youTag")}

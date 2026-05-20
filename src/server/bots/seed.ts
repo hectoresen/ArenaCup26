@@ -2,6 +2,7 @@ import { eq, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { users } from "@/server/db/schema";
 import { BOT_CATALOG, botEmail } from "./catalog";
+import { refreshLiveBotPresence } from "./presence";
 
 /**
  * Reconcilia los 27 bots del catálogo en la tabla `users`.
@@ -67,6 +68,11 @@ export async function seedBotUsers(db: Database): Promise<{
     if (result[0]?.createdAtNow) created++;
     else updated++;
   }
+
+  // Justo tras el seed: ponemos a "live" a los bots designados. Sin
+  // esto, después de un fresh seed nadie tiene puntito verde hasta que
+  // el cron `auto-reject-bot-requests` corra (24h después).
+  await refreshLiveBotPresence(db);
 
   return { created, updated };
 }

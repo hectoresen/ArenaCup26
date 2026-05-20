@@ -57,6 +57,13 @@ export type GroupRankingEntry = {
   correctCount: number;
   /** Si true, el user es ex-miembro y `points` son los congelados al `left_at`. */
   frozen: boolean;
+  /**
+   * `true` si el miembro estuvo activo en las últimas 24h
+   * (`users.last_active_at`). Mismo umbral que el ranking global —
+   * dispara el puntito verde en `<RankRow>`. Ex-miembros congelados
+   * pueden conservar el dot si siguen entrando a la app.
+   */
+  isOnline: boolean;
   /** Rank within group (1-based). Calculado en query. */
   rank: number;
   /** Delta vs hace 7 días dentro de ESTE grupo. null si no hay historial. */

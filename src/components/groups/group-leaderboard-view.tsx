@@ -124,7 +124,7 @@ function toPlayer(e: GroupRankingEntry): Player {
     correctCount: e.correctCount,
     rank: e.rank,
     previousRank: e.rankDelta !== null ? e.rank + e.rankDelta : e.rank,
-    isOnline: false,
+    isOnline: e.isOnline,
     avatarId: e.avatarId,
     image: e.image,
   };

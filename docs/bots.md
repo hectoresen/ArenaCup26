@@ -113,6 +113,32 @@ Después de eso, `seedLeaderboardPlaceholders` se elimina del codebase.
 - **`is_bot` NUNCA en API**. Ningún select público lo incluye. Es
   flag interno para métricas y operativa.
 
+## Bots "live" — puntito verde durante fase de grupos
+
+Cinco bots del catálogo (`LIVE_BOT_USERNAMES` en
+`src/server/bots/presence.ts`) tienen su `last_active_at` refrescado
+diariamente para que aparezcan con el indicador "online" (puntito
+verde) en el ranking global, en grupos, en `/inicio` y en el perfil
+público. Sin esto el ranking se sentiría desierto en cold-start —
+ningún bot dispara el dot porque ninguno navega la app.
+
+- **Quiénes**: `diego-martinez` (AR), `sofia-ramirez` (MX),
+  `felix-hartmann` (DE), `yuki-tanaka` (JP), `omar-benali` (MA).
+  Diversidad regional intencional.
+- **Cuándo se refresca**: el cron diario
+  `auto-reject-bot-requests` (03:30 UTC) hace piggy-back llamando a
+  `refreshLiveBotPresence`. También se ejecuta tras cada
+  `seedBotUsers` para que un fresh seed deje los bots verdes desde el
+  segundo cero.
+- **Hasta cuándo**: `LIVE_BOTS_END_DATE = 2026-07-04T00:00:00Z`.
+  Pasado el cierre de la fase de grupos, el cron deja de refrescar y
+  los bots caen a "offline" 24h después de forma natural. Si quieres
+  extender, mueve la constante en código (no hay migration).
+- **Side effect**: cualquier consulta `getRealSnapshot`,
+  `getMiniLeaderboard`, `getFriendsRanking` o `getGroupRanking` ya
+  consume el `lastActiveAt` actualizado — no hay que tocar las
+  superficies UI.
+
 ## Comportamiento esperado en el ranking
 
 - Con 27 bots y ~30 hits promedio cada uno (varía por style),

@@ -171,7 +171,8 @@ export async function getFriendsRanking(
   );
   const subsetIds = [viewerId, ...friendIds];
 
-  // 2) Datos de cada miembro + puntos.
+  // 2) Datos de cada miembro + puntos. `lastActiveAt` viaja para que
+  //    el ranking de amigos también pinte el puntito verde.
   const userRows = await db
     .select({
       userId: users.id,
@@ -181,6 +182,7 @@ export async function getFriendsRanking(
       avatarId: users.avatarId,
       image: users.image,
       createdAt: users.createdAt,
+      lastActiveAt: users.lastActiveAt,
       points: userPoints.totalPoints,
       streak: userPoints.streak,
       streakMax: userPoints.streakMax,
@@ -219,6 +221,11 @@ export async function getFriendsRanking(
     return a.createdAt.getTime() - b.createdAt.getTime();
   });
 
+  // Mismo umbral (24h) que el ranking global / grupo. Centralizar en
+  // una constante puede esperar a que veamos drift entre superficies.
+  const now = Date.now();
+  const ONLINE_WINDOW_MS = 24 * 60 * 60 * 1000;
+
   return sorted.map((r, i) => ({
     userId: r.userId,
     username: r.username,
@@ -230,6 +237,9 @@ export async function getFriendsRanking(
     streak: r.streak ?? 0,
     correctCount: r.correctCount ?? 0,
     frozen: false,
+    isOnline: r.lastActiveAt
+      ? now - r.lastActiveAt.getTime() <= ONLINE_WINDOW_MS
+      : false,
     rank: i + 1,
     rankDelta: null,
   }));
