@@ -18,27 +18,28 @@ Detalle ampliado en las secciones de abajo y en los docs enlazados.
 | `<LiveAutoRefresh>` en /inicio        | 30 s     | mientras hay un partido `status='live'`             | `src/components/dashboard/live-auto-refresh.tsx`              |
 | `<PreKickoffAutoRefresh>`             | 60 s     | ±30 min alrededor del kickoff del próximo partido   | ibíd.                                                         |
 
-### Crons servidor (GitHub Actions → Railway)
+### Crons servidor
 
-| Workflow                                | Cadencia          | Objetivo                                                       |
-|-----------------------------------------|-------------------|----------------------------------------------------------------|
-| `match-data-sync.yml`                   | cada 3 h          | Sincronizar fixtures de las ligas configuradas (hoy-1d → +7d)  |
-| `live-scoring.yml`                      | cada 2 min¹       | Marcadores en vivo + kickoff reminders + trigger scoring       |
-| `snapshot-ranking.yml`                  | 00:05 UTC diario  | Snapshot histórico del ranking (delta 24h + sparkline 7d)      |
-| `auto-reject-bot-requests.yml`          | 03:30 UTC diario  | Auto-rechazar friend/group requests a bots >48h pending + refresh `lastActiveAt` de los 5 bots "live" |
-| `db-backup.yml`                         | 03:00 UTC diario  | Backup íntegro Postgres → Backblaze B2 (retención 30d)         |
-| `db-backup-tournament.yml`              | cada 6 h          | Backup elevado durante el Mundial (date guard 11 jun→19 jul 2026) |
-
-¹ GitHub Actions free tier honra `*/2 * * * *` con intervalos reales
-de **30-60 min** en momentos de alta carga global (documentado por
-GitHub). El cron HTTP queda como safety net pero la cadencia real de
-live-scoring viene del **self-scheduler in-process** descrito abajo.
+| Quién dispara                | Cadencia          | Objetivo                                                       |
+|------------------------------|-------------------|----------------------------------------------------------------|
+| **Self-cron in-process**     | cada 2 min reales | **Live scoring** + kickoff reminders + trigger scoring         |
+| `match-data-sync.yml` (GH)   | cada 3 h          | Sincronizar fixtures de las ligas (hoy-1d → +7d)               |
+| `snapshot-ranking.yml` (GH)  | 00:05 UTC diario  | Snapshot histórico del ranking (delta 24h + sparkline 7d)      |
+| `auto-reject-bot-requests.yml` (GH) | 03:30 UTC diario | Auto-rechazar friend/group requests a bots >48h pending + refresh `lastActiveAt` de los 5 bots "live" |
+| `db-backup.yml` (GH)         | 03:00 UTC diario  | Backup íntegro Postgres → Backblaze B2 (retención 30d)         |
+| `db-backup-tournament.yml` (GH) | cada 6 h       | Backup elevado durante el Mundial (date guard 11 jun→19 jul 2026) |
 
 ### Self-scheduler in-process (Node)
 
-Desde 2026-05-20, el wmundial arranca al subir el proceso un
-`setInterval` que ejecuta cada **2 min reales** la misma lógica que
-el cron HTTP `/api/cron/live-scoring`:
+El live-scoring **no** se dispara desde GitHub Actions. Se ejecuta
+directamente desde el proceso Node del wmundial vía `setInterval`.
+
+**Por qué**: GitHub Actions free tier honra `cron: */2 * * * *` con
+intervalos reales de 30-60 min durante alta carga global (incidente
+2026-05-20). Pagar tier superior **no resuelve** el problema — es
+limitación de plataforma documentada, no de pricing. Las alternativas
+viables eran Railway Cron (paga) o servicios externos (cuenta nueva).
+Optamos por la solución cero-coste: el propio proceso Node.
 
 - Implementación: `src/server/cron/in-process-scheduler.ts`,
   enganchado en `src/instrumentation.ts`.
@@ -53,6 +54,9 @@ el cron HTTP `/api/cron/live-scoring`:
 - **Limitación**: si Railway escala a múltiples instancias del
   servicio, cada réplica ejecuta su propio tick. Asumido —
   el setup actual es single-instance y los upserts son idempotentes.
+- **Migración futura** (no necesaria a esta escala): si el tick
+  in-process empieza a afectar latencia de requests web (medible en
+  Sentry), se mueve a un Railway Cron service aislado (~3-5 €/mes).
 
 ### Provider externo
 
@@ -109,11 +113,14 @@ $CRON_SECRET`. Si necesitas mover uno a otro scheduler externo
 | Workflow                                         | Cadencia       | Endpoint                          | Aporta                                  |
 |--------------------------------------------------|----------------|-----------------------------------|------------------------------------------|
 | [`match-data-sync.yml`](../.github/workflows/match-data-sync.yml) | cada 3 h   | `/api/cron/sync-fixtures`         | Calendario de partidos en BD            |
-| [`live-scoring.yml`](../.github/workflows/live-scoring.yml)       | cada 2 min | `/api/cron/live-scoring`          | Marcadores en vivo + kickoff reminders + trigger de scoring |
 | [`snapshot-ranking.yml`](../.github/workflows/snapshot-ranking.yml) | 00:05 UTC | `/api/cron/snapshot-ranking`      | Histórico del ranking (delta 24h + sparkline 7d)|
 | [`auto-reject-bot-requests.yml`](../.github/workflows/auto-reject-bot-requests.yml) | 03:30 UTC | `/api/cron/auto-reject-bot-requests` | Limpia friend requests + group invitations a bots con >48h pending |
 | [`db-backup.yml`](../.github/workflows/db-backup.yml)             | 03:00 UTC  | (script `pg_dump` a S3, prefijo `daily/`) | Backup integral diario, retención 30d |
 | [`db-backup-tournament.yml`](../.github/workflows/db-backup-tournament.yml) | cada 6h (solo Mundial) | (script `pg_dump` a S3, prefijo `tournament/`) | Backup elevado durante el torneo (date guard 11 jun → 19 jul 2026) |
+
+El **live-scoring** vive aparte y NO usa GitHub Actions — corre como
+`setInterval` dentro del proceso Node del wmundial. Ver
+[Self-scheduler in-process](#self-scheduler-in-process-node) arriba.
 
 ### Secrets compartidos por los workflows
 
@@ -121,7 +128,6 @@ $CRON_SECRET`. Si necesitas mover uno a otro scheduler externo
 |-------------------------------|-----------------------------------------------------------------|
 | `CRON_SECRET`                 | Token shared con Railway (`Authorization: Bearer …`)            |
 | `RAILWAY_SYNC_URL`            | `https://www.arenacup26.com/api/cron/sync-fixtures`             |
-| `RAILWAY_LIVE_URL`            | `https://www.arenacup26.com/api/cron/live-scoring`              |
 | `RAILWAY_SNAPSHOT_URL`        | `https://www.arenacup26.com/api/cron/snapshot-ranking`          |
 | `RAILWAY_AUTO_REJECT_URL`     | `https://www.arenacup26.com/api/cron/auto-reject-bot-requests`  |
 | `DATABASE_URL` (solo backups) | Connection string de Postgres (vía `railway variables`)         |
@@ -136,21 +142,32 @@ partido cambió a `finished` entre llamadas, dispara `processFinishedMatch`
 de respaldo. **Sin este cron, `/partidos` se queda vacío** — es el que
 puebla el calendario para que el user tenga qué predecir.
 
-### live-scoring — _marcador en vivo_
+### live-scoring — _marcador en vivo_ (self-cron in-process)
 
-Cada 2 min comprueba en BD si hay algún match `live` o un kickoff a
-±15/30 min. Si NO, devuelve 200 con `synced:false` sin tocar el provider
-(skip silencioso, 0 cost). Si SÍ, fetch a api-football limitado a los
-fixtures de hoy y actualiza marcadores en BD. **Cuando detecta que un
-partido pasó a `finished`, ejecuta `processFinishedMatch` in-band**:
-calcula puntos para cada predicción, persiste en `user_points`, y los
-SSE clients reciben el ranking actualizado en el siguiente tick (≤15 s).
+Cada 2 min reales el proceso Node del wmundial ejecuta esta lógica
+desde su propio `setInterval` (ver
+[Self-scheduler in-process](#self-scheduler-in-process-node)). Pasos:
+
+1. Comprueba en BD si hay algún match `live` o un kickoff a ±15/30 min.
+   Si NO, salta el tick sin tocar el provider (0 coste).
+2. Si SÍ, fetch a api-football limitado a los fixtures de hoy y
+   actualiza marcadores en BD.
+3. **Cuando detecta que un partido pasó a `finished`, ejecuta
+   `processFinishedMatch` in-band**: calcula puntos para cada
+   predicción, persiste en `user_points`, y los SSE clients reciben el
+   ranking actualizado en el siguiente tick (≤60 s).
 
 **Kickoff reminders**: en cada tick (independiente de si hay sync o no),
 busca partidos con kickoff en [+25, +35] min y dispara push
 `prediction_locked` a usuarios activos (lastActive < 30d) que no hayan
 predicho. Dedup natural por `notifications.matchId + kind` evita
 duplicados.
+
+Históricamente (antes de 2026-05-20) esto se disparaba desde un
+workflow de GitHub Actions cada 2 min. Se eliminó cuando descubrimos
+que GH Actions free tier honra el `*/2 min` con cadencia real de
+30-60 min durante alta carga global — inservible para marcador en
+vivo. Ver `docs/incident-2026-05-20-live-scoring-throttling.md`.
 
 ### snapshot-ranking — _histórico del ranking_
 
@@ -273,20 +290,19 @@ sin la dependencia de red.
    ▼ ~5-15s
 [api-football lo publica]
    │
-   ▼ 0-2 min (espera al próximo tick de live-scoring)
-[live-scoring cron pide /fixtures?date=hoy]
+   ▼ 0-2 min (espera al próximo tick del self-cron in-process)
+[in-process scheduler pide /fixtures?date=hoy]
    │
-   ├─ actualiza matches.homeScore/awayScore en BD
+   ├─ actualiza matches.homeScore/awayScore/minute en BD
    │
    ▼ (si el match pasa a finished)
 [processFinishedMatch in-band, batch concurrency=25]
    │
    ├─ recorre predicciones de ese match
    ├─ calcula puntos con scoreMatchPrediction
-   ├─ UPDATE user_points (totalPoints, streak, correctCount)
-   └─ publishRankingChange() → Redis SETEX
+   └─ UPDATE user_points (totalPoints, streak, correctCount)
    │
-   ▼ ≤1s (poll de SSE al pointer Redis)
+   ▼ ≤60s (tick periódico del SSE)
 [SSE /api/leaderboard/stream emite snapshot a clientes conectados]
    │
    ▼ ≤30s en dashboard (LiveAutoRefresh)
@@ -295,10 +311,9 @@ sin la dependencia de red.
 
 Latencia worst-case extremo a extremo:
 
-- **Gol real → BD**: ~5-15 s (provider) + 0-2 min (cron live-scoring)
-  = ~**2-3 min** en el peor caso. Cuello de botella: la cadencia del
-  cron, no nuestro código.
-- **BD → UI**: ≤15 s (tick periódico del SSE).
+- **Gol real → BD**: ~5-15 s (provider) + 0-2 min (tick in-process)
+  = ~**2-3 min** en el peor caso.
+- **BD → UI**: ≤60 s (tick periódico del SSE).
 
 Para bajar el lag total habría que sustituir el cron polling por
 webhooks del provider (api-football no soporta; Sportmonks con Pusher

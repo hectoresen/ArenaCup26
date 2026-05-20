@@ -10,8 +10,9 @@ name: Match data sync
 #   `processFinishedMatch` → calcula y persiste puntos en `user_points`.
 # - Descubre equipos nuevos al vuelo (escudo + nombre + código).
 #
-# Es el "calendario amplio". Complementario a `live-scoring.yml` que
-# corre cada 2 min con ventana solo de hoy.
+# Es el "calendario amplio". El live-scoring (marcador en vivo cada
+# 2 min) vive aparte como self-scheduler in-process dentro de
+# wmundial — ver `docs/data-pipeline.md §self-scheduler`.
 #
 # Ver `docs/data-pipeline.md` para el flujo completo de datos.
 #

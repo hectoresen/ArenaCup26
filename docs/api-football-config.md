@@ -52,9 +52,9 @@ API_FOOTBALL_KEY=<set en Railway>
 ```
 
 Estimación de quota: 7-9 días × 1 req/día = ~10 req/día por sync de
-fixtures, + crons de live-scoring (cada 2 min cuando hay match activo).
-Pico durante un día con 4 partidos en paralelo: ~1 440 req/día. Cabe
-sobrado en los 7 500 del plan Pro.
+fixtures, + ticks del self-cron in-process (cada 2 min cuando hay
+match activo). Pico durante un día con 4 partidos en paralelo:
+~1 440 req/día. Cabe sobrado en los 7 500 del plan Pro.
 
 ## Switch al Mundial 2026 (junio 2026)
 
@@ -91,13 +91,15 @@ El cron pasará de pedir `?date=YYYY-MM-DD` a pedir
 ## Crons que consumen el provider
 
 - **`/api/cron/sync-fixtures`** — cada **3 h** vía GitHub Actions.
-  Refresca fixtures de la ventana configurada.
-- **`/api/cron/live-scoring`** — cada **2 min** vía GitHub Actions.
-  Solo dispara si hay match `live` o kickoff en ±15 min. Cuando
-  detecta un match pasando a `finished`, llama `processFinishedMatch`
-  in-band → actualiza `user_points`.
-
-Ambos endpoints requieren header `Authorization: Bearer $CRON_SECRET`.
+  Refresca fixtures de la ventana configurada. Requiere header
+  `Authorization: Bearer $CRON_SECRET`.
+- **Self-cron in-process** (`src/server/cron/in-process-scheduler.ts`)
+  — cada **2 min** dentro del proceso Node del wmundial. Solo dispara
+  si hay match `live` o kickoff en ±15 min. Cuando detecta un match
+  pasando a `finished`, llama `processFinishedMatch` in-band → actualiza
+  `user_points`. NO usa HTTP ni CRON_SECRET — invoca la lógica
+  directamente. Ver `docs/data-pipeline.md §self-scheduler` para
+  rationale.
 
 ## Campos de api-football que recibimos pero NO usamos (futuro)
 
