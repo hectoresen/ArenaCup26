@@ -1,30 +1,30 @@
-import { Redis } from "@upstash/redis";
 import { dlog } from "@/lib/debug-log";
-import { REDIS_TIMEOUT_MS, withTimeout } from "@/lib/redis/with-timeout";
-
-// Leemos `process.env` directamente en lugar de importar `env` de
-// `@/lib/env` para evitar el side-effect de la validación zod cuando
-// este módulo se importa desde tests puros (e.g. `handler.test.ts`,
-// que no carga AUTH_SECRET / GOOGLE_*). El env de prod sigue
-// gobernado por env.ts; aquí solo nos interesa "está set o no".
-const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
-const NODE_ENV = process.env.NODE_ENV;
 
 /**
- * Rate limiting "casero" sobre Upstash Redis (o adapter HTTP
- * compatible). No usamos `@upstash/ratelimit` directamente porque
- * ese paquete ejecuta scripts Lua vía `EVALSHA`, y el adapter HTTP
- * que tenemos en Railway (`luggapugga/serverless-redis`) no
- * implementa Lua (responde `NoScript: No matching script`).
- * Implementamos un **fixed window counter** con `INCR` + `EXPIRE`
- * — comandos básicos que cualquier Redis (o adapter HTTP) entiende.
+ * Rate limiting **in-memory** (fixed-window counter por proceso Node).
  *
- * Fixed window vs sliding window: fixed es menos preciso (un user
- * puede hacer `limit` requests al final de una ventana + `limit`
- * más al principio de la siguiente). Para nuestros umbrales (10
- * por minuto, 60 por minuto, etc.) es perfectamente suficiente y
- * no vamos a ver burst-abuse a esa escala temporal.
+ * Por qué no Redis: el adapter HTTP de Upstash interno de Railway
+ * resultó frágil (cuelgues silenciosos del proxy `*.railway.internal`)
+ * y ningún sentido pagar/configurar Upstash Cloud para una app con
+ * tráfico bajo. Ver `docs/data-pipeline.md §rate-limit` y el incidente
+ * del 2026-05-20 para contexto.
+ *
+ * Tradeoffs aceptados:
+ *  - **Estado por instancia**: si algún día escalas a múltiples
+ *    réplicas en Railway, cada una mantiene su propio contador. Límite
+ *    efectivo = N × limit por usuario/IP. Para un atacante real eso
+ *    sigue siendo un freno; para un user legítimo es transparente.
+ *  - **Estado volátil**: en cada deploy/restart el Map se resetea. Un
+ *    atacante avispado podría dispararse contra los redeploys. No es
+ *    una preocupación a escala actual; si lo fuera, mover a Postgres
+ *    es ~50 líneas (tabla `rate_limit_buckets`).
+ *
+ * Ventajas:
+ *  - Latencia: nanosegundos. Cero llamadas de red por request.
+ *  - Cero infra externa, cero coste mensual, cero env vars.
+ *  - Mismo interface público que el módulo anterior — los callers
+ *    (`submitPredictionAction`, crons, `/api/notifications/subscribe`)
+ *    no cambian una línea.
  *
  * Defendemos los puntos donde un atacante o bot podría hacer daño:
  *
@@ -33,14 +33,11 @@ const NODE_ENV = process.env.NODE_ENV;
  *  - `publicRead`: 60 / 60s    por IP en `/` y `/u/<username>`.
  *  - `signup`:      5 / 3600s  por IP. Anti-creación masiva de cuentas.
  *
- * **Modo noop**: si `UPSTASH_REDIS_REST_URL` o `..._TOKEN` no están
- * set, los checks siempre devuelven `ok: true`. Útil para dev local
- * sin Redis y para que el deploy no falle si la BD no está aún
- * configurada. En producción el módulo emite warning al arrancar.
- *
- * **Política fail-open**: si Redis falla por cualquier motivo, el
- * check permite la request. Mejor abuso temporal que cortar a un
- * usuario legítimo por un problema de infra interna.
+ * Implementación: fixed-window counter. Clave
+ * `<scope>:<id>:<bucketIndex>`, donde `bucketIndex = floor(now / windowMs)`.
+ * Al cambiar de ventana (un segundo después del cierre) la clave anterior
+ * queda huérfana en el Map — el `cleanupExpired` (lazy + periódico) la
+ * descarta.
  */
 
 type LimiterConfig = {
@@ -58,21 +55,53 @@ const CONFIGS: LimiterConfig[] = [
 
 const CONFIG_BY_NAME = new Map(CONFIGS.map((c) => [c.name, c]));
 
-const isEnabled = Boolean(REDIS_URL) && Boolean(REDIS_TOKEN);
+type Bucket = {
+  count: number;
+  /** Epoch ms en el que la ventana se cierra y la clave es desechable. */
+  resetAt: number;
+};
 
-if (!isEnabled && NODE_ENV === "production") {
-  // eslint-disable-next-line no-console
-  console.warn(
-    "[AC/ratelimit] UPSTASH_REDIS_REST_URL / TOKEN not set in production — rate limiting is DISABLED",
-  );
+/**
+ * El store en sí. Es un singleton del módulo — el runtime de Node
+ * mantiene el mismo `Map` vivo entre requests dentro del mismo proceso.
+ * Cuando Railway reinicia el contenedor (deploy, OOM, etc.) el Map se
+ * crea de cero. Aceptable a esta escala.
+ */
+const store = new Map<string, Bucket>();
+
+/**
+ * Guard-rail para que el Map no crezca sin tope si llega tráfico masivo
+ * o un bug genera claves únicas. Si alguna vez superamos este número,
+ * `check` purga claves caducadas antes de admitir nuevas. En operación
+ * normal el Map se mantiene en cientos de entries — los users activos
+ * por minuto.
+ */
+const MAX_BUCKETS = 50_000;
+
+/**
+ * Última vez (epoch ms) que hicimos un sweep completo del store. El
+ * sweep es O(n) pero solo lo hacemos como mucho cada 60s o cuando
+ * superamos el tope. En estado estable nunca se ejecuta — los buckets
+ * se crean y se descartan por hash colisional cuando vuelve la misma
+ * IP/userId al minuto siguiente.
+ */
+let lastSweepAt = 0;
+const SWEEP_INTERVAL_MS = 60_000;
+
+function maybeSweep(now: number) {
+  if (store.size < MAX_BUCKETS && now - lastSweepAt < SWEEP_INTERVAL_MS) return;
+  let removed = 0;
+  for (const [key, bucket] of store) {
+    if (bucket.resetAt <= now) {
+      store.delete(key);
+      removed++;
+    }
+  }
+  lastSweepAt = now;
+  if (removed > 0) {
+    dlog("ranking", "rate_limit_sweep", { removed, remaining: store.size });
+  }
 }
-
-const redis = isEnabled
-  ? new Redis({
-      url: REDIS_URL ?? "",
-      token: REDIS_TOKEN ?? "",
-    })
-  : null;
 
 export type RateLimitResult = {
   ok: boolean;
@@ -83,51 +112,37 @@ export type RateLimitResult = {
 };
 
 /**
- * Fixed window counter: clave `wm:rl:<scope>:<id>:<bucketEpoch>`.
- * En el primer hit del bucket hace `INCR` (→1) y `EXPIRE` con el
- * tamaño exacto de la ventana, así la clave se autodestruye cuando
- * cierra. Re-hits incrementan sin tocar el TTL.
+ * Core check. Idempotente respecto al store: dos llamadas con el mismo
+ * (scope, identifier) dentro de la misma ventana actualizan el mismo
+ * bucket.
  *
- * **Fail-open con timeout** (≤ REDIS_TIMEOUT_MS): si Redis tarda
- * más de lo esperado o lanza, devolvemos `ok:true` para no bloquear
- * la request.
+ * **No** es fail-open en sentido estricto — al ser in-memory no hay
+ * "fallo de red" del que protegerse. Si lanza por alguna razón muy
+ * inesperada (OOM en el INCR), el caller debería dejar pasar la
+ * request; lo gestionamos con try/catch en `check`.
  */
-async function check(
+function check(
   scope: LimiterConfig["name"],
   identifier: string,
-): Promise<RateLimitResult> {
-  if (!redis) {
-    return { ok: true, remaining: 999, reset: 0 };
-  }
+): RateLimitResult {
   const config = CONFIG_BY_NAME.get(scope);
   if (!config) {
     return { ok: true, remaining: 999, reset: 0 };
   }
 
   const now = Date.now();
-  const bucketIndex = Math.floor(now / (config.windowSec * 1000));
-  const key = `wm:rl:${scope}:${identifier}:${bucketIndex}`;
-  const bucketEnd = (bucketIndex + 1) * config.windowSec * 1000;
+  const windowMs = config.windowSec * 1000;
+  const bucketIndex = Math.floor(now / windowMs);
+  const key = `${scope}:${identifier}:${bucketIndex}`;
+  const resetAt = (bucketIndex + 1) * windowMs;
+
+  maybeSweep(now);
 
   try {
-    const count = await withTimeout(redis.incr(key), REDIS_TIMEOUT_MS, "rl_incr");
-    if (count === 1) {
-      // Primera vez en este bucket → fijar TTL al cierre de la
-      // ventana. Re-hits no tocan el TTL (clave se autodestruye).
-      // Fire-and-forget: si EXPIRE falla, la key se queda sin TTL
-      // y caduca cuando Redis hace su LRU eviction. No bloqueamos
-      // el path crítico esperando este ack.
-      void withTimeout(
-        Promise.resolve(redis.expire(key, config.windowSec)),
-        REDIS_TIMEOUT_MS,
-        "rl_expire",
-      ).catch((err) => {
-        dlog("ranking", "rl_expire_failed", {
-          scope,
-          err: err instanceof Error ? err.message : String(err),
-        });
-      });
-    }
+    const existing = store.get(key);
+    const count = (existing?.count ?? 0) + 1;
+    store.set(key, { count, resetAt });
+
     const ok = count <= config.limit;
     if (!ok) {
       dlog("ranking", "rate_limited", {
@@ -140,9 +155,11 @@ async function check(
     return {
       ok,
       remaining: Math.max(0, config.limit - count),
-      reset: bucketEnd,
+      reset: resetAt,
     };
   } catch (err) {
+    // Defensa por si algo del store falla raro (Map agotado por OOM,
+    // p.ej.). Fail-open: mejor dejar pasar al user legítimo que cortar.
     dlog("ranking", "rate_limit_check_failed", {
       scope,
       err: err instanceof Error ? err.message : String(err),
@@ -151,23 +168,37 @@ async function check(
   }
 }
 
-export async function checkSubmitLimit(userId: string): Promise<RateLimitResult> {
-  return check("submit", userId);
+export function checkSubmitLimit(userId: string): Promise<RateLimitResult> {
+  return Promise.resolve(check("submit", userId));
 }
 
-export async function checkCronLimit(ip: string): Promise<RateLimitResult> {
-  return check("cron", ip);
+export function checkCronLimit(ip: string): Promise<RateLimitResult> {
+  return Promise.resolve(check("cron", ip));
 }
 
-export async function checkPublicReadLimit(ip: string): Promise<RateLimitResult> {
-  return check("publicRead", ip);
+export function checkPublicReadLimit(ip: string): Promise<RateLimitResult> {
+  return Promise.resolve(check("publicRead", ip));
 }
 
-export async function checkSignupLimit(ip: string): Promise<RateLimitResult> {
-  return check("signup", ip);
+export function checkSignupLimit(ip: string): Promise<RateLimitResult> {
+  return Promise.resolve(check("signup", ip));
 }
 
-/** Pura, para tests. Indica si la integración con Upstash está activa. */
+/**
+ * En la versión Upstash devolvía true/false según hubiera env vars
+ * configuradas. Ahora el rate-limit es siempre operativo (in-memory),
+ * así que siempre `true`. Lo dejamos exportado para no romper callers.
+ */
 export function isRateLimitEnabled(): boolean {
-  return isEnabled;
+  return true;
+}
+
+/**
+ * Para tests: vacía el store entre suites para evitar leakage de
+ * estado. NO exportar fuera de tests — un caller en runtime podría
+ * resetear contadores sin querer.
+ */
+export function __resetRateLimitStoreForTests(): void {
+  store.clear();
+  lastSweepAt = 0;
 }

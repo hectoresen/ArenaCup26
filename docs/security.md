@@ -135,40 +135,48 @@ Si un secret real se cuela en un commit:
 4. Anotar en `docs/incidents.md` (crear cuando ocurra el primero):
    fecha, qué se filtró, alcance, remediation, lecciones aprendidas.
 
-## 7. Rate limiting (add-rate-limiting, 2026-05-15)
+## 7. Rate limiting
 
-`src/lib/rate-limit.ts` implementa cuatro limiters basados en
-Upstash Redis (sliding window):
+`src/lib/rate-limit.ts` implementa cuatro limiters **in-memory**
+(fixed-window counter por proceso Node):
 
 | Limiter        | Límite          | Identificador | Dónde se aplica                                  |
 | -------------- | --------------- | ------------- | ------------------------------------------------ |
 | `submit`       | 10 / 60 s       | userId        | `submitPrediction` (server action).              |
 | `cron`         | 6 / 60 s        | IP            | `handleCronRequest` tras pasar bearer.           |
-| `publicRead`   | 60 / 60 s       | IP            | Pendiente de wirear (landing + /u/<username>).   |
-| `signup`       | 5 / 3600 s      | IP            | Pendiente de wirear (Auth.js callback).          |
+| `publicRead`   | 60 / 60 s       | IP            | `/` y `/u/<username>` (server components).       |
+| `signup`       | 5 / 3600 s      | IP            | Callback `signIn` de Auth.js.                    |
 
 ### Configuración
 
-Env vars en Railway:
+Ninguna. El store vive en un `Map` del proceso Node y se reinicia
+con cada deploy. No requiere env vars ni infraestructura externa.
 
-```
-UPSTASH_REDIS_REST_URL=https://...upstash.io
-UPSTASH_REDIS_REST_TOKEN=...
-```
+Antes (2026-05-15 → 2026-05-20) usábamos Upstash Redis vía
+`@upstash/redis`. Se retiró cuando el adapter HTTP interno de
+Railway (`*.railway.internal:8080`) resultó frágil y se decidió no
+asumir el coste/operativa de Upstash Cloud para una app a esta
+escala. Ver `docs/data-pipeline.md §rate-limiting` para el rationale.
 
-Si no están set, los limiters quedan en **noop mode** (siempre
-permiten). En producción el deploy emite warning:
+### Tradeoffs aceptados
 
-```
-[AC/ratelimit] UPSTASH_REDIS_REST_URL / TOKEN not set in production — rate limiting is DISABLED
-```
+- **Estado por instancia**: si en algún momento escalamos a múltiples
+  réplicas en Railway, el límite efectivo se multiplica por N. Para
+  un atacante real sigue siendo freno; para un usuario legítimo,
+  transparente.
+- **Estado volátil**: cada deploy resetea contadores. Un atacante
+  avispado podría aprovechar redeploys; el ratio coste/beneficio no
+  compensa a esta escala.
+- **Política fail-open**: si la lógica del limiter lanza por causa
+  inesperada, devolvemos `ok:true`. Mejor abuso temporal que cortar
+  a un usuario legítimo por un bug del propio limiter.
 
-### Política fail-open
+### Si en algún momento necesitas store compartido
 
-Si Redis no responde (timeout, down), el limiter **permite** la
-request en lugar de bloquear. Mejor sufrir un poco de abuso
-temporal que cortar a usuarios legítimos por un fallo de Upstash.
-Cuando tengamos métricas reales de abuso, evaluar invertir.
+Mover a Postgres es ~50 líneas: tabla `rate_limit_buckets` con upsert
+atómico (`INSERT … ON CONFLICT … DO UPDATE SET count = count + 1`).
+Misma interface pública, mismo algoritmo fixed-window. No requiere
+infra externa adicional. Pendiente solo si vemos abuso real.
 
 ---
 

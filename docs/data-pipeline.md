@@ -137,23 +137,46 @@ retirar invocando `removeLeaderboardPlaceholders`.
 
 ## Ranking event-driven (Upstash + pointer poll)
 
-Desde 2026-05-18 el SSE del ranking (`/api/leaderboard/stream`) usa
-un patrón **pointer-poll** para detectar cambios en cuasi-tiempo real:
+El SSE del ranking (`/api/leaderboard/stream`) emite un **snapshot
+cada 15 s** a todos los clientes conectados, más el snapshot inicial
+al conectar. Suficiente para el requisito de "ranking en vivo" sin
+infraestructura externa.
 
-- Cada vez que `user_points` cambia globalmente (al final de
-  `processFinishedMatch`), el server escribe `Date.now()` en la clave
-  Redis `arenacup26:ranking:last-changed`.
-- Cada conexión SSE polla esta clave **cada 1 s**. Si su valor es más
-  reciente que el último emit del stream, dispara un snapshot
-  inmediato. Latencia "BD → UI": 15 s → ~1 s.
-- **Fallback**: si Upstash no está configurado o el GET falla, el SSE
-  emite snapshots cada 15 s como antes. Nunca queda mudo.
+- `FALLBACK_TICK_MS = 15_000` en `src/app/api/leaderboard/stream/route.ts`.
+- Heartbeat `:hb` cada 30 s para mantener viva la conexión vía proxies
+  que cierran idle.
+- `event: bye` al alcanzar `MAX_DURATION_MS` (30 min) para que el
+  cliente reabra la conexión limpiamente (evita `ERR_CONNECTION_RESET`).
 
-Por qué no `SUBSCRIBE` clásico: Upstash REST no soporta suscripciones
-persistentes via HTTP. El polling de una sola clave (1 GET/s/conexión
-≈ 86 400 GETs/día/conexión, ~9 MB) cabe sobrado en el free tier
-Upstash y consigue el mismo resultado funcional. Ver
-`src/lib/redis/ranking-events.ts` para la implementación.
+**Historial breve**: entre 2026-05-18 y 2026-05-20 existía un patrón
+pointer-poll vía Redis para conseguir latencia <1s. Se retiró cuando
+el adapter HTTP de Upstash interno de Railway resultó inestable y se
+decidió no migrar a Upstash Cloud — la latencia de 15s cumple
+sobradamente y elimina una dependencia externa. Si en el futuro hace
+falta sub-segundo, reintroducir Redis es ~30 líneas en el route.
+
+## Rate limiting
+
+Implementación **in-memory** (`src/lib/rate-limit.ts`) con
+`Map<scope:id:bucket, {count, resetAt}>` por proceso Node. Mismo
+algoritmo fixed-window counter que la versión previa con Upstash,
+sin la dependencia de red.
+
+| Scope        | Límite      | Identificador | Aplicado en                    |
+|--------------|-------------|---------------|--------------------------------|
+| `submit`     | 10 / 60s    | userId        | `submitPredictionAction`       |
+| `cron`       | 6 / 60s     | IP            | endpoints `/api/cron/*`        |
+| `publicRead` | 60 / 60s    | IP            | `/`, `/u/<username>`           |
+| `signup`     | 5 / 3600s   | IP            | `/api/notifications/subscribe` |
+
+**Tradeoffs**:
+- Estado por instancia — si escalamos a múltiples réplicas, el límite
+  efectivo se multiplica por N. Aceptable a escala actual.
+- Estado volátil — un deploy resetea contadores. Un atacante avispado
+  podría aprovecharlo pero el ratio coste/beneficio no compensa.
+- Si en algún momento fuera necesario un store compartido, mover a
+  Postgres (tabla `rate_limit_buckets` con upsert atómico) es ~50
+  líneas. No requiere infra externa adicional.
 
 ## Flujo end-to-end de un gol → ranking actualizado
 
@@ -188,11 +211,13 @@ Latencia worst-case extremo a extremo:
 - **Gol real → BD**: ~5-15 s (provider) + 0-2 min (cron live-scoring)
   = ~**2-3 min** en el peor caso. Cuello de botella: la cadencia del
   cron, no nuestro código.
-- **BD → UI**: ≤1 s con Upstash configurado, ≤15 s en fallback.
+- **BD → UI**: ≤15 s (tick periódico del SSE).
 
-Para bajar el lag total a sub-segundo habría que sustituir el cron
-polling por webhooks del provider (api-football no soporta; Sportmonks
-con Pusher sí, ~€69/mes). El sub-segundo BD→UI ya está hecho.
+Para bajar el lag total habría que sustituir el cron polling por
+webhooks del provider (api-football no soporta; Sportmonks con Pusher
+sí, ~€69/mes). En el lado servidor→cliente también es asumible
+volver a un pub/sub Redis si algún día necesitamos sub-segundo, pero
+no es requisito actual.
 
 ## Configuración relevante (env vars)
 

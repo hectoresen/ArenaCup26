@@ -77,11 +77,12 @@ ver `docs/roadmap.md`.
 
 ## Realtime mejoras
 
-- [x] **`add-ranking-pubsub`** ✓ 2026-05-18. Implementado vía polling
-  de pointer Redis (Upstash REST no soporta SUBSCRIBE persistente).
-  Latencia ranking en BD → UI: 15 s → ~1 s. Fallback de 15 s
-  preservado si Redis no está configurado o falla. Propuesta
-  archivada en `openspec/changes/archive/add-ranking-pubsub/`.
+- [x] **`add-ranking-pubsub`** ✓ 2026-05-18 / ↩︎ 2026-05-20.
+  Originalmente vía pointer Redis (Upstash). Retirado el 2026-05-20
+  cuando Upstash interno de Railway resultó inestable y se decidió
+  no migrar a Upstash Cloud — la latencia BD→UI vuelve a ser ≤15 s,
+  suficiente para "ranking en vivo" y sin dependencia externa. Ver
+  `docs/data-pipeline.md §SSE` para el rationale completo.
 
 ## Producto
 

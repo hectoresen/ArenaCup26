@@ -42,7 +42,7 @@ existe cada uno.
 - **Puerto público**: 8080 expuesto como `wmundial-production.up.railway.app`.
 - **Pre-deploy command**: `npm run db:migrate && npm run bootstrap`. Aplica migraciones drizzle pendientes y siembra catálogo de logros + 7 placeholder users.
 - **Health**: implícito por respuesta de `/`.
-- **Env vars relevantes**: `AUTH_SECRET`, `AUTH_TRUST_HOST=true`, `AUTH_URL=https://wmundial-production.up.railway.app`, `GOOGLE_CLIENT_ID/SECRET`, `DATABASE_URL` (referencia), `API_FOOTBALL_KEY`, `CRON_SECRET`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. Ver `docs/security.md` §1.
+- **Env vars relevantes**: `AUTH_SECRET`, `AUTH_TRUST_HOST=true`, `AUTH_URL=https://wmundial-production.up.railway.app`, `GOOGLE_CLIENT_ID/SECRET`, `DATABASE_URL` (referencia), `API_FOOTBALL_KEY`, `CRON_SECRET`. Ver `docs/security.md` §1.
 
 ### 2.2 `Postgres`
 
@@ -52,26 +52,23 @@ existe cada uno.
 - **Acceso externo**: ninguno. Solo accesible desde dentro del proyecto Railway.
 - **Cliente en el código**: drizzle-orm + postgres-js (`src/server/db/client.ts`).
 
-### 2.3 `Redis` (key-value en memoria)
+### 2.3 ~~`Redis` + adapter HTTP~~ (retirado 2026-05-20)
 
-- **ID**: `5a58b48f-76c8-42c0-b7d7-a011cafb129a`.
-- **Para qué**: backend del rate-limiting. Cuenta cuántas requests ha hecho cada user/IP en una ventana móvil (60s típicamente), expira solo, no consume disco.
-- **Dominio interno**: `redis.railway.internal:6379`.
-- **Acceso externo**: ninguno.
-- **Por qué Redis y no Postgres**: la app pregunta "¿cuántas requests lleva user X en los últimos 60s?" decenas de veces por segundo en pico. Redis devuelve respuestas sub-milisegundo desde RAM; hacerlo contra Postgres saturaría la BD principal sin necesidad para datos efímeros.
+Los servicios `Redis` (ID `5a58b48f-76c8-42c0-b7d7-a011cafb129a`) y
+`luggapugga/serverless-redis:latest` (ID
+`6c8ff7da-4149-4b97-8461-e02e832b9506`) **siguen existiendo en
+Railway pero la app ya no los consume**. Originalmente eran el backend
+del rate-limit y del pub/sub del ranking; el adapter HTTP demostró ser
+frágil (cuelgues silenciosos del proxy `*.railway.internal`) y se
+migró a:
 
-### 2.4 `luggapugga/serverless-redis:latest` (adapter HTTP)
+- Rate-limit → in-memory en Node (ver `docs/security.md §7`).
+- Pub/sub del ranking → ticker periódico cada 15 s en el SSE.
 
-- **ID**: `6c8ff7da-4149-4b97-8461-e02e832b9506`.
-- **Imagen**: `ghcr.io/luggapugga/serverless-redis:latest`.
-- **Para qué**: traduce HTTP ↔ Redis TCP. Expone Redis como una API REST compatible con el SDK `@upstash/redis`. Acepta requests con `Authorization: Bearer <SR_TOKEN>`.
-- **Puerto interno**: 8080.
-- **Dominio interno**: `luggapuggaserverless-redislatest.railway.internal:8080`.
-- **Acceso externo**: ninguno.
-- **Por qué un adapter** y no Redis directo:
-  1. El SDK `@upstash/redis` solo habla HTTP (no TCP). Es la opción estándar en el ecosistema serverless por simplicidad — sin necesidad de pools de conexiones TCP en cada función edge.
-  2. La auth por Bearer es trivial vs. configurar TLS + ACLs en Redis nativo.
-  3. Si en el futuro queremos migrar a Upstash externo (Pro plan, multirregión, etc.), solo cambiamos las dos env vars `UPSTASH_REDIS_REST_URL/TOKEN`. Cero cambio en código.
+**Se pueden desmantelar de Railway sin riesgo**. Para hacerlo:
+`railway service delete luggapugga/serverless-redis:latest` y luego
+`Redis`. Liberan slot pero no aportan nada vivo. Pendiente
+operacional, no urgente.
 
 ## 3. Flujos críticos
 
@@ -80,18 +77,15 @@ existe cada uno.
 ```
 [browser] ──POST /partidos/123─→ [wmundial] ──submitPrediction()
                                        │
-                                       ├─→ checkSubmitLimit(userId)
-                                       │       ↓
-                                       │   [adapter] ──INCR rl:submit:userId──→ [Redis]
-                                       │       ↓
-                                       │   ok / rate_limited
+                                       ├─→ checkSubmitLimit(userId) [in-memory Map]
+                                       │       ↓ ok / rate_limited
                                        │
                                        ├─→ INSERT predictions ──→ [Postgres]
                                        │
                                        └─→ createNotification → INSERT notifications
 ```
 
-Latencia esperada: ~5ms el rate-limit, ~20ms el insert Postgres.
+Latencia esperada: <1ms el rate-limit (in-memory), ~20ms el insert Postgres.
 
 ### 3.2 Cron de sync-fixtures
 
@@ -101,7 +95,7 @@ Latencia esperada: ~5ms el rate-limit, ~20ms el insert Postgres.
                                             ↓
                                       [wmundial]
                                   ├─ verify bearer
-                                  ├─ checkCronLimit(IP) [adapter+Redis]
+                                  ├─ checkCronLimit(IP) [in-memory Map]
                                   ├─ GET /fixtures?date=… × N días [api-football]
                                   ├─ reconcileMatch + upsertTeams [Postgres]
                                   └─ onMatchFinished → processFinishedMatch

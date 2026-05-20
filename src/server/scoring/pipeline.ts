@@ -13,7 +13,6 @@ import { derr } from "@/lib/debug-log";
 import { evaluateAndUnlock } from "@/server/achievements/unlock";
 import { payReferralBonusIfFirstHit } from "@/server/invitations/referral-payout";
 import { notifyWithPush } from "@/server/notifications/notify-with-push";
-import { publishRankingChange } from "@/lib/redis/ranking-events";
 import { scoreMatchPrediction } from "./engine";
 import type {
   MatchOutcome,
@@ -218,13 +217,11 @@ export async function processFinishedMatch(
     }
   });
 
-  // Anunciar el cambio a los SSE conectados. Best-effort — si Redis
-  // no está o falla, el SSE caerá al tick periódico de 15 s como
-  // fallback. Solo publicamos si hubo procesados (skipped + errors no
-  // mueven el ranking).
-  if (result.processed > 0) {
-    void publishRankingChange();
-  }
+  // El SSE del ranking emite snapshots cada 15 s por su cuenta
+  // (`FALLBACK_TICK_MS`). No publicamos nada extra desde aquí — antes
+  // existía un pointer en Redis para latencia sub-segundo, pero se
+  // eliminó cuando rate-limit se migró a in-memory (ver
+  // `docs/data-pipeline.md §rate-limit`).
 
   dlog("scoring", "processFinishedMatch done", {
     matchId,
