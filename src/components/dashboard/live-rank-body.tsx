@@ -7,11 +7,11 @@ type Props = {
   /** Rank con el que se hizo SSR. Se sustituye en cuanto llega el primer evento SSE. */
   initialRank: number;
   /**
-   * Rank de hace 7 días según el snapshot histórico (o `null` si
+   * Rank de hace ~24h según el snapshot histórico (o `null` si
    * todavía no hay baseline). Se usa para calcular el delta: si
-   * `weekAgoRank < rank` el user empeoró; si mayor, mejoró.
+   * `dayAgoRank < rank` el user empeoró; si mayor, mejoró.
    */
-  weekAgoRank: number | null;
+  dayAgoRank: number | null;
   /**
    * Serie de los snapshots ya consolidados (NO incluye el rank
    * actual). Si no hay snapshots, `null`. Para la sparkline, se
@@ -31,7 +31,7 @@ type Props = {
  * Si `myRank` es `null` (sin sesión o user fuera de top que no se
  * resolvió), mantenemos el `initialRank` SSR — degradación silenciosa.
  */
-export function LiveRankBody({ initialRank, weekAgoRank, historical }: Props) {
+export function LiveRankBody({ initialRank, dayAgoRank, historical }: Props) {
   const t = useTranslations("dashboard.progress");
   const [rank, setRank] = useState(initialRank);
 
@@ -55,7 +55,7 @@ export function LiveRankBody({ initialRank, weekAgoRank, historical }: Props) {
     };
   }, []);
 
-  const delta = weekAgoRank === null ? null : weekAgoRank - rank;
+  const delta = dayAgoRank === null ? null : dayAgoRank - rank;
   const sparkline = historical === null ? null : [...historical, rank];
 
   return (

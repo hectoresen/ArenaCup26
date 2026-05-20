@@ -7,7 +7,7 @@ const NOW = new Date("2026-06-13T10:00:00Z");
 
 function buildProgress(overrides: Partial<Progress> = {}): Progress {
   return {
-    rank: { rank: 42, rankDelta: null, sparkline: null },
+    rank: { rank: 42, rankDelta: null, dayAgoRank: null, sparkline: null },
     achievements: {
       unlocked: 8,
       total: 24,
@@ -53,52 +53,50 @@ describe("<ProgressCards>", () => {
     expect(screen.getByText(/Empezamos a registrar el 11 de junio/)).toBeInTheDocument();
   });
 
-  it("shows '▲ +3 posiciones esta semana' when current rank improved 3 spots", () => {
-    // weekAgoRank=45, rank=42 → delta=+3 (subió 3). El delta se
-    // calcula a partir del primer punto de la sparkline; el rankDelta
-    // del prop se mantiene por compatibilidad de tipos pero ya no es
-    // la fuente de verdad.
+  it("shows '▲ +3 posiciones en 24h' when current rank improved 3 spots vs ayer", () => {
+    // dayAgoRank=45, rank=42 → delta=+3 (subió 3). El delta se
+    // calcula en el cliente con dayAgoRank vs rank live (vía SSE).
     renderWithProviders(
       <ProgressCards
         progress={buildProgress({
-          rank: { rank: 42, rankDelta: 3, sparkline: [45, 44, 43, 42] },
+          rank: { rank: 42, rankDelta: 3, dayAgoRank: 45, sparkline: [45, 44, 43, 42] },
         })}
         now={NOW}
       />,
     );
-    expect(screen.getByText(/▲ \+3 posiciones esta semana/)).toBeInTheDocument();
+    expect(screen.getByText(/▲ \+3 posiciones en 24h/)).toBeInTheDocument();
     expect(screen.queryByText(/Empezamos a registrar el 11 de junio/)).not.toBeInTheDocument();
   });
 
-  it("shows '▼ 2 posiciones esta semana' when current rank dropped 2 spots", () => {
-    // weekAgoRank=40, rank=42 → delta=-2 (bajó 2).
+  it("shows '▼ 2 posiciones en 24h' when current rank dropped 2 spots vs ayer", () => {
+    // dayAgoRank=40, rank=42 → delta=-2 (bajó 2).
     renderWithProviders(
       <ProgressCards
         progress={buildProgress({
-          rank: { rank: 42, rankDelta: -2, sparkline: [40, 41, 42, 42] },
+          rank: { rank: 42, rankDelta: -2, dayAgoRank: 40, sparkline: [40, 41, 42, 42] },
         })}
         now={NOW}
       />,
     );
-    expect(screen.getByText(/▼ 2 posiciones esta semana/)).toBeInTheDocument();
+    expect(screen.getByText(/▼ 2 posiciones en 24h/)).toBeInTheDocument();
   });
 
-  it("shows 'Sin cambios esta semana' when rank stayed flat", () => {
+  it("shows 'Sin cambios en 24h' when rank stayed flat", () => {
     renderWithProviders(
       <ProgressCards
         progress={buildProgress({
-          rank: { rank: 42, rankDelta: 0, sparkline: [42, 42, 42, 42] },
+          rank: { rank: 42, rankDelta: 0, dayAgoRank: 42, sparkline: [42, 42, 42, 42] },
         })}
         now={NOW}
       />,
     );
-    expect(screen.getByText(/Sin cambios esta semana/)).toBeInTheDocument();
+    expect(screen.getByText(/Sin cambios en 24h/)).toBeInTheDocument();
   });
 
   it("renders the tail rank for a user without points (ranking is inamovible)", () => {
     renderWithProviders(
       <ProgressCards
-        progress={buildProgress({ rank: { rank: 12480, rankDelta: null, sparkline: null } })}
+        progress={buildProgress({ rank: { rank: 12480, rankDelta: null, dayAgoRank: null, sparkline: null } })}
         now={NOW}
       />,
     );
@@ -109,7 +107,7 @@ describe("<ProgressCards>", () => {
     const { container } = renderWithProviders(
       <ProgressCards
         progress={buildProgress({
-          rank: { rank: 38, rankDelta: 4, sparkline: [42, 41, 40, 39, 38, 38, 38] },
+          rank: { rank: 38, rankDelta: 4, dayAgoRank: 42, sparkline: [42, 41, 40, 39, 38, 38, 38] },
         })}
         now={NOW}
       />,
@@ -122,7 +120,7 @@ describe("<ProgressCards>", () => {
   it("does not render sparkline when history has only one snapshot", () => {
     const { container } = renderWithProviders(
       <ProgressCards
-        progress={buildProgress({ rank: { rank: 38, rankDelta: 0, sparkline: [38] } })}
+        progress={buildProgress({ rank: { rank: 38, rankDelta: 0, dayAgoRank: 38, sparkline: [38] } })}
         now={NOW}
       />,
     );

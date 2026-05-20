@@ -80,8 +80,7 @@ function RankProgressCard({ progress }: { progress: Progress }) {
   // cada 15s vía SSE en `<LiveRankBody>`.
   const hasHistory = sparkline !== null && sparkline.length >= 1;
   const historical = hasHistory ? sparkline.slice(0, -1) : null;
-  const weekAgoRank =
-    sparkline !== null && sparkline.length > 0 ? sparkline[0] ?? null : null;
+  const dayAgoRank = progress.rank.dayAgoRank;
 
   return (
     <Link
@@ -105,7 +104,7 @@ function RankProgressCard({ progress }: { progress: Progress }) {
       {hasHistory ? (
         <LiveRankBody
           initialRank={rank}
-          weekAgoRank={weekAgoRank}
+          dayAgoRank={dayAgoRank}
           historical={historical}
         />
       ) : (

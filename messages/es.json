@@ -422,9 +422,9 @@
       "viewAll": "Ver todos",
       "viewFullRanking": "Ver ranking completo",
       "historyStarting": "Empezamos a registrar el 11 de junio",
-      "rankDeltaUp": "▲ +{delta} posiciones esta semana",
-      "rankDeltaDown": "▼ {delta} posiciones esta semana",
-      "rankDeltaFlat": "Sin cambios esta semana",
+      "rankDeltaUp": "▲ +{delta} posiciones en 24h",
+      "rankDeltaDown": "▼ {delta} posiciones en 24h",
+      "rankDeltaFlat": "Sin cambios en 24h",
       "sparklineAria": "Evolución de tu posición los últimos días"
     },
     "miniLeaderboard": {

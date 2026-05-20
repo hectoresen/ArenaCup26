@@ -23,9 +23,22 @@ $CRON_SECRET`. Si necesitas mover uno a otro scheduler externo
 |--------------------------------------------------|----------------|-----------------------------------|------------------------------------------|
 | [`match-data-sync.yml`](../.github/workflows/match-data-sync.yml) | cada 3 h   | `/api/cron/sync-fixtures`         | Calendario de partidos en BD            |
 | [`live-scoring.yml`](../.github/workflows/live-scoring.yml)       | cada 2 min | `/api/cron/live-scoring`          | Marcadores en vivo + kickoff reminders + trigger de scoring |
-| [`snapshot-ranking.yml`](../.github/workflows/snapshot-ranking.yml) | 00:05 UTC | `/api/cron/snapshot-ranking`      | Histórico del ranking (delta + sparkline)|
+| [`snapshot-ranking.yml`](../.github/workflows/snapshot-ranking.yml) | 00:05 UTC | `/api/cron/snapshot-ranking`      | Histórico del ranking (delta 24h + sparkline 7d)|
+| [`auto-reject-bot-requests.yml`](../.github/workflows/auto-reject-bot-requests.yml) | 03:30 UTC | `/api/cron/auto-reject-bot-requests` | Limpia friend requests + group invitations a bots con >48h pending |
 | [`db-backup.yml`](../.github/workflows/db-backup.yml)             | 03:00 UTC  | (script `pg_dump` a S3, prefijo `daily/`) | Backup integral diario, retención 30d |
 | [`db-backup-tournament.yml`](../.github/workflows/db-backup-tournament.yml) | cada 6h (solo Mundial) | (script `pg_dump` a S3, prefijo `tournament/`) | Backup elevado durante el torneo (date guard 11 jun → 19 jul 2026) |
+
+### Secrets compartidos por los workflows
+
+| Secret en GitHub              | Valor                                                          |
+|-------------------------------|-----------------------------------------------------------------|
+| `CRON_SECRET`                 | Token shared con Railway (`Authorization: Bearer …`)            |
+| `RAILWAY_SYNC_URL`            | `https://www.arenacup26.com/api/cron/sync-fixtures`             |
+| `RAILWAY_LIVE_URL`            | `https://www.arenacup26.com/api/cron/live-scoring`              |
+| `RAILWAY_SNAPSHOT_URL`        | `https://www.arenacup26.com/api/cron/snapshot-ranking`          |
+| `RAILWAY_AUTO_REJECT_URL`     | `https://www.arenacup26.com/api/cron/auto-reject-bot-requests`  |
+| `DATABASE_URL` (solo backups) | Connection string de Postgres (vía `railway variables`)         |
+| `BACKUP_S3_*` (solo backups)  | Acceso a Backblaze B2 (ACCESS_KEY, SECRET_KEY, BUCKET, REGION)  |
 
 ### match-data-sync — _calendario amplio_
 
@@ -56,8 +69,27 @@ duplicados.
 
 Una vez al día (00:05 UTC, justo después de medianoche) vuelca en la
 tabla `ranking_snapshots` el rank + puntos de cada user. **Alimenta el
-delta semanal** (▲/▼) y la sparkline de la card "Tu posición" en
-`/inicio`. Sin esto, el dashboard no puede mostrar evolución temporal.
+delta de 24h** (▲/▼ vs snapshot del día anterior) y la sparkline de la
+card "Tu posición" en `/inicio`.
+
+**Por qué 24h y no semanal**: el Mundial dura ~5 semanas. Con delta
+semanal el usuario ve evolución 2-3 veces total — muy poco feedback. Con
+delta de 24h ve el contexto cada día. La sparkline cubre 7 días para
+seguir dando contexto de tendencia.
+
+Sin esto, el dashboard no puede mostrar evolución temporal.
+
+### auto-reject-bot-requests — _housekeeping de bots_
+
+Una vez al día (03:30 UTC) llama al endpoint que marca como `rejected`
+las friend requests y group invitations dirigidas a bots con > 48h en
+`pending`. Los 27 bots no son usuarios reales, así que no aceptan ni
+rechazan — sin este cron las solicitudes quedarían pending para siempre,
+ocupando la bandeja "enviadas" del user real que invitó.
+
+Idempotente: si no hay nada pending >48h, responde
+`{friendshipsRejected: 0, groupInvitationsRejected: 0}` y termina sin
+side-effects.
 
 ### db-backup — _seguridad operativa (daily)_
 

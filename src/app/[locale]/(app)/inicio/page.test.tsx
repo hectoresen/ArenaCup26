@@ -6,6 +6,7 @@ import type { DashboardData } from "@/server/dashboard/types";
 // AppRouterProvider — no disponible en jsdom. Lo mockeamos a no-op.
 vi.mock("@/components/dashboard/live-auto-refresh", () => ({
   LiveAutoRefresh: () => null,
+  PreKickoffAutoRefresh: () => null,
 }));
 
 const { DashboardSections } = await import("@/components/dashboard/dashboard-sections");
@@ -44,7 +45,7 @@ function buildData(overrides: Partial<DashboardData> = {}): DashboardData {
       },
     ],
     progress: {
-      rank: { rank: 42, rankDelta: null, sparkline: null },
+      rank: { rank: 42, rankDelta: null, dayAgoRank: null, sparkline: null },
       achievements: {
         unlocked: 8,
         total: 24,

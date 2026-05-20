@@ -422,9 +422,9 @@
       "viewAll": "عرض الكل",
       "viewFullRanking": "عرض الترتيب الكامل",
       "historyStarting": "نبدأ التسجيل في 11 يونيو",
-      "rankDeltaUp": "▲ +{delta} مركز هذا الأسبوع",
-      "rankDeltaDown": "▼ {delta} مركز هذا الأسبوع",
-      "rankDeltaFlat": "بدون تغيير هذا الأسبوع",
+      "rankDeltaUp": "▲ +{delta} مركز خلال 24 ساعة",
+      "rankDeltaDown": "▼ {delta} مركز خلال 24 ساعة",
+      "rankDeltaFlat": "بدون تغيير خلال 24 ساعة",
       "sparklineAria": "تطوّر مرتبتك خلال الأيام الأخيرة"
     },
     "miniLeaderboard": {

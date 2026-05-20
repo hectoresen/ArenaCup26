@@ -387,23 +387,23 @@ export async function getProgress(db: Database, userId: string): Promise<Progres
     .where(sql`${userPoints.totalPoints} > ${userTotal}`);
   const rank: number = (aheadRows[0]?.ahead ?? 0) + 1;
 
-  // Histórico de los últimos 7 snapshots para sparkline + delta. Si
-  // todavía no hay snapshots (cron no ejecutado o user nuevo),
-  // `weekAgoRank` y `sparkline` quedan en null y la UI muestra el
-  // placeholder "El histórico empieza pronto".
+  // Histórico de snapshots: delta vs hace 24h + sparkline 7 días para
+  // tendencia. Si todavía no hay snapshot del día anterior (cron no
+  // ejecutado o user nuevo), `dayAgoRank` y `sparkline` quedan en null
+  // y la UI muestra el placeholder "El histórico empieza pronto".
   const history = await getRankHistory(db, userId);
   // rankDelta positivo significa que has SUBIDO posiciones (rank
-  // numéricamente menor). Convención: ▲ +N para "has subido N",
-  // ▼ -N para "has bajado N". Sin histórico → null.
+  // numéricamente menor) en las últimas 24h. Convención: ▲ +N para
+  // "has subido N", ▼ -N para "has bajado N". Sin histórico → null.
   const rankDelta =
-    history.weekAgoRank === null ? null : history.weekAgoRank - rank;
+    history.dayAgoRank === null ? null : history.dayAgoRank - rank;
   // Sparkline: incluimos el snapshot del momento al final para que la
   // gráfica refleje el rank actual sin esperar al cron de mañana.
   const sparkline =
     history.sparkline === null ? null : [...history.sparkline, rank];
 
   return {
-    rank: { rank, rankDelta, sparkline },
+    rank: { rank, rankDelta, dayAgoRank: history.dayAgoRank, sparkline },
     achievements: {
       unlocked,
       total,

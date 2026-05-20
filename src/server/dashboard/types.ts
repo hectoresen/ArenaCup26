@@ -77,9 +77,15 @@ export type UpcomingMatch = {
 
 export type RankProgress = {
   rank: number;
-  /** Cambio respecto a la semana pasada. `null` mientras no tengamos histórico. */
+  /** Cambio respecto a hace 24h. `null` mientras no tengamos histórico. */
   rankDelta: number | null;
-  /** Serie de posiciones para la sparkline. `null` mientras no tengamos histórico. */
+  /**
+   * Rank de hace ~24h (snapshot del día anterior). Se propaga al
+   * cliente para que `LiveRankBody` pueda recalcular el delta cuando
+   * llega un nuevo rank vía SSE. `null` si no hay snapshot anterior.
+   */
+  dayAgoRank: number | null;
+  /** Serie de posiciones para la sparkline (7 días). `null` mientras no tengamos histórico. */
   sparkline: number[] | null;
 };
 
