@@ -37,21 +37,43 @@ export function LiveRankBody({ initialRank, dayAgoRank, historical }: Props) {
 
   useEffect(() => {
     if (typeof EventSource === "undefined") return;
-    const es = new EventSource("/api/leaderboard/stream");
-    const handler = (e: MessageEvent) => {
-      try {
-        const data = JSON.parse(e.data) as { myRank?: number | null };
-        if (typeof data.myRank === "number" && data.myRank > 0) {
-          setRank(data.myRank);
+    let current: EventSource | null = null;
+    let cancelled = false;
+
+    /**
+     * Abre un EventSource y registra los handlers. Al recibir el
+     * evento `bye` (el server alcanzó MAX_DURATION), cerramos NOSOTROS
+     * con `es.close()` y reabrimos. Esto evita el `ERR_CONNECTION_RESET`
+     * que el browser loguea cuando el server termina el TCP por su
+     * cuenta.
+     */
+    const open = () => {
+      if (cancelled) return;
+      const es = new EventSource("/api/leaderboard/stream");
+      current = es;
+      es.addEventListener("snapshot", (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data) as { myRank?: number | null };
+          if (typeof data.myRank === "number" && data.myRank > 0) {
+            setRank(data.myRank);
+          }
+        } catch {
+          // Ignorar payloads corruptos — el siguiente tick traerá uno nuevo.
         }
-      } catch {
-        // Ignorar payloads corruptos — el siguiente tick (15s) traerá uno nuevo.
-      }
+      });
+      es.addEventListener("bye", () => {
+        es.close();
+        current = null;
+        // Reapertura inmediata. Si el server estaba reciclando por
+        // timeout, el nuevo stream tiene 30 min frescos.
+        open();
+      });
     };
-    es.addEventListener("snapshot", handler);
+
+    open();
     return () => {
-      es.removeEventListener("snapshot", handler);
-      es.close();
+      cancelled = true;
+      current?.close();
     };
   }, []);
 

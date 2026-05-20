@@ -17,10 +17,14 @@ const POLL_MS = 1_000;
 // cadencia que el comportamiento previo a pub/sub.
 const FALLBACK_TICK_MS = 15_000;
 const HEARTBEAT_MS = 30_000;
-// Tope conservador para evitar conexiones zombies en Railway. Tras
-// 5 min el cliente reconectará automáticamente (EventSource lo hace
-// solo).
-const MAX_DURATION_MS = 5 * 60_000;
+// Tope para evitar conexiones zombies en Railway. Al alcanzarlo
+// enviamos un evento `bye` y el CLIENTE cierra su EventSource para
+// luego reabrir uno nuevo (el server NO hace controller.close — eso
+// causaría `ERR_CONNECTION_RESET` en consola del browser aunque
+// EventSource reconectase solo). 30 min equilibra: poco ruido y los
+// intervalos del server no se acumulan indefinidamente si el cliente
+// se desconecta de forma silenciosa (red móvil, suspend del tab).
+const MAX_DURATION_MS = 30 * 60_000;
 
 /**
  * SSE stream del ranking público. Emite eventos `snapshot` con el
@@ -151,21 +155,32 @@ export async function GET(req: Request) {
       hbInterval = setInterval(sendHeartbeat, HEARTBEAT_MS);
 
       maxDuration = setTimeout(() => {
-        // Cierre limpio: avisamos al cliente con un evento `bye` ANTES
-        // de cerrar el controller. Sin esto, los browsers loguean
-        // `ERR_CONNECTION_RESET` aunque EventSource reconecte solo
-        // (ruido en consola que confunde durante debug).
+        // Cierre limpio en dos fases para evitar `ERR_CONNECTION_RESET`
+        // en consola del cliente:
+        //  1. Enviamos evento `bye` — el cliente lo escucha y llama
+        //     `es.close()` por su cuenta. Cierre iniciado por el cliente
+        //     es silencioso (no genera RST_STREAM visible).
+        //  2. Damos 5 s de gracia para que el browser procese el evento
+        //     y el TCP se cierre desde el cliente. Si transcurridos esos
+        //     5 s el cliente sigue conectado (ignoró `bye`), forzamos
+        //     `controller.close()` desde server.
         try {
           safeEnqueue(`event: bye\ndata: {"reason":"max_duration"}\n\n`);
         } catch {
           // controller ya cerrado por cancel — no-op.
         }
-        cleanup();
-        try {
-          controller.close();
-        } catch {
-          // Ya cerrado por cancel; no-op.
-        }
+        // El cliente honraría el `bye` cerrando él mismo. Cuando
+        // `req.signal` aborte, `cleanup()` se dispara y los intervals
+        // se limpian. Si no honra (cliente viejo o roto), forzamos
+        // close server-side tras la ventana de gracia.
+        setTimeout(() => {
+          cleanup();
+          try {
+            controller.close();
+          } catch {
+            // Ya cerrado por cancel; no-op.
+          }
+        }, 5_000);
       }, MAX_DURATION_MS);
     },
     cancel() {
