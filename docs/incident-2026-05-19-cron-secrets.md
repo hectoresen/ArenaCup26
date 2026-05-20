@@ -54,11 +54,53 @@ Síntomas reportados por el usuario:
 - `119ad64` — `fix(dashboard): polling también pre-kickoff para capturar scheduled→live`.
 - `57f4c53` — `chore(cron): diagnóstico de host + script smoke-test api-football`.
 
-## Lo que queda PARA MAÑANA
+## Validación post-recovery (20-may 07:24 UTC)
 
-### Cuando Railway esté de vuelta
+Tras el outage de Railway (~07:13 UTC recovery), CLI re-login, smoke-tests:
 
-1. **Verificar el secret SSL**:
+### api-football
+- ✅ `/status` → Plan Pro hasta 2026-06-18. Quota: 20/7500 hoy.
+- ✅ Cuota muy baja confirma que `shouldSyncLive` está haciendo skip
+  correctamente cuando no hay live ni kickoff próximo (la mayoría de
+  ticks devuelven `synced:false, reason:no_live_matches`).
+
+### Crons en producción
+Logs Railway muestran actividad post-recovery:
+- **live-scoring (cada 2 min)**: dispara `processFinishedMatch` cuando
+  detecta `live→finished`. Logs confirmados con 3 matches scoreados:
+  Bra-Tolima (27 preds), Santa Fe-Platense (27 preds), Boca-Cruzeiro (27 preds).
+- **sync-fixtures (cada 3h)**: detectó otras 4 transiciones a finished
+  (367490bc, 5c2b296c, f7dbbaf5, 8e6782fc) y procesó scoring para 27-28
+  predicciones por match.
+
+### Estado BD
+- `matches.updated_at` con ráfagas a 03:00 (3 updates) y 04:00 UTC (10
+  updates) — los crons sí están escribiendo.
+- **0 matches finished con scoring huérfano**.
+- **0 matches scheduled con kickoff >30 min en el pasado**.
+- Próximo partido: Freiburg vs Aston Villa hoy 19:00 UTC.
+
+### Sync manual de validación
+```
+POST /api/cron/sync-fixtures  → 200 OK | inserted:0 updated:0 noop:87 errors:[]
+POST /api/cron/live-scoring   → 200 OK | synced:false reason:no_live_matches
+```
+
+### Warning no crítico
+`[AC/ranking] rate_limit_check_failed {scope:cron, err:fetch failed}` aparece
+en los logs. Viene de `src/lib/rate-limit.ts:129` — Redis Upstash interno
+ocasionalmente no responde, pero la función es **fail-open** (devuelve
+`ok:true`) así que el cron sigue ejecutándose. No requiere acción
+inmediata; documentar y vigilar.
+
+## Cosas que quedan PARA MAÑANA (priorizado)
+
+### Pendientes operacionales
+
+1. **Verificar el secret SSL** (queda por confirmar, no urgente porque
+   live-scoring ya está disparando desde Railway, pero el workflow GH
+   debería responder OK desde la próxima ejecución con el diagnóstico
+   nuevo):
    - Ir a GitHub → Settings → Secrets → Actions → `RAILWAY_LIVE_URL`.
    - Borrarlo y crearlo de nuevo escribiendo `https://www.arenacup26.com/api/cron/live-scoring`
      a mano (no copy/paste, evitar CRLF).
