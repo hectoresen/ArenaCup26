@@ -219,6 +219,7 @@
       "tbdPending": "Pendiente",
       "predict": "Predecir",
       "predictionSent": "Predicción enviada",
+      "noPredictionShort": "Sin predicción",
       "versus": "vs"
     },
     "tabs": {
@@ -394,6 +395,7 @@
       "pts": "pts",
       "winningNow": "🔥 Si el partido acaba así te llevas +{points} pts. ¡Resiste hasta el pitido!",
       "missingNow": "Tu predicción no encaja todavía. No tires la toalla — esto se decide en el pitido final.",
+      "seeOtherLive": "Ver {count, plural, =1 {otro partido} other {los otros # partidos}} en vivo",
       "ariaLive": "Partido en vivo: {home} {homeScore} – {awayScore} {away}, minuto {minute}"
     },
     "next": {

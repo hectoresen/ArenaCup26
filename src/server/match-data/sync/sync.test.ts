@@ -32,6 +32,7 @@ function buildSnapshot(overrides: Partial<ProviderMatch> = {}): ProviderMatch {
     scoreAt90: { home: 2, away: 2 },
     scoreAtExtra: { home: 3, away: 3 },
     penaltyWinner: "home",
+    minute: null,
     fetchedAt: new Date(),
     ...overrides,
   };
@@ -70,6 +71,7 @@ function buildInMemoryRepo(
         awayScoreExtra: row.awayScoreExtra,
         penaltyWinnerTeamId: row.penaltyWinnerTeamId,
         kickoffAt: row.kickoffAt,
+        minute: row.minute,
       });
       return id;
     },
@@ -131,6 +133,7 @@ describe("syncFixtures", () => {
       awayScoreExtra: null,
       penaltyWinnerTeamId: null,
       kickoffAt: new Date("2022-12-18T15:00:00Z"),
+      minute: null,
     };
     const repo = buildInMemoryRepo({
       teams: TEAM_MAP,
@@ -275,6 +278,7 @@ describe("syncFixtures", () => {
       awayScoreExtra: null,
       penaltyWinnerTeamId: null,
       kickoffAt: new Date("2022-12-18T15:00:00Z"),
+      minute: null,
     };
     const repo = buildInMemoryRepo({
       teams: TEAM_MAP,

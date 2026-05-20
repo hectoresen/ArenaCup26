@@ -24,6 +24,7 @@ function snapshot(overrides: Partial<ProviderMatch> = {}): ProviderMatch {
     scoreAt90: { home: 2, away: 2 },
     scoreAtExtra: { home: 3, away: 3 },
     penaltyWinner: "home",
+    minute: null,
     fetchedAt: new Date(),
     ...overrides,
   };
@@ -39,6 +40,7 @@ function currentRow(overrides: Partial<CurrentMatchRow> = {}): CurrentMatchRow {
     awayScoreExtra: null,
     penaltyWinnerTeamId: null,
     kickoffAt: new Date("2022-12-18T15:00:00Z"),
+    minute: null,
     ...overrides,
   };
 }
@@ -126,6 +128,7 @@ describe("reconcileMatch — insert cases", () => {
         homeScoreExtra: 3,
         awayScoreExtra: 3,
         penaltyWinnerTeamId: "uuid-arg",
+        minute: null,
       },
     });
   });

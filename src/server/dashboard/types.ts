@@ -152,6 +152,12 @@ export type DashboardData = {
   stats: UserStats;
   /** Si hay partido en vivo, este viene poblado y `nextMatch` queda `null`. */
   live: LiveMatchView | null;
+  /**
+   * Total de partidos con `status='live'` en BD. La live card pinta
+   * solo el primero pero, si hay más, deja un link "ver otros en vivo"
+   * a `/partidos?status=live`. 0 cuando `live` es null.
+   */
+  liveCount: number;
   /** Solo se rellena cuando `live === null` y hay un próximo kickoff. */
   nextMatch: UpcomingHeroView | null;
   upcoming: UpcomingMatch[];

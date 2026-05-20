@@ -92,6 +92,7 @@ export function reconcileMatch(input: ReconcileInput): ReconcileResult {
       homeScoreExtra: snapshot.scoreAtExtra?.home ?? null,
       awayScoreExtra: snapshot.scoreAtExtra?.away ?? null,
       penaltyWinnerTeamId: penaltyWinnerToTeamId(snapshot.penaltyWinner, homeTeamId, awayTeamId),
+      minute: snapshot.minute,
     };
     return { kind: "insert", row, externalId: snapshot.externalId };
   }
@@ -138,6 +139,14 @@ export function reconcileMatch(input: ReconcileInput): ReconcileResult {
 
   if (snapshot.kickoffAt.getTime() !== current.kickoffAt.getTime()) {
     patch.kickoffAt = snapshot.kickoffAt;
+  }
+
+  // Minuto: solo cambia si el provider devuelve un valor distinto al
+  // que ya tenemos. Cuando el partido termina, `snapshot.minute` cae a
+  // null y aquí escribimos null para limpiar el reloj — coherente con
+  // la regla "el dato relevante post-FT es el marcador, no el reloj".
+  if (snapshot.minute !== current.minute) {
+    patch.minute = snapshot.minute;
   }
 
   if (Object.keys(patch).length === 0) {

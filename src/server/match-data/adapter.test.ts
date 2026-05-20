@@ -23,6 +23,7 @@ function baseProviderMatch(overrides: Partial<ProviderMatch> = {}): ProviderMatc
     scoreAt90: { home: 2, away: 1 },
     scoreAtExtra: null,
     penaltyWinner: null,
+    minute: null,
     fetchedAt: new Date(),
     ...overrides,
   };

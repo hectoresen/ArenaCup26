@@ -127,6 +127,7 @@ export async function getFilteredMatches(
       status: matches.status,
       homeScore: matches.homeScore,
       awayScore: matches.awayScore,
+      minute: matches.minute,
       homeTeamName: homeTeam.name,
       homeTeamCode: homeTeam.code,
       homeTeamFlag: homeTeam.flag,
@@ -189,6 +190,7 @@ export async function getFilteredMatches(
     }),
     homeScore: row.homeScore,
     awayScore: row.awayScore,
+    minute: row.minute,
     prediction: predictionMap.get(row.id) ?? null,
   }));
 }
@@ -209,6 +211,7 @@ export async function getAllMatches(db: Database, userId: string): Promise<Match
       status: matches.status,
       homeScore: matches.homeScore,
       awayScore: matches.awayScore,
+      minute: matches.minute,
       homeTeamName: homeTeam.name,
       homeTeamCode: homeTeam.code,
       homeTeamFlag: homeTeam.flag,
@@ -245,6 +248,7 @@ export async function getAllMatches(db: Database, userId: string): Promise<Match
     }),
     homeScore: row.homeScore,
     awayScore: row.awayScore,
+    minute: row.minute,
     prediction: predictionMap.get(row.id) ?? null,
   }));
 }
@@ -270,6 +274,7 @@ export async function getMatchById(
       homeScoreExtra: matches.homeScoreExtra,
       awayScoreExtra: matches.awayScoreExtra,
       penaltyWinnerTeamId: matches.penaltyWinnerTeamId,
+      minute: matches.minute,
       homeTeamName: homeTeam.name,
       homeTeamCode: homeTeam.code,
       homeTeamFlag: homeTeam.flag,
@@ -334,6 +339,7 @@ export async function getMatchById(
     homeScoreExtra: row.homeScoreExtra,
     awayScoreExtra: row.awayScoreExtra,
     penaltyWinnerTeamId: row.penaltyWinnerTeamId,
+    minute: row.minute,
     prediction,
     provisional,
   };
@@ -356,6 +362,7 @@ export async function getBracketMatches(db: Database, userId: string): Promise<B
       status: matches.status,
       homeScore: matches.homeScore,
       awayScore: matches.awayScore,
+      minute: matches.minute,
       homeTeamName: homeTeam.name,
       homeTeamCode: homeTeam.code,
       homeTeamFlag: homeTeam.flag,
@@ -399,6 +406,7 @@ export async function getBracketMatches(db: Database, userId: string): Promise<B
       }),
       homeScore: row.homeScore,
       awayScore: row.awayScore,
+      minute: row.minute,
       prediction: predictionMap.get(row.id) ?? null,
     };
     byRound.get(row.stage as BracketRound)?.push(item);

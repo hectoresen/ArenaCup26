@@ -306,6 +306,13 @@ export const matches = pgTable(
     homeScoreExtra: integer("home_score_extra"),
     awayScoreExtra: integer("away_score_extra"),
     penaltyWinnerTeamId: uuid("penalty_winner_team_id").references(() => teams.id),
+    /**
+     * Minuto en juego del partido. Solo poblado mientras
+     * `status IN ('live','extra_time','penalty_shootout')` (api-football
+     * `fixture.status.elapsed`). En finished / programado queda en
+     * NULL — el dato relevante pasa a ser el marcador o el kickoff.
+     */
+    minute: integer("minute"),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({

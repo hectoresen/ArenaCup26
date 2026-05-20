@@ -98,3 +98,25 @@ El cron pasará de pedir `?date=YYYY-MM-DD` a pedir
   in-band → actualiza `user_points`.
 
 Ambos endpoints requieren header `Authorization: Bearer $CRON_SECRET`.
+
+## Campos de api-football que recibimos pero NO usamos (futuro)
+
+Cada llamada a `/fixtures` ya nos devuelve más datos de los que
+persistimos. Aprovecharlos no añade requests — solo más SELECT/UPDATE
+sobre columnas existentes o nuevas. Lista priorizada:
+
+| Campo del provider              | Coste de añadir | Valor UX                                        |
+|---------------------------------|-----------------|-------------------------------------------------|
+| `fixture.status.elapsed`        | ✅ Implementado 2026-05-20 (columna `minute`) | "Min 67'" en las cards live. |
+| `fixture.status.extra`          | columna `addedTime` int + parser | Tiempo añadido cuando el árbitro lo señala.    |
+| `fixture.status.long`           | distinguir `Halftime`, `Penalty Shootout`, etc. sin BD | Diferenciar "Descanso" vs "1ª parte".          |
+| `score.halftime.{home,away}`    | 2 columnas nuevas | Marcador al descanso en el detalle del partido. |
+| `fixture.venue.name + city`     | columnas `venueName`, `venueCity` | "Estadio Azteca · Ciudad de México" en detalle. |
+| `fixture.referee`               | columna `refereeName` | Curiosidad bonita en el detalle.                |
+| `league.logo`, `league.flag`    | URLs (CDN api-football) | Logo de la liga / bandera del país en cards.    |
+| `teams.{home,away}.winner`      | post-finished, derivable de score → no añade valor real. | — |
+
+Si añades alguno, recuerda regenerar la migración con
+`npx drizzle-kit generate` y propagar a `MatchListItem` /
+`MatchDetail`. El parser de api-football vive en
+`src/server/match-data/providers/api-football.parser.ts`.

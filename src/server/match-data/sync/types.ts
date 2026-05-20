@@ -27,6 +27,7 @@ export type CurrentMatchRow = {
   awayScoreExtra: number | null;
   penaltyWinnerTeamId: string | null;
   kickoffAt: Date;
+  minute: number | null;
 };
 
 /**
@@ -42,6 +43,8 @@ export type MatchUpdatePatch = {
   awayScoreExtra?: number | null;
   penaltyWinnerTeamId?: string | null;
   kickoffAt?: Date;
+  /** Minuto en juego. Null cuando el partido ya no está en curso. */
+  minute?: number | null;
 };
 
 /**
@@ -59,6 +62,7 @@ export type MatchInsertRow = {
   homeScoreExtra: number | null;
   awayScoreExtra: number | null;
   penaltyWinnerTeamId: string | null;
+  minute: number | null;
 };
 
 export type ReconcileSkipReason = "team_not_mapped" | "stage_unresolved" | "self_match";

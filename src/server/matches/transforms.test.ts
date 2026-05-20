@@ -24,6 +24,7 @@ function buildMatch(kickoffAt: string, id: string): MatchListItem {
     awayTeam: { name: "B", flag: null, code: "BBB" },
     homeScore: null,
     awayScore: null,
+    minute: null,
     prediction: null,
   };
 }

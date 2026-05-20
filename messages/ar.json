@@ -219,6 +219,7 @@
       "tbdPending": "معلّق",
       "predict": "توقع",
       "predictionSent": "تم إرسال التوقع",
+      "noPredictionShort": "بدون توقع",
       "versus": "ضد"
     },
     "tabs": {
@@ -394,6 +395,7 @@
       "pts": "نقاط",
       "winningNow": "🔥 إذا انتهت هكذا تربح +{points} نقاط. اصمد حتى صافرة النهاية!",
       "missingNow": "توقّعك لا يطابق بعد. لا تفقد الأمل — كل شيء يُحسم عند الصافرة الأخيرة.",
+      "seeOtherLive": "شاهد {count, plural, =1 {مباراة مباشرة أخرى} other {# مباريات مباشرة أخرى}}",
       "ariaLive": "مباراة مباشرة: {home} {homeScore} – {awayScore} {away}، الدقيقة {minute}"
     },
     "next": {

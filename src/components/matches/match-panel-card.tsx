@@ -116,8 +116,18 @@ function ScoreOrVs({ match }: { match: MatchListItem }) {
     (match.status === "live" || match.status === "finished")
   ) {
     return (
-      <div className="text-center font-display text-2xl leading-none tracking-wider text-foreground">
-        {match.homeScore} <span className="text-muted">–</span> {match.awayScore}
+      <div className="flex flex-col items-center gap-0.5">
+        <div className="text-center font-display text-2xl leading-none tracking-wider text-foreground">
+          {match.homeScore} <span className="text-muted">–</span> {match.awayScore}
+        </div>
+        {/* Reloj del partido — solo cuando live y el provider ha
+            reportado un minuto válido. En finished no aporta valor;
+            el badge "Final" ya lo dice. */}
+        {match.status === "live" && match.minute !== null && (
+          <div className="text-[10px] font-black tracking-[0.06em] text-danger">
+            {match.minute}&apos;
+          </div>
+        )}
       </div>
     );
   }
@@ -173,6 +183,20 @@ function FooterRow({ match }: { match: MatchListItem }) {
       <div className="mt-3 text-end">
         <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-gold transition-[gap] group-hover:gap-2">
           {t("predict")} <span aria-hidden="true">→</span>
+        </span>
+      </div>
+    );
+  }
+  // Live/finished sin predicción: feedback explícito al user — antes
+  // el footer quedaba vacío y no era obvio si predijo o no.
+  if (
+    !match.prediction &&
+    (match.status === "live" || match.status === "finished")
+  ) {
+    return (
+      <div className="mt-3 text-end">
+        <span className="inline-flex items-center gap-1 rounded-md border-[1.5px] border-border bg-card-hover px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.1em] text-muted">
+          {t("noPredictionShort")}
         </span>
       </div>
     );

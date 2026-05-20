@@ -219,6 +219,7 @@
       "tbdPending": "Pending",
       "predict": "Predict",
       "predictionSent": "Prediction sent",
+      "noPredictionShort": "No prediction",
       "versus": "vs"
     },
     "tabs": {
@@ -394,6 +395,7 @@
       "pts": "pts",
       "winningNow": "🔥 If the match ends like this you take +{points} pts. Hold on until the whistle!",
       "missingNow": "Your prediction doesn't match yet. Don't throw in the towel — it's decided at the final whistle.",
+      "seeOtherLive": "See {count, plural, =1 {other live match} other {# other live matches}}",
       "ariaLive": "Live match: {home} {homeScore} – {awayScore} {away}, minute {minute}"
     },
     "next": {

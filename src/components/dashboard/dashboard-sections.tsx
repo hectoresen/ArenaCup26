@@ -51,7 +51,7 @@ export function DashboardSections({
         <PreKickoffAutoRefresh kickoffAt={data.nextMatch.kickoffAt} />
       )}
 
-      <LiveSection live={data.live} nextMatch={data.nextMatch} />
+      <LiveSection live={data.live} nextMatch={data.nextMatch} liveCount={data.liveCount} />
 
       {data.upcoming.length > 0 && (
         <>

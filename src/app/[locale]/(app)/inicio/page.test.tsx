@@ -26,6 +26,7 @@ function buildData(overrides: Partial<DashboardData> = {}): DashboardData {
       totalPlayers: 12480,
     },
     live: null,
+    liveCount: 0,
     nextMatch: {
       matchId: "next1",
       stage: "group",

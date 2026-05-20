@@ -146,6 +146,17 @@ export function parseApiFootballFixture(
     scoreAt90,
     scoreAtExtra,
     penaltyWinner,
+    // `elapsed` solo aporta valor mientras el partido está vivo o en
+    // prórroga/penaltis. En estados terminados (finished, cancelled,
+    // postponed) lo descartamos: el dato técnico está en
+    // `score.fulltime`, no en el reloj.
+    minute:
+      (status === "live" ||
+        status === "extra_time" ||
+        status === "penalty_shootout") &&
+      typeof raw.fixture.status.elapsed === "number"
+        ? raw.fixture.status.elapsed
+        : null,
     fetchedAt,
   };
 }

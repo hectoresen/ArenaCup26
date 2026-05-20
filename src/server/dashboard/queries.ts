@@ -56,10 +56,16 @@ export async function getDashboardData(db: Database, userId: string): Promise<Da
     ? Math.max(0, NAME_COOLDOWN_MS - (Date.now() - nameChangedAt.getTime()))
     : 0;
 
-  const [stats, live, upcomingRaw, progress, miniGlobal, miniFriends, achievementsTotal] =
+  const [stats, live, liveCountRows, upcomingRaw, progress, miniGlobal, miniFriends, achievementsTotal] =
     await Promise.all([
       getUserStats(db, userId),
       getLiveMatchForUser(db, userId),
+      // Conteo de partidos `live` para el link "ver otros en vivo"
+      // (la live card pinta solo uno).
+      db
+        .select({ total: sql<number>`count(*)::int` })
+        .from(matches)
+        .where(eq(matches.status, "live")),
       getUpcomingMatches(db, userId, UPCOMING_LIMIT * 2),
       getProgress(db, userId),
       getMiniLeaderboard(db, userId, 5),
@@ -67,6 +73,7 @@ export async function getDashboardData(db: Database, userId: string): Promise<Da
       countAchievementDefinitions(db),
     ]);
   const mini: MiniLeaderboardData = { global: miniGlobal, friends: miniFriends };
+  const liveCount = liveCountRows[0]?.total ?? 0;
 
   const sortedAll = sortUpcomingMatches(upcomingRaw);
 
@@ -96,6 +103,7 @@ export async function getDashboardData(db: Database, userId: string): Promise<Da
     userName,
     stats: { ...stats, achievementsTotal },
     live,
+    liveCount,
     nextMatch,
     upcoming,
     progress,
@@ -213,6 +221,7 @@ export async function getLiveMatchForUser(
       stage: matches.stage,
       homeScore: matches.homeScore,
       awayScore: matches.awayScore,
+      minute: matches.minute,
       homeTeamName: homeTeam.name,
       homeTeamCode: homeTeam.code,
       homeTeamFlag: homeTeam.flag,
@@ -273,9 +282,7 @@ export async function getLiveMatchForUser(
     }),
     homeScore: row.homeScore ?? 0,
     awayScore: row.awayScore ?? 0,
-    // El minuto en vivo no está en el schema actual — vendrá con
-    // `add-live-scoring` cuando expongamos goles parciales del provider.
-    minute: null,
+    minute: row.minute,
     prediction,
     provisional,
   };

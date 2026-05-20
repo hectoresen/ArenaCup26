@@ -49,6 +49,10 @@ export function MatchDetailHero({ match, now }: Props) {
             className="h-1.5 w-1.5 rounded-full bg-danger motion-safe:animate-[blink_1.4s_ease_infinite]"
           />
           {t("status.live")}
+          {/* Minuto del partido si el provider lo aporta (api-football
+              `status.elapsed`). En kickoff exacto puede llegar `0` —
+              también lo mostramos como "0'", es semánticamente válido. */}
+          {match.minute !== null && <span className="ms-1.5">· {match.minute}&apos;</span>}
         </div>
       )}
     </article>

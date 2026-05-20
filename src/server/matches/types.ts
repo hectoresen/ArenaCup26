@@ -10,6 +10,12 @@ export type MatchListItem = {
   awayTeam: TeamView | null;
   homeScore: number | null;
   awayScore: number | null;
+  /**
+   * Minuto en juego cuando `status` es `live`/`extra_time`/
+   * `penalty_shootout`. Null en programados o finalizados.
+   * Permite a las cards mostrar "Min 67'" sin más llamadas.
+   */
+  minute: number | null;
   prediction: PredictionView | null;
 };
 

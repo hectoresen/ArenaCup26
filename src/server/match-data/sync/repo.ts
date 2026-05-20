@@ -53,6 +53,7 @@ export function createMatchRepo(db: Database): MatchRepo {
           awayScoreExtra: matches.awayScoreExtra,
           penaltyWinnerTeamId: matches.penaltyWinnerTeamId,
           kickoffAt: matches.kickoffAt,
+          minute: matches.minute,
         })
         .from(matches)
         .where(eq(matches.id, matchId))
@@ -68,6 +69,7 @@ export function createMatchRepo(db: Database): MatchRepo {
         awayScoreExtra: row.awayScoreExtra,
         penaltyWinnerTeamId: row.penaltyWinnerTeamId,
         kickoffAt: row.kickoffAt,
+        minute: row.minute,
       };
       return result;
     },
@@ -90,6 +92,7 @@ export function createMatchRepo(db: Database): MatchRepo {
             homeScoreExtra: row.homeScoreExtra,
             awayScoreExtra: row.awayScoreExtra,
             penaltyWinnerTeamId: row.penaltyWinnerTeamId,
+            minute: row.minute,
           })
           .returning({ id: matches.id });
         const newMatch = inserted[0];

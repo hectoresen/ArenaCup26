@@ -67,6 +67,13 @@ export type ProviderMatch = {
   scoreAtExtra: { home: number; away: number } | null;
   /** Ganador por tanda de penaltis. Null si no hubo tanda. */
   penaltyWinner: "home" | "away" | null;
+  /**
+   * Minuto en juego del partido. Solo tiene valor cuando el partido
+   * está `live` / `extra_time` / `penalty_shootout`. En api-football
+   * corresponde a `fixture.status.elapsed`. Null para partidos
+   * programados o finalizados (no aporta valor).
+   */
+  minute: number | null;
   /** Cuándo se obtuvo el snapshot. */
   fetchedAt: Date;
 };
