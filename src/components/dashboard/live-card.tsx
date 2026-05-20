@@ -1,6 +1,7 @@
 import type { LiveMatchView } from "@/server/dashboard/types";
 import { useTranslations } from "next-intl";
 import { TeamFlag } from "@/components/common/team-flag";
+import { LivePredictionBlock } from "@/components/matches/live-prediction-block";
 
 type Props = {
   live: LiveMatchView;
@@ -63,9 +64,9 @@ export function LiveCard({ live }: Props) {
       </div>
 
       {live.prediction ? (
-        <PredictionBlock
-          home={live.homeTeam.name}
-          away={live.awayTeam.name}
+        <LivePredictionBlock
+          homeName={live.homeTeam.name}
+          awayName={live.awayTeam.name}
           prediction={live.prediction}
           provisional={live.provisional}
         />
@@ -83,68 +84,6 @@ function TeamColumn({ name, flag }: { name: string; flag: string | null }) {
     <div className="flex flex-1 flex-col items-center gap-1">
       <TeamFlag flag={flag} name={name} size={28} className="text-2xl leading-none" />
       <span className="text-center text-xs font-extrabold text-foreground">{name}</span>
-    </div>
-  );
-}
-
-function PredictionBlock({
-  home,
-  away,
-  prediction,
-  provisional,
-}: {
-  home: string;
-  away: string;
-  prediction: NonNullable<LiveMatchView["prediction"]>;
-  provisional: LiveMatchView["provisional"];
-}) {
-  const t = useTranslations("dashboard.live");
-  const label =
-    prediction.kind === "exact"
-      ? `${home} ${prediction.predictedHomeScore ?? 0} – ${prediction.predictedAwayScore ?? 0} ${away}`
-      : prediction.predictedWinner === "home"
-        ? `${home}`
-        : prediction.predictedWinner === "away"
-          ? `${away}`
-          : "—";
-
-  const winning = provisional !== null && provisional.kind !== "miss" && provisional.kind !== "voided";
-  const provEmoji =
-    provisional?.kind === "exact" ? "💎" : provisional?.kind === "simple" ? "🎯" : provisional?.kind === "double" ? "⚡" : "❌";
-
-  return (
-    <div
-      className={`mt-3.5 flex flex-wrap items-center justify-between gap-2.5 rounded-xl border-[1.5px] px-3.5 py-3 ${
-        winning ? "border-success/30 bg-success/[0.08]" : "border-border bg-white/[0.03]"
-      }`}
-    >
-      <div>
-        <div className="mb-0.5 text-[10px] font-black uppercase tracking-[0.12em] text-muted">
-          {t("yourPrediction")}
-        </div>
-        <div className="font-display text-base text-foreground">{label}</div>
-      </div>
-      <div className="text-right">
-        {provisional ? (
-          <>
-            <span
-              className={`block font-display text-xl leading-none ${winning ? "text-success" : "text-muted"}`}
-            >
-              {provEmoji} {winning ? `+${provisional.points}` : "0"} pts
-            </span>
-            <span
-              aria-label={t("provisional")}
-              className="mt-1 inline-flex items-center gap-1 rounded-md border-[1.5px] border-info/30 bg-info/10 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-[0.1em] text-info"
-            >
-              {t("provisional")}
-            </span>
-          </>
-        ) : (
-          <span className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-muted">
-            {t("computedAtEnd")}
-          </span>
-        )}
-      </div>
     </div>
   );
 }

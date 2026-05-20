@@ -1,3 +1,4 @@
+import { LivePredictionBlock } from "@/components/matches/live-prediction-block";
 import { MatchDetailHero } from "@/components/matches/match-detail-hero";
 import { PredictionForm } from "@/components/predictions/prediction-form";
 import { Link } from "@/i18n/navigation";
@@ -30,6 +31,16 @@ export default async function MatchDetailPage({
     match.homeTeam !== null &&
     match.awayTeam !== null;
 
+  // Cuando el partido está en juego y el viewer tenía predicción,
+  // preferimos el bloque "vas ganando / no todo está perdido" antes
+  // que el banner genérico "Ventana cerrada — tu predicción se guardó".
+  // El detalle del marcador en vivo lo aporta `MatchDetailHero`.
+  const showLivePrediction =
+    match.status === "live" &&
+    match.prediction !== null &&
+    match.homeTeam !== null &&
+    match.awayTeam !== null;
+
   return (
     <>
       <BackLink />
@@ -42,6 +53,15 @@ export default async function MatchDetailPage({
           awayTeamName={match.awayTeam?.name ?? "—"}
           initial={match.prediction}
           onSubmit={submitPredictionAction}
+        />
+      ) : showLivePrediction ? (
+        // biome-ignore lint/style/noNonNullAssertion: garantizado por `showLivePrediction`.
+        <LivePredictionBlock
+          homeName={match.homeTeam!.name}
+          awayName={match.awayTeam!.name}
+          // biome-ignore lint/style/noNonNullAssertion: idem.
+          prediction={match.prediction!}
+          provisional={match.provisional}
         />
       ) : (
         <ClosedPredictionBanner status={match.status} hasPrediction={match.prediction !== null} />

@@ -390,6 +390,10 @@
       "noPrediction": "لم تتوقع هذه المباراة",
       "provisional": "مؤقت",
       "computedAtEnd": "يُحتسب عند انتهاء المباراة",
+      "draw": "تعادل",
+      "pts": "نقاط",
+      "winningNow": "🔥 إذا انتهت هكذا تربح +{points} نقاط. اصمد حتى صافرة النهاية!",
+      "missingNow": "توقّعك لا يطابق بعد. لا تفقد الأمل — كل شيء يُحسم عند الصافرة الأخيرة.",
       "ariaLive": "مباراة مباشرة: {home} {homeScore} – {awayScore} {away}، الدقيقة {minute}"
     },
     "next": {

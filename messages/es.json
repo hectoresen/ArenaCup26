@@ -390,6 +390,10 @@
       "noPrediction": "No predijiste este partido",
       "provisional": "Provisional",
       "computedAtEnd": "Se calcula al final del partido",
+      "draw": "Empate",
+      "pts": "pts",
+      "winningNow": "🔥 Si el partido acaba así te llevas +{points} pts. ¡Resiste hasta el pitido!",
+      "missingNow": "Tu predicción no encaja todavía. No tires la toalla — esto se decide en el pitido final.",
       "ariaLive": "Partido en vivo: {home} {homeScore} – {awayScore} {away}, minuto {minute}"
     },
     "next": {

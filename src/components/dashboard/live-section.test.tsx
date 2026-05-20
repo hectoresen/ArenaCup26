@@ -59,7 +59,10 @@ describe("<LiveSection>", () => {
   it("renders provisional points (+30 pts) with 'Provisional' badge inside the live card", () => {
     renderWithProviders(<LiveSection live={liveMatch} nextMatch={null} now={NOW} />);
     expect(screen.getByText("Provisional")).toBeInTheDocument();
-    expect(screen.getByText(/\+30 pts/)).toBeInTheDocument();
+    // El bloque renderiza "+30 pts" en el headline y también en el
+    // microcopy "Si el partido acaba así te llevas +30 pts...".
+    // Comprobamos que aparece ≥1 vez (al menos uno de los dos sitios).
+    expect(screen.getAllByText(/\+30 pts/).length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders 'Se calcula al final' placeholder when there's no provisional yet", () => {

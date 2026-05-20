@@ -1,6 +1,7 @@
 import type { PredictionView, TeamView } from "@/server/dashboard/types";
 import type { Database } from "@/server/db/client";
-import { matches, predictions, teams } from "@/server/db/schema";
+import { matches, predictions, teams, userPoints } from "@/server/db/schema";
+import { computeProvisionalScore } from "@/server/scoring/pipeline";
 import type { MatchStage, MatchStatus } from "@/server/scoring/types";
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -286,6 +287,32 @@ export async function getMatchById(
   if (!row) return null;
 
   const predictionMap = await fetchPredictionMap(db, userId, [row.id]);
+  const prediction = predictionMap.get(row.id) ?? null;
+
+  // Provisional al vuelo cuando el partido está live y el viewer tiene
+  // predicción. Mismo flujo que `getLiveMatchForUser`: leemos el streak
+  // actual para alimentar el engine pero NO lo persistimos.
+  let provisional: MatchDetail["provisional"] = null;
+  if (
+    prediction !== null &&
+    row.status === "live" &&
+    row.homeScore !== null &&
+    row.awayScore !== null
+  ) {
+    const streakRows = await db
+      .select({ streak: userPoints.streak })
+      .from(userPoints)
+      .where(eq(userPoints.userId, userId))
+      .limit(1);
+    const scored = computeProvisionalScore(
+      { stage: row.stage, homeScore: row.homeScore, awayScore: row.awayScore },
+      prediction,
+      { current: streakRows[0]?.streak ?? 0, containsDouble: false },
+    );
+    if (scored) {
+      provisional = { points: scored.points, kind: scored.kind };
+    }
+  }
 
   return {
     matchId: row.id,
@@ -307,7 +334,8 @@ export async function getMatchById(
     homeScoreExtra: row.homeScoreExtra,
     awayScoreExtra: row.awayScoreExtra,
     penaltyWinnerTeamId: row.penaltyWinnerTeamId,
-    prediction: predictionMap.get(row.id) ?? null,
+    prediction,
+    provisional,
   };
 }
 

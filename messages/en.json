@@ -390,6 +390,10 @@
       "noPrediction": "You didn't predict this match",
       "provisional": "Provisional",
       "computedAtEnd": "Calculated when the match ends",
+      "draw": "Draw",
+      "pts": "pts",
+      "winningNow": "🔥 If the match ends like this you take +{points} pts. Hold on until the whistle!",
+      "missingNow": "Your prediction doesn't match yet. Don't throw in the towel — it's decided at the final whistle.",
       "ariaLive": "Live match: {home} {homeScore} – {awayScore} {away}, minute {minute}"
     },
     "next": {

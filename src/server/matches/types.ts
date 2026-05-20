@@ -27,6 +27,16 @@ export type MatchDetail = MatchListItem & {
   awayScoreExtra: number | null;
   /** UUID del equipo que ganó por penales. `null` si no fue a penales. */
   penaltyWinnerTeamId: string | null;
+  /**
+   * Puntos provisionales si el partido acabara con el marcador actual.
+   * Solo tiene valor cuando `status === 'live'`, hay marcador y hay
+   * predicción del viewer. Mismo shape que en `LiveMatchView` del
+   * dashboard — comparten el bloque de predicción en vivo.
+   */
+  provisional: {
+    points: number;
+    kind: "simple" | "exact" | "double" | "miss" | "voided";
+  } | null;
 };
 
 /**
