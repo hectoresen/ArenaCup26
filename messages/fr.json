@@ -394,7 +394,7 @@
       "draw": "Nul",
       "pts": "pts",
       "winningNow": "🔥 Si ça finit comme ça tu gagnes +{points} pts. Tiens jusqu'au sifflet !",
-      "missingNow": "Ta prédiction n'y est pas encore. Pas de panique — tout se joue au coup de sifflet final.",
+      "missingNow": "⏱ Tout se joue au sifflet final",
       "seeOtherLive": "Voir {count, plural, =1 {un autre match} other {# autres matchs}} en direct",
       "ariaLive": "Match en direct: {home} {homeScore} – {awayScore} {away}, minute {minute}"
     },
@@ -421,7 +421,7 @@
     "progress": {
       "achievementsLabel": "Succès débloqués",
       "rankLabel": "Ta position globale",
-      "lastUnlocked": "Dernier: {title} · il y a {days, plural, =0 {aujourd'hui} =1 {1 j} other {# j}}",
+      "lastUnlocked": "Dernier: {title} · {days, plural, =0 {obtenu aujourd'hui} =1 {obtenu hier} other {il y a # jours}}",
       "lastUnlockedNone": "Aucun débloqué encore",
       "viewAll": "Voir tout",
       "viewFullRanking": "Voir le classement complet",

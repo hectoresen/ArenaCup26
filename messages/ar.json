@@ -394,7 +394,7 @@
       "draw": "تعادل",
       "pts": "نقاط",
       "winningNow": "🔥 إذا انتهت هكذا تربح +{points} نقاط. اصمد حتى صافرة النهاية!",
-      "missingNow": "توقّعك لا يطابق بعد. لا تفقد الأمل — كل شيء يُحسم عند الصافرة الأخيرة.",
+      "missingNow": "⏱ يُحسم عند صافرة النهاية",
       "seeOtherLive": "شاهد {count, plural, =1 {مباراة مباشرة أخرى} other {# مباريات مباشرة أخرى}}",
       "ariaLive": "مباراة مباشرة: {home} {homeScore} – {awayScore} {away}، الدقيقة {minute}"
     },
@@ -421,7 +421,7 @@
     "progress": {
       "achievementsLabel": "الإنجازات المفتوحة",
       "rankLabel": "ترتيبك العالمي",
-      "lastUnlocked": "آخر إنجاز: {title} · منذ {days, plural, =0 {اليوم} =1 {يوم} other {# أيام}}",
+      "lastUnlocked": "آخر إنجاز: {title} · {days, plural, =0 {تم اليوم} =1 {تم أمس} other {منذ # أيام}}",
       "lastUnlockedNone": "لا توجد إنجازات بعد",
       "viewAll": "عرض الكل",
       "viewFullRanking": "عرض الترتيب الكامل",

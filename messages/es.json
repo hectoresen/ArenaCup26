@@ -394,7 +394,7 @@
       "draw": "Empate",
       "pts": "pts",
       "winningNow": "🔥 Si el partido acaba así te llevas +{points} pts. ¡Resiste hasta el pitido!",
-      "missingNow": "Tu predicción no encaja todavía. No tires la toalla — esto se decide en el pitido final.",
+      "missingNow": "⏱ Se decide al pitido final",
       "seeOtherLive": "Ver {count, plural, =1 {otro partido} other {los otros # partidos}} en vivo",
       "ariaLive": "Partido en vivo: {home} {homeScore} – {awayScore} {away}, minuto {minute}"
     },
@@ -421,7 +421,7 @@
     "progress": {
       "achievementsLabel": "Logros desbloqueados",
       "rankLabel": "Tu posición global",
-      "lastUnlocked": "Último: {title} · hace {days, plural, =0 {hoy} =1 {1 d} other {# d}}",
+      "lastUnlocked": "Último: {title} · {days, plural, =0 {conseguido hoy} =1 {conseguido ayer} other {hace # días}}",
       "lastUnlockedNone": "Aún sin desbloquear",
       "viewAll": "Ver todos",
       "viewFullRanking": "Ver ranking completo",

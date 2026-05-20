@@ -394,7 +394,7 @@
       "draw": "Draw",
       "pts": "pts",
       "winningNow": "🔥 If the match ends like this you take +{points} pts. Hold on until the whistle!",
-      "missingNow": "Your prediction doesn't match yet. Don't throw in the towel — it's decided at the final whistle.",
+      "missingNow": "⏱ Decided at the final whistle",
       "seeOtherLive": "See {count, plural, =1 {other live match} other {# other live matches}}",
       "ariaLive": "Live match: {home} {homeScore} – {awayScore} {away}, minute {minute}"
     },
@@ -421,7 +421,7 @@
     "progress": {
       "achievementsLabel": "Achievements unlocked",
       "rankLabel": "Your global rank",
-      "lastUnlocked": "Last: {title} · {days, plural, =0 {today} =1 {1 d ago} other {# d ago}}",
+      "lastUnlocked": "Last: {title} · {days, plural, =0 {unlocked today} =1 {unlocked yesterday} other {# days ago}}",
       "lastUnlockedNone": "Nothing unlocked yet",
       "viewAll": "View all",
       "viewFullRanking": "View full ranking",
