@@ -166,8 +166,13 @@ describe("parseApiFootballFixture — live 2H", () => {
     expect(result.status).toBe("live");
   });
 
-  it("scoreAt90 is null because the match hasn't ended yet", () => {
-    expect(result.scoreAt90).toBeNull();
+  // Regresión 2026-05-20: durante el partido, api-football deja
+  // `score.fulltime` en null y publica el marcador acumulado en
+  // `goals`. Antes leíamos solo `fulltime` y perdíamos el score
+  // live; el partido quedaba `live` con score null y la UI mostraba
+  // "Britannia - vs - Bodo/Glimt" sin marcador.
+  it("scoreAt90 refleja el marcador en vivo desde `goals`", () => {
+    expect(result.scoreAt90).toEqual({ home: 2, away: 1 });
   });
 });
 

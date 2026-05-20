@@ -151,8 +151,18 @@ export function parseApiFootballFixture(
 }
 
 /**
- * `score.fulltime` = marcador al final del 90' regular. Solo lo
- * consideramos válido cuando el partido ha terminado al menos esa fase.
+ * Marcador "actual a 90'" según el contexto del partido:
+ *
+ *  - **scheduled / cancelled / postponed** → `null` (no hay score).
+ *  - **live** → `raw.goals.{home,away}` (score acumulado en vivo).
+ *    `score.fulltime` está vacío hasta el pitido final, así que
+ *    usar fulltime aquí pierde el live score (bug detectado
+ *    2026-05-20 — los partidos quedaban "live" con score null).
+ *  - **finished** → `score.fulltime` (marcador al 90' regular, sin
+ *    contar prórroga). Si el partido fue a extra time, `goals` ya
+ *    incluye los de la prórroga; aquí queremos los del 90' para el
+ *    scoring engine, por eso preferimos fulltime cuando lo hay y
+ *    caemos a `goals` solo como defensa.
  */
 function extractScoreAt90(
   raw: ApiFootballFixture,
@@ -161,9 +171,21 @@ function extractScoreAt90(
   if (status === "scheduled" || status === "cancelled" || status === "postponed") {
     return null;
   }
+  if (status === "live") {
+    const g = raw.goals;
+    if (g.home === null || g.away === null) return null;
+    return { home: g.home, away: g.away };
+  }
+  // finished: preferimos `score.fulltime` (marcador a 90' sin
+  // prórroga). Fallback a `goals` por si el provider llega con
+  // fulltime null en algún caso raro (no debería).
   const ft = raw.score.fulltime;
-  if (ft.home === null || ft.away === null) return null;
-  return { home: ft.home, away: ft.away };
+  if (ft.home !== null && ft.away !== null) {
+    return { home: ft.home, away: ft.away };
+  }
+  const g = raw.goals;
+  if (g.home === null || g.away === null) return null;
+  return { home: g.home, away: g.away };
 }
 
 /**
