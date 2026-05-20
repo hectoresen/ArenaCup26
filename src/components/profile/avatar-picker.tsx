@@ -119,7 +119,7 @@ export function AvatarPicker({
           role="dialog"
           aria-modal="true"
           aria-label={t("avatarPickerTitle")}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm [animation:fadeUp_0.2s_ease_forwards]"
+          className="fixed inset-0 z-50 flex bg-black/60 backdrop-blur-sm sm:items-center sm:justify-center sm:p-4 [animation:fadeUp_0.2s_ease_forwards]"
           onClick={(e) => {
             if (e.target === e.currentTarget) discard();
           }}
@@ -127,8 +127,13 @@ export function AvatarPicker({
             if (e.key === "Escape") discard();
           }}
         >
-          <div className="w-full max-w-md rounded-3xl border-2 border-gold/30 bg-card p-5 shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
-            <header className="mb-4 flex items-center justify-between">
+          {/* Mobile: full-screen, header/footer fijos, body scrollable.
+              Desktop (≥ sm): modal centrada, max-w-md, mismo look que
+              antes — el redoneado/border/sombra solo aplica en ≥sm.
+              `dvh` (en vez de vh) descuenta el chrome del navegador
+              en mobile, así el footer nunca queda detrás del URL bar. */}
+          <div className="flex h-[100dvh] w-full flex-col bg-card sm:h-auto sm:max-h-[90vh] sm:max-w-md sm:rounded-3xl sm:border-2 sm:border-gold/30 sm:shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
+            <header className="flex shrink-0 items-center justify-between border-b border-border px-5 py-4 sm:border-0 sm:px-5 sm:pb-3 sm:pt-5">
               <h2 className="font-display text-lg text-gold">{t("avatarPickerTitle")}</h2>
               <button
                 type="button"
@@ -140,60 +145,67 @@ export function AvatarPicker({
               </button>
             </header>
 
-            <div
-              role="radiogroup"
-              aria-label={t("avatarPickerTitle")}
-              className="grid grid-cols-2 gap-3 sm:grid-cols-4"
-            >
-              {AVATAR_GALLERY.map((a) => (
-                <button
-                  key={a.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={draft === a.id}
-                  aria-label={a.label}
-                  onClick={() => setDraft(a.id)}
-                  disabled={isPending}
-                  className={`group/avatar flex flex-col items-center gap-1.5 rounded-2xl border-2 p-2.5 transition-all disabled:cursor-wait disabled:opacity-60 ${
-                    draft === a.id
-                      ? "border-gold bg-gold/[0.12] scale-[1.02] cursor-pointer"
-                      : "border-border bg-card-hover hover:border-gold/40 hover:scale-[1.02] cursor-pointer"
-                  }`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={a.src}
-                    alt=""
-                    width={96}
-                    height={96}
-                    className="h-full w-full max-w-[96px] rounded-full"
-                    loading="lazy"
-                  />
-                  <span className="font-display text-[11px] uppercase tracking-[0.08em] text-foreground">
-                    {a.label}
-                  </span>
-                </button>
-              ))}
+            <div className="flex-1 overflow-y-auto px-5 py-4">
+              <div
+                role="radiogroup"
+                aria-label={t("avatarPickerTitle")}
+                className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+              >
+                {AVATAR_GALLERY.map((a) => (
+                  <button
+                    key={a.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={draft === a.id}
+                    aria-label={a.label}
+                    onClick={() => setDraft(a.id)}
+                    disabled={isPending}
+                    className={`group/avatar flex flex-col items-center gap-1.5 rounded-2xl border-2 p-2.5 transition-all disabled:cursor-wait disabled:opacity-60 ${
+                      draft === a.id
+                        ? "border-gold bg-gold/[0.12] scale-[1.02] cursor-pointer"
+                        : "border-border bg-card-hover hover:border-gold/40 hover:scale-[1.02] cursor-pointer"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={a.src}
+                      alt=""
+                      width={96}
+                      height={96}
+                      className="h-full w-full max-w-[96px] rounded-full"
+                      loading="lazy"
+                    />
+                    <span className="font-display text-[11px] uppercase tracking-[0.08em] text-foreground">
+                      {a.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {hasGoogleImage && (
+                <div className="mt-4 border-t border-border pt-3 text-center">
+                  <button
+                    type="button"
+                    onClick={() => setDraft(null)}
+                    disabled={isPending || draft === null}
+                    className={`cursor-pointer rounded-full border-2 px-4 py-2 text-xs font-extrabold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                      draft === null
+                        ? "border-gold bg-gold/[0.08] text-gold"
+                        : "border-border bg-card-hover text-muted hover:border-gold/30 hover:text-foreground"
+                    }`}
+                  >
+                    {draft === null ? t("usingGoogle") : t("backToGoogle")}
+                  </button>
+                </div>
+              )}
             </div>
 
-            {hasGoogleImage && (
-              <div className="mt-4 border-t border-border pt-3 text-center">
-                <button
-                  type="button"
-                  onClick={() => setDraft(null)}
-                  disabled={isPending || draft === null}
-                  className={`cursor-pointer rounded-full border-2 px-4 py-2 text-xs font-extrabold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                    draft === null
-                      ? "border-gold bg-gold/[0.08] text-gold"
-                      : "border-border bg-card-hover text-muted hover:border-gold/30 hover:text-foreground"
-                  }`}
-                >
-                  {draft === null ? t("usingGoogle") : t("backToGoogle")}
-                </button>
-              </div>
-            )}
-
-            <footer className="mt-5 flex justify-end gap-2 border-t border-border pt-4">
+            {/* Footer sticky abajo. En mobile reserva padding extra para
+                la safe area del iPhone (home indicator) — sin esto los
+                botones quedaban tocando el borde inferior del dispositivo. */}
+            <footer
+              className="flex shrink-0 justify-end gap-2 border-t border-border px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 sm:pb-4"
+            >
               <button
                 type="button"
                 onClick={discard}
