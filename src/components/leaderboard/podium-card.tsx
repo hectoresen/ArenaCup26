@@ -82,29 +82,32 @@ export function PodiumCard({ player, place }: { player: Player; place: Place }) 
       >
         {tone.label}
       </span>
-      <div
-        className={`relative mx-auto mb-1.5 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-[3px] border-black/35 font-display text-lg ${tone.avatar}`}
-      >
-        {(() => {
-          const gallery = getAvatar(player.avatarId);
-          if (gallery) {
-            // eslint-disable-next-line @next/next/no-img-element
-            return <img src={gallery.src} alt="" className="h-full w-full object-cover" />;
-          }
-          if (player.image) {
-            // eslint-disable-next-line @next/next/no-img-element
-            return <img src={player.image} alt="" className="h-full w-full object-cover" />;
-          }
-          return initials(player.name);
-        })()}
-        {/* Puntito de "activo en 24h" anclado al avatar del podio.
-            Coherente con `<RankRow>`; el borde negro del avatar lo
-            destaca sobre cualquier tono (oro/plata/bronce). */}
+      {/* Wrapper para anclar el dot fuera del overflow-hidden del avatar.
+          Sin esto, el dot queda recortado por el redondeo del círculo. */}
+      <div className="relative mx-auto mb-1.5 h-12 w-12">
+        <div
+          className={`flex h-full w-full items-center justify-center overflow-hidden rounded-full border-[3px] border-black/35 font-display text-lg ${tone.avatar}`}
+        >
+          {(() => {
+            const gallery = getAvatar(player.avatarId);
+            if (gallery) {
+              // eslint-disable-next-line @next/next/no-img-element
+              return <img src={gallery.src} alt="" className="h-full w-full object-cover" />;
+            }
+            if (player.image) {
+              // eslint-disable-next-line @next/next/no-img-element
+              return <img src={player.image} alt="" className="h-full w-full object-cover" />;
+            }
+            return initials(player.name);
+          })()}
+        </div>
+        {/* Puntito de "activo en 24h" coherente con `<RankRow>`. El
+            borde negro lo destaca sobre cualquier tono (oro/plata/bronce). */}
         {player.isOnline && (
           <span
             aria-label="Online"
             title="Online"
-            className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-black/40 bg-success"
+            className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-black/40 bg-success"
           />
         )}
       </div>

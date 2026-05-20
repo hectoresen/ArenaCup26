@@ -3,6 +3,68 @@
 De dónde sale cada dato que aparece en la UI. Toda la entrada está
 en este doc; si un valor en pantalla no encaja, su origen está aquí.
 
+## ⏱ Tabla maestra de cadencias
+
+Una sola pasada para ver "cada cuánto pasa qué" en el sistema.
+Detalle ampliado en las secciones de abajo y en los docs enlazados.
+
+### Polling / refresh del cliente (browser)
+
+| Superficie / componente               | Cadencia | Cuándo aplica                                       | Código                                                       |
+|---------------------------------------|----------|-----------------------------------------------------|--------------------------------------------------------------|
+| SSE `/api/leaderboard/stream`         | 60 s     | `/inicio` (mini-leaderboard) y `/ranking` (global)  | `FALLBACK_TICK_MS` en `src/app/api/leaderboard/stream/route.ts` |
+| SSE heartbeat `:hb`                   | 30 s     | mantener viva la conexión vía proxies               | `HEARTBEAT_MS` ibíd.                                          |
+| SSE `event: bye` + reconexión cliente | 30 min   | reciclar el TCP / liberar memoria server            | `MAX_DURATION_MS` ibíd.                                       |
+| `<LiveAutoRefresh>` en /inicio        | 30 s     | mientras hay un partido `status='live'`             | `src/components/dashboard/live-auto-refresh.tsx`              |
+| `<PreKickoffAutoRefresh>`             | 60 s     | ±30 min alrededor del kickoff del próximo partido   | ibíd.                                                         |
+
+### Crons servidor (GitHub Actions → Railway)
+
+| Workflow                                | Cadencia          | Objetivo                                                       |
+|-----------------------------------------|-------------------|----------------------------------------------------------------|
+| `match-data-sync.yml`                   | cada 3 h          | Sincronizar fixtures de las ligas configuradas (hoy-1d → +7d)  |
+| `live-scoring.yml`                      | cada 2 min        | Marcadores en vivo + kickoff reminders + trigger scoring       |
+| `snapshot-ranking.yml`                  | 00:05 UTC diario  | Snapshot histórico del ranking (delta 24h + sparkline 7d)      |
+| `auto-reject-bot-requests.yml`          | 03:30 UTC diario  | Auto-rechazar friend/group requests a bots >48h pending + refresh `lastActiveAt` de los 5 bots "live" |
+| `db-backup.yml`                         | 03:00 UTC diario  | Backup íntegro Postgres → Backblaze B2 (retención 30d)         |
+| `db-backup-tournament.yml`              | cada 6 h          | Backup elevado durante el Mundial (date guard 11 jun→19 jul 2026) |
+
+### Provider externo
+
+| Aspecto                                  | Cadencia / valor       |
+|------------------------------------------|------------------------|
+| api-football refresh oficial (live)      | 15 s                   |
+| Quota plan Pro                           | 7 500 req/día          |
+| Uso estimado actual (steady state)       | ≤ 800 req/día          |
+
+### Rate-limits (in-memory por proceso Node)
+
+| Scope        | Límite           | Identificador | Aplicado en                          |
+|--------------|------------------|---------------|--------------------------------------|
+| `submit`     | 10 / 60 s        | userId        | Predicciones (`submitPredictionAction`) |
+| `cron`       | 6 / 60 s         | IP            | Endpoints `/api/cron/*` (segunda capa tras bearer) |
+| `publicRead` | 60 / 60 s        | IP            | `/` (landing pública) y `/u/<username>` |
+| `signup`     | 5 / 3600 s       | IP            | Callback `signIn` de Auth.js          |
+
+### Cooldowns de usuario
+
+| Acción                       | Cooldown | Doc                                    |
+|------------------------------|----------|----------------------------------------|
+| Cambio de nombre público     | 1 h      | `src/server/profile/actions.ts` (`NAME_COOLDOWN_MS`) |
+| Cambio de avatar             | 1 h      | mismo cooldown que nombre              |
+
+### Otras ventanas relevantes
+
+| Ventana                                          | Valor       | Para qué                                                            |
+|--------------------------------------------------|-------------|---------------------------------------------------------------------|
+| Online dot — umbral de actividad reciente        | 24 h        | "Puntito verde" en RankRow/PodiumCard/mini-leaderboard               |
+| `lastActiveAt` ping throttle (app layout)        | 5 min       | UPDATE a `users.lastActiveAt` máximo cada 5 min por user            |
+| Window predicción abierta                        | hasta kickoff | Tras el kickoff `predictionLocked`; ver `docs/scoring.md`        |
+| Auto-reject de friend/group requests a bots      | 48 h        | El cron `auto-reject-bot-requests` los marca `rejected` tras este umbral |
+| Snapshot history TTL relevante                   | 7 días      | Ventana de la sparkline + cálculo del rankDelta histórico           |
+
+---
+
 ## Fuentes de datos
 
 | Fuente                | Tipo de dato                                | Frecuencia            |

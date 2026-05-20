@@ -7,14 +7,13 @@ import { getRealSnapshot, getRealSnapshotForUser } from "@/lib/leaderboard/real"
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Cadencia única de snapshots: cada 15 s emitimos un refresh a todos
-// los clientes conectados. Suficiente para el requisito de "ranking
-// en vivo" del producto. Antes existía un pointer en Redis para
-// activar snapshots inmediatos (~1s) tras cada cambio en
-// `user_points`, pero se eliminó cuando el rate-limit migró a
-// in-memory — ya no había razón para mantener Upstash en
-// infraestructura.
-const FALLBACK_TICK_MS = 15_000;
+// Cadencia única de snapshots: cada 60 s emitimos un refresh a todos
+// los clientes conectados. Bajó de 15 s → 60 s el 2026-05-20 para
+// reducir tráfico SSR/Postgres a lo necesario — la sensación "en
+// vivo" se mantiene perfectamente con un minuto, y el footer indica
+// con timestamp local cuándo fue el último sync (transparente para
+// el usuario).
+const FALLBACK_TICK_MS = 60_000;
 const HEARTBEAT_MS = 30_000;
 // Tope para evitar conexiones zombies en Railway. Al alcanzarlo
 // enviamos un evento `bye` y el CLIENTE cierra su EventSource para

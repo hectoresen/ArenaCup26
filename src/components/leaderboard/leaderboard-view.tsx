@@ -1,6 +1,7 @@
 "use client";
 
 import { CountryFlag } from "@/components/common/country-flag";
+import { LocalTime } from "@/components/common/local-time";
 import { TopChrome } from "@/components/layout/top-chrome";
 import { useLiveSnapshot } from "@/hooks/use-live-snapshot";
 import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/types";
@@ -107,7 +108,13 @@ export function LeaderboardView({
         </ol>
 
         <footer className="mt-4 flex items-center justify-between px-0.5 opacity-0 [animation:fadeUp_0.4s_ease_1s_forwards]">
-          <span className="text-[11px] font-bold text-muted">⏱ {t("footer.updatedNow")}</span>
+          {/* `generatedAt` viene del server en UTC; `<LocalTime>`
+              re-renderiza en hora del navegador tras hidratar para que
+              el usuario nunca vea horas "raras" de zonas ajenas. El
+              color verde refuerza que es un valor vivo. */}
+          <span className="text-[11px] font-bold text-success">
+            ⏱ {t("footer.updatedAt")} <LocalTime date={snapshot.generatedAt} />
+          </span>
           <span className="font-display text-xs uppercase tracking-[0.1em] text-gold opacity-60">
             WE ARE 26
           </span>

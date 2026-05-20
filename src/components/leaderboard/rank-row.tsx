@@ -66,22 +66,26 @@ export function RankRow({
         </span>
       </div>
       {/* Avatar circle 32px. SVG si avatarId resuelve, foto Google si
-          no, fallback a iniciales. Indicador online se pega abajo. */}
-      <span className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-card-hover font-display text-[10px] text-muted">
-        {galleryAvatar ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={galleryAvatar.src} alt="" className="h-full w-full object-cover" />
-        ) : player.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={player.image} alt="" className="h-full w-full object-cover" />
-        ) : (
-          (player.name?.[0] ?? "?").toUpperCase()
-        )}
+          no, fallback a iniciales. El indicador online se pega abajo
+          a la derecha — vive como hermano del círculo (no descendiente)
+          para que `overflow-hidden` del círculo no recorte el dot. */}
+      <span className="relative h-8 w-8 shrink-0">
+        <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border border-border bg-card-hover font-display text-[10px] text-muted">
+          {galleryAvatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={galleryAvatar.src} alt="" className="h-full w-full object-cover" />
+          ) : player.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={player.image} alt="" className="h-full w-full object-cover" />
+          ) : (
+            (player.name?.[0] ?? "?").toUpperCase()
+          )}
+        </span>
         {player.isOnline && (
           <span
             aria-label="Online"
             title="Online"
-            className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-card bg-success"
+            className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border border-card bg-success"
           />
         )}
       </span>
