@@ -23,11 +23,36 @@ Detalle ampliado en las secciones de abajo y en los docs enlazados.
 | Workflow                                | Cadencia          | Objetivo                                                       |
 |-----------------------------------------|-------------------|----------------------------------------------------------------|
 | `match-data-sync.yml`                   | cada 3 h          | Sincronizar fixtures de las ligas configuradas (hoy-1d → +7d)  |
-| `live-scoring.yml`                      | cada 2 min        | Marcadores en vivo + kickoff reminders + trigger scoring       |
+| `live-scoring.yml`                      | cada 2 min¹       | Marcadores en vivo + kickoff reminders + trigger scoring       |
 | `snapshot-ranking.yml`                  | 00:05 UTC diario  | Snapshot histórico del ranking (delta 24h + sparkline 7d)      |
 | `auto-reject-bot-requests.yml`          | 03:30 UTC diario  | Auto-rechazar friend/group requests a bots >48h pending + refresh `lastActiveAt` de los 5 bots "live" |
 | `db-backup.yml`                         | 03:00 UTC diario  | Backup íntegro Postgres → Backblaze B2 (retención 30d)         |
 | `db-backup-tournament.yml`              | cada 6 h          | Backup elevado durante el Mundial (date guard 11 jun→19 jul 2026) |
+
+¹ GitHub Actions free tier honra `*/2 * * * *` con intervalos reales
+de **30-60 min** en momentos de alta carga global (documentado por
+GitHub). El cron HTTP queda como safety net pero la cadencia real de
+live-scoring viene del **self-scheduler in-process** descrito abajo.
+
+### Self-scheduler in-process (Node)
+
+Desde 2026-05-20, el wmundial arranca al subir el proceso un
+`setInterval` que ejecuta cada **2 min reales** la misma lógica que
+el cron HTTP `/api/cron/live-scoring`:
+
+- Implementación: `src/server/cron/in-process-scheduler.ts`,
+  enganchado en `src/instrumentation.ts`.
+- Llama directo a `shouldSyncLive` + `syncFixtures` +
+  `triggerKickoffReminders` — **sin HTTP, sin bearer, sin red
+  externa**. Cadencia garantizada por el event loop de Node.
+- Tick inmediato al arranque (catch-up tras deploy).
+- Idempotente: el `started` flag evita doble registro tras
+  hot-reload o múltiples `register()`.
+- Limita por `NODE_ENV=production` y por presencia de
+  `API_FOOTBALL_KEY` para no ensuciar dev/CI.
+- **Limitación**: si Railway escala a múltiples instancias del
+  servicio, cada réplica ejecuta su propio tick. Asumido —
+  el setup actual es single-instance y los upserts son idempotentes.
 
 ### Provider externo
 

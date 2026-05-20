@@ -12,6 +12,15 @@ import * as Sentry from "@sentry/nextjs";
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
     await import("../sentry.server.config");
+    // Arranca el scheduler interno (live-scoring + kickoff reminders)
+    // — independiente del cron HTTP de GitHub Actions, que sufre
+    // throttling severo en el free tier (intervalos reales de hasta
+    // 1h vs el `*/2 * * * *` configurado). Ver
+    // `src/server/cron/in-process-scheduler.ts` para el rationale.
+    const { startInProcessScheduler } = await import(
+      "./server/cron/in-process-scheduler"
+    );
+    startInProcessScheduler();
   }
   if (process.env.NEXT_RUNTIME === "edge") {
     await import("../sentry.edge.config");
