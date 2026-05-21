@@ -8,6 +8,7 @@ import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/ty
 import { useTranslations } from "next-intl";
 import { FloatingBalls } from "./floating-balls";
 import { LiveBadge } from "./live-badge";
+import { MundialCountdown } from "./mundial-countdown";
 import { PodiumCard } from "./podium-card";
 import { RankRow } from "./rank-row";
 import { TrophyLogo } from "./trophy-logo";
@@ -61,6 +62,12 @@ export function LeaderboardView({
           withChrome ? "pt-16 sm:pt-20" : ""
         }`}
       >
+        {/* Cuenta atrás al Mundial. Solo para visitantes (no logados):
+            el user ya dentro del producto no necesita un "empieza en"
+            — ve los partidos próximos en `/inicio` y `/partidos`. El
+            propio componente se auto-oculta cuando el kickoff pasa. */}
+        {!user && <MundialCountdown />}
+
         <header className="mb-6 text-center opacity-0 [animation:popIn_0.7s_cubic-bezier(0.34,1.56,0.64,1)_forwards]">
           <div className="mb-2.5 flex items-center justify-center gap-3.5">
             <TrophyLogo className="animate-[trophyFloat_3.5s_ease-in-out_infinite] drop-shadow-[0_4px_20px_rgba(245,200,66,0.45)]" />

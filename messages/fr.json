@@ -11,6 +11,15 @@
   "footer": {
     "tagline": "Pronostics de la Coupe du Monde 2026"
   },
+  "countdown": {
+    "ariaLabel": "Compte à rebours jusqu'au début de la Coupe du Monde 2026",
+    "title": "La Coupe du Monde commence dans",
+    "days": "jours",
+    "hours": "heures",
+    "minutes": "min",
+    "seconds": "sec",
+    "kickoffLabel": "11 juin · Mexique 2026"
+  },
   "leaderboard": {
     "tagline": "FIFA Coupe du Monde · Canada · Mexique · USA",
     "liveBadge": "Classement en direct",

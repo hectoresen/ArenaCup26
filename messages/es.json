@@ -11,6 +11,15 @@
   "footer": {
     "tagline": "Predicciones del Mundial 2026"
   },
+  "countdown": {
+    "ariaLabel": "Cuenta atrás al inicio del Mundial 2026",
+    "title": "Empieza el Mundial en",
+    "days": "días",
+    "hours": "horas",
+    "minutes": "min",
+    "seconds": "seg",
+    "kickoffLabel": "11 jun · México 2026"
+  },
   "leaderboard": {
     "tagline": "FIFA World Cup · Canadá · México · USA",
     "liveBadge": "Ranking en vivo",
