@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { checkAdmin } from "@/lib/admin-auth";
+import "../../globals.css";
 
 /**
  * Layout del subtree `/admin/(authed)/*` — todo el panel admin

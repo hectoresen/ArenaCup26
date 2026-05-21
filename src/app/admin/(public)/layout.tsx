@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "../../globals.css";
 
 /**
  * Layout del subtree `/admin/(public)/*` — páginas accesibles sin

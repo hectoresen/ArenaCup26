@@ -52,6 +52,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   session: { strategy: "database" },
   trustHost: env.NODE_ENV !== "production" || env.AUTH_TRUST_HOST,
+  // SessionToken con `domain=.arenacup26.com` para que la cookie sea
+  // legible desde www.arenacup26.com Y admin.arenacup26.com. El OAuth
+  // flow corre en www (AUTH_URL=https://www.arenacup26.com), crea la
+  // sesión, y el redirectTo lleva al user al subdomain admin que ve
+  // la cookie cross-subdomain. Sin esto, admin nunca encuentra sesión.
+  // Las cookies temporales del flow OAuth (state, pkce, csrf, callback)
+  // dejan sus defaults — viven solo en www durante el flow y se
+  // descartan tras el callback.
+  cookies:
+    env.NODE_ENV === "production"
+      ? {
+          sessionToken: {
+            name: "__Secure-authjs.session-token",
+            options: {
+              domain: ".arenacup26.com",
+              httpOnly: true,
+              sameSite: "lax",
+              secure: true,
+              path: "/",
+            },
+          },
+        }
+      : undefined,
   events: {
     async createUser({ user }) {
       // user.id viene siempre (DrizzleAdapter lo asigna antes del evento).
