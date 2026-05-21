@@ -4,25 +4,25 @@ import type { ReactNode } from "react";
 import { checkAdmin } from "@/lib/admin-auth";
 
 /**
- * Layout raíz del panel admin. Servido en `/admin` desde cualquier
- * host (www, apex, subdomain admin dedicado si se añade en futuro).
+ * Layout raíz del panel admin. Se sirve desde dos hosts posibles:
+ *  - `admin.arenacup26.com` (futuro, cuando haya slot de custom domain).
+ *  - `wmundial-production.up.railway.app/admin` (actual).
  *
- * La seguridad es doble llave en el server, no por obfuscación de
- * URL: allowlist hardcoded en `admin-allowlist.ts` + flag
- * `users.is_admin = true` en BD + sesión Google OAuth activa.
+ * Auth gate antes de renderizar nada:
+ *  - Sin sesión → redirect al OAuth Google con callbackUrl al admin home.
+ *  - Sesión pero no admin (email no allowlisted o `is_admin=false`
+ *    o `banned_until > now`) → redirect a la landing pública.
+ *    No mostramos "403 admin only" para no revelar la existencia del
+ *    panel a quien no debe verlo.
  *
- * Auth gate antes de renderizar:
- *  - Sin sesión → redirect a OAuth Google con callbackUrl al admin.
- *  - Sesión pero no admin → redirect a landing pública (sin revelar
- *    que el panel exista vía mensaje "403 admin only").
- *
- * El callbackUrl se construye desde el host actual para que el
- * redirect tras login vuelva al mismo host (www, subdomain, etc.).
+ * El callbackUrl se construye desde el host actual (no hardcoded)
+ * para que funcione tanto en railway provided como en el subdomain
+ * cuando lo añadamos.
  */
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const check = await checkAdmin();
   const reqHeaders = await headers();
-  const host = reqHeaders.get("host") ?? "www.arenacup26.com";
+  const host = reqHeaders.get("host") ?? "wmundial-production.up.railway.app";
   // En railway provided el admin vive bajo `/admin`. En el subdomain
   // dedicado vive en `/` (porque el middleware reescribe `/` → `/admin`).
   const adminBase = host.startsWith("admin.")
