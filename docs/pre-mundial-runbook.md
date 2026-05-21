@@ -47,19 +47,29 @@ Estos datos siguen intactos para preservar el contexto social del user:
 ### Paso 1 · Backup completo (1 min)
 
 Antes de tocar nada, snapshot de seguridad. Si algo va mal, restauras
-y vuelves a empezar.
+y vuelves a empezar. Usamos el workflow `db-backup.yml` con
+`workflow_dispatch` para forzar un dump ahora mismo y subirlo como
+artifact:
 
 ```bash
-# Desde tu local, con Railway CLI logueado:
-PG_URL=$(railway variables --service Postgres --kv | grep DATABASE_PUBLIC_URL= | cut -d= -f2-)
-pg_dump "$PG_URL" --format=custom \
-  --file="backup-pre-mundial-$(date -u +%Y%m%d_%H%M%S).dump"
-ls -lh backup-pre-mundial-*.dump
+# Disparar manual el workflow de backup
+gh workflow run db-backup.yml
+# Esperar ~2 min y comprobar
+gh run list --workflow=db-backup.yml --limit 1
+# (Debe aparecer en `completed success`.)
 ```
 
-Guarda el `.dump` fuera del repo (Google Drive, Dropbox, etc.). El
-backup automático diario también está activo (`db-backup.yml`) pero
-mejor tener uno explícito justo antes del reset.
+El backup queda subido como artifact `wmundial-backup` con retención
+90 días. Si algo va mal en los pasos siguientes, lo descargas con:
+
+```bash
+gh run list --workflow=db-backup.yml --limit 5
+gh run download <run-id> --name wmundial-backup --dir ./restore
+zcat ./restore/wmundial-*.sql.gz | psql "$DATABASE_PUBLIC_URL"
+```
+
+El workflow scheduled (`db-backup.yml`) corre automáticamente cada
+noche a las 03:00 UTC y produce otro artifact diario.
 
 ### Paso 2 · Dry-run del reset (30s)
 
@@ -273,12 +283,19 @@ railway variables --service wmundial \
   --set MATCH_DATA_LEAGUE_FILTER=140,39,135,78,61,2,3,253,71,128,218,13,11,307,88,144,255,106,197,103,244,98,292
 
 # 2. Restaurar BD desde el backup del paso 1
-pg_restore --clean --no-owner -d "$PG_URL" backup-pre-mundial-*.dump
+PG_URL=$(railway variables --service Postgres --kv | grep DATABASE_PUBLIC_URL= | cut -d= -f2-)
+gh run list --workflow=db-backup.yml --limit 5
+gh run download <run-id-del-paso-1> --name wmundial-backup --dir ./restore
+zcat ./restore/wmundial-*.sql.gz | psql "$PG_URL"
 
 # 3. Trigger redeploy
 git commit --allow-empty -m "chore: rollback pre-Mundial switch"
 git push
 ```
+
+Si quieres ver el sistema de backups en detalle (cadencia diaria
+03:00 UTC + cadencia 6h durante el Mundial vía
+`db-backup-tournament.yml`), consulta `docs/backups.md`.
 
 ## Referencias
 

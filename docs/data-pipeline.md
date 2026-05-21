@@ -26,8 +26,8 @@ Detalle ampliado en las secciones de abajo y en los docs enlazados.
 | `match-data-sync.yml` (GH)   | cada 3 h          | Sincronizar fixtures de las ligas (hoy-1d → +7d)               |
 | `snapshot-ranking.yml` (GH)  | 00:05 UTC diario  | Snapshot histórico del ranking (delta 24h + sparkline 7d)      |
 | `auto-reject-bot-requests.yml` (GH) | 03:30 UTC diario | Auto-rechazar friend/group requests a bots >48h pending + refresh `lastActiveAt` de los 5 bots "live" |
-| `db-backup.yml` (GH)         | 03:00 UTC diario  | Backup íntegro Postgres → Backblaze B2 (retención 30d)         |
-| `db-backup-tournament.yml` (GH) | cada 6 h       | Backup elevado durante el Mundial (date guard 11 jun→19 jul 2026) |
+| `db-backup.yml` (GH)         | 03:00 UTC diario  | Backup íntegro Postgres → GitHub Artifact (retención 90d). Ver `docs/backups.md`. |
+| `db-backup-tournament.yml` (GH) | cada 6 h       | Backup elevado durante el Mundial (date guard 11 jun→19 jul 2026) — también GH Artifact. |
 
 ### Self-scheduler in-process (Node)
 
@@ -130,8 +130,7 @@ El **live-scoring** vive aparte y NO usa GitHub Actions — corre como
 | `RAILWAY_SYNC_URL`            | `https://www.arenacup26.com/api/cron/sync-fixtures`             |
 | `RAILWAY_SNAPSHOT_URL`        | `https://www.arenacup26.com/api/cron/snapshot-ranking`          |
 | `RAILWAY_AUTO_REJECT_URL`     | `https://www.arenacup26.com/api/cron/auto-reject-bot-requests`  |
-| `DATABASE_URL` (solo backups) | Connection string de Postgres (vía `railway variables`)         |
-| `BACKUP_S3_*` (solo backups)  | Acceso a Backblaze B2 (ACCESS_KEY, SECRET_KEY, BUCKET, REGION)  |
+| `DATABASE_URL` (solo backups) | `DATABASE_PUBLIC_URL` del service Postgres de Railway (público, no `*.railway.internal`) |
 
 ### match-data-sync — _calendario amplio_
 
