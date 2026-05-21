@@ -13,54 +13,24 @@ const intlMiddleware = createMiddleware(routing);
 // y banner referencien siempre el mismo nombre. Cookie httpOnly, secure
 // en prod, sameSite=lax (sobrevive el round-trip a accounts.google.com).
 
-/**
- * Hosts donde el path `/admin/*` puede servirse:
- *  - **Subdomain dedicado** `admin.arenacup26.com`: futuro, cuando
- *    haya slot de custom domain en el plan Railway (ahora ocupados
- *    por www + apex).
- *  - **Railway provided** `*.up.railway.app`: actual. URL fea pero
- *    no consume slot custom. Solo Hector la usa.
- *  - **Localhost**: dev local.
- *
- * Cualquier otro host (www / apex / dominio publico) sirve 404
- * cuando se accede a `/admin*` para no exponer el admin a tráfico
- * público que pueda escanear URLs.
- *
- * La auth gate real (checkAdmin) vive en el layout — esto solo
- * decide qué hosts tienen acceso al routing del admin.
- */
-function isAdminHost(host: string): boolean {
-  if (host.startsWith("admin.")) return true;
-  if (host.endsWith(".up.railway.app")) return true;
-  if (host.startsWith("localhost") || host.startsWith("127.0.0.1")) return true;
-  return false;
-}
-
 export default function middleware(request: NextRequest) {
   const host = (request.headers.get("host") ?? "").toLowerCase();
   const pathname = request.nextUrl.pathname;
-  const adminHost = isAdminHost(host);
 
-  // 0) Subdomain admin dedicado → rewrite root y subpaths a `/admin/*`.
-  //    Solo aplica al subdomain `admin.*`, no al railway provided
-  //    (donde el user navega explícitamente a `/admin/...`).
+  // 0) Subdomain `admin.*` dedicado (futuro): rewrite root y subpaths
+  //    a `/admin/*` para que la URL pretty sea `admin.arenacup26.com/`
+  //    en vez de `admin.arenacup26.com/admin/`.
   if (host.startsWith("admin.") && !pathname.startsWith("/admin")) {
     const url = request.nextUrl.clone();
     url.pathname = `/admin${pathname === "/" ? "" : pathname}`;
     return NextResponse.rewrite(url);
   }
 
-  // 1) Hosts públicos (custom domains: www, apex) NO deben servir
-  //    `/admin*`. Si alguien escribe `arenacup26.com/admin`, devolvemos
-  //    404 puro — la existencia del admin solo es visible desde hosts
-  //    autorizados (railway provided o subdomain admin).
-  if (!adminHost && (pathname === "/admin" || pathname.startsWith("/admin/"))) {
-    return new NextResponse(null, { status: 404 });
-  }
-
-  // 2) En hosts admin, las rutas `/admin/*` se sirven tal cual.
-  //    Saltamos el resto del middleware (no aplicamos i18n a /admin).
-  if (adminHost && pathname.startsWith("/admin")) {
+  // 1) `/admin/*` se sirve tal cual desde cualquier host (www, apex,
+  //    railway provided, subdomain). La seguridad real vive en la
+  //    doble llave del layout (allowlist hardcoded + flag is_admin BD).
+  //    Saltamos i18n: el admin no se traduce.
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     return NextResponse.next();
   }
 
