@@ -100,18 +100,33 @@ export function startInProcessScheduler(): void {
       const tomorrowStart = new Date(todayStart);
       tomorrowStart.setUTCDate(tomorrowStart.getUTCDate() + 1);
 
+      // Respeta `MATCH_DATA_MODE` igual que el cron HTTP de
+      // sync-fixtures. En modo `season` solo pide los fixtures del
+      // torneo configurado (e.g. Mundial 2026), sin contaminar BD con
+      // ligas pre-Mundial. En modo `date-window` mantiene el
+      // comportamiento previo (ventana de hoy, filtrada por
+      // MATCH_DATA_LEAGUE_FILTER si está).
+      const fetchOpts =
+        env.MATCH_DATA_MODE === "date-window"
+          ? ({
+              mode: "date-window" as const,
+              from: todayStart,
+              to: tomorrowStart,
+              leagueIds:
+                env.MATCH_DATA_LEAGUE_FILTER.length > 0
+                  ? env.MATCH_DATA_LEAGUE_FILTER
+                  : undefined,
+            } as const)
+          : ({
+              mode: "season" as const,
+              leagueId: env.MATCH_DATA_LEAGUE_ID,
+              season: env.MATCH_DATA_SEASON,
+            } as const);
+
       const report = await syncFixtures({
         provider,
         repo,
-        fetch: {
-          mode: "date-window",
-          from: todayStart,
-          to: tomorrowStart,
-          leagueIds:
-            env.MATCH_DATA_LEAGUE_FILTER.length > 0
-              ? env.MATCH_DATA_LEAGUE_FILTER
-              : undefined,
-        },
+        fetch: fetchOpts,
         onMatchFinished: async (matchId) => {
           dlog("cron", "in-process: match finished, scoring", { matchId });
           const r = await processFinishedMatch(db, matchId);
