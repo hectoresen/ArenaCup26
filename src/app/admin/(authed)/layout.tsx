@@ -1,39 +1,31 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { checkAdmin } from "@/lib/admin-auth";
 
 /**
- * Layout raíz del panel admin. Se sirve desde dos hosts posibles:
- *  - `admin.arenacup26.com` (futuro, cuando haya slot de custom domain).
- *  - `wmundial-production.up.railway.app/admin` (actual).
+ * Layout del subtree `/admin/(authed)/*` — todo el panel admin
+ * funcional. Sirve desde `admin.arenacup26.com` (el middleware
+ * reescribe `/` → `/admin`).
  *
- * Auth gate antes de renderizar nada:
- *  - Sin sesión → redirect al OAuth Google con callbackUrl al admin home.
- *  - Sesión pero no admin (email no allowlisted o `is_admin=false`
- *    o `banned_until > now`) → redirect a la landing pública.
- *    No mostramos "403 admin only" para no revelar la existencia del
- *    panel a quien no debe verlo.
- *
- * El callbackUrl se construye desde el host actual (no hardcoded)
- * para que funcione tanto en railway provided como en el subdomain
- * cuando lo añadamos.
+ * Auth gate antes de renderizar:
+ *  - Sin sesión → redirect a `/admin/signin` (nuestra signin custom).
+ *    NO usamos `/api/auth/signin` (default de Auth.js) porque su
+ *    form action sale con `localhost:8080` en multi-host Railway —
+ *    Auth.js v5 no respeta `X-Forwarded-Host` en esa página. La
+ *    custom page envuelve `signIn("google")` en un Server Action,
+ *    que sí ejecuta con contexto de request y genera la OAuth URL
+ *    correcta.
+ *  - Sesión pero no admin (no allowlisted / is_admin=false / banned)
+ *    → redirect a landing pública. No revelamos la existencia del
+ *    panel con un "403 admin only".
  */
-export default async function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminAuthedLayout({ children }: { children: ReactNode }) {
   const check = await checkAdmin();
-  const reqHeaders = await headers();
-  const host = reqHeaders.get("host") ?? "wmundial-production.up.railway.app";
-  // En railway provided el admin vive bajo `/admin`. En el subdomain
-  // dedicado vive en `/` (porque el middleware reescribe `/` → `/admin`).
-  const adminBase = host.startsWith("admin.")
-    ? `https://${host}/`
-    : `https://${host}/admin`;
 
   if (!check.ok) {
     if (check.reason === "no-session") {
-      redirect(`/api/auth/signin?callbackUrl=${encodeURIComponent(adminBase)}`);
+      redirect("/admin/signin");
     }
-    // Allowlisted-but-not-flag, not-allowlisted, banned → landing pública.
     redirect("https://www.arenacup26.com/");
   }
 
