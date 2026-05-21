@@ -39,27 +39,41 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Install PostgreSQL client
+      - name: Install PostgreSQL 18 client
         run: |
+          # Railway managed Postgres está en v18 desde mid-2026. apt
+          # default trae v16, que falla con "server version mismatch"
+          # al dumpear una BD v18. Añadimos el repo oficial PGDG para
+          # tener client v18.
           sudo apt-get update
-          # postgresql-client-16 alineado con la mayor de Railway managed
-          # Postgres en 2026. Si Railway sube a 17, actualizar aquí.
-          sudo apt-get install -y postgresql-client
+          sudo apt-get install -y curl ca-certificates gnupg
+          curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
+          echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-18
 
       - name: Run pg_dump
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
+          set -euo pipefail
           if [ -z "$DATABASE_URL" ]; then
             echo "❌ DATABASE_URL secret missing"
             exit 1
           fi
+          # `pg_dump 18` para emparejar la mayor de Railway managed Postgres.
+          PG_DUMP=$(ls /usr/lib/postgresql/18/bin/pg_dump 2>/dev/null || command -v pg_dump)
+          echo "Using $PG_DUMP ($($PG_DUMP --version))"
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
           FILE="wmundial-${TIMESTAMP}.sql.gz"
           # `--no-owner --no-acl` para que el dump sea restaurable en
           # cualquier servidor con permisos distintos. Plain + gzip
           # es portable y fácil de inspeccionar (zcat | head).
-          pg_dump "$DATABASE_URL" --no-owner --no-acl | gzip > "$FILE"
+          # `pipefail` arriba garantiza que si pg_dump falla, gzip no
+          # enmascara el exit code.
+          "$PG_DUMP" "$DATABASE_URL" --no-owner --no-acl | gzip > "$FILE"
           echo "Dump size: $(du -h "$FILE" | cut -f1)"
           echo "BACKUP_FILE=$FILE" >> $GITHUB_ENV
 
