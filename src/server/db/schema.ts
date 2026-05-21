@@ -200,12 +200,29 @@ export const users = pgTable(
      * real no distingue un bot de un humano.
      */
     isBot: boolean("is_bot").notNull().default(false),
+    /**
+     * Flag de admin del panel de administración (subdomain
+     * `admin.arenacup26.com`). Default false — solo se setea a true
+     * manualmente vía psql para users de confianza. La auth gate
+     * requiere ADEMÁS que el email esté en `ADMIN_EMAILS` allowlist
+     * en código (doble llave) para mitigar escalado de privilegios
+     * por SQL injection futura. Ver `src/lib/admin-allowlist.ts`.
+     */
+    isAdmin: boolean("is_admin").notNull().default(false),
+    /**
+     * Si está set y `> now()`, el user no puede iniciar sesión
+     * (banneado por el admin). `'9999-12-31T23:59:59Z'` =
+     * permanente, fecha concreta = ban temporal. Default NULL
+     * (no banneado).
+     */
+    bannedUntil: timestamp("banned_until", { withTimezone: true }),
   },
   (table) => ({
     usernameIdx: uniqueIndex("users_username_idx").on(table.username),
     // Index parcial: acelera filtros internos `WHERE is_bot=true`
     // (admin/analytics) sin penalizar reads de users reales.
     isBotIdx: index("users_is_bot_idx").on(table.isBot).where(sql`${table.isBot} = true`),
+    isAdminIdx: index("users_is_admin_idx").on(table.isAdmin).where(sql`${table.isAdmin} = true`),
   }),
 );
 
