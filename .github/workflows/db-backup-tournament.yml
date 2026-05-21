@@ -1,22 +1,22 @@
 name: DB backup (tournament cadence)
 
 # Backup cada 6h durante el Mundial 2026 (11 jun → 19 jul). Sube los
-# dumps con prefijo `tournament/` para identificarlos como cadencia
-# elevada y aplicarles una política de retención propia si conviene.
+# dumps como artifacts con nombre prefijado `tournament-` para
+# distinguirlos del daily.
 #
-# Coexiste con `db-backup.yml` (diario a 03:00 UTC, prefijo `daily/`).
-# La idea es: el daily sigue siendo la base de retención larga (~30d);
+# Coexiste con `db-backup.yml` (diario a 03:00 UTC).
+# La idea es: el daily sigue siendo la base de retención larga (90d);
 # este workflow añade granularidad fina solo mientras el torneo está
-# activo.
+# activo. Cadencia 6h en ventana de 38 días = ~152 dumps.
 #
-# **Setup** (mismos secrets que db-backup.yml):
-#   DATABASE_URL, BACKUP_S3_ENDPOINT, BACKUP_S3_BUCKET,
-#   BACKUP_S3_ACCESS_KEY, BACKUP_S3_SECRET_KEY, BACKUP_S3_REGION.
+# **Setup**: mismo secret que db-backup.yml (`DATABASE_URL`).
 #
-# **Retención**: el step "Smart retention" al final aplica la regla
-# "borra >10d siempre que existan ≥2 más recientes" sobre `tournament/`.
-# Con cadencia 6h en ventana de 38 días, estabiliza en ~40 backups
-# (los últimos 10 días = 4×24/6×10 ≈ 40 dumps).
+# **Descarga del backup más reciente** (para restore):
+#   ```bash
+#   gh run list --workflow=db-backup-tournament.yml --limit 5
+#   gh run download <run-id> --name wmundial-tournament-backup --dir ./restore
+#   zcat ./restore/wmundial-*.sql.gz | psql "$DATABASE_URL"
+#   ```
 
 on:
   schedule:
@@ -35,7 +35,7 @@ env:
 jobs:
   backup:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Date guard (skip outside Mundial window)
         id: gate
@@ -55,13 +55,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client
 
-      - name: Install AWS CLI (S3-compatible client)
-        if: steps.gate.outputs.skip != 'true'
-        run: |
-          curl -sSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscli.zip
-          unzip -q /tmp/awscli.zip -d /tmp
-          sudo /tmp/aws/install --update
-
       - name: Run pg_dump
         if: steps.gate.outputs.skip != 'true'
         env:
@@ -72,30 +65,12 @@ jobs:
             exit 1
           fi
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
-          FILE="arenacup26-${TIMESTAMP}.sql.gz"
+          FILE="wmundial-tournament-${TIMESTAMP}.sql.gz"
           pg_dump "$DATABASE_URL" --no-owner --no-acl | gzip > "$FILE"
           echo "Dump size: $(du -h "$FILE" | cut -f1)"
           echo "BACKUP_FILE=$FILE" >> $GITHUB_ENV
 
-      - name: Upload to S3-compatible bucket
-        if: steps.gate.outputs.skip != 'true'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
-          ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
-          BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
-        run: |
-          if [ -z "$ENDPOINT" ] || [ -z "$BUCKET" ]; then
-            echo "❌ BACKUP_S3_ENDPOINT or BACKUP_S3_BUCKET secret missing"
-            exit 1
-          fi
-          aws s3 cp "$BACKUP_FILE" "s3://$BUCKET/tournament/$BACKUP_FILE" \
-            --endpoint-url "$ENDPOINT" \
-            --no-progress
-          echo "✓ Uploaded $BACKUP_FILE to s3://$BUCKET/tournament/"
-
-      - name: Verify backup integrity
+      - name: Verify dump integrity
         if: steps.gate.outputs.skip != 'true'
         run: |
           BYTES=$(stat -c%s "$BACKUP_FILE")
@@ -110,51 +85,11 @@ jobs:
           fi
           echo "✓ Backup verified"
 
-      - name: Smart retention (delete >10d only if ≥2 newer exist)
+      - name: Upload backup as artifact
         if: steps.gate.outputs.skip != 'true'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
-          ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
-          BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
-        run: |
-          # Misma regla que `db-backup.yml` pero aplicada al prefix
-          # `tournament/`. Cada 6h durante el Mundial → ~120 backups
-          # totales; con la regla "borra >10d si hay ≥2 más recientes"
-          # se estabiliza en ~40-45 entradas (los últimos 10 días).
-          aws s3api list-objects-v2 \
-            --endpoint-url "$ENDPOINT" \
-            --bucket "$BUCKET" \
-            --prefix "tournament/" \
-            --query "sort_by(Contents, &LastModified)[*].[Key,LastModified]" \
-            --output text > /tmp/backups.txt || true
-
-          if [ ! -s /tmp/backups.txt ]; then
-            echo "→ No hay backups en tournament/, nada que retener."
-            exit 0
-          fi
-
-          tac /tmp/backups.txt > /tmp/backups-desc.txt
-          TOTAL=$(wc -l < /tmp/backups-desc.txt)
-          echo "→ $TOTAL backups en tournament/"
-          if [ "$TOTAL" -le 2 ]; then
-            echo "→ ≤2 backups, conservamos todos."
-            exit 0
-          fi
-
-          NOW_TS=$(date -u +%s)
-          THRESHOLD_TS=$((NOW_TS - 10*24*3600))
-          DELETED=0
-          KEPT=0
-          tail -n +3 /tmp/backups-desc.txt | while IFS=$'\t' read -r KEY LASTMOD; do
-            MOD_TS=$(date -u -d "$LASTMOD" +%s 2>/dev/null || echo 0)
-            if [ "$MOD_TS" -lt "$THRESHOLD_TS" ]; then
-              aws s3 rm "s3://$BUCKET/$KEY" --endpoint-url "$ENDPOINT" --quiet
-              echo "  deleted (>10d): $KEY"
-              DELETED=$((DELETED + 1))
-            else
-              KEPT=$((KEPT + 1))
-            fi
-          done
-          echo "→ Retención completa. kept=$KEPT, deleted=$DELETED"
+        uses: actions/upload-artifact@v4
+        with:
+          name: wmundial-tournament-backup
+          path: ${{ env.BACKUP_FILE }}
+          retention-days: 90
+          if-no-files-found: error

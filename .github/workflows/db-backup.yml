@@ -1,24 +1,32 @@
 name: DB backup
 
-# Backup diario de Postgres a un bucket S3-compatible (Backblaze B2 o
-# Cloudflare R2). Retención SMART aplicada en el propio workflow (ver
-# step "Smart retention" más abajo): borra backups de >10 días siempre
-# y cuando existan ≥2 más recientes — así nunca quedamos sin cobertura.
+# Backup diario de Postgres como GitHub Actions Artifact. Retención
+# 90 días (default de GH Free). No requiere infraestructura externa
+# (Backblaze, R2, S3); todo vive dentro de GitHub.
 #
-# **Setup en GitHub Secrets**:
-#   - `DATABASE_URL` → la URL completa de Railway Postgres (incluye
-#     password). Necesaria para `pg_dump`.
-#   - `BACKUP_S3_ENDPOINT` → endpoint compatible S3 (B2: `https://s3.eu-central-003.backblazeb2.com`).
-#   - `BACKUP_S3_BUCKET` → nombre del bucket (e.g. `wmundial-backups`).
-#   - `BACKUP_S3_ACCESS_KEY` y `BACKUP_S3_SECRET_KEY`.
-#   - `BACKUP_S3_REGION` (opcional, default `auto` para R2 /
-#     `eu-central-003` para B2).
+# **Setup en GitHub Secrets** (uno solo):
+#   - `DATABASE_URL` → URL pública de Railway Postgres (incluye
+#     password). Es el `DATABASE_PUBLIC_URL` del service Postgres,
+#     NO el `DATABASE_URL` interno (que apunta a *.railway.internal
+#     y solo resuelve dentro de Railway).
 #
-# **Setup en el bucket (una vez)**:
-#  1. Crear bucket privado.
-#  2. Generar Application Key con scope solo-este-bucket.
-#     (NO se requiere lifecycle policy — la retención la maneja
-#     este workflow.)
+# **Descarga del backup más reciente** (para restore):
+#   ```bash
+#   # Listar runs recientes
+#   gh run list --workflow=db-backup.yml --limit 5
+#
+#   # Descargar el artifact del último run
+#   gh run download <run-id> --name wmundial-backup --dir ./restore
+#
+#   # Restaurar (asume Postgres local o staging — NUNCA prod sin
+#   # haber hecho un dump del estado actual antes):
+#   zcat ./restore/wmundial-*.sql.gz | psql "$DATABASE_URL"
+#   ```
+#
+# Tamaño esperado: ~50-300 KB por dump (BD ~1 MB sin comprimir,
+# gzip lo deja en <30%). Plan GH Free permite 500 MB de artifacts —
+# caben miles de dumps. Con 90 días de retención y 1 dump/día = 90
+# dumps = ~30 MB. Trivial.
 
 on:
   schedule:
@@ -29,7 +37,7 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Install PostgreSQL client
         run: |
@@ -37,12 +45,6 @@ jobs:
           # postgresql-client-16 alineado con la mayor de Railway managed
           # Postgres en 2026. Si Railway sube a 17, actualizar aquí.
           sudo apt-get install -y postgresql-client
-
-      - name: Install AWS CLI (S3-compatible client)
-        run: |
-          curl -sSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscli.zip
-          unzip -q /tmp/awscli.zip -d /tmp
-          sudo /tmp/aws/install --update
 
       - name: Run pg_dump
         env:
@@ -55,37 +57,14 @@ jobs:
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
           FILE="wmundial-${TIMESTAMP}.sql.gz"
           # `--no-owner --no-acl` para que el dump sea restaurable en
-          # cualquier servidor con permisos distintos. `-Fc` daría
-          # custom format (más rápido restore + parallel) pero el
-          # plain + gzip es más portable y fácil de inspeccionar.
+          # cualquier servidor con permisos distintos. Plain + gzip
+          # es portable y fácil de inspeccionar (zcat | head).
           pg_dump "$DATABASE_URL" --no-owner --no-acl | gzip > "$FILE"
           echo "Dump size: $(du -h "$FILE" | cut -f1)"
           echo "BACKUP_FILE=$FILE" >> $GITHUB_ENV
 
-      - name: Upload to S3-compatible bucket
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
-          ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
-          BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+      - name: Verify dump integrity
         run: |
-          if [ -z "$ENDPOINT" ] || [ -z "$BUCKET" ]; then
-            echo "❌ BACKUP_S3_ENDPOINT or BACKUP_S3_BUCKET secret missing"
-            exit 1
-          fi
-          aws s3 cp "$BACKUP_FILE" "s3://$BUCKET/daily/$BACKUP_FILE" \
-            --endpoint-url "$ENDPOINT" \
-            --no-progress
-          echo "✓ Uploaded $BACKUP_FILE to s3://$BUCKET/daily/"
-
-      - name: Verify restore (dry run pg_restore --list)
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          # Sanidad mínima: el archivo debe descomprimir y empezar
-          # con un DDL válido. Si pg_dump falló silenciosamente
-          # tendríamos un .sql.gz vacío o corrupto.
           BYTES=$(stat -c%s "$BACKUP_FILE")
           if [ "$BYTES" -lt 1024 ]; then
             echo "❌ Backup file suspiciously small: ${BYTES}B"
@@ -100,60 +79,15 @@ jobs:
           fi
           echo "✓ Backup verified"
 
-      - name: Smart retention (delete >10d only if ≥2 newer exist)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
-          ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
-          BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
-        run: |
-          # Reglas: para borrar un backup, deben existir ≥2 más recientes.
-          # Implementación equivalente: ordenar todos por fecha desc,
-          # saltarse los 2 primeros (que SIEMPRE se conservan), y de los
-          # restantes borrar los que tengan >10 días.
-          #
-          # Esto garantiza: como mínimo siempre 2 backups (los más
-          # recientes) y cualquier backup <= 10d. No depende del
-          # lifecycle del bucket, así que funciona contra cualquier
-          # S3-compatible (B2, R2, MinIO, etc.).
-          aws s3api list-objects-v2 \
-            --endpoint-url "$ENDPOINT" \
-            --bucket "$BUCKET" \
-            --prefix "daily/" \
-            --query "sort_by(Contents, &LastModified)[*].[Key,LastModified]" \
-            --output text > /tmp/backups.txt || true
-
-          if [ ! -s /tmp/backups.txt ]; then
-            echo "→ No hay backups en daily/, nada que retener."
-            exit 0
-          fi
-
-          # `sort_by` con `&LastModified` lo deja ascendente (oldest first).
-          # Reverse para tener newest first.
-          tac /tmp/backups.txt > /tmp/backups-desc.txt
-
-          TOTAL=$(wc -l < /tmp/backups-desc.txt)
-          echo "→ $TOTAL backups en daily/"
-          if [ "$TOTAL" -le 2 ]; then
-            echo "→ ≤2 backups, conservamos todos por la regla \"≥2 posteriores\"."
-            exit 0
-          fi
-
-          # Skip los 2 más recientes; de los restantes, borrar >10d.
-          NOW_TS=$(date -u +%s)
-          THRESHOLD_TS=$((NOW_TS - 10*24*3600))
-          DELETED=0
-          KEPT=0
-          tail -n +3 /tmp/backups-desc.txt | while IFS=$'\t' read -r KEY LASTMOD; do
-            # LASTMOD viene como ISO 8601 UTC, e.g. "2026-05-09T03:00:42+00:00".
-            MOD_TS=$(date -u -d "$LASTMOD" +%s 2>/dev/null || echo 0)
-            if [ "$MOD_TS" -lt "$THRESHOLD_TS" ]; then
-              aws s3 rm "s3://$BUCKET/$KEY" --endpoint-url "$ENDPOINT" --quiet
-              echo "  deleted (>10d): $KEY"
-              DELETED=$((DELETED + 1))
-            else
-              KEPT=$((KEPT + 1))
-            fi
-          done
-          echo "→ Retención completa. Conservados (top 2 + recientes): kept=$KEPT del bucket, eliminados=$DELETED"
+      - name: Upload backup as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wmundial-backup
+          path: ${{ env.BACKUP_FILE }}
+          # 90 días = máximo del plan Free. Si en el futuro pasamos a
+          # plan pagado podemos subir esto a 400. Para nuestra cadencia
+          # diaria, 90d cubre cualquier situación realista.
+          retention-days: 90
+          # `error` (default) si el patrón no encuentra archivo. Útil
+          # como sanity check de que el step anterior generó el dump.
+          if-no-files-found: error
