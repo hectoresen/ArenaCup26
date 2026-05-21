@@ -83,13 +83,14 @@ async function main() {
 
   if (!confirmed) {
     console.log("Plan:");
-    console.log("  1. DELETE FROM matches  (cascade → predictions, point_events)");
-    console.log("  2. UPDATE user_points → 0/0/0/0/0  para todos los usuarios");
+    console.log("  1. DELETE FROM point_events  (FK 'set null', borrar explícito)");
+    console.log("  2. DELETE FROM matches       (cascade → predictions, match_external_ids)");
+    console.log("  3. UPDATE user_points → 0/0/0/0/0  para todos los usuarios");
     if (forTournament) {
-      console.log("  3. DELETE FROM user_achievements (todos los logros desbloqueados)");
-      console.log("  4. DELETE FROM ranking_snapshots (todo el histórico de ranking)");
-      console.log("  5. UPDATE group_memberships SET frozen_* = NULL  (limpia ex-miembros)");
-      console.log("  6. DELETE FROM notifications  (huérfanas + scoring/achievements)");
+      console.log("  4. DELETE FROM user_achievements (todos los logros desbloqueados)");
+      console.log("  5. DELETE FROM ranking_snapshots (todo el histórico de ranking)");
+      console.log("  6. UPDATE group_memberships SET frozen_* = NULL  (limpia ex-miembros)");
+      console.log("  7. DELETE FROM notifications  (huérfanas + scoring/achievements)");
     }
     console.log("");
     console.log(`Estado actual: ${realUsersTouched} HUMANOS con datos de scoring (los bots se resetean siempre).`);
@@ -118,9 +119,17 @@ async function main() {
     process.exit(2);
   }
 
+  console.log("→ Borrando point_events (FK con set null, no cascade)...");
+  // `point_events.match_id` tiene `onDelete: 'set null'` por design (queremos
+  // conservar el histórico de scoring aunque el match se borre). Pero en un
+  // reset pre-Mundial los puntos viejos contaminan los nuevos cálculos —
+  // mejor borrarlos explícitamente ANTES del DELETE de matches.
+  const pointEventsDel = await db.delete(pointEvents).returning({ id: pointEvents.id });
+  console.log(`✓ ${pointEventsDel.length} point_events eliminados.`);
+
   console.log("→ Borrando matches (cascade)...");
   await db.delete(matches);
-  console.log("✓ matches borrados (cascade aplicó a predictions + point_events + match_external_ids).");
+  console.log("✓ matches borrados (cascade aplicó a predictions + match_external_ids).");
 
   console.log("→ Reseteando user_points para todos los usuarios...");
   // Reset total: bots y humanos. Los bots recuperan sus puntos cuando
