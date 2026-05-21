@@ -51,6 +51,9 @@ function buildCsp(): string {
       "https://media.api-sports.io",
       "https://*.googleusercontent.com",
       "https://flagcdn.com",
+      // Logo Google que Auth.js sirve en la página default de signin.
+      // Sin esto, la default signin page muestra el botón sin icono.
+      "https://authjs.dev",
     ],
     "font-src": ["'self'", "data:"],
     "connect-src": ["'self'", "https://v3.football.api-sports.io"],
