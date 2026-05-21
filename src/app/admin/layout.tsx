@@ -1,32 +1,37 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { checkAdmin } from "@/lib/admin-auth";
 
 /**
- * Layout raíz del panel admin (`admin.arenacup26.com`). Server
- * Component que aplica la auth gate antes de renderizar nada:
+ * Layout raíz del panel admin. Se sirve desde dos hosts posibles:
+ *  - `admin.arenacup26.com` (futuro, cuando haya slot de custom domain).
+ *  - `wmundial-production.up.railway.app/admin` (actual).
  *
- *  - Sin sesión → redirect al OAuth Google con callbackUrl = admin home.
+ * Auth gate antes de renderizar nada:
+ *  - Sin sesión → redirect al OAuth Google con callbackUrl al admin home.
  *  - Sesión pero no admin (email no allowlisted o `is_admin=false`
  *    o `banned_until > now`) → redirect a la landing pública.
  *    No mostramos "403 admin only" para no revelar la existencia del
  *    panel a quien no debe verlo.
  *
- * Si pasa la gate, renderiza el shell del admin (header con email +
- * logout, nav lateral). Layout independiente del `[locale]/(app)`
- * del producto — paleta más sobria, sin notificaciones, sin invite.
+ * El callbackUrl se construye desde el host actual (no hardcoded)
+ * para que funcione tanto en railway provided como en el subdomain
+ * cuando lo añadamos.
  */
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const check = await checkAdmin();
+  const reqHeaders = await headers();
+  const host = reqHeaders.get("host") ?? "wmundial-production.up.railway.app";
+  // En railway provided el admin vive bajo `/admin`. En el subdomain
+  // dedicado vive en `/` (porque el middleware reescribe `/` → `/admin`).
+  const adminBase = host.startsWith("admin.")
+    ? `https://${host}/`
+    : `https://${host}/admin`;
 
   if (!check.ok) {
-    // Mismo redirect para todos los motivos no-admin: queremos que la
-    // experiencia de un visitante curioso vs un user real no-admin vs
-    // un email allowlisted pero sin flag sea indistinguible.
     if (check.reason === "no-session") {
-      // Vuelve al admin home tras login. El callbackUrl es absoluto
-      // para que tras OAuth aterrice en el subdomain admin, no en www.
-      redirect("/api/auth/signin?callbackUrl=" + encodeURIComponent("https://admin.arenacup26.com/"));
+      redirect(`/api/auth/signin?callbackUrl=${encodeURIComponent(adminBase)}`);
     }
     // Allowlisted-but-not-flag, not-allowlisted, banned → landing pública.
     redirect("https://www.arenacup26.com/");
