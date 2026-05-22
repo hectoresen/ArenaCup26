@@ -31,6 +31,17 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
     ],
   },
   {
+    title: "Comunidad",
+    items: [
+      {
+        href: "/admin/users",
+        label: "Usuarios",
+        icon: "users",
+        description: "Listado + detalle de usuarios",
+      },
+    ],
+  },
+  {
     title: "Comunicación",
     items: [
       {
@@ -259,6 +270,15 @@ function Icon({ name }: { name: string }) {
       return (
         <svg {...common} aria-hidden="true">
           <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4l-6 6a2 2 0 1 0 3 3l6-6a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2 2.3-2.3z" />
+        </svg>
+      );
+    case "users":
+      return (
+        <svg {...common} aria-hidden="true">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
       );
     case "menu":
