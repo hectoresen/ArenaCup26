@@ -3,7 +3,7 @@
 import { checkAdmin } from "@/lib/admin-auth";
 import { logAdminAction } from "@/server/admin/audit";
 import { db } from "@/server/db/client";
-import { pointEvents, userPoints } from "@/server/db/schema";
+import { notifications, pointEvents, userPoints } from "@/server/db/schema";
 import { sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -40,6 +40,12 @@ export async function adjustPointsAction(input: unknown): Promise<AdjustResult> 
     return { ok: false, error: "delta-zero" };
   }
 
+  const sign = parsed.data.delta > 0 ? "+" : "";
+  const title =
+    parsed.data.delta > 0
+      ? `Has recibido ${sign}${parsed.data.delta} puntos`
+      : `Ajuste de ${parsed.data.delta} puntos`;
+
   await db.transaction(async (tx) => {
     await tx.insert(pointEvents).values({
       userId: parsed.data.userId,
@@ -61,6 +67,18 @@ export async function adjustPointsAction(input: unknown): Promise<AdjustResult> 
           updatedAt: sql`now()`,
         },
       });
+
+    // Notificación in-app al user afectado con el motivo del admin.
+    // Reusamos kind `admin_broadcast` (ya tiene label "Aviso" en la
+    // campana) — un ajuste de puntos manual conceptualmente es un
+    // aviso del equipo. Sin push: la campana del polling lo recoge
+    // en < 60s sin requerir F5.
+    await tx.insert(notifications).values({
+      userId: parsed.data.userId,
+      kind: "admin_broadcast",
+      title,
+      body: parsed.data.reason,
+    });
   });
 
   await logAdminAction({
