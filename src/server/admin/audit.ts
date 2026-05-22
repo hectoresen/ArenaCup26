@@ -12,6 +12,7 @@ export type AdminAction =
   | "broadcast_sent"
   | "user_banned"
   | "user_unbanned"
+  | "user_sessions_revoked"
   | "points_adjusted"
   | "tournament_reset";
 

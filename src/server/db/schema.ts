@@ -99,6 +99,10 @@ export const pointEventKindEnum = pgEnum("point_event_kind", [
   "combo",
   "poll",
   "referral",
+  // Ajuste manual desde el panel admin (Fase 3). El delta puede ser
+  // positivo (corrección al alza) o negativo (penalización). La razón
+  // textual queda en `admin_audit_log.payload`.
+  "manual_adjustment",
 ]);
 
 export const notificationKindEnum = pgEnum("notification_kind", [

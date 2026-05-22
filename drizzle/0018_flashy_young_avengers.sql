@@ -1,0 +1,1 @@
+ALTER TYPE "public"."point_event_kind" ADD VALUE 'manual_adjustment';

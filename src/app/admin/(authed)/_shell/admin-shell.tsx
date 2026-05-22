@@ -67,6 +67,12 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
         icon: "database",
         description: "Listado de snapshots BD",
       },
+      {
+        href: "/admin/audit",
+        label: "Audit log",
+        icon: "log",
+        description: "Historial de acciones admin",
+      },
     ],
   },
 ];
@@ -293,6 +299,14 @@ function Icon({ name }: { name: string }) {
           <ellipse cx="12" cy="5" rx="9" ry="3" />
           <path d="M3 5v14a9 3 0 0 0 18 0V5" />
           <path d="M3 12a9 3 0 0 0 18 0" />
+        </svg>
+      );
+    case "log":
+      return (
+        <svg {...common} aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <path d="M14 2v6h6" />
+          <path d="M8 13h8M8 17h5" />
         </svg>
       );
     case "menu":

@@ -1,7 +1,9 @@
+import { checkAdmin } from "@/lib/admin-auth";
 import { getUserDetailForAdmin } from "@/server/admin/users-list";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { UserAvatar } from "../_components/user-avatar";
+import { UserActions } from "./_components/user-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +13,11 @@ export default async function AdminUserDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const user = await getUserDetailForAdmin(id);
+  const [user, check] = await Promise.all([getUserDetailForAdmin(id), checkAdmin()]);
   if (!user) notFound();
+  const adminId = check.ok ? check.user.id : null;
 
-  const isBanned = user.bannedUntil && user.bannedUntil > new Date();
+  const isBanned = !!(user.bannedUntil && user.bannedUntil > new Date());
 
   return (
     <div className="space-y-6">
@@ -90,15 +93,15 @@ export default async function AdminUserDetailPage({
         </dl>
       </section>
 
-      <section className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-xs text-slate-400">
-        <h2 className="mb-2 font-display text-sm uppercase tracking-[0.14em] text-slate-300">
-          Acciones (Fase 3)
-        </h2>
-        <p>
-          Banear, desbanear, ajustar puntos manualmente y forzar logout llegarán en la siguiente
-          fase. Por ahora la vista es read-only.
-        </p>
-      </section>
+      {!user.isBot && (
+        <UserActions
+          userId={user.id}
+          userName={user.name}
+          isBanned={isBanned}
+          isSelf={adminId === user.id}
+          isBot={user.isBot}
+        />
+      )}
     </div>
   );
 }
