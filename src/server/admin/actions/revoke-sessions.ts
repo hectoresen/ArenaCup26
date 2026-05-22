@@ -1,5 +1,6 @@
 "use server";
 
+import { dlog } from "@/lib/debug-log";
 import { checkAdmin } from "@/lib/admin-auth";
 import { logAdminAction } from "@/server/admin/audit";
 import { db } from "@/server/db/client";
@@ -18,11 +19,18 @@ export type RevokeResult = { ok: true; revoked: number } | { ok: false; error: s
  * Útil tras un ban o cuando sospechas cuenta comprometida.
  */
 export async function revokeUserSessionsAction(input: unknown): Promise<RevokeResult> {
+  dlog("ranking", "revokeUserSessionsAction invoked", { input });
   const check = await checkAdmin();
-  if (!check.ok) return { ok: false, error: "no-permission" };
+  if (!check.ok) {
+    dlog("ranking", "revokeUserSessionsAction blocked: not admin", { reason: check.reason });
+    return { ok: false, error: "no-permission" };
+  }
 
   const parsed = Schema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "invalid-input" };
+  if (!parsed.success) {
+    dlog("ranking", "revokeUserSessionsAction invalid input", { issues: parsed.error.issues });
+    return { ok: false, error: "invalid-input" };
+  }
 
   // No bloqueamos auto-revoke (a veces el admin quiere cerrar
   // su propia sesión desde el panel), pero anotamos en payload.
