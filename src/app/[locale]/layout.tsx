@@ -48,6 +48,16 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+/**
+ * Forzar dinámico todo el subtree `[locale]/*` porque el layout
+ * consulta `getMaintenanceDecision()` en cada request. Si dejásemos
+ * prerender estático, el wall no aparecería en páginas cacheadas al
+ * activar el modo mantenimiento (legal/terms, bienvenido…). Cost:
+ * pérdida de caché en páginas casi-estáticas, aceptable porque el
+ * 90% de la app ya es dinámica (ranking, perfiles, historial).
+ */
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {

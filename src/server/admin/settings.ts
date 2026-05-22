@@ -31,18 +31,29 @@ const DEFAULT_MAINTENANCE: MaintenanceMode = { enabled: false, message: null };
  * favorece simplicidad sobre micro-optimización.
  */
 export async function getMaintenanceMode(): Promise<MaintenanceMode> {
-  const rows = await db
-    .select({ value: appSettings.value })
-    .from(appSettings)
-    .where(eq(appSettings.key, "maintenance"))
-    .limit(1);
+  // Try/catch porque este helper se invoca desde el root layout
+  // `[locale]/layout.tsx`, que Next.js ejecuta en build-time para
+  // prerender páginas estáticas (`/legal/terms`, `/bienvenido`…).
+  // En build la BD `postgres.railway.internal` no resuelve y rompe
+  // todo el deploy. Devolver el default en error mantiene la app
+  // navegable: las páginas estáticas se renderizan "sin mantenimiento",
+  // y las dinámicas leerán el estado real en runtime.
+  try {
+    const rows = await db
+      .select({ value: appSettings.value })
+      .from(appSettings)
+      .where(eq(appSettings.key, "maintenance"))
+      .limit(1);
 
-  const row = rows[0];
-  if (!row) return DEFAULT_MAINTENANCE;
+    const row = rows[0];
+    if (!row) return DEFAULT_MAINTENANCE;
 
-  const parsed = MaintenanceSchema.safeParse(row.value);
-  if (!parsed.success) return DEFAULT_MAINTENANCE;
-  return parsed.data;
+    const parsed = MaintenanceSchema.safeParse(row.value);
+    if (!parsed.success) return DEFAULT_MAINTENANCE;
+    return parsed.data;
+  } catch {
+    return DEFAULT_MAINTENANCE;
+  }
 }
 
 /**
