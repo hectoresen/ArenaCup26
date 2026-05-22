@@ -76,29 +76,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             secure: true,
             path: "/",
           };
+          // Names únicos prefix `ac26-` para evitar colisión con las
+          // cookies viejas `__Secure-authjs.*` que algunos users tienen
+          // host-only (del deploy previo al multi-host). Si reutilizamos
+          // el name, el browser envía la cookie host-only vieja (más
+          // específica por RFC 6265) y Auth.js no encuentra la session
+          // nueva → "login que vuelve al ranking sin loguearse".
+          // Las cookies viejas quedan huérfanas hasta expirar.
           return {
             sessionToken: {
-              name: "__Secure-authjs.session-token",
+              name: "__Secure-ac26-session",
               options: sharedOptions,
             },
             callbackUrl: {
-              name: "__Secure-authjs.callback-url",
+              name: "__Secure-ac26-callback-url",
               options: sharedOptions,
             },
             csrfToken: {
-              name: "__Secure-authjs.csrf-token",
+              name: "__Secure-ac26-csrf-token",
               options: sharedOptions,
             },
             pkceCodeVerifier: {
-              name: "__Secure-authjs.pkce.code_verifier",
+              name: "__Secure-ac26-pkce",
               options: { ...sharedOptions, maxAge: 900 },
             },
             state: {
-              name: "__Secure-authjs.state",
+              name: "__Secure-ac26-state",
               options: { ...sharedOptions, maxAge: 900 },
             },
             nonce: {
-              name: "__Secure-authjs.nonce",
+              name: "__Secure-ac26-nonce",
               options: sharedOptions,
             },
           };
