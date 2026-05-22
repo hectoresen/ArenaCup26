@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
 import type { PredictionView } from "@/server/dashboard/types";
+import { useTranslations } from "next-intl";
 
 type Provisional = {
   points: number;
@@ -35,12 +35,7 @@ type Props = {
  *    si el viewer está ganando provisionalmente o no, con guiño
  *    futbolero (no rendirse hasta el pitido final).
  */
-export function LivePredictionBlock({
-  homeName,
-  awayName,
-  prediction,
-  provisional,
-}: Props) {
+export function LivePredictionBlock({ homeName, awayName, prediction, provisional }: Props) {
   const t = useTranslations("dashboard.live");
 
   const label =
@@ -53,9 +48,7 @@ export function LivePredictionBlock({
           : t("draw");
 
   const winning =
-    provisional !== null &&
-    provisional.kind !== "miss" &&
-    provisional.kind !== "voided";
+    provisional !== null && provisional.kind !== "miss" && provisional.kind !== "voided";
 
   const provEmoji =
     provisional?.kind === "exact"

@@ -1,5 +1,5 @@
-import { CountryFlag } from "./country-flag";
 import { flagEmojiToCountryCode } from "@/lib/format/country";
+import { CountryFlag } from "./country-flag";
 
 type Props = {
   /**

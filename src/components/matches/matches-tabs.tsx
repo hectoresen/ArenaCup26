@@ -42,9 +42,7 @@ function TabLink({
       href={href as never}
       aria-current={isActive ? "page" : undefined}
       className={`cursor-pointer rounded-full px-4 py-1.5 text-[12px] font-extrabold uppercase tracking-[0.08em] no-underline transition-colors ${
-        isActive
-          ? "bg-gold text-black"
-          : "text-muted hover:text-foreground"
+        isActive ? "bg-gold text-black" : "text-muted hover:text-foreground"
       }`}
     >
       {label}

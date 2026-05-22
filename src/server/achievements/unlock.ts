@@ -1,4 +1,3 @@
-import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { dlog } from "@/lib/debug-log";
 import { env } from "@/lib/env";
 import type { Database } from "@/server/db/client";
@@ -13,6 +12,7 @@ import {
   userPoints,
 } from "@/server/db/schema";
 import { notifyWithPush } from "@/server/notifications/notify-with-push";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 
 /**
  * Reglas de unlock evaluables hoy a partir del estado en BD. Para
@@ -115,10 +115,7 @@ const PENDING_RULES = new Set([
  */
 const GATE_BYPASS = new Set(["team-spirit"]);
 
-export async function evaluateAndUnlock(
-  db: Database,
-  userId: string,
-): Promise<string[]> {
+export async function evaluateAndUnlock(db: Database, userId: string): Promise<string[]> {
   // Gate global: bloqueamos los logros de RENDIMIENTO hasta que se
   // hayan jugado N matches (configurable via env). Los achievements
   // listados en `GATE_BYPASS` siguen evaluándose normalmente.
@@ -175,10 +172,7 @@ export async function evaluateAndUnlock(
     if (!rule(ctx)) continue;
 
     try {
-      await db
-        .insert(userAchievements)
-        .values({ userId, achievementId })
-        .onConflictDoNothing();
+      await db.insert(userAchievements).values({ userId, achievementId }).onConflictDoNothing();
 
       const def = await db
         .select({ title: achievementDefinitions.title })
@@ -245,9 +239,7 @@ async function loadContext(db: Database, userId: string): Promise<UnlockContext>
       .where(sql`${userPoints.totalPoints} > ${points.totalPoints}`);
     rank = (aheadRows[0]?.ahead ?? 0) + 1;
   }
-  const totalUsersRow = await db
-    .select({ total: sql<number>`count(*)::int` })
-    .from(userPoints);
+  const totalUsersRow = await db.select({ total: sql<number>`count(*)::int` }).from(userPoints);
   const totalUsers = totalUsersRow[0]?.total ?? 0;
 
   // Cuántos invitados de este user han acertado su primera
@@ -257,10 +249,7 @@ async function loadContext(db: Database, userId: string): Promise<UnlockContext>
     .select({ total: sql<number>`count(*)::int` })
     .from(invitationRedemptions)
     .where(
-      and(
-        eq(invitationRedemptions.inviterId, userId),
-        isNotNull(invitationRedemptions.firstHitAt),
-      ),
+      and(eq(invitationRedemptions.inviterId, userId), isNotNull(invitationRedemptions.firstHitAt)),
     );
   const referredFirstHits = referredFirstHitsRow[0]?.total ?? 0;
 

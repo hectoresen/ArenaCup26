@@ -1,13 +1,10 @@
-import { setRequestLocale, getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
 import { HistoryFiltersBar } from "@/components/history/history-filters";
 import { HistoryList } from "@/components/history/history-list";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
-import {
-  type HistoryOutcomeFilter,
-  getPredictionHistory,
-} from "@/server/history/queries";
+import { type HistoryOutcomeFilter, getPredictionHistory } from "@/server/history/queries";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 /**
  * Historial de predicciones del user logado. URL-driven:
@@ -31,9 +28,7 @@ export default async function HistorialPage({
   const t = await getTranslations({ locale, namespace: "history" });
   const { outcome: outcomeRaw } = await searchParams;
   const outcome: HistoryOutcomeFilter =
-    outcomeRaw === "hit" || outcomeRaw === "miss" || outcomeRaw === "pending"
-      ? outcomeRaw
-      : "all";
+    outcomeRaw === "hit" || outcomeRaw === "miss" || outcomeRaw === "pending" ? outcomeRaw : "all";
 
   const [allEntries, filtered] = await Promise.all([
     getPredictionHistory(db, session.user.id),

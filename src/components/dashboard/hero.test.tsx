@@ -33,10 +33,7 @@ describe("<Hero>", () => {
 
   it("uses 'Empieza tu primera predicción' for a new user (totalPoints=0) but still shows real rank", () => {
     renderWithProviders(
-      <Hero
-        userName="Carlos Mendoza"
-        stats={{ ...baseStats, rank: 12480, totalPoints: 0 }}
-      />,
+      <Hero userName="Carlos Mendoza" stats={{ ...baseStats, rank: 12480, totalPoints: 0 }} />,
     );
     expect(screen.getByText(/Empieza tu primera predicción/)).toBeInTheDocument();
     expect(screen.queryByText(/de 12.480 jugadores/)).not.toBeInTheDocument();
@@ -83,8 +80,6 @@ describe("<Hero>", () => {
 
   it("'Puntos' mini-stat is NOT a link (it's a stat, not a destination)", () => {
     renderWithProviders(<Hero userName="Carlos Mendoza" stats={baseStats} />);
-    expect(
-      screen.queryByRole("link", { name: /Puntos/ }),
-    ).toBeNull();
+    expect(screen.queryByRole("link", { name: /Puntos/ })).toBeNull();
   });
 });

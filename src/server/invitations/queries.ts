@@ -1,7 +1,7 @@
-import { desc, eq, sql } from "drizzle-orm";
-import type { Database } from "@/server/db/client";
 import { env } from "@/lib/env";
+import type { Database } from "@/server/db/client";
 import { invitationRedemptions, invitations } from "@/server/db/schema";
+import { desc, eq, sql } from "drizzle-orm";
 import type { InvitationListItem } from "./types";
 
 /**
@@ -15,10 +15,7 @@ export function buildInvitationUrl(token: string): string {
 }
 
 /** Carga todos los links de un user, más recientes primero. */
-export async function getInvitations(
-  db: Database,
-  userId: string,
-): Promise<InvitationListItem[]> {
+export async function getInvitations(db: Database, userId: string): Promise<InvitationListItem[]> {
   const rows = await db
     .select({
       id: invitations.id,
@@ -79,10 +76,7 @@ export async function findRedeemableInvitation(
  * Útil para mostrar "X amigos invitados" en la sección de
  * invitaciones de `/amigos`.
  */
-export async function countRedeemedInvitations(
-  db: Database,
-  inviterId: string,
-): Promise<number> {
+export async function countRedeemedInvitations(db: Database, inviterId: string): Promise<number> {
   const rows = await db
     .select({ total: sql<number>`count(*)::int` })
     .from(invitationRedemptions)

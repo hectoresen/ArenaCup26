@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { BOT_CATALOG } from "./catalog";
-import {
-  LIVE_BOTS_END_DATE,
-  LIVE_BOT_USERNAMES,
-  getLiveBotIds,
-} from "./presence";
+import { LIVE_BOTS_END_DATE, LIVE_BOT_USERNAMES, getLiveBotIds } from "./presence";
 
 /**
  * Tests puros del catálogo de bots "live". El path con BD

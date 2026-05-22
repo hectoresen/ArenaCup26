@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
-import { db } from "@/server/db/client";
 import { getRealSnapshot, getRealSnapshotForUser } from "@/lib/leaderboard/real";
+import { db } from "@/server/db/client";
 
 // Force Node runtime — SSE necesita streaming response que el edge
 // runtime maneja distinto. Con Node + Railway funciona out-of-the-box.

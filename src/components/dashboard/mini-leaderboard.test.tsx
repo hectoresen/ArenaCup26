@@ -51,9 +51,7 @@ describe("<MiniLeaderboard>", () => {
       top,
       me: { ...entry(42, "me", 1840), name: "Carlos Mendoza" },
     });
-    const { container } = renderWithProviders(
-      <MiniLeaderboard mini={mini} active="global" />,
-    );
+    const { container } = renderWithProviders(<MiniLeaderboard mini={mini} active="global" />);
     expect(screen.getByText("#42")).toBeInTheDocument();
     expect(screen.getByText("Carlos Mendoza", { exact: false })).toBeInTheDocument();
     expect(screen.getByText(/\(tú\)/)).toBeInTheDocument();
@@ -62,9 +60,7 @@ describe("<MiniLeaderboard>", () => {
 
   it("hides separator + (tú) when me is null (already in top)", () => {
     const mini = buildMini({ top, me: null });
-    const { container } = renderWithProviders(
-      <MiniLeaderboard mini={mini} active="global" />,
-    );
+    const { container } = renderWithProviders(<MiniLeaderboard mini={mini} active="global" />);
     expect(container.querySelector("[data-testid='mini-leaderboard-separator']")).toBeNull();
     expect(screen.queryByText(/\(tú\)/)).not.toBeInTheDocument();
   });
@@ -114,10 +110,7 @@ describe("<MiniLeaderboard>", () => {
       },
     );
     renderWithProviders(<MiniLeaderboard mini={mini} active="global" />);
-    expect(screen.getByRole("link", { name: "Global" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    expect(screen.getByRole("link", { name: "Global" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Amigos" })).toBeInTheDocument();
   });
 
@@ -135,10 +128,7 @@ describe("<MiniLeaderboard>", () => {
     expect(screen.queryByText("User U1")).toBeNull();
     // El top de amigos tiene Krawer.
     expect(screen.getByText("Krawer")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Amigos" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    expect(screen.getByRole("link", { name: "Amigos" })).toHaveAttribute("aria-current", "page");
   });
 
   it("falls back to global if active=amigos but user has 0 friends", () => {
@@ -152,10 +142,7 @@ describe("<MiniLeaderboard>", () => {
     // friendsCount > 0 (tab visible) pero top vacío — caso raro pero
     // posible si los amigos no tienen user_points (acabaron de
     // registrarse). El widget debería mostrar el copy específico.
-    const mini = buildMini(
-      { top, me: null },
-      { top: [], me: null, friendsCount: 1 },
-    );
+    const mini = buildMini({ top, me: null }, { top: [], me: null, friendsCount: 1 });
     renderWithProviders(<MiniLeaderboard mini={mini} active="amigos" />);
     expect(screen.getByText(/Aún no tienes amigos/i)).toBeInTheDocument();
   });

@@ -1,11 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
 import type { PredictionKind, PredictionWinner } from "@/server/dashboard/types";
 import { allowedKindsForStage, basePointsForKind } from "@/server/predictions/rules";
 import type { SubmitPredictionResult } from "@/server/predictions/submit";
 import type { MatchStage } from "@/server/scoring/types";
+import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 
 const KNOWN_ERROR_CODES = {
   match_not_found: true,
@@ -178,15 +178,13 @@ export function PredictionForm({
     e.preventDefault();
     setErrorCode(null);
     startTransition(async () => {
-      let payload:
-        | {
-            matchId: string;
-            kind: PredictionKind;
-            predictedWinner: PredictionWinner | null;
-            predictedHomeScore: number | null;
-            predictedAwayScore: number | null;
-          }
-        | null = null;
+      let payload: {
+        matchId: string;
+        kind: PredictionKind;
+        predictedWinner: PredictionWinner | null;
+        predictedHomeScore: number | null;
+        predictedAwayScore: number | null;
+      } | null = null;
 
       if (mode === "exact") {
         payload = {
@@ -291,9 +289,7 @@ export function PredictionForm({
             onHome={setHome}
             onAway={setAway}
           />
-          <p className="mt-2 text-center text-[11px] font-bold text-muted">
-            💎 {t("bonus.exact")}
-          </p>
+          <p className="mt-2 text-center text-[11px] font-bold text-muted">💎 {t("bonus.exact")}</p>
         </>
       )}
 
@@ -540,9 +536,7 @@ function PredictionSummaryCard({
       <div className="mb-2 inline-flex items-center gap-1 rounded-full border-[1.5px] border-success/40 bg-success/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-success">
         ✓ {t("summary.saved")}
       </div>
-      <h2 className="mb-1 font-display text-lg leading-tight text-foreground">
-        {summary}
-      </h2>
+      <h2 className="mb-1 font-display text-lg leading-tight text-foreground">{summary}</h2>
       <p className="mb-4 text-[12px] font-bold text-muted">
         {emoji} {t("summary.potential", { points })}
       </p>

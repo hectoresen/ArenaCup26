@@ -1,12 +1,13 @@
 "use server";
 
+import { auth } from "@/lib/auth";
+import { dlog } from "@/lib/debug-log";
+import { assertNotInMaintenance } from "@/server/admin/maintenance-guard";
+import { db } from "@/server/db/client";
+import { groupLinks, groupMemberships, groups } from "@/server/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { dlog } from "@/lib/debug-log";
-import { auth } from "@/lib/auth";
-import { db } from "@/server/db/client";
-import { groupLinks, groupMemberships, groups } from "@/server/db/schema";
 import { canCreateAnotherLink } from "./caps";
 import { buildGroupInviteUrl, generateGroupLinkToken } from "./tokens";
 import type { GroupActionResult } from "./types";
@@ -28,6 +29,7 @@ export async function createGroupLink(
 ): Promise<GroupActionResult & { token?: string; url?: string }> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const parsed = createLinkSchema.safeParse(input);
@@ -88,6 +90,7 @@ export async function revokeGroupLink(
 ): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const parsed = revokeLinkSchema.safeParse(input);
@@ -104,10 +107,7 @@ export async function revokeGroupLink(
     .from(groupLinks)
     .leftJoin(
       groupMemberships,
-      and(
-        eq(groupMemberships.groupId, groupLinks.groupId),
-        eq(groupMemberships.userId, userId),
-      ),
+      and(eq(groupMemberships.groupId, groupLinks.groupId), eq(groupMemberships.userId, userId)),
     )
     .where(eq(groupLinks.id, linkId))
     .limit(1);

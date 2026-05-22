@@ -1,6 +1,6 @@
-import webpush from "web-push";
-import { env } from "@/lib/env";
 import { dlog } from "@/lib/debug-log";
+import { env } from "@/lib/env";
+import webpush from "web-push";
 
 /**
  * Inicializa el cliente web-push con los VAPID keys del entorno. Si
@@ -14,11 +14,7 @@ import { dlog } from "@/lib/debug-log";
  * firma los pushes).
  */
 export function getPushClient(): typeof webpush | null {
-  if (
-    !env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
-    !env.VAPID_PRIVATE_KEY ||
-    !env.VAPID_SUBJECT
-  ) {
+  if (!env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY || !env.VAPID_SUBJECT) {
     // Falta VAPID_SUBJECT también: los providers (FCM/Mozilla) lo
     // exigen como contacto del operador del push service. Mientras
     // no haya un canal de contacto público, el sistema queda en

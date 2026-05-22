@@ -120,6 +120,13 @@
       "when": 1779395640494,
       "tag": "0016_curly_lily_hollister",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1779437001194,
+      "tag": "0017_mean_lady_deathstrike",
+      "breakpoints": true
     }
   ]
 }

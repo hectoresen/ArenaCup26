@@ -1,18 +1,15 @@
 "use server";
 
+import { auth } from "@/lib/auth";
+import { derr, dlog } from "@/lib/debug-log";
+import { evaluateAndUnlock } from "@/server/achievements/unlock";
+import { assertNotInMaintenance } from "@/server/admin/maintenance-guard";
+import { db } from "@/server/db/client";
+import { GROUP_COLORS, groupMemberships, groups } from "@/server/db/schema";
+import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { dlog, derr } from "@/lib/debug-log";
-import { auth } from "@/lib/auth";
-import { db } from "@/server/db/client";
-import {
-  GROUP_COLORS,
-  groupMemberships,
-  groups,
-} from "@/server/db/schema";
-import { evaluateAndUnlock } from "@/server/achievements/unlock";
-import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import {
   GROUP_MEMBERS_DEFAULT,
   GROUP_MEMBERS_MAX,
@@ -53,6 +50,7 @@ export type CreateGroupInput = z.infer<typeof createGroupSchema>;
 export async function createGroup(input: CreateGroupInput): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const parsed = createGroupSchema.safeParse(input);
@@ -114,12 +112,7 @@ const updateGroupSchema = z.object({
   name: nameSchema.optional(),
   color: colorSchema.optional(),
   visibility: z.enum(["public", "private"]).optional(),
-  maxMembers: z
-    .number()
-    .int()
-    .min(GROUP_MEMBERS_MIN)
-    .max(GROUP_MEMBERS_MAX)
-    .optional(),
+  maxMembers: z.number().int().min(GROUP_MEMBERS_MIN).max(GROUP_MEMBERS_MAX).optional(),
 });
 
 export type UpdateGroupInput = z.infer<typeof updateGroupSchema>;
@@ -132,6 +125,7 @@ export type UpdateGroupInput = z.infer<typeof updateGroupSchema>;
 export async function updateGroup(input: UpdateGroupInput): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const parsed = updateGroupSchema.safeParse(input);
@@ -139,7 +133,11 @@ export async function updateGroup(input: UpdateGroupInput): Promise<GroupActionR
   const { groupId, ...patch } = parsed.data;
 
   const adminRows = await db
-    .select({ creatorId: groups.creatorId, deletedAt: groups.deletedAt, role: groupMemberships.role })
+    .select({
+      creatorId: groups.creatorId,
+      deletedAt: groups.deletedAt,
+      role: groupMemberships.role,
+    })
     .from(groups)
     .leftJoin(
       groupMemberships,
@@ -189,6 +187,7 @@ export async function updateGroup(input: UpdateGroupInput): Promise<GroupActionR
 export async function deleteGroup(groupId: string): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const adminRows = await db
@@ -265,6 +264,7 @@ export async function transferAdmin(
 ): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const parsed = transferAdminSchema.safeParse(input);
@@ -298,9 +298,7 @@ export async function transferAdmin(
   const targetRows = await db
     .select({ leftAt: groupMemberships.leftAt })
     .from(groupMemberships)
-    .where(
-      and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, newAdminUserId)),
-    )
+    .where(and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, newAdminUserId)))
     .limit(1);
   const target = targetRows[0];
   if (!target || target.leftAt !== null) return { ok: false, code: "not_member" };
@@ -310,15 +308,11 @@ export async function transferAdmin(
   await db
     .update(groupMemberships)
     .set({ role: "member" })
-    .where(
-      and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, userId)),
-    );
+    .where(and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, userId)));
   await db
     .update(groupMemberships)
     .set({ role: "admin" })
-    .where(
-      and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, newAdminUserId)),
-    );
+    .where(and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, newAdminUserId)));
 
   await notifyWithPush({
     db,

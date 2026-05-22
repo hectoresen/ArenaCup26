@@ -1,6 +1,6 @@
-import { and, asc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { matches } from "@/server/db/schema";
+import { and, asc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 
 /**
  * Ventana antes de kickoff durante la cual ya consideramos "live"
@@ -18,7 +18,11 @@ const KICKOFF_WINDOW_MIN = 15;
 const POST_KICKOFF_WINDOW_MIN = 30;
 
 export type ShouldSyncLiveResult =
-  | { sync: true; reason: "live_in_progress" | "kickoff_imminent" | "recent_kickoff"; sample: string }
+  | {
+      sync: true;
+      reason: "live_in_progress" | "kickoff_imminent" | "recent_kickoff";
+      sample: string;
+    }
   | { sync: false };
 
 /**

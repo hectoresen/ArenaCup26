@@ -502,7 +502,7 @@
     "subtitle": "Visibility, notifications, and account deletion.",
     "privacyTitle": "Profile visibility",
     "privacySubtitle": "Who can open your full profile.",
-    "dangerTitle":"Danger zone",
+    "dangerTitle": "Danger zone",
     "dangerSubtitle": "Deleting your account is irreversible."
   },
   "accountMenu": {

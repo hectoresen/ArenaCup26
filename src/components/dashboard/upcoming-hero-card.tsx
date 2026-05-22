@@ -1,11 +1,11 @@
-import { useLocale, useTranslations } from "next-intl";
 import { LocalTime } from "@/components/common/local-time";
 import { TeamFlag } from "@/components/common/team-flag";
-import { formatMatchDate, type SupportedLocale } from "@/lib/format/date";
 import { Link } from "@/i18n/navigation";
+import { type SupportedLocale, formatMatchDate } from "@/lib/format/date";
 import type { PredictionView, UpcomingHeroView } from "@/server/dashboard/types";
 import { basePointsForKind } from "@/server/predictions/rules";
 import { POINTS } from "@/server/scoring/rules";
+import { useLocale, useTranslations } from "next-intl";
 
 type Props = {
   next: UpcomingHeroView;
@@ -40,7 +40,11 @@ export function UpcomingHeroCard({ next, now }: Props) {
         <Team name={next.awayTeam.name} flag={next.awayTeam.flag ?? next.awayTeam.code} />
       </div>
 
-      <PredictionRow prediction={next.prediction} home={next.homeTeam.name} away={next.awayTeam.name} />
+      <PredictionRow
+        prediction={next.prediction}
+        home={next.homeTeam.name}
+        away={next.awayTeam.name}
+      />
     </Link>
   );
 }

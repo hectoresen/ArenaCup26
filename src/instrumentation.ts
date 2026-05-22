@@ -17,9 +17,7 @@ export async function register() {
     // throttling severo en el free tier (intervalos reales de hasta
     // 1h vs el `*/2 * * * *` configurado). Ver
     // `src/server/cron/in-process-scheduler.ts` para el rationale.
-    const { startInProcessScheduler } = await import(
-      "./server/cron/in-process-scheduler"
-    );
+    const { startInProcessScheduler } = await import("./server/cron/in-process-scheduler");
     startInProcessScheduler();
   }
   if (process.env.NEXT_RUNTIME === "edge") {

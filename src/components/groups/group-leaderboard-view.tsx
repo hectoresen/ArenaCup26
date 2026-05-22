@@ -1,10 +1,10 @@
-import { useTranslations } from "next-intl";
 import { PodiumPlaceholder } from "@/components/groups/podium-placeholder";
 import { PodiumCard } from "@/components/leaderboard/podium-card";
 import { RankRow } from "@/components/leaderboard/rank-row";
 import { countryCodeToFlag } from "@/lib/format/country";
 import type { Player } from "@/lib/leaderboard/types";
 import type { GroupRankingEntry } from "@/server/groups/types";
+import { useTranslations } from "next-intl";
 
 type Props = {
   entries: GroupRankingEntry[];
@@ -39,9 +39,7 @@ export function GroupLeaderboardView({ entries, title, countLabel }: Props) {
               {title}
             </h2>
           )}
-          {countLabel && (
-            <span className="text-[11px] font-bold text-muted">{countLabel}</span>
-          )}
+          {countLabel && <span className="text-[11px] font-bold text-muted">{countLabel}</span>}
         </header>
       )}
 

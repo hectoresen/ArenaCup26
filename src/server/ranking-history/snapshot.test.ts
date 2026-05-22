@@ -23,9 +23,7 @@ describe("summarizeRankHistory", () => {
   it("dayAgoRank=null si solo hay snapshot de HOY (cron de ayer sin correr)", () => {
     // Sparkline tiene 1 punto pero ese punto es hoy → no hay baseline
     // para el delta 24h.
-    expect(
-      summarizeRankHistory([{ rank: 42, snapshotDate: TODAY }], DAY_AGO),
-    ).toEqual({
+    expect(summarizeRankHistory([{ rank: 42, snapshotDate: TODAY }], DAY_AGO)).toEqual({
       dayAgoRank: null,
       sparkline: [42],
     });

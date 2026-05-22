@@ -1,13 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
-import {
-  createInvitation,
-  revokeInvitation,
-} from "@/server/invitations/actions";
+import { createInvitation, revokeInvitation } from "@/server/invitations/actions";
 import type { InvitationListItem } from "@/server/invitations/types";
+import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 
 type Props = {
   invitations: InvitationListItem[];
@@ -43,10 +40,12 @@ export function InvitationsManager({ invitations: initial }: Props) {
       const result = await createInvitation(maxUses);
       if (!result.ok) {
         setFeedback(
-          t(`feedback.create.${result.code}` as
-            | "feedback.create.unauthorized"
-            | "feedback.create.limit_reached"
-            | "feedback.create.invalid_input"),
+          t(
+            `feedback.create.${result.code}` as
+              | "feedback.create.unauthorized"
+              | "feedback.create.limit_reached"
+              | "feedback.create.invalid_input",
+          ),
         );
         return;
       }
@@ -79,9 +78,13 @@ export function InvitationsManager({ invitations: initial }: Props) {
       const result = await revokeInvitation(id);
       if (!result.ok) {
         setItems(previous);
-        setFeedback(t(`feedback.revoke.${result.code}` as
-          | "feedback.revoke.unauthorized"
-          | "feedback.revoke.not_found"));
+        setFeedback(
+          t(
+            `feedback.revoke.${result.code}` as
+              | "feedback.revoke.unauthorized"
+              | "feedback.revoke.not_found",
+          ),
+        );
       }
     });
   }
@@ -112,9 +115,7 @@ export function InvitationsManager({ invitations: initial }: Props) {
         <span>{t("singleUseLabel")}</span>
       </label>
 
-      {feedback && (
-        <p className="mb-3 text-[12px] font-bold text-success">{feedback}</p>
-      )}
+      {feedback && <p className="mb-3 text-[12px] font-bold text-success">{feedback}</p>}
 
       {items.length === 0 ? (
         <div className="rounded-2xl border-2 border-dashed border-border bg-card/40 px-4 py-6 text-center text-[12px] font-bold text-muted">
@@ -123,11 +124,7 @@ export function InvitationsManager({ invitations: initial }: Props) {
       ) : (
         <ul className="m-0 flex list-none flex-col gap-2 p-0">
           {items.map((item) => (
-            <InvitationRow
-              key={item.id}
-              item={item}
-              onRevoke={() => setPendingRevokeId(item.id)}
-            />
+            <InvitationRow key={item.id} item={item} onRevoke={() => setPendingRevokeId(item.id)} />
           ))}
         </ul>
       )}

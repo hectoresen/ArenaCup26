@@ -134,11 +134,7 @@ export async function syncFixtures(input: SyncFixturesInput): Promise<SyncReport
           });
           // Detección de transición a `finished`: el current existía y
           // NO estaba en finished, y el patch lo pone en finished.
-          if (
-            current &&
-            current.status !== "finished" &&
-            result.patch.status === "finished"
-          ) {
+          if (current && current.status !== "finished" && result.patch.status === "finished") {
             finishedTransitions.push(result.matchId);
           }
           break;

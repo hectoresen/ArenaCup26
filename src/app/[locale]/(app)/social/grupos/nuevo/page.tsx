@@ -30,9 +30,7 @@ export default async function NuevoGrupoPage({
         <h1 className="mt-2 font-display text-[26px] leading-none text-foreground">
           {tc("headerTitle")}
         </h1>
-        <p className="mt-1 text-[13px] font-bold text-muted">
-          {tc("headerSubtitle")}
-        </p>
+        <p className="mt-1 text-[13px] font-bold text-muted">{tc("headerSubtitle")}</p>
       </header>
 
       {activeCount >= MAX_GROUPS_PER_USER ? (

@@ -1,9 +1,9 @@
-import { useLocale, useTranslations } from "next-intl";
 import { LocalTime } from "@/components/common/local-time";
 import { TeamFlag } from "@/components/common/team-flag";
 import { Link } from "@/i18n/navigation";
 import { type SupportedLocale, formatMatchDate } from "@/lib/format/date";
 import type { HistoryEntry } from "@/server/history/types";
+import { useLocale, useTranslations } from "next-intl";
 
 type Props = {
   entry: HistoryEntry;
@@ -37,8 +37,7 @@ export function HistoryEntryCard({ entry, now }: Props) {
     >
       <div className="mb-2 flex items-center justify-between gap-2 text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted">
         <span>
-          <strong className="text-foreground">{date}</strong> ·{" "}
-          <LocalTime date={entry.kickoffAt} />
+          <strong className="text-foreground">{date}</strong> · <LocalTime date={entry.kickoffAt} />
         </span>
         <StatusBadge status={entry.status} />
       </div>
@@ -81,12 +80,7 @@ export function HistoryEntryCard({ entry, now }: Props) {
           <div className="mt-0.5 flex items-center gap-1.5">
             <KindBadge kind={entry.prediction.kind} />
             <span className="truncate text-[13px] font-bold text-foreground">
-              {formatPredictionLabel(
-                entry.prediction,
-                entry.homeTeam.name,
-                entry.awayTeam.name,
-                t,
-              )}
+              {formatPredictionLabel(entry.prediction, entry.homeTeam.name, entry.awayTeam.name, t)}
             </span>
           </div>
         </div>

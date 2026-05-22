@@ -106,9 +106,7 @@ async function aggregateUser(userId: string): Promise<Aggregate> {
 async function main() {
   const apply = process.argv.includes("--apply");
 
-  const userRows = await db
-    .selectDistinct({ userId: pointEvents.userId })
-    .from(pointEvents);
+  const userRows = await db.selectDistinct({ userId: pointEvents.userId }).from(pointEvents);
 
   console.log(`→ Encontrados ${userRows.length} users con eventos.`);
   console.log(apply ? "Modo: APPLY" : "Modo: DRY-RUN (sin tocar BD)");
@@ -176,7 +174,9 @@ async function main() {
 
   console.log("");
   console.log(`Resultado: ${unchanged} sin cambios, ${drift} con drift.`);
-  console.log(apply ? "✓ Aplicado." : "(dry-run, no se persistió nada — ejecuta con --apply para escribir)");
+  console.log(
+    apply ? "✓ Aplicado." : "(dry-run, no se persistió nada — ejecuta con --apply para escribir)",
+  );
   process.exit(0);
 }
 

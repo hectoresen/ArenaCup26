@@ -1,6 +1,6 @@
+import { checkAdmin } from "@/lib/admin-auth";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { checkAdmin } from "@/lib/admin-auth";
 import "../../globals.css";
 
 /**

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
 import { GroupAvatar } from "@/components/groups/group-avatar";
 import { Link } from "@/i18n/navigation";
 import type { GroupSummary } from "@/server/groups/types";
+import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 
 type Props = {
   group: GroupSummary;
@@ -32,8 +32,7 @@ export function DiscoverGroupCard({ group }: Props) {
   const isMember = group.viewerRole !== null;
   const lockMode = isPrivate && !isMember;
 
-  const memberLabel =
-    group.memberCount === 1 ? t("members.one") : t("members.many");
+  const memberLabel = group.memberCount === 1 ? t("members.one") : t("members.many");
 
   const inner = (
     <>
@@ -104,9 +103,7 @@ export function DiscoverGroupCard({ group }: Props) {
             <LockIcon />
             <span className="uppercase tracking-[0.12em]">{td("title")}</span>
           </div>
-          <p className="text-[12px] font-bold leading-snug text-foreground/90">
-            {toast}
-          </p>
+          <p className="text-[12px] font-bold leading-snug text-foreground/90">{toast}</p>
         </div>
       )}
     </>

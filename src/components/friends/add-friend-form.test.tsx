@@ -1,7 +1,7 @@
-import { renderWithProviders, screen } from "@/test/render-with-providers";
 import { sendFriendRequest } from "@/server/friends/actions";
+import { renderWithProviders, screen } from "@/test/render-with-providers";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AddFriendForm } from "./add-friend-form";
 
 const mockedSend = vi.mocked(sendFriendRequest);

@@ -1,6 +1,6 @@
-import { and, eq, inArray, lt } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { friendships, groupInvitations, users } from "@/server/db/schema";
+import { and, eq, inArray, lt } from "drizzle-orm";
 
 /**
  * Limpia los friend requests y group invitations dirigidos a BOTS
@@ -54,7 +54,12 @@ export async function autoRejectStaleBotRequests(
   if (friendIds.length > 0) {
     const deleted = await db
       .delete(friendships)
-      .where(inArray(friendships.id, friendIds.map((r) => r.id)))
+      .where(
+        inArray(
+          friendships.id,
+          friendIds.map((r) => r.id),
+        ),
+      )
       .returning({ id: friendships.id });
     friendshipsRejected = deleted.length;
   }
@@ -78,7 +83,12 @@ export async function autoRejectStaleBotRequests(
     const updated = await db
       .update(groupInvitations)
       .set({ status: "rejected", decidedAt: now })
-      .where(inArray(groupInvitations.id, groupInvIds.map((r) => r.id)))
+      .where(
+        inArray(
+          groupInvitations.id,
+          groupInvIds.map((r) => r.id),
+        ),
+      )
       .returning({ id: groupInvitations.id });
     groupInvitationsRejected = updated.length;
   }

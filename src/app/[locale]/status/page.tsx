@@ -1,8 +1,8 @@
 import { TopChrome } from "@/components/layout/top-chrome";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
-import { sql } from "drizzle-orm";
 import { db } from "@/server/db/client";
+import { sql } from "drizzle-orm";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
@@ -73,7 +73,9 @@ function StatusContent({
               key={name}
               className="flex items-center justify-between rounded-2xl border-2 border-border bg-card px-4 py-3"
             >
-              <span className="font-display text-[14px] text-foreground">{t(`services.${name}`)}</span>
+              <span className="font-display text-[14px] text-foreground">
+                {t(`services.${name}`)}
+              </span>
               <StatusChip status={status} label={t(`status.${status}`)} />
             </li>
           ))}
@@ -127,11 +129,7 @@ function StatusChip({
   label: string;
 }) {
   const cls =
-    status === "ok"
-      ? "text-success"
-      : status === "degraded"
-        ? "text-warm"
-        : "text-danger";
+    status === "ok" ? "text-success" : status === "degraded" ? "text-warm" : "text-danger";
   return (
     <span className={`text-[11px] font-extrabold uppercase tracking-[0.1em] ${cls}`}>{label}</span>
   );

@@ -27,15 +27,15 @@ describe("resolveNotificationHref", () => {
   });
 
   it("match-related kinds route to /partidos/<matchId> when matchId is present", () => {
-    expect(
-      resolveNotificationHref(build({ kind: "prediction_sent", matchId: "m1" })),
-    ).toBe("/partidos/m1");
-    expect(
-      resolveNotificationHref(build({ kind: "prediction_locked", matchId: "m2" })),
-    ).toBe("/partidos/m2");
-    expect(
-      resolveNotificationHref(build({ kind: "match_finished", matchId: "m3" })),
-    ).toBe("/partidos/m3");
+    expect(resolveNotificationHref(build({ kind: "prediction_sent", matchId: "m1" }))).toBe(
+      "/partidos/m1",
+    );
+    expect(resolveNotificationHref(build({ kind: "prediction_locked", matchId: "m2" }))).toBe(
+      "/partidos/m2",
+    );
+    expect(resolveNotificationHref(build({ kind: "match_finished", matchId: "m3" }))).toBe(
+      "/partidos/m3",
+    );
   });
 
   it("match-related kinds return null when matchId is missing (no deep-link target)", () => {

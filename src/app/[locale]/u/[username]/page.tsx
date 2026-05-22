@@ -1,6 +1,6 @@
-import { TopChrome } from "@/components/layout/top-chrome";
 import { ThrottledState } from "@/components/common/throttled-state";
 import { FriendActionButton } from "@/components/friends/friend-action-button";
+import { TopChrome } from "@/components/layout/top-chrome";
 import { InvitationsPlaceholderCard } from "@/components/profile/invitations-placeholder-card";
 import { RecentPredictionsCard } from "@/components/profile/recent-predictions-card";
 import { StreakStatsCard } from "@/components/profile/streak-stats-card";
@@ -17,8 +17,8 @@ import { getViewerRelationWithId } from "@/server/friends/queries";
 import { getOwnerExtras } from "@/server/profile/owner-extras";
 import { getPublicProfile } from "@/server/public-profile/queries";
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 /**
@@ -78,10 +78,7 @@ export default async function PublicProfilePage({
     return (
       <>
         <TopChrome user={session?.user ?? null} />
-        <main
-          id="main-content"
-          className="relative z-10 mx-auto max-w-[560px] px-5 py-9 pt-16"
-        >
+        <main id="main-content" className="relative z-10 mx-auto max-w-[560px] px-5 py-9 pt-16">
           <PrivateProfile identity={result.identity} />
         </main>
       </>
@@ -89,9 +86,7 @@ export default async function PublicProfilePage({
   }
 
   const profile = result.profile;
-  const isOwner = Boolean(
-    viewerId && session?.user?.username === profile.identity.username,
-  );
+  const isOwner = Boolean(viewerId && session?.user?.username === profile.identity.username);
   const t = await getTranslations({ locale, namespace: "publicProfile" });
 
   // Cajas extra solo para el dueño. Lazy: anon/visitantes no

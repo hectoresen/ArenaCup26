@@ -1,10 +1,10 @@
-import { and, count, desc, eq, gte, sql } from "drizzle-orm";
 import { dlog } from "@/lib/debug-log";
 import type { Database } from "@/server/db/client";
 import { pointEvents, userPoints, users } from "@/server/db/schema";
 import { getPredictionHistory } from "@/server/history/queries";
 import type { HistoryEntry } from "@/server/history/types";
 import { countRedeemedInvitations } from "@/server/invitations/queries";
+import { and, count, desc, eq, gte, sql } from "drizzle-orm";
 
 export type OwnerStreakStats = {
   /** Racha activa ahora mismo. 0 si no hay racha. */
@@ -49,10 +49,7 @@ const COOLDOWN_MS = 60 * 60 * 1000;
  * invitación creado por este usuario (sistema F4 — `add-invitations`,
  * 2026-05-16).
  */
-export async function getOwnerExtras(
-  db: Database,
-  userId: string,
-): Promise<OwnerExtras> {
+export async function getOwnerExtras(db: Database, userId: string): Promise<OwnerExtras> {
   const [pointsRow, comboCount, recent, invitationsTotal, userRow] = await Promise.all([
     db
       .select({

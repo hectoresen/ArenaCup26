@@ -1,6 +1,6 @@
-import { FriendsList } from "@/components/friends/friends-list";
-import { FriendRequestsInbox } from "@/components/friends/friend-requests-inbox";
 import { AddFriendForm } from "@/components/friends/add-friend-form";
+import { FriendRequestsInbox } from "@/components/friends/friend-requests-inbox";
+import { FriendsList } from "@/components/friends/friends-list";
 import { GroupInvitationsInbox } from "@/components/groups/group-invitations-inbox";
 import { MyGroupsSection } from "@/components/groups/my-groups-section";
 import { InvitationsManager } from "@/components/invitations/invitations-manager";
@@ -8,14 +8,8 @@ import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { getFriends, getPendingFriendRequests } from "@/server/friends/queries";
 import { MAX_GROUPS_PER_USER } from "@/server/groups/caps";
-import {
-  getPendingGroupInvitations,
-  getUserGroups,
-} from "@/server/groups/queries";
-import {
-  countRedeemedInvitations,
-  getInvitations,
-} from "@/server/invitations/queries";
+import { getPendingGroupInvitations, getUserGroups } from "@/server/groups/queries";
+import { countRedeemedInvitations, getInvitations } from "@/server/invitations/queries";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
@@ -37,15 +31,14 @@ export default async function AmigosPage({
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}`);
 
-  const [requests, friends, invitations, redeemed, myGroups, groupInvites] =
-    await Promise.all([
-      getPendingFriendRequests(db, session.user.id),
-      getFriends(db, session.user.id),
-      getInvitations(db, session.user.id),
-      countRedeemedInvitations(db, session.user.id),
-      getUserGroups(db, session.user.id),
-      getPendingGroupInvitations(db, session.user.id),
-    ]);
+  const [requests, friends, invitations, redeemed, myGroups, groupInvites] = await Promise.all([
+    getPendingFriendRequests(db, session.user.id),
+    getFriends(db, session.user.id),
+    getInvitations(db, session.user.id),
+    countRedeemedInvitations(db, session.user.id),
+    getUserGroups(db, session.user.id),
+    getPendingGroupInvitations(db, session.user.id),
+  ]);
 
   return (
     <AmigosLayout
@@ -86,9 +79,7 @@ function AmigosLayout({
   return (
     <>
       <header className="mb-5">
-        <h1 className="mb-1 font-display text-[26px] leading-none text-foreground">
-          {t("title")}
-        </h1>
+        <h1 className="mb-1 font-display text-[26px] leading-none text-foreground">{t("title")}</h1>
         <p className="text-[13px] font-bold text-muted">
           {friendsCount} {friendsCount === 1 ? t("friendCount.one") : t("friendCount.many")}
           {pendingCount > 0
@@ -104,7 +95,9 @@ function AmigosLayout({
       {groupInvites.length > 0 && (
         <section className="mt-7">
           <header className="mb-3 flex items-center gap-2.5">
-            <span aria-hidden="true" className="text-[14px] leading-none text-gold">◈</span>
+            <span aria-hidden="true" className="text-[14px] leading-none text-gold">
+              ◈
+            </span>
             <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
               {tGroups("title")}
             </h2>
@@ -119,7 +112,9 @@ function AmigosLayout({
       {requests.length > 0 && (
         <section className="mt-6">
           <header className="mb-3 flex items-center gap-2.5">
-            <span aria-hidden="true" className="text-[14px] leading-none text-gold">◈</span>
+            <span aria-hidden="true" className="text-[14px] leading-none text-gold">
+              ◈
+            </span>
             <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
               {t("requestsHeader")}
             </h2>
@@ -133,7 +128,9 @@ function AmigosLayout({
 
       <section className="mt-7">
         <header className="mb-3 flex items-center gap-2.5">
-          <span aria-hidden="true" className="text-[14px] leading-none text-gold">◈</span>
+          <span aria-hidden="true" className="text-[14px] leading-none text-gold">
+            ◈
+          </span>
           <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
             {t("friendsHeader")}
           </h2>
@@ -143,7 +140,9 @@ function AmigosLayout({
 
       <section id="invitaciones" className="mt-8">
         <header className="mb-3 flex items-center gap-2.5">
-          <span aria-hidden="true" className="text-[14px] leading-none text-gold">◈</span>
+          <span aria-hidden="true" className="text-[14px] leading-none text-gold">
+            ◈
+          </span>
           <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
             {tInvite("title")}
           </h2>

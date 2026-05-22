@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { invitations, users } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 
 // Constantes Edge-safe (sin imports a Drizzle) viven en
 // `cookie-constants.ts` para que `middleware.ts` no arrastre el

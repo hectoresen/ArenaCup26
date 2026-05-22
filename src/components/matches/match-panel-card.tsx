@@ -41,8 +41,8 @@ export function MatchPanelCard({ match, now }: Props) {
         <div className="flex-1">
           <div className="text-base font-bold tracking-wider text-muted">? vs ?</div>
           <div className="text-[11px] font-bold text-muted">
-            {formatMatchDate(match.kickoffAt, locale, now)} ·{" "}
-            <LocalTime date={match.kickoffAt} /> · {t("tbdLabel")}
+            {formatMatchDate(match.kickoffAt, locale, now)} · <LocalTime date={match.kickoffAt} /> ·{" "}
+            {t("tbdLabel")}
           </div>
         </div>
         <span className="rounded-md border-[1.5px] border-border bg-white/[0.06] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.1em] text-muted">
@@ -98,12 +98,7 @@ function TeamSide({
     <div
       className={`flex items-center gap-2 ${side === "away" ? "flex-row-reverse text-right" : ""}`}
     >
-      <TeamFlag
-        flag={team.flag}
-        name={team.name}
-        size={28}
-        className="text-2xl leading-none"
-      />
+      <TeamFlag flag={team.flag} name={team.name} size={28} className="text-2xl leading-none" />
       <div className="min-w-0 truncate text-sm font-extrabold text-foreground">{team.name}</div>
     </div>
   );
@@ -189,10 +184,7 @@ function FooterRow({ match }: { match: MatchListItem }) {
   }
   // Live/finished sin predicción: feedback explícito al user — antes
   // el footer quedaba vacío y no era obvio si predijo o no.
-  if (
-    !match.prediction &&
-    (match.status === "live" || match.status === "finished")
-  ) {
+  if (!match.prediction && (match.status === "live" || match.status === "finished")) {
     return (
       <div className="mt-3 text-end">
         <span className="inline-flex items-center gap-1 rounded-md border-[1.5px] border-border bg-card-hover px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.1em] text-muted">

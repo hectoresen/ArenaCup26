@@ -1,13 +1,9 @@
 import { GroupLeaderboardView } from "@/components/groups/group-leaderboard-view";
-import {
-  type GroupNavEntry,
-  RankingNav,
-  type RankingScope,
-} from "@/components/groups/ranking-nav";
+import { type GroupNavEntry, RankingNav, type RankingScope } from "@/components/groups/ranking-nav";
 import { LeaderboardView } from "@/components/leaderboard/leaderboard-view";
-import { derr } from "@/lib/debug-log";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
+import { derr } from "@/lib/debug-log";
 import { getRealSnapshot } from "@/lib/leaderboard/real";
 import { db } from "@/server/db/client";
 import { getFriends, getFriendsRanking } from "@/server/friends/queries";
@@ -42,11 +38,7 @@ export default async function RankingPage({
 
   const { scope: scopeParam, g: groupParam } = await searchParams;
   const scope: RankingScope =
-    scopeParam === "amigos"
-      ? "amigos"
-      : scopeParam === "grupos"
-        ? "grupos"
-        : "global";
+    scopeParam === "amigos" ? "amigos" : scopeParam === "grupos" ? "grupos" : "global";
 
   const [snapshot, session] = await Promise.all([getRealSnapshot(db), auth()]);
   const viewerId = session?.user?.id ?? null;
@@ -72,8 +64,7 @@ export default async function RankingPage({
   }));
 
   // Si el user pidió `?scope=amigos` pero no tiene amigos, fallback a global.
-  const effectiveScope: RankingScope =
-    scope === "amigos" && !hasFriends ? "global" : scope;
+  const effectiveScope: RankingScope = scope === "amigos" && !hasFriends ? "global" : scope;
 
   // Resolver grupo activo cuando scope = grupos.
   const activeGroupId =
@@ -141,7 +132,9 @@ export default async function RankingPage({
             activeGroupId && (
               <GroupLeaderboardView
                 entries={groupRanking}
-                title={myGroups.find((g) => g.id === activeGroupId)?.name ?? tr("groupRankingTitle")}
+                title={
+                  myGroups.find((g) => g.id === activeGroupId)?.name ?? tr("groupRankingTitle")
+                }
                 countLabel={`${groupRanking.length} ${
                   groupRanking.length === 1 ? tg("members.one") : tg("members.many")
                 }`}
@@ -169,9 +162,7 @@ async function NoGroupsEmptyState() {
       <div aria-hidden="true" className="mb-3 text-[34px]">
         👥
       </div>
-      <h3 className="mb-2 font-display text-[16px] text-foreground">
-        {t("title")}
-      </h3>
+      <h3 className="mb-2 font-display text-[16px] text-foreground">{t("title")}</h3>
       <p className="mx-auto mb-5 max-w-[340px] text-[13px] font-bold leading-relaxed text-muted">
         {t("body")}
       </p>

@@ -1,6 +1,6 @@
-import { and, eq, isNotNull, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { users } from "@/server/db/schema";
+import { and, eq, isNotNull, sql } from "drizzle-orm";
 
 /**
  * Helpers internos para distinguir users reales de bots en métricas.

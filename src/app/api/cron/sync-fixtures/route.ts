@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
-import { dlog, derr } from "@/lib/debug-log";
+import { derr, dlog } from "@/lib/debug-log";
 import { env } from "@/lib/env";
 import { db } from "@/server/db/client";
 import { createApiFootballProvider } from "@/server/match-data/providers/api-football";
 import { createMatchRepo } from "@/server/match-data/sync/repo";
 import { syncFixtures } from "@/server/match-data/sync/sync";
 import { processFinishedMatch } from "@/server/scoring/pipeline";
+import { NextResponse } from "next/server";
 import { handleCronRequest } from "./handler";
 
 export async function POST(req: Request) {
@@ -44,9 +44,7 @@ export async function POST(req: Request) {
               from: daysFromNow(-env.MATCH_DATA_BEFORE_DAYS),
               to: daysFromNow(env.MATCH_DATA_AFTER_DAYS),
               leagueIds:
-                env.MATCH_DATA_LEAGUE_FILTER.length > 0
-                  ? env.MATCH_DATA_LEAGUE_FILTER
-                  : undefined,
+                env.MATCH_DATA_LEAGUE_FILTER.length > 0 ? env.MATCH_DATA_LEAGUE_FILTER : undefined,
             } as const)
           : ({
               mode: "season" as const,

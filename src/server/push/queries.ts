@@ -1,6 +1,6 @@
-import { eq, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { pushSubscriptions } from "@/server/db/schema";
+import { eq, sql } from "drizzle-orm";
 
 export type PushSubscriptionRow = {
   id: string;
@@ -37,10 +37,7 @@ export async function deletePushSubscriptionByEndpoint(
 }
 
 /** Counter para mostrar "X devices conectados" en settings. */
-export async function countUserPushSubscriptions(
-  db: Database,
-  userId: string,
-): Promise<number> {
+export async function countUserPushSubscriptions(db: Database, userId: string): Promise<number> {
   const rows = await db
     .select({ total: sql<number>`count(*)::int` })
     .from(pushSubscriptions)

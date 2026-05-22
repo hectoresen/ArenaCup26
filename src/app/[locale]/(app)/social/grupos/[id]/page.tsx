@@ -4,7 +4,9 @@ import { GroupLeaderboardView } from "@/components/groups/group-leaderboard-view
 import { LeaveGroupButton } from "@/components/groups/leave-group-button";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
+import { GROUP_COLOR_STYLES } from "@/lib/group-colors";
 import { db } from "@/server/db/client";
+import { getFriendsAvailableToInvite } from "@/server/groups/invitations";
 import {
   getGroupDetail,
   getGroupLinks,
@@ -12,8 +14,6 @@ import {
   getGroupRanking,
   getOutboundGroupInvitations,
 } from "@/server/groups/queries";
-import { getFriendsAvailableToInvite } from "@/server/groups/invitations";
-import { GROUP_COLOR_STYLES } from "@/lib/group-colors";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 
@@ -70,7 +70,8 @@ export default async function GrupoDetailPage({
           </h1>
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-muted">
             <span>
-              {detail.memberCount}/{detail.maxMembers} {detail.memberCount === 1 ? t("members.one") : t("members.many")}
+              {detail.memberCount}/{detail.maxMembers}{" "}
+              {detail.memberCount === 1 ? t("members.one") : t("members.many")}
             </span>
             <span>·</span>
             <span>{detail.visibility === "public" ? tb("public") : tb("private")}</span>
@@ -90,7 +91,9 @@ export default async function GrupoDetailPage({
 
       <section className="mt-6">
         <header className="mb-3 flex items-center gap-2.5">
-          <span aria-hidden="true" className="text-[14px] leading-none text-gold">◈</span>
+          <span aria-hidden="true" className="text-[14px] leading-none text-gold">
+            ◈
+          </span>
           <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
             {tr("groupRankingTitle")}
           </h2>

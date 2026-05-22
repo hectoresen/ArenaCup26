@@ -23,8 +23,7 @@ export function ThrottledState() {
           Demasiadas peticiones
         </h1>
         <p className="mx-auto mt-2 max-w-xs text-[13px] font-bold leading-relaxed text-muted">
-          Has hecho muchas requests en poco tiempo. Espera unos segundos y
-          vuelve a intentarlo.
+          Has hecho muchas requests en poco tiempo. Espera unos segundos y vuelve a intentarlo.
         </p>
       </article>
     </main>

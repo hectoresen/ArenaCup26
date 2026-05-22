@@ -1,11 +1,11 @@
+import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
+import { auth } from "@/lib/auth";
+import { db } from "@/server/db/client";
+import { users } from "@/server/db/schema";
+import { slugifyName } from "@/server/users/username";
 import { eq } from "drizzle-orm";
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
-import { auth } from "@/lib/auth";
-import { slugifyName } from "@/server/users/username";
-import { db } from "@/server/db/client";
-import { users } from "@/server/db/schema";
 
 /**
  * Wizard de bienvenida tras el primer login. SSR carga los valores

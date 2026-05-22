@@ -1,6 +1,6 @@
+import { Link } from "@/i18n/navigation";
 import type { LiveMatchView, UpcomingHeroView } from "@/server/dashboard/types";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { LiveCard } from "./live-card";
 import { UpcomingHeroCard } from "./upcoming-hero-card";
 

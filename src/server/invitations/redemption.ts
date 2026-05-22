@@ -1,13 +1,9 @@
 import { randomBytes } from "node:crypto";
-import { and, eq, or, sql } from "drizzle-orm";
 import { dlog } from "@/lib/debug-log";
 import type { Database } from "@/server/db/client";
-import {
-  friendships,
-  invitationRedemptions,
-  invitations,
-} from "@/server/db/schema";
+import { friendships, invitationRedemptions, invitations } from "@/server/db/schema";
 import { notifyWithPush } from "@/server/notifications/notify-with-push";
+import { and, eq, or, sql } from "drizzle-orm";
 import { findRedeemableInvitation } from "./queries";
 
 /**
@@ -28,11 +24,7 @@ export type RedemptionResult =
   | { ok: true; inviterId: string }
   | {
       ok: false;
-      code:
-        | "not_found"
-        | "revoked_or_exhausted"
-        | "self_redeem"
-        | "already_redeemed";
+      code: "not_found" | "revoked_or_exhausted" | "self_redeem" | "already_redeemed";
     };
 
 /**
@@ -99,10 +91,7 @@ export async function redeemInvitationForUser(
         eq(invitations.id, invitation.id),
         // Solo bumpea si no se ha agotado: `max_uses = 0` (ilimitado)
         // o `uses < max_uses`.
-        or(
-          eq(invitations.maxUses, 0),
-          sql`${invitations.uses} < ${invitations.maxUses}`,
-        ),
+        or(eq(invitations.maxUses, 0), sql`${invitations.uses} < ${invitations.maxUses}`),
       ),
     )
     .returning({ id: invitations.id });

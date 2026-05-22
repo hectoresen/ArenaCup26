@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { completeOnboarding } from "@/server/onboarding/actions";
+import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 import { CountryPicker } from "./country-picker";
 
 type Props = {
@@ -81,9 +81,7 @@ export function OnboardingWizard({ initial }: Props) {
           {[1, 2, 3].map((s) => (
             <span
               key={s}
-              className={`h-1.5 w-8 rounded-full ${
-                s <= step ? "bg-gold" : "bg-white/[0.1]"
-              }`}
+              className={`h-1.5 w-8 rounded-full ${s <= step ? "bg-gold" : "bg-white/[0.1]"}`}
             />
           ))}
         </div>
@@ -114,11 +112,7 @@ export function OnboardingWizard({ initial }: Props) {
             </span>
           </label>
 
-          <CountryPicker
-            value={country}
-            onChange={setCountry}
-            label={t("step1.countryLabel")}
-          />
+          <CountryPicker value={country} onChange={setCountry} label={t("step1.countryLabel")} />
 
           <p className="rounded-xl border-[1.5px] border-info/25 bg-info/[0.06] px-3 py-2 text-[11px] font-bold leading-relaxed text-muted">
             🔒 {t("step1.privacyNote")}

@@ -19,9 +19,7 @@
  *
  * Para revocar: misma ruta inversa (remover de Set + `is_admin=false`).
  */
-export const ADMIN_EMAILS: ReadonlySet<string> = new Set([
-  "inforeshector@gmail.com",
-]);
+export const ADMIN_EMAILS: ReadonlySet<string> = new Set(["inforeshector@gmail.com"]);
 
 /**
  * `true` si el email del session está en la allowlist. No comprueba

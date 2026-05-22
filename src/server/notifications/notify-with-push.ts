@@ -1,11 +1,8 @@
-import { dlog, derr } from "@/lib/debug-log";
+import { derr, dlog } from "@/lib/debug-log";
 import type { Database } from "@/server/db/client";
-import {
-  deletePushSubscriptionByEndpoint,
-  getUserPushSubscriptions,
-} from "@/server/push/queries";
 import { sendPushTo } from "@/server/push/client";
-import { createNotification, type CreateNotificationInput } from "./create";
+import { deletePushSubscriptionByEndpoint, getUserPushSubscriptions } from "@/server/push/queries";
+import { type CreateNotificationInput, createNotification } from "./create";
 import { resolveNotificationHref } from "./href";
 
 export type NotifyInput = Omit<CreateNotificationInput, "db"> & {
@@ -92,10 +89,7 @@ export async function notifyWithPush(
 
   const results = await Promise.allSettled(
     subscriptions.map((sub) =>
-      sendPushTo(
-        { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
-        payload,
-      ),
+      sendPushTo({ endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth }, payload),
     ),
   );
 
@@ -115,9 +109,7 @@ export async function notifyWithPush(
     }
   }
   if (goneEndpoints.length > 0) {
-    await Promise.allSettled(
-      goneEndpoints.map((ep) => deletePushSubscriptionByEndpoint(db, ep)),
-    );
+    await Promise.allSettled(goneEndpoints.map((ep) => deletePushSubscriptionByEndpoint(db, ep)));
     dlog("push", "removed gone subscriptions", {
       userId: input.userId,
       count: goneEndpoints.length,
@@ -128,9 +120,7 @@ export async function notifyWithPush(
       userId: input.userId,
     });
   } else {
-    const successCount = results.filter(
-      (r) => r.status === "fulfilled" && r.value === null,
-    ).length;
+    const successCount = results.filter((r) => r.status === "fulfilled" && r.value === null).length;
     if (successCount > 0) {
       dlog("push", "push sent", {
         userId: input.userId,

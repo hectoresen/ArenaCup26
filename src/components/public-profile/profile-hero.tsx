@@ -53,11 +53,7 @@ export function ProfileHero({ identity, isOwner = false, cooldowns }: Props) {
           ) : identity.image ? (
             // biome-ignore lint/performance/noImgElement: small avatar
             // biome-ignore lint/a11y/useAltText: alt resolved by parent label
-            <img
-              src={identity.image}
-              alt=""
-              className="h-full w-full rounded-full object-cover"
-            />
+            <img src={identity.image} alt="" className="h-full w-full rounded-full object-cover" />
           ) : (
             initial
           )}
@@ -114,7 +110,12 @@ export function ProfileHero({ identity, isOwner = false, cooldowns }: Props) {
             aria-label={t("flagAria", { country: identity.country })}
             className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-border bg-card-hover px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.1em] text-foreground"
           >
-            <CountryFlag code={identity.country} name={identity.country} size={16} className="rounded-sm" />
+            <CountryFlag
+              code={identity.country}
+              name={identity.country}
+              size={16}
+              className="rounded-sm"
+            />
             {identity.country}
           </div>
         )}

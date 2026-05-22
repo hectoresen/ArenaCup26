@@ -1,9 +1,9 @@
-import { and, desc, eq, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
 import { dlog } from "@/lib/debug-log";
 import type { Database } from "@/server/db/client";
 import { matches, pointEvents, predictions, teams } from "@/server/db/schema";
 import type { MatchStatus, PredictionKind, PredictionWinner } from "@/server/scoring/types";
+import { and, desc, eq, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import type { HistoryEntry } from "./types";
 
 export type HistoryOutcomeFilter = "all" | "hit" | "miss" | "pending";
@@ -79,15 +79,9 @@ export async function getPredictionHistory(
       and(
         eq(predictions.userId, userId),
         outcome === "hit"
-          ? and(
-              eq(matches.status, "finished"),
-              sql`coalesce(${pointsByMatch.total}, 0) > 0`,
-            )
+          ? and(eq(matches.status, "finished"), sql`coalesce(${pointsByMatch.total}, 0) > 0`)
           : outcome === "miss"
-            ? and(
-                eq(matches.status, "finished"),
-                sql`coalesce(${pointsByMatch.total}, 0) = 0`,
-              )
+            ? and(eq(matches.status, "finished"), sql`coalesce(${pointsByMatch.total}, 0) = 0`)
             : outcome === "pending"
               ? sql`${matches.status} <> 'finished'`
               : undefined,
@@ -98,29 +92,31 @@ export async function getPredictionHistory(
 
   dlog("ranking", "getPredictionHistory", { userId, entries: rows.length });
 
-  return rows.map((row): HistoryEntry => ({
-    matchId: row.matchId,
-    kickoffAt: row.kickoffAt,
-    status: row.status as MatchStatus,
-    homeTeam: {
-      name: row.homeName ?? "—",
-      flag: row.homeFlag,
-      code: row.homeCode,
-    },
-    awayTeam: {
-      name: row.awayName ?? "—",
-      flag: row.awayFlag,
-      code: row.awayCode,
-    },
-    homeScore: row.homeScore,
-    awayScore: row.awayScore,
-    prediction: {
-      kind: row.kind as PredictionKind,
-      predictedWinner: row.predictedWinner as PredictionWinner | null,
-      predictedHomeScore: row.predictedHomeScore,
-      predictedAwayScore: row.predictedAwayScore,
-      submittedAt: row.submittedAt,
-    },
-    pointsEarned: row.status === "finished" ? row.pointsEarned ?? 0 : null,
-  }));
+  return rows.map(
+    (row): HistoryEntry => ({
+      matchId: row.matchId,
+      kickoffAt: row.kickoffAt,
+      status: row.status as MatchStatus,
+      homeTeam: {
+        name: row.homeName ?? "—",
+        flag: row.homeFlag,
+        code: row.homeCode,
+      },
+      awayTeam: {
+        name: row.awayName ?? "—",
+        flag: row.awayFlag,
+        code: row.awayCode,
+      },
+      homeScore: row.homeScore,
+      awayScore: row.awayScore,
+      prediction: {
+        kind: row.kind as PredictionKind,
+        predictedWinner: row.predictedWinner as PredictionWinner | null,
+        predictedHomeScore: row.predictedHomeScore,
+        predictedAwayScore: row.predictedAwayScore,
+        submittedAt: row.submittedAt,
+      },
+      pointsEarned: row.status === "finished" ? (row.pointsEarned ?? 0) : null,
+    }),
+  );
 }

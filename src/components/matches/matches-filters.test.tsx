@@ -1,7 +1,7 @@
+import type { MatchesFilters } from "@/server/matches/types";
 import { renderWithProviders, screen } from "@/test/render-with-providers";
 import { describe, expect, it } from "vitest";
 import { MatchesFiltersBar } from "./matches-filters";
-import type { MatchesFilters } from "@/server/matches/types";
 
 function buildFilters(overrides: Partial<MatchesFilters> = {}): MatchesFilters {
   return {
@@ -30,13 +30,8 @@ describe("<MatchesFiltersBar>", () => {
   });
 
   it("marks the active status chip with aria-current=page", () => {
-    renderWithProviders(
-      <MatchesFiltersBar active={buildFilters({ status: "live" })} count={3} />,
-    );
-    expect(screen.getByRole("link", { name: "En vivo" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    renderWithProviders(<MatchesFiltersBar active={buildFilters({ status: "live" })} count={3} />);
+    expect(screen.getByRole("link", { name: "En vivo" })).toHaveAttribute("aria-current", "page");
   });
 
   it("toggle exposes aria-checked according to predictedOnly", () => {
@@ -74,10 +69,7 @@ describe("<MatchesFiltersBar>", () => {
 
   it("preserves the predicted toggle state when switching status", () => {
     renderWithProviders(
-      <MatchesFiltersBar
-        active={buildFilters({ status: "all", predictedOnly: true })}
-        count={1}
-      />,
+      <MatchesFiltersBar active={buildFilters({ status: "all", predictedOnly: true })} count={1} />,
     );
     const liveLink = screen.getByRole("link", { name: "En vivo" });
     const href = liveLink.getAttribute("href") ?? "";

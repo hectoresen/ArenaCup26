@@ -20,80 +20,76 @@ export const alt = "ArenaCup26 — Predice los partidos del Mundial 2026";
  */
 export default function OpengraphImage() {
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        background: "radial-gradient(ellipse at 50% 30%, #1a2030 0%, #0d1117 65%)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "60px 80px",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        position: "relative",
+      }}
+    >
+      {/* Top accent strip */}
       <div
         style={{
-          width: "100%",
-          height: "100%",
-          background:
-            "radial-gradient(ellipse at 50% 30%, #1a2030 0%, #0d1117 65%)",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 6,
+          background: "linear-gradient(90deg, transparent 0%, #f5c842 50%, transparent 100%)",
+        }}
+      />
+
+      <div style={{ fontSize: 220, lineHeight: 1, marginBottom: 20 }}>🏆</div>
+
+      <div
+        style={{
+          fontSize: 96,
+          fontWeight: 900,
+          color: "#f5c842",
+          letterSpacing: -2,
+          marginBottom: 14,
+          textShadow: "0 4px 24px rgba(245,200,66,0.35)",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "60px 80px",
-          fontFamily: "system-ui, -apple-system, sans-serif",
-          position: "relative",
         }}
       >
-        {/* Top accent strip */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 6,
-            background:
-              "linear-gradient(90deg, transparent 0%, #f5c842 50%, transparent 100%)",
-          }}
-        />
-
-        <div style={{ fontSize: 220, lineHeight: 1, marginBottom: 20 }}>🏆</div>
-
-        <div
-          style={{
-            fontSize: 96,
-            fontWeight: 900,
-            color: "#f5c842",
-            letterSpacing: -2,
-            marginBottom: 14,
-            textShadow: "0 4px 24px rgba(245,200,66,0.35)",
-            display: "flex",
-          }}
-        >
-          ArenaCup26
-        </div>
-
-        <div
-          style={{
-            fontSize: 36,
-            fontWeight: 700,
-            color: "#e8e8e8",
-            textAlign: "center",
-            letterSpacing: 0.5,
-            display: "flex",
-          }}
-        >
-          Predice el Mundial 2026 · Compite con tus amigos
-        </div>
-
-        {/* Bottom URL chip */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 40,
-            fontSize: 26,
-            fontWeight: 800,
-            color: "#a8a8a8",
-            letterSpacing: 1.5,
-            display: "flex",
-          }}
-        >
-          www.arenacup26.com
-        </div>
+        ArenaCup26
       </div>
-    ),
+
+      <div
+        style={{
+          fontSize: 36,
+          fontWeight: 700,
+          color: "#e8e8e8",
+          textAlign: "center",
+          letterSpacing: 0.5,
+          display: "flex",
+        }}
+      >
+        Predice el Mundial 2026 · Compite con tus amigos
+      </div>
+
+      {/* Bottom URL chip */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 40,
+          fontSize: 26,
+          fontWeight: 800,
+          color: "#a8a8a8",
+          letterSpacing: 1.5,
+          display: "flex",
+        }}
+      >
+        www.arenacup26.com
+      </div>
+    </div>,
     { ...size },
   );
 }

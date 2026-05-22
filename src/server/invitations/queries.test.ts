@@ -9,9 +9,7 @@ import { buildInvitationUrl } from "./queries";
  */
 describe("buildInvitationUrl", () => {
   it("composes the share link with the token in the query string", () => {
-    expect(buildInvitationUrl("abc123")).toBe(
-      "http://localhost:3000/?invite=abc123",
-    );
+    expect(buildInvitationUrl("abc123")).toBe("http://localhost:3000/?invite=abc123");
   });
 
   it("URL-encodes tokens with reserved characters so the link no rompe al pegarse", () => {
@@ -20,9 +18,7 @@ describe("buildInvitationUrl", () => {
     expect(buildInvitationUrl("abc/123+ñ")).toBe(
       "http://localhost:3000/?invite=abc%2F123%2B%C3%B1",
     );
-    expect(buildInvitationUrl("ok_token-XYZ")).toBe(
-      "http://localhost:3000/?invite=ok_token-XYZ",
-    );
+    expect(buildInvitationUrl("ok_token-XYZ")).toBe("http://localhost:3000/?invite=ok_token-XYZ");
   });
 
   it("evita el //?invite= cuando la base tiene trailing slash", () => {

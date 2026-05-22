@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 
 type Props = {
   /** Rank con el que se hizo SSR. Se sustituye en cuanto llega el primer evento SSE. */

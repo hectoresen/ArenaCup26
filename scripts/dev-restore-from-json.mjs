@@ -22,7 +22,12 @@ const sql = postgres(process.env.DATABASE_URL);
 
 async function main() {
   console.log("=== Restoring from", BACKUP_FILE, "===");
-  console.log("Snapshot keys:", Object.keys(dump).map((k) => `${k}=${dump[k].length}`).join(", "));
+  console.log(
+    "Snapshot keys:",
+    Object.keys(dump)
+      .map((k) => `${k}=${dump[k].length}`)
+      .join(", "),
+  );
 
   // 1. Limpiar lo que metimos post-reset (Mundial + bots predicciones)
   console.log("\n→ Limpiando estado post-reset actual...");
@@ -109,7 +114,12 @@ async function main() {
 
   console.log("→ Restaurando group_memberships.frozen_*…");
   for (const gm of dump.group_memberships) {
-    if (gm.frozen_points === null && gm.frozen_streak_max === null && gm.frozen_simple_hits === null) continue;
+    if (
+      gm.frozen_points === null &&
+      gm.frozen_streak_max === null &&
+      gm.frozen_simple_hits === null
+    )
+      continue;
     await sql`
       UPDATE group_memberships SET
         frozen_points = ${gm.frozen_points},

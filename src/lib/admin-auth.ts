@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { users } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 import { isAdminEmail } from "./admin-allowlist";
 
 /**

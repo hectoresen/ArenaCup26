@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
-import { cookies } from "next/headers";
 import { dlog } from "@/lib/debug-log";
 import { env } from "@/lib/env";
 import { db } from "@/server/db/client";
 import { sessions, users } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 /**
  * Endpoint **solo-test** que crea una sesión de Auth.js para un user
@@ -66,11 +66,7 @@ export async function POST(req: Request) {
   }
 
   // Sanity: el user debe existir.
-  const exists = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
+  const exists = await db.select({ id: users.id }).from(users).where(eq(users.id, userId)).limit(1);
   if (!exists[0]) {
     return NextResponse.json({ error: "user_not_found" }, { status: 404 });
   }

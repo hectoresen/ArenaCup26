@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import { dlog, derr } from "@/lib/debug-log";
+import { derr, dlog } from "@/lib/debug-log";
 import { env } from "@/lib/env";
 import { db } from "@/server/db/client";
 import { takeRankingSnapshot } from "@/server/ranking-history/snapshot";
+import { NextResponse } from "next/server";
 import { handleSnapshotCronRequest } from "./handler";
 
 /**

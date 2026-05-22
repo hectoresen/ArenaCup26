@@ -27,7 +27,10 @@ describe("<StatsRow>", () => {
 
   it("shows the real tail rank for a user with no points (ranking is inamovible)", () => {
     renderWithProviders(
-      <StatsRow stats={buildStats({ rank: 12480, totalPlayers: 12480, points: 0 })} isOwner={true} />,
+      <StatsRow
+        stats={buildStats({ rank: 12480, totalPlayers: 12480, points: 0 })}
+        isOwner={true}
+      />,
     );
     expect(screen.getByText("#12480")).toBeInTheDocument();
   });

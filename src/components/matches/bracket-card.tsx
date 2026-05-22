@@ -1,7 +1,7 @@
 import { LocalTime } from "@/components/common/local-time";
 import { TeamFlag } from "@/components/common/team-flag";
-import { formatMatchDate, type SupportedLocale } from "@/lib/format/date";
 import { Link } from "@/i18n/navigation";
+import { type SupportedLocale, formatMatchDate } from "@/lib/format/date";
 import type { MatchListItem } from "@/server/matches/types";
 import { useLocale, useTranslations } from "next-intl";
 

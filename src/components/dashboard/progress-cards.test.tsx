@@ -96,7 +96,9 @@ describe("<ProgressCards>", () => {
   it("renders the tail rank for a user without points (ranking is inamovible)", () => {
     renderWithProviders(
       <ProgressCards
-        progress={buildProgress({ rank: { rank: 12480, rankDelta: null, dayAgoRank: null, sparkline: null } })}
+        progress={buildProgress({
+          rank: { rank: 12480, rankDelta: null, dayAgoRank: null, sparkline: null },
+        })}
         now={NOW}
       />,
     );
@@ -120,7 +122,9 @@ describe("<ProgressCards>", () => {
   it("does not render sparkline when history has only one snapshot", () => {
     const { container } = renderWithProviders(
       <ProgressCards
-        progress={buildProgress({ rank: { rank: 38, rankDelta: 0, dayAgoRank: 38, sparkline: [38] } })}
+        progress={buildProgress({
+          rank: { rank: 38, rankDelta: 0, dayAgoRank: 38, sparkline: [38] },
+        })}
         now={NOW}
       />,
     );

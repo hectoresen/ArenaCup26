@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
-import type { GroupSummary } from "@/server/groups/types";
 import { Link } from "@/i18n/navigation";
+import type { GroupSummary } from "@/server/groups/types";
+import { useTranslations } from "next-intl";
 import { GroupCard } from "./group-card";
 
 type Props = {
@@ -34,9 +34,7 @@ export function MyGroupsSection({ groups, maxGroups }: Props) {
 
       {groups.length === 0 ? (
         <div className="rounded-2xl border-2 border-dashed border-border bg-card/40 px-4 py-5 text-center">
-          <p className="mb-3 text-[12px] font-bold text-muted">
-            {t("emptyCopy")}
-          </p>
+          <p className="mb-3 text-[12px] font-bold text-muted">{t("emptyCopy")}</p>
           <div className="flex flex-wrap justify-center gap-2">
             <Link
               href="/social/grupos/nuevo"

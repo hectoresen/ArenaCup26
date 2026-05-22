@@ -1,12 +1,13 @@
 "use server";
 
-import { and, eq, or } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { dlog } from "@/lib/debug-log";
 import { auth } from "@/lib/auth";
+import { dlog } from "@/lib/debug-log";
+import { assertNotInMaintenance } from "@/server/admin/maintenance-guard";
 import { db } from "@/server/db/client";
 import { friendships, users } from "@/server/db/schema";
 import { notifyWithPush } from "@/server/notifications/notify-with-push";
+import { and, eq, or } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export type FriendActionResult =
   | { ok: true }
@@ -36,6 +37,7 @@ export type FriendActionResult =
 export async function sendFriendRequest(targetUsername: string): Promise<FriendActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const fromId = session.user.id;
 
   const targetRows = await db
@@ -99,6 +101,7 @@ export async function sendFriendRequest(targetUsername: string): Promise<FriendA
 export async function acceptFriendRequest(friendshipId: string): Promise<FriendActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const rows = await db
@@ -139,6 +142,7 @@ export async function acceptFriendRequest(friendshipId: string): Promise<FriendA
 export async function rejectFriendRequest(friendshipId: string): Promise<FriendActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const rows = await db
@@ -166,6 +170,7 @@ export async function rejectFriendRequest(friendshipId: string): Promise<FriendA
 export async function removeFriend(otherUserId: string): Promise<FriendActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   await db

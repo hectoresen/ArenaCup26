@@ -12,9 +12,7 @@
  * mismo bucket — peor para usuarios legítimos detrás de NAT raros,
  * pero seguro contra atacantes.
  */
-export function getRequestIp(
-  headers: { get: (name: string) => string | null } | Headers,
-): string {
+export function getRequestIp(headers: { get: (name: string) => string | null } | Headers): string {
   const fwd = headers.get("x-forwarded-for");
   if (fwd) {
     const first = fwd.split(",")[0]?.trim();

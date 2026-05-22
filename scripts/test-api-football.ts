@@ -57,7 +57,11 @@ async function main() {
   }
   const fxJson = (await fxRes.json()) as {
     response: Array<{
-      fixture: { id: number; date: string; status: { short: string; long: string; elapsed: number | null } };
+      fixture: {
+        id: number;
+        date: string;
+        status: { short: string; long: string; elapsed: number | null };
+      };
       league: { id: number; name: string };
       teams: { home: { name: string }; away: { name: string } };
       goals: { home: number | null; away: number | null };
@@ -82,9 +86,7 @@ async function main() {
   for (const f of inFilter.slice(0, 8)) {
     const hh = f.fixture.date.slice(11, 16);
     const score =
-      f.goals.home !== null && f.goals.away !== null
-        ? `${f.goals.home}-${f.goals.away}`
-        : "—";
+      f.goals.home !== null && f.goals.away !== null ? `${f.goals.home}-${f.goals.away}` : "—";
     const min = f.fixture.status.elapsed != null ? `${f.fixture.status.elapsed}'` : "";
     console.log(
       `    [${f.fixture.status.short.padEnd(4)}] ${hh} ${f.teams.home.name} vs ${f.teams.away.name} (${score}) ${min} — ${f.league.name}`,

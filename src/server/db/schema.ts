@@ -107,6 +107,9 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "match_finished",
   "achievement_unlocked",
   "system",
+  // Broadcast del admin a todos los humanos. Aparece en la campana
+  // como una notificación más. Sin push (decisión: simplicidad).
+  "admin_broadcast",
   "friend_request",
   "friend_accepted",
   // ───── Grupos de competición (add-competition-groups, 2026-05-18) ─────
@@ -118,11 +121,7 @@ export const notificationKindEnum = pgEnum("notification_kind", [
   "group_deleted",
 ]);
 
-export const friendshipStatusEnum = pgEnum("friendship_status", [
-  "pending",
-  "accepted",
-  "blocked",
-]);
+export const friendshipStatusEnum = pgEnum("friendship_status", ["pending", "accepted", "blocked"]);
 
 export const groupVisibilityEnum = pgEnum("group_visibility", ["public", "private"]);
 export const groupMemberRoleEnum = pgEnum("group_member_role", ["admin", "member"]);
@@ -620,8 +619,7 @@ export const rankingSnapshots = pgTable(
     rank: integer("rank").notNull(),
     totalPoints: integer("total_points").notNull(),
     /** UTC date (no timezone) — la clave de unicidad de un snapshot. */
-    snapshotDate: timestamp("snapshot_date", { mode: "date", withTimezone: false })
-      .notNull(),
+    snapshotDate: timestamp("snapshot_date", { mode: "date", withTimezone: false }).notNull(),
     /** Timestamp exacto de inserción. Solo para debugging. */
     snapshotAt: timestamp("snapshot_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -800,6 +798,56 @@ export const groupLinks = pgTable(
   (table) => ({
     uniqueToken: uniqueIndex("group_links_token_unique").on(table.token),
     groupActiveIdx: index("group_links_group_active_idx").on(table.groupId, table.revokedAt),
+  }),
+);
+
+// ─── ADMIN ─────────────────────────────────────────────────
+
+/**
+ * Settings globales (singleton key/value). Una sola fila por key.
+ * El valor es JSONB para permitir esquemas distintos por setting:
+ *   - `maintenance` → `{ enabled: boolean, message: string | null }`
+ *   - (futuro) `ramp_up`, `featured_match`, etc.
+ *
+ * Lectura en hot-path (banner global) — `key` indexado por PK ya
+ * basta para latency O(1). Solo el admin escribe; los reads sin
+ * cache valen para volumen actual.
+ */
+export const appSettings = pgTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedBy: uuid("updated_by").references(() => users.id, { onDelete: "set null" }),
+});
+
+/**
+ * Audit log de cualquier acción admin (toggle mantenimiento, envío
+ * de broadcast, ban de user, ajuste de puntos…). Append-only; no se
+ * borra ni se actualiza. `payload` JSONB para diff/contexto.
+ *
+ * Indexado por `(admin_user_id, created_at)` para que el detalle de
+ * "qué hizo Hector hoy" sea instantáneo, y por `created_at` solo
+ * para el feed cronológico global del dashboard.
+ */
+export const adminAuditLog = pgTable(
+  "admin_audit_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    adminUserId: uuid("admin_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    action: text("action").notNull(),
+    targetType: text("target_type"),
+    targetId: text("target_id"),
+    payload: jsonb("payload"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    adminCreatedIdx: index("admin_audit_log_admin_created_idx").on(
+      table.adminUserId,
+      table.createdAt,
+    ),
+    createdIdx: index("admin_audit_log_created_idx").on(table.createdAt),
   }),
 );
 

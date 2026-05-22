@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
 import type { BracketData, BracketRound } from "@/server/matches/types";
+import { useTranslations } from "next-intl";
 import { BracketCard } from "./bracket-card";
 
 type Props = {

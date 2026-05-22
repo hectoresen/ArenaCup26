@@ -1,6 +1,6 @@
-import { and, asc, eq, gte, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { rankingSnapshots } from "@/server/db/schema";
+import { and, asc, eq, gte, sql } from "drizzle-orm";
 import { utcMidnight } from "./snapshot";
 
 export type RankHistory = {
@@ -53,9 +53,7 @@ export async function getRankHistory(db: Database, userId: string): Promise<Rank
       snapshotDate: rankingSnapshots.snapshotDate,
     })
     .from(rankingSnapshots)
-    .where(
-      and(eq(rankingSnapshots.userId, userId), gte(rankingSnapshots.snapshotDate, since)),
-    )
+    .where(and(eq(rankingSnapshots.userId, userId), gte(rankingSnapshots.snapshotDate, since)))
     .orderBy(asc(rankingSnapshots.snapshotDate));
 
   return summarizeRankHistory(

@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 /**
  * Estado vacío del historial. Coherente con `EmptyMatchesState`:
@@ -26,13 +26,9 @@ export function EmptyHistoryState() {
           </span>
         </div>
 
-        <h2 className="font-display text-[22px] leading-tight text-foreground">
-          {t("title")}
-        </h2>
+        <h2 className="font-display text-[22px] leading-tight text-foreground">{t("title")}</h2>
 
-        <p className="max-w-sm text-[13px] font-bold leading-relaxed text-muted">
-          {t("body")}
-        </p>
+        <p className="max-w-sm text-[13px] font-bold leading-relaxed text-muted">{t("body")}</p>
 
         <Link
           href="/partidos"

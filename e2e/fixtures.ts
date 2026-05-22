@@ -1,4 +1,4 @@
-import { test as base, expect, type Page } from "@playwright/test";
+import { type Page, test as base, expect } from "@playwright/test";
 
 /**
  * Helpers de auth E2E. Usan el endpoint `/api/test/auth-as` (solo
@@ -31,10 +31,7 @@ export const DEFAULT_TEST_USERNAME = "carlos-mendoza";
  * `beforeEach` o como fixture de Playwright. Lanza error si el
  * endpoint no está habilitado (env vars no seteadas).
  */
-export async function loginAs(
-  page: Page,
-  username: string = DEFAULT_TEST_USERNAME,
-): Promise<void> {
+export async function loginAs(page: Page, username: string = DEFAULT_TEST_USERNAME): Promise<void> {
   const secret = process.env.E2E_AUTH_SECRET;
   if (!secret) {
     throw new Error(
@@ -47,9 +44,7 @@ export async function loginAs(
     data: { username },
   });
   if (!res.ok()) {
-    throw new Error(
-      `loginAs failed: ${res.status()} ${await res.text().catch(() => "")}`,
-    );
+    throw new Error(`loginAs failed: ${res.status()} ${await res.text().catch(() => "")}`);
   }
 }
 

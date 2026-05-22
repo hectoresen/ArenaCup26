@@ -1,11 +1,11 @@
 "use server";
 
-import { eq, sql } from "drizzle-orm";
+import { auth } from "@/lib/auth";
 import { dlog } from "@/lib/debug-log";
 import { env } from "@/lib/env";
-import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { pushSubscriptions } from "@/server/db/schema";
+import { eq, sql } from "drizzle-orm";
 
 export type PushSubscriptionInput = {
   endpoint: string;
@@ -60,9 +60,7 @@ export async function subscribePush(input: PushSubscriptionInput): Promise<Subsc
   return { ok: true };
 }
 
-export type UnsubscribeResult =
-  | { ok: true }
-  | { ok: false; code: "unauthorized" | "not_found" };
+export type UnsubscribeResult = { ok: true } | { ok: false; code: "unauthorized" | "not_found" };
 
 /**
  * Borra una suscripción concreta del user actual. Acepta el endpoint

@@ -64,10 +64,7 @@ export default async function AppGroupLayout({
   const lastActive = onboardingRow[0]?.lastActiveAt ?? null;
   const PING_THROTTLE_MS = 5 * 60 * 1000;
   if (!lastActive || Date.now() - lastActive.getTime() > PING_THROTTLE_MS) {
-    await db
-      .update(users)
-      .set({ lastActiveAt: new Date() })
-      .where(eq(users.id, session.user.id));
+    await db.update(users).set({ lastActiveAt: new Date() }).where(eq(users.id, session.user.id));
   }
 
   const { items, unreadCount } = await getNotificationsForUser(db, session.user.id);

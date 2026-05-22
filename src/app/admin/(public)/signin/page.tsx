@@ -1,5 +1,5 @@
+import { auth, signIn } from "@/lib/auth";
 import { headers } from "next/headers";
-import { signIn, auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 /**
@@ -39,9 +39,7 @@ export default async function AdminSignin() {
             Panel de administración
           </div>
         </div>
-        <p className="text-sm text-slate-400">
-          Inicia sesión con tu cuenta de Google autorizada.
-        </p>
+        <p className="text-sm text-slate-400">Inicia sesión con tu cuenta de Google autorizada.</p>
         <form action={doSignIn}>
           <button
             type="submit"

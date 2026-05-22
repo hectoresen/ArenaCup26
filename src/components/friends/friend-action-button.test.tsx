@@ -1,7 +1,7 @@
+import { acceptFriendRequest, sendFriendRequest } from "@/server/friends/actions";
 import { renderWithProviders, screen } from "@/test/render-with-providers";
-import { sendFriendRequest, acceptFriendRequest } from "@/server/friends/actions";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FriendActionButton } from "./friend-action-button";
 
 const mockedSend = vi.mocked(sendFriendRequest);

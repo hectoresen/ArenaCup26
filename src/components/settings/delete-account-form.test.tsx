@@ -1,16 +1,14 @@
-import { renderWithProviders, screen } from "@/test/render-with-providers";
 import { deleteAccount } from "@/server/users/delete-account";
+import { renderWithProviders, screen } from "@/test/render-with-providers";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock del router — jsdom no tiene el provider del App Router de
 // Next montado y `useRouter()` falla con "invariant expected app
 // router to be mounted". Sustituimos por noops; el flujo del form
 // no depende de la navegación real (solo se llama tras `ok: true`).
 vi.mock("@/i18n/navigation", async () => {
-  const actual = await vi.importActual<typeof import("@/i18n/navigation")>(
-    "@/i18n/navigation",
-  );
+  const actual = await vi.importActual<typeof import("@/i18n/navigation")>("@/i18n/navigation");
   return {
     ...actual,
     useRouter: () => ({

@@ -1,9 +1,9 @@
-import { eq } from "drizzle-orm";
-import { setRequestLocale } from "next-intl/server";
-import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { users } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
+import { setRequestLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 /**
  * Ruta legacy: la sección "Logros" dejó de ser una pestaña dedicada

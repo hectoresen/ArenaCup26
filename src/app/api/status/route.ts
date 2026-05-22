@@ -1,6 +1,6 @@
+import { db } from "@/server/db/client";
 import { sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { db } from "@/server/db/client";
 
 /**
  * Endpoint de health check público. Devuelve estado de los

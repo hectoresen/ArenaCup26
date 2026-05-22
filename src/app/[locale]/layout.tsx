@@ -1,7 +1,8 @@
+import { MaintenanceBanner } from "@/components/admin/maintenance-banner";
 import { AppFooter } from "@/components/common/app-footer";
 import { InviteBannerMount } from "@/components/invitations/invite-banner-mount";
-import { env } from "@/lib/env";
 import { isValidLocale, routing } from "@/i18n/routing";
+import { env } from "@/lib/env";
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
@@ -118,6 +119,10 @@ export default async function LocaleLayout({
           {dir === "rtl" ? "تخطّى إلى المحتوى" : "Saltar al contenido"}
         </a>
         <NextIntlClientProvider messages={messages}>
+          {/* Banner global cuando el admin ha activado modo mantenimiento.
+              SSR-only, sin botón de cerrar — debe seguir visible hasta
+              que el admin lo desactive. */}
+          <MaintenanceBanner />
           {/* Banner sticky cuando hay cookie de invite activa y el
               visitante NO está logado. SSR-only — el server resuelve
               el inviter; si no aplica, no se monta nada. */}

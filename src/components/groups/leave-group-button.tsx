@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { leaveGroup } from "@/server/groups/membership";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 type Props = {
   groupId: string;
@@ -26,11 +26,7 @@ export function LeaveGroupButton({ groupId, groupName }: Props) {
         router.refresh();
         return;
       }
-      setError(
-        res.code === "is_admin_cannot_leave"
-          ? t("error.adminBlocked")
-          : t("error.generic"),
-      );
+      setError(res.code === "is_admin_cannot_leave" ? t("error.adminBlocked") : t("error.generic"));
     });
   }
 
@@ -51,9 +47,7 @@ export function LeaveGroupButton({ groupId, groupName }: Props) {
       <p className="mb-2 text-[12px] font-bold text-foreground">
         {t("confirmTitle", { name: groupName })}
       </p>
-      <p className="mb-3 text-[11px] font-bold leading-snug text-muted">
-        {t("confirmBody")}
-      </p>
+      <p className="mb-3 text-[11px] font-bold leading-snug text-muted">{t("confirmBody")}</p>
       {error && (
         <div className="mb-2 rounded-xl border border-red-500/40 bg-red-500/20 px-3 py-1.5 text-[12px] font-bold text-red-300">
           {error}

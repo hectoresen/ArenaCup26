@@ -1,6 +1,6 @@
-import { inArray } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { users } from "@/server/db/schema";
+import { inArray } from "drizzle-orm";
 import { BOT_CATALOG } from "./catalog";
 
 /**

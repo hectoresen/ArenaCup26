@@ -1,10 +1,10 @@
 import { routing } from "@/i18n/routing";
-import createMiddleware from "next-intl/middleware";
-import { NextResponse, type NextRequest } from "next/server";
 import {
   INVITE_COOKIE,
   INVITE_COOKIE_MAX_AGE_SECONDS,
 } from "@/server/invitations/cookie-constants";
+import createMiddleware from "next-intl/middleware";
+import { type NextRequest, NextResponse } from "next/server";
 
 const intlMiddleware = createMiddleware(routing);
 

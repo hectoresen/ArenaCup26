@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { CountryFlag } from "@/components/common/country-flag";
-import { getAvatar } from "@/server/profile/avatars";
 import { acceptFriendRequest, rejectFriendRequest } from "@/server/friends/actions";
 import type { FriendRequest } from "@/server/friends/types";
+import { getAvatar } from "@/server/profile/avatars";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 type Props = {
   requests: FriendRequest[];
@@ -59,7 +59,11 @@ export function FriendRequestsInbox({ requests }: Props) {
               {galleryAvatar ? (
                 // biome-ignore lint/performance/noImgElement: small avatar
                 // biome-ignore lint/a11y/useAltText: alt resolved by parent label
-                <img src={galleryAvatar.src} alt="" className="h-full w-full rounded-full object-cover" />
+                <img
+                  src={galleryAvatar.src}
+                  alt=""
+                  className="h-full w-full rounded-full object-cover"
+                />
               ) : r.fromImage ? (
                 // biome-ignore lint/performance/noImgElement: small avatar
                 // biome-ignore lint/a11y/useAltText: alt resolved by parent label

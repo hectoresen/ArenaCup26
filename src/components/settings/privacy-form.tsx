@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
 import { updatePrivacy } from "@/server/privacy/actions";
 import type { UserPrivacy } from "@/server/privacy/apply";
+import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 
 type Props = {
   initial: UserPrivacy;
@@ -87,7 +87,9 @@ export function PrivacyForm({ initial }: Props) {
         </legend>
         <label
           className={`flex cursor-pointer items-center gap-3 rounded-2xl border-2 px-4 py-3 transition-colors ${
-            state.showHistory ? "border-gold bg-gold/[0.06]" : "border-border bg-card hover:border-gold/30"
+            state.showHistory
+              ? "border-gold bg-gold/[0.06]"
+              : "border-border bg-card hover:border-gold/30"
           }`}
         >
           <input
@@ -97,12 +99,8 @@ export function PrivacyForm({ initial }: Props) {
             className="accent-gold"
           />
           <div className="flex-1">
-            <div className="text-sm font-extrabold text-foreground">
-              {t("showHistory.title")}
-            </div>
-            <div className="mt-0.5 text-[11px] font-bold text-muted">
-              {t("showHistory.desc")}
-            </div>
+            <div className="text-sm font-extrabold text-foreground">{t("showHistory.title")}</div>
+            <div className="mt-0.5 text-[11px] font-bold text-muted">{t("showHistory.desc")}</div>
           </div>
         </label>
       </fieldset>

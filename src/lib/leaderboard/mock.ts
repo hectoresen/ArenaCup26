@@ -1,6 +1,9 @@
 import type { LeaderboardSnapshot, Player } from "./types";
 
-type Seed = Omit<Player, "rank" | "previousRank" | "username" | "isOnline" | "avatarId" | "image"> & {
+type Seed = Omit<
+  Player,
+  "rank" | "previousRank" | "username" | "isOnline" | "avatarId" | "image"
+> & {
   username?: string | null;
   isOnline?: boolean;
   avatarId?: string | null;

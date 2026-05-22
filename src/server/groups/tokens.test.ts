@@ -42,9 +42,9 @@ describe("buildGroupInviteUrl", () => {
   it("strips trailing slash from base URL to avoid double slashes", () => {
     // El mock devuelve sin slash, pero esta defensive case verifica el
     // contract del helper.
-    expect(buildGroupInviteUrl("xyz").startsWith("https://arenacup26.com/social/grupos/unirse/")).toBe(
-      true,
-    );
+    expect(
+      buildGroupInviteUrl("xyz").startsWith("https://arenacup26.com/social/grupos/unirse/"),
+    ).toBe(true);
     expect(buildGroupInviteUrl("xyz")).not.toContain("//social");
   });
 });

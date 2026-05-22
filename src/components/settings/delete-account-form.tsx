@@ -3,8 +3,8 @@
 import { useRouter } from "@/i18n/navigation";
 import { deleteAccount } from "@/server/users/delete-account";
 import { DELETE_CONFIRMATION_PHRASE } from "@/server/users/delete-account-constants";
-import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 
 /**
  * Formulario de borrado de cuenta. Doble confirmación:
@@ -35,13 +35,7 @@ export function DeleteAccountForm() {
     startTransition(async () => {
       const result = await deleteAccount(confirm);
       if (!result.ok) {
-        setError(
-          t(
-            `error.${result.code}` as
-              | "error.unauthorized"
-              | "error.confirmation_mismatch",
-          ),
-        );
+        setError(t(`error.${result.code}` as "error.unauthorized" | "error.confirmation_mismatch"));
         return;
       }
       // Redirect a la landing. El server ya hizo signOut, pero el
@@ -80,9 +74,7 @@ export function DeleteAccountForm() {
         >
           {t.rich("confirmLabel", {
             phrase: () => (
-              <span className="font-display text-danger">
-                {DELETE_CONFIRMATION_PHRASE}
-              </span>
+              <span className="font-display text-danger">{DELETE_CONFIRMATION_PHRASE}</span>
             ),
           })}
         </label>

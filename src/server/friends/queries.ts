@@ -1,8 +1,8 @@
-import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
 import type { Database } from "@/server/db/client";
 import { friendships, predictions, userPoints, users } from "@/server/db/schema";
 import type { GroupRankingEntry } from "@/server/groups/types";
+import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import type { Friend, FriendRequest, ViewerRelation } from "./types";
 
 /**
@@ -166,9 +166,7 @@ export async function getFriendsRanking(
       ),
     );
 
-  const friendIds = friendRows.map((r) =>
-    r.requester === viewerId ? r.addressee : r.requester,
-  );
+  const friendIds = friendRows.map((r) => (r.requester === viewerId ? r.addressee : r.requester));
   const subsetIds = [viewerId, ...friendIds];
 
   // 2) Datos de cada miembro + puntos. `lastActiveAt` viaja para que
@@ -237,9 +235,7 @@ export async function getFriendsRanking(
     streak: r.streak ?? 0,
     correctCount: r.correctCount ?? 0,
     frozen: false,
-    isOnline: r.lastActiveAt
-      ? now - r.lastActiveAt.getTime() <= ONLINE_WINDOW_MS
-      : false,
+    isOnline: r.lastActiveAt ? now - r.lastActiveAt.getTime() <= ONLINE_WINDOW_MS : false,
     rank: i + 1,
     rankDelta: null,
   }));
@@ -288,10 +284,7 @@ export async function getPendingFriendRequests(
  * Counter rápido de solicitudes pendientes para mostrar como badge en
  * el nav (e.g. "Amigos · 3"). Usa COUNT en BD, no carga las filas.
  */
-export async function countPendingFriendRequests(
-  db: Database,
-  userId: string,
-): Promise<number> {
+export async function countPendingFriendRequests(db: Database, userId: string): Promise<number> {
   const rows = await db
     .select({ total: sql<number>`count(*)::int` })
     .from(friendships)
@@ -304,11 +297,7 @@ export async function countPendingFriendRequests(
  * de la fila). Usado por `canViewProfile` para resolver el caso
  * `visibility = 'friends_only'`.
  */
-export async function areFriends(
-  db: Database,
-  userIdA: string,
-  userIdB: string,
-): Promise<boolean> {
+export async function areFriends(db: Database, userIdA: string, userIdB: string): Promise<boolean> {
   if (userIdA === userIdB) return true;
   const rows = await db
     .select({ id: friendships.id })

@@ -1,12 +1,13 @@
 "use server";
 
+import { auth } from "@/lib/auth";
+import { dlog } from "@/lib/debug-log";
+import { assertNotInMaintenance } from "@/server/admin/maintenance-guard";
+import { db } from "@/server/db/client";
+import { users } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
-import { dlog } from "@/lib/debug-log";
-import { db } from "@/server/db/client";
-import { users } from "@/server/db/schema";
 import { AVATAR_GALLERY } from "./avatars";
 
 /**
@@ -22,10 +23,7 @@ const nameSchema = z.string().trim().min(1).max(60);
 const avatarSchema = z
   .string()
   .nullable()
-  .refine(
-    (v) => v === null || AVATAR_GALLERY.some((a) => a.id === v),
-    "Avatar id no reconocido",
-  );
+  .refine((v) => v === null || AVATAR_GALLERY.some((a) => a.id === v), "Avatar id no reconocido");
 
 export type ProfileActionResult =
   | { ok: true }
@@ -44,11 +42,10 @@ export type ProfileActionResult =
  *  - Si fue hace menos, devuelve `code: "cooldown"` con el tiempo
  *    restante para que el cliente lo muestre.
  */
-export async function updateProfileName(
-  rawName: string,
-): Promise<ProfileActionResult> {
+export async function updateProfileName(rawName: string): Promise<ProfileActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
 
   const parsed = nameSchema.safeParse(rawName);
   if (!parsed.success) {
@@ -104,6 +101,7 @@ export async function updateProfileAvatar(
 ): Promise<ProfileActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
 
   const parsed = avatarSchema.safeParse(rawAvatarId);
   if (!parsed.success) {

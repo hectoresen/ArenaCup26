@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 /**
  * Pantalla vacía de `/partidos` cuando la BD no tiene partidos (o
@@ -35,13 +35,9 @@ export function EmptyMatchesState() {
           </span>
         </div>
 
-        <h2 className="font-display text-[22px] leading-tight text-foreground">
-          {t("title")}
-        </h2>
+        <h2 className="font-display text-[22px] leading-tight text-foreground">{t("title")}</h2>
 
-        <p className="max-w-sm text-[13px] font-bold leading-relaxed text-muted">
-          {t("body")}
-        </p>
+        <p className="max-w-sm text-[13px] font-bold leading-relaxed text-muted">{t("body")}</p>
 
         <Link
           href="/inicio"

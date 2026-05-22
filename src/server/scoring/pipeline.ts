@@ -1,26 +1,14 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
 import { dlog } from "@/lib/debug-log";
-import type { Database } from "@/server/db/client";
-import {
-  matches,
-  pointEvents,
-  predictions,
-  teams,
-  userPoints,
-} from "@/server/db/schema";
 import { derr } from "@/lib/debug-log";
 import { evaluateAndUnlock } from "@/server/achievements/unlock";
+import type { Database } from "@/server/db/client";
+import { matches, pointEvents, predictions, teams, userPoints } from "@/server/db/schema";
 import { payReferralBonusIfFirstHit } from "@/server/invitations/referral-payout";
 import { notifyWithPush } from "@/server/notifications/notify-with-push";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { scoreMatchPrediction } from "./engine";
-import type {
-  MatchOutcome,
-  MatchStage,
-  Prediction,
-  StreakState,
-  PointEventKind,
-} from "./types";
+import type { MatchOutcome, MatchStage, PointEventKind, Prediction, StreakState } from "./types";
 
 export type ProcessFinishedMatchResult = {
   matchId: string;
@@ -350,7 +338,9 @@ async function persistScore({
   });
 }
 
-function pointEventKindFor(scoredKind: PointEventKind): "simple" | "exact" | "double" | "combo" | "poll" | "referral" {
+function pointEventKindFor(
+  scoredKind: PointEventKind,
+): "simple" | "exact" | "double" | "combo" | "poll" | "referral" {
   // El enum de BD no tiene `miss`/`voided`. En esos casos
   // guardamos `simple` con 0 puntos para conservar trazabilidad.
   if (scoredKind === "simple" || scoredKind === "exact" || scoredKind === "double") {

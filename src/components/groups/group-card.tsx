@@ -1,7 +1,7 @@
 "use client";
 
-import type { GroupSummary } from "@/server/groups/types";
 import { Link } from "@/i18n/navigation";
+import type { GroupSummary } from "@/server/groups/types";
 import { useTranslations } from "next-intl";
 import { GroupAvatar } from "./group-avatar";
 
@@ -17,8 +17,7 @@ type Props = {
  */
 export function GroupCard({ group }: Props) {
   const t = useTranslations("groups");
-  const memberLabel =
-    group.memberCount === 1 ? t("members.one") : t("members.many");
+  const memberLabel = group.memberCount === 1 ? t("members.one") : t("members.many");
   return (
     <Link
       href={`/social/grupos/${group.id}`}
@@ -46,7 +45,10 @@ export function GroupCard({ group }: Props) {
           {group.maxMembers ? ` · ${t("capLabel", { max: group.maxMembers })}` : ""}
         </div>
       </div>
-      <span aria-hidden="true" className="font-display text-base text-muted transition-transform group-hover:translate-x-0.5">
+      <span
+        aria-hidden="true"
+        className="font-display text-base text-muted transition-transform group-hover:translate-x-0.5"
+      >
         ›
       </span>
     </Link>

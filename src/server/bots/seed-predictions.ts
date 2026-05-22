@@ -1,6 +1,6 @@
-import { and, eq, ne, inArray } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { matches, predictions, users } from "@/server/db/schema";
+import { and, eq, inArray, ne } from "drizzle-orm";
 import { BOT_CATALOG } from "./catalog";
 import { generatePrediction } from "./predict";
 
@@ -77,9 +77,7 @@ export async function seedBotPredictions(db: Database): Promise<{
         botsToProcess.map((b) => b.id),
       ),
     );
-  const existingPairs = new Set(
-    existingRows.map((r) => `${r.userId}:${r.matchId}`),
-  );
+  const existingPairs = new Set(existingRows.map((r) => `${r.userId}:${r.matchId}`));
 
   const now = Date.now();
   const random = Math.random;
@@ -133,4 +131,3 @@ export async function seedBotPredictions(db: Database): Promise<{
     botsProcessed: botsToProcess.length,
   };
 }
-

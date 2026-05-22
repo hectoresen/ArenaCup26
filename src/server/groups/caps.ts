@@ -1,6 +1,6 @@
-import { and, eq, isNull, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { groupLinks, groupMemberships, groups } from "@/server/db/schema";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 /**
  * Capacidades / invariantes del dominio de grupos. Estas constantes

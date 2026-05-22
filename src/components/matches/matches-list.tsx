@@ -1,7 +1,7 @@
-import { useLocale, useTranslations } from "next-intl";
 import { type SupportedLocale, formatMatchDate } from "@/lib/format/date";
 import { groupMatchesByDay } from "@/server/matches/transforms";
 import type { MatchListItem } from "@/server/matches/types";
+import { useLocale, useTranslations } from "next-intl";
 import { EmptyMatchesState } from "./empty-matches-state";
 import { MatchPanelCard } from "./match-panel-card";
 

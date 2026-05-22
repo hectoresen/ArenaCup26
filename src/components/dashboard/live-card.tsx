@@ -1,7 +1,7 @@
-import type { LiveMatchView } from "@/server/dashboard/types";
-import { useTranslations } from "next-intl";
 import { TeamFlag } from "@/components/common/team-flag";
 import { LivePredictionBlock } from "@/components/matches/live-prediction-block";
+import type { LiveMatchView } from "@/server/dashboard/types";
+import { useTranslations } from "next-intl";
 
 type Props = {
   live: LiveMatchView;

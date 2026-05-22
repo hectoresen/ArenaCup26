@@ -11,7 +11,15 @@ import type { PublicProfile } from "./types";
 
 export type PublicProfileResult =
   | { kind: "found"; profile: PublicProfile }
-  | { kind: "private"; identity: { name: string; flag: string | null; avatarId: string | null; image: string | null } }
+  | {
+      kind: "private";
+      identity: {
+        name: string;
+        flag: string | null;
+        avatarId: string | null;
+        image: string | null;
+      };
+    }
   | { kind: "not_found" };
 
 /**

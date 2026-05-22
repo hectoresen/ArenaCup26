@@ -1,14 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
-import {
-  acceptFriendRequest,
-  removeFriend,
-  sendFriendRequest,
-} from "@/server/friends/actions";
+import { acceptFriendRequest, removeFriend, sendFriendRequest } from "@/server/friends/actions";
 import type { ViewerRelation } from "@/server/friends/types";
+import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 
 type Props = {
   /** Relación inicial calculada server-side. */

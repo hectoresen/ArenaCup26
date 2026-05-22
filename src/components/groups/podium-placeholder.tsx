@@ -2,10 +2,7 @@ import { useTranslations } from "next-intl";
 
 type Place = 1 | 2 | 3;
 
-const TONE: Record<
-  Place,
-  { container: string; border: string; badge: string; emoji: string }
-> = {
+const TONE: Record<Place, { container: string; border: string; badge: string; emoji: string }> = {
   1: {
     container: "bg-gradient-to-br from-[#1e1a08]/40 to-[#14120a]/40",
     border: "border-dashed border-gold/40",

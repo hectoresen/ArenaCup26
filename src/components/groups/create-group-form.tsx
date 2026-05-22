@@ -1,16 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { GROUP_COLORS, type GroupColor } from "@/server/db/schema";
 import { GROUP_COLOR_STYLES } from "@/lib/group-colors";
+import { GROUP_COLORS, type GroupColor } from "@/server/db/schema";
 import { createGroup } from "@/server/groups/actions";
-import {
-  GROUP_MEMBERS_DEFAULT,
-  GROUP_MEMBERS_MAX,
-  GROUP_MEMBERS_MIN,
-} from "@/server/groups/caps";
+import { GROUP_MEMBERS_DEFAULT, GROUP_MEMBERS_MAX, GROUP_MEMBERS_MIN } from "@/server/groups/caps";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 export function CreateGroupForm() {
   const router = useRouter();

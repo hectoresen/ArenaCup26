@@ -1,20 +1,15 @@
 "use server";
 
+import { auth } from "@/lib/auth";
+import { derr, dlog } from "@/lib/debug-log";
+import { evaluateAndUnlock } from "@/server/achievements/unlock";
+import { assertNotInMaintenance } from "@/server/admin/maintenance-guard";
+import { db } from "@/server/db/client";
+import { friendships, groupInvitations, groupMemberships, groups, users } from "@/server/db/schema";
+import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import { and, eq, isNull, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { dlog, derr } from "@/lib/debug-log";
-import { auth } from "@/lib/auth";
-import { db } from "@/server/db/client";
-import {
-  friendships,
-  groupInvitations,
-  groupMemberships,
-  groups,
-  users,
-} from "@/server/db/schema";
-import { evaluateAndUnlock } from "@/server/achievements/unlock";
-import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import { canJoinAnotherGroup, hasRoomForOneMore } from "./caps";
 import type { GroupActionResult } from "./types";
 
@@ -40,6 +35,7 @@ export async function createGroupInvitation(
 ): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const inviterId = session.user.id;
 
   const parsed = createInvitationSchema.safeParse(input);
@@ -69,7 +65,11 @@ export async function createGroupInvitation(
   if (adminRow.role !== "admin") return { ok: false, code: "unauthorized" };
 
   // El invitee existe.
-  const invRows = await db.select({ id: users.id }).from(users).where(eq(users.id, inviteeId)).limit(1);
+  const invRows = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.id, inviteeId))
+    .limit(1);
   if (!invRows[0]) return { ok: false, code: "not_found" };
 
   // ¿Ya es miembro activo?
@@ -141,6 +141,7 @@ export async function acceptGroupInvitation(
 ): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const parsed = decideInvitationSchema.safeParse(input);
@@ -198,9 +199,7 @@ export async function acceptGroupInvitation(
         frozenSimpleHits: null,
         joinedAt: new Date(),
       })
-      .where(
-        and(eq(groupMemberships.groupId, inv.groupId), eq(groupMemberships.userId, userId)),
-      );
+      .where(and(eq(groupMemberships.groupId, inv.groupId), eq(groupMemberships.userId, userId)));
   } else {
     await db.insert(groupMemberships).values({
       groupId: inv.groupId,
@@ -275,6 +274,7 @@ export async function rejectGroupInvitation(
 ): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const parsed = decideInvitationSchema.safeParse(input);
@@ -317,6 +317,7 @@ export async function cancelGroupInvitation(
 ): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const parsed = decideInvitationSchema.safeParse(input);
@@ -374,9 +375,7 @@ export async function cancelGroupInvitation(
  * como actions; las funciones que devuelven datos puros se usan
  * server-side normalmente.
  */
-export async function getFriendsAvailableToInvite(
-  groupId: string,
-): Promise<
+export async function getFriendsAvailableToInvite(groupId: string): Promise<
   Array<{
     id: string;
     name: string | null;
@@ -430,12 +429,7 @@ export async function getFriendsAvailableToInvite(
   const pendings = await db
     .select({ inviteeId: groupInvitations.inviteeId })
     .from(groupInvitations)
-    .where(
-      and(
-        eq(groupInvitations.groupId, groupId),
-        eq(groupInvitations.status, "pending"),
-      ),
-    );
+    .where(and(eq(groupInvitations.groupId, groupId), eq(groupInvitations.status, "pending")));
   const pendingSet = new Set(pendings.map((p) => p.inviteeId));
 
   return allFriends

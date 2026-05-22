@@ -256,7 +256,9 @@ export function AccountMenu({
             onClick={() => setOpen(false)}
             className="flex w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-start text-[12px] font-bold text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
           >
-            <span aria-hidden="true" className="ms-7 inline-block">·</span>
+            <span aria-hidden="true" className="ms-7 inline-block">
+              ·
+            </span>
             {t("legalPrivacy")}
           </Link>
 
@@ -266,7 +268,9 @@ export function AccountMenu({
             onClick={() => setOpen(false)}
             className="flex w-full cursor-pointer items-center gap-3 border-b border-border px-4 py-2.5 text-start text-[12px] font-bold text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground"
           >
-            <span aria-hidden="true" className="ms-7 inline-block">·</span>
+            <span aria-hidden="true" className="ms-7 inline-block">
+              ·
+            </span>
             {t("legalTerms")}
           </Link>
 

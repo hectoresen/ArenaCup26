@@ -1,6 +1,6 @@
+import { PushOptIn } from "@/components/push/push-opt-in";
 import { DeleteAccountForm } from "@/components/settings/delete-account-form";
 import { PrivacyForm } from "@/components/settings/privacy-form";
-import { PushOptIn } from "@/components/push/push-opt-in";
 import { auth } from "@/lib/auth";
 import { env } from "@/lib/env";
 import { db } from "@/server/db/client";
@@ -56,9 +56,7 @@ function AjustesLayout({
   return (
     <>
       <header className="mb-6">
-        <h1 className="mb-1 font-display text-[26px] leading-none text-foreground">
-          {t("title")}
-        </h1>
+        <h1 className="mb-1 font-display text-[26px] leading-none text-foreground">{t("title")}</h1>
         <p className="text-[13px] font-bold text-muted">{t("subtitle")}</p>
       </header>
 

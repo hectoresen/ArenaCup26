@@ -14,9 +14,7 @@ export function normalizePrivacy(raw: unknown): UserPrivacy {
   const r = raw as Partial<UserPrivacy>;
   return {
     visibility:
-      r.visibility === "private" || r.visibility === "friends_only"
-        ? r.visibility
-        : "public",
+      r.visibility === "private" || r.visibility === "friends_only" ? r.visibility : "public",
     // Default `true` para rows pre-2026-05-18 sin este campo: la mayoría
     // de users querría exhibir su historial; quien quiera ocultarlo
     // tendrá que togglearlo explícitamente.

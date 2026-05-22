@@ -4,10 +4,10 @@ import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { CountryFlag } from "@/components/common/country-flag";
 import { Link } from "@/i18n/navigation";
 import { removeFriend } from "@/server/friends/actions";
-import { getAvatar } from "@/server/profile/avatars";
 import type { Friend } from "@/server/friends/types";
-import { useState, useTransition } from "react";
+import { getAvatar } from "@/server/profile/avatars";
 import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 
 type Props = {
   friends: Friend[];
@@ -56,22 +56,14 @@ export function FriendsList({ friends: initial }: Props) {
     <>
       <ul className="m-0 flex list-none flex-col gap-2 p-0">
         {friends.map((f) => (
-          <FriendRow
-            key={f.userId}
-            friend={f}
-            onRemove={() => setPendingRemove(f)}
-          />
+          <FriendRow key={f.userId} friend={f} onRemove={() => setPendingRemove(f)} />
         ))}
       </ul>
 
       <ConfirmDialog
         open={pendingRemove !== null}
         title={t("removeTitle")}
-        body={
-          pendingRemove
-            ? t("removeBody", { name: pendingRemove.name })
-            : ""
-        }
+        body={pendingRemove ? t("removeBody", { name: pendingRemove.name }) : ""}
         confirmLabel={t("removeCta")}
         cancelLabel={tCommon("cancel")}
         variant="danger"

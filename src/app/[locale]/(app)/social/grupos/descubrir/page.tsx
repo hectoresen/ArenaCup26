@@ -40,9 +40,7 @@ export default async function DescubrirGruposPage({
         <h1 className="mt-2 font-display text-[26px] leading-none text-foreground">
           {td("headerTitle")}
         </h1>
-        <p className="mt-1 text-[13px] font-bold text-muted">
-          {td("headerSubtitle")}
-        </p>
+        <p className="mt-1 text-[13px] font-bold text-muted">{td("headerSubtitle")}</p>
       </header>
 
       <form method="GET" className="mb-5">

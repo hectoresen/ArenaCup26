@@ -1,13 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import {
-  deleteGroup,
-  transferAdmin,
-  updateGroup,
-} from "@/server/groups/actions";
+import { deleteGroup, transferAdmin, updateGroup } from "@/server/groups/actions";
+import { MAX_LINKS_PER_GROUP } from "@/server/groups/caps";
 import { cancelGroupInvitation, createGroupInvitation } from "@/server/groups/invitations";
 import { createGroupLink, revokeGroupLink } from "@/server/groups/links";
 import { expelMember } from "@/server/groups/membership";
@@ -17,7 +11,9 @@ import type {
   GroupLinkRow,
   GroupMemberRow,
 } from "@/server/groups/types";
-import { MAX_LINKS_PER_GROUP } from "@/server/groups/caps";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 type Friend = {
   id: string;
@@ -28,7 +24,9 @@ type Friend = {
 type Props = {
   group: GroupDetail;
   members: GroupMemberRow[];
-  pendingInvitations: Array<GroupInvitationRow & { inviteeName: string | null; inviteeUsername: string | null }>;
+  pendingInvitations: Array<
+    GroupInvitationRow & { inviteeName: string | null; inviteeUsername: string | null }
+  >;
   links: GroupLinkRow[];
   invitableFriends: Friend[];
 };
@@ -44,7 +42,9 @@ export function GroupAdminPanel({
   return (
     <section className="mt-6 space-y-3">
       <header className="flex items-center gap-2.5">
-        <span aria-hidden="true" className="text-[14px] leading-none text-gold">◈</span>
+        <span aria-hidden="true" className="text-[14px] leading-none text-gold">
+          ◈
+        </span>
         <h2 className="font-display text-[13px] uppercase tracking-[0.12em] text-gold">
           {t("panelTitle")}
         </h2>
@@ -65,7 +65,9 @@ function InvitePanel({
 }: {
   groupId: string;
   friends: Friend[];
-  pending: Array<GroupInvitationRow & { inviteeName: string | null; inviteeUsername: string | null }>;
+  pending: Array<
+    GroupInvitationRow & { inviteeName: string | null; inviteeUsername: string | null }
+  >;
 }) {
   const router = useRouter();
   const t = useTranslations("groups.admin.invite");
@@ -97,7 +99,11 @@ function InvitePanel({
   }
 
   return (
-    <details open={open} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)} className="rounded-2xl border-2 border-border bg-card">
+    <details
+      open={open}
+      onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}
+      className="rounded-2xl border-2 border-border bg-card"
+    >
       <summary className="cursor-pointer list-none px-4 py-3 font-display text-[14px] text-foreground">
         {t("header")}
         {pending.length > 0 && (
@@ -108,9 +114,7 @@ function InvitePanel({
       </summary>
       <div className="space-y-3 border-t border-border px-4 py-4">
         {friends.length === 0 ? (
-          <p className="text-[12px] font-bold text-muted">
-            {t("emptyFriends")}
-          </p>
+          <p className="text-[12px] font-bold text-muted">{t("emptyFriends")}</p>
         ) : (
           <ul className="space-y-1.5">
             {friends.map((f) => (
@@ -119,9 +123,7 @@ function InvitePanel({
                   <div className="truncate text-[14px] font-bold text-foreground">
                     {f.name ?? f.username ?? t("noName")}
                   </div>
-                  {f.username && (
-                    <div className="text-[11px] text-muted">@{f.username}</div>
-                  )}
+                  {f.username && <div className="text-[11px] text-muted">@{f.username}</div>}
                 </div>
                 <button
                   type="button"
@@ -240,11 +242,12 @@ function LinksPanel({ groupId, links }: { groupId: string; links: GroupLinkRow[]
               const capLabel =
                 l.maxUses === 0 ? t("metaUnlimited") : t("metaCap", { max: l.maxUses });
               return (
-                <li key={l.linkId} className="rounded-xl border border-border bg-card-hover/40 px-3 py-2.5">
+                <li
+                  key={l.linkId}
+                  className="rounded-xl border border-border bg-card-hover/40 px-3 py-2.5"
+                >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-[11px] font-bold text-muted">
-                      {l.url}
-                    </span>
+                    <span className="truncate text-[11px] font-bold text-muted">{l.url}</span>
                     <div className="flex shrink-0 gap-2">
                       <button
                         type="button"
@@ -324,7 +327,10 @@ function MembersPanel({
           <p className="text-[12px] font-bold text-muted">{t("empty")}</p>
         ) : (
           members.map((m) => (
-            <div key={m.userId} className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card-hover/40 px-3 py-2">
+            <div
+              key={m.userId}
+              className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card-hover/40 px-3 py-2"
+            >
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[13px] font-bold text-foreground">
                   {m.name}
@@ -334,9 +340,7 @@ function MembersPanel({
                     </span>
                   )}
                 </div>
-                {m.username && (
-                  <div className="text-[11px] text-muted">@{m.username}</div>
-                )}
+                {m.username && <div className="text-[11px] text-muted">@{m.username}</div>}
               </div>
               {m.role !== "admin" && (
                 <div className="flex gap-2">
@@ -362,9 +366,7 @@ function MembersPanel({
 
         {confirmId && (
           <div className="rounded-2xl border-2 border-red-500/40 bg-red-500/10 p-3">
-            <p className="mb-2 text-[12px] font-bold text-foreground">
-              {t("confirmExpelTitle")}
-            </p>
+            <p className="mb-2 text-[12px] font-bold text-foreground">{t("confirmExpelTitle")}</p>
             <div className="flex gap-2">
               <button
                 type="button"
@@ -387,9 +389,7 @@ function MembersPanel({
 
         {transferId && (
           <div className="rounded-2xl border-2 border-gold/40 bg-gold/[0.06] p-3">
-            <p className="mb-2 text-[12px] font-bold text-foreground">
-              {t("transferTitle")}
-            </p>
+            <p className="mb-2 text-[12px] font-bold text-foreground">{t("transferTitle")}</p>
             <div className="flex gap-2">
               <button
                 type="button"
@@ -439,9 +439,7 @@ function DangerZone({ group }: { group: GroupDetail }) {
         router.refresh();
       } else {
         setError(
-          res.code === "max_members_below_count"
-            ? t("error.capBelowCount")
-            : t("error.generic"),
+          res.code === "max_members_below_count" ? t("error.capBelowCount") : t("error.generic"),
         );
       }
     });
@@ -474,7 +472,9 @@ function DangerZone({ group }: { group: GroupDetail }) {
         ) : (
           <div className="space-y-3">
             <label className="block">
-              <span className="mb-1 block text-[11px] font-black uppercase tracking-[0.1em] text-muted">{t("nameLabel")}</span>
+              <span className="mb-1 block text-[11px] font-black uppercase tracking-[0.1em] text-muted">
+                {t("nameLabel")}
+              </span>
               <input
                 type="text"
                 value={name}
@@ -484,7 +484,9 @@ function DangerZone({ group }: { group: GroupDetail }) {
               />
             </label>
             <fieldset>
-              <legend className="mb-1 block text-[11px] font-black uppercase tracking-[0.1em] text-muted">{t("visibilityLabel")}</legend>
+              <legend className="mb-1 block text-[11px] font-black uppercase tracking-[0.1em] text-muted">
+                {t("visibilityLabel")}
+              </legend>
               <select
                 value={visibility}
                 onChange={(e) => setVisibility(e.target.value as "public" | "private")}

@@ -1,5 +1,5 @@
 import { test as anonTest, expect } from "@playwright/test";
-import { test, loginAs } from "./fixtures";
+import { loginAs, test } from "./fixtures";
 
 /**
  * Smoke + happy-path tests del módulo de grupos.
@@ -76,9 +76,7 @@ test.describe("groups — happy paths (authenticated)", () => {
     await expect(authedPage.getByRole("link", { name: /^Grupos$/i })).toBeVisible();
   });
 
-  test("clicking 'Grupos' tab when no groups shows empty state CTA", async ({
-    authedPage,
-  }) => {
+  test("clicking 'Grupos' tab when no groups shows empty state CTA", async ({ authedPage }) => {
     // Asumimos un user fresh sin grupos. Si tiene grupos, el flujo
     // muestra el primer grupo y el test se vuelve no-aplicable.
     await authedPage.goto("/es/ranking?scope=grupos");
@@ -97,9 +95,7 @@ test.describe("groups — happy paths (authenticated)", () => {
     }
   });
 
-  test("discover page renders ALL groups including private with lock", async ({
-    authedPage,
-  }) => {
+  test("discover page renders ALL groups including private with lock", async ({ authedPage }) => {
     await authedPage.goto("/es/social/grupos/descubrir");
     // Encabezado debe estar presente.
     await expect(authedPage.locator("h1")).toBeVisible();

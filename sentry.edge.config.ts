@@ -5,8 +5,8 @@
  * sí ejecuta código en Edge, por eso lo dejamos configurado.
  */
 
-import * as Sentry from "@sentry/nextjs";
 import { scrubPiiBeforeSend } from "@/lib/sentry-scrub";
+import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,

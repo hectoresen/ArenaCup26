@@ -143,10 +143,7 @@ export type MatchRepo = {
    * Si dos teams del provider colisionan en el mismo `code`, genera un
    * código derivado del nombre para evitar romper la unique constraint.
    */
-  upsertTeamFromProvider: (
-    team: ProviderTeamUpsert,
-    source: string,
-  ) => Promise<string>;
+  upsertTeamFromProvider: (team: ProviderTeamUpsert, source: string) => Promise<string>;
   /**
    * Devuelve IDs de matches en `status='finished'` que tienen al menos
    * una predicción sin su correspondiente fila en `point_events`. Es el

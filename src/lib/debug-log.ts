@@ -10,15 +10,7 @@
  * verbosos a propósito.
  */
 
-type Scope =
-  | "cron"
-  | "sync"
-  | "reconcile"
-  | "scoring"
-  | "predict"
-  | "ranking"
-  | "notify"
-  | "push";
+type Scope = "cron" | "sync" | "reconcile" | "scoring" | "predict" | "ranking" | "notify" | "push";
 
 /**
  * Loguea un evento del pipeline. El payload se serializa con JSON.stringify

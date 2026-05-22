@@ -1,15 +1,3 @@
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  inArray,
-  isNull,
-  isNotNull,
-  or,
-  sql,
-} from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
 import type { Database } from "@/server/db/client";
 import {
   type GroupColor,
@@ -22,8 +10,10 @@ import {
   userPoints,
   users,
 } from "@/server/db/schema";
-import { buildGroupInviteUrl } from "./tokens";
+import { and, asc, desc, eq, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { countActiveMembers } from "./caps";
+import { buildGroupInviteUrl } from "./tokens";
 import type {
   GroupDetail,
   GroupInvitationRow,
@@ -71,12 +61,7 @@ export async function getUserGroups(db: Database, userId: string): Promise<Group
       total: sql<number>`count(*)::int`,
     })
     .from(groupMemberships)
-    .where(
-      and(
-        inArray(groupMemberships.groupId, groupIds),
-        isNull(groupMemberships.leftAt),
-      ),
-    )
+    .where(and(inArray(groupMemberships.groupId, groupIds), isNull(groupMemberships.leftAt)))
     .groupBy(groupMemberships.groupId);
   const countMap = new Map(counts.map((c) => [c.groupId, c.total]));
 
@@ -201,9 +186,7 @@ export async function getGroupDetail(
     const membRows = await db
       .select({ role: groupMemberships.role, leftAt: groupMemberships.leftAt })
       .from(groupMemberships)
-      .where(
-        and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, viewerId)),
-      )
+      .where(and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, viewerId)))
       .limit(1);
     const memb = membRows[0];
     if (memb) {
@@ -250,10 +233,7 @@ export async function getGroupDetail(
  * filtrando por miembros del grupo. Si no hay historial suficiente,
  * `rankDelta` queda `null`.
  */
-export async function getGroupRanking(
-  db: Database,
-  groupId: string,
-): Promise<GroupRankingEntry[]> {
+export async function getGroupRanking(db: Database, groupId: string): Promise<GroupRankingEntry[]> {
   // 1) Memberships del grupo (activos + congelados) con datos del user.
   //    `lastActiveAt` viaja hasta la fila final para que el ranking de
   //    grupo muestre el mismo "puntito verde" que el global.
@@ -302,7 +282,12 @@ export async function getGroupRanking(
       total: sql<number>`count(*)::int`,
     })
     .from(predictions)
-    .where(inArray(predictions.userId, memberRows.map((m) => m.userId)))
+    .where(
+      inArray(
+        predictions.userId,
+        memberRows.map((m) => m.userId),
+      ),
+    )
     .groupBy(predictions.userId);
   const predMap = new Map(predRows.map((p) => [p.userId, p.total]));
 
@@ -431,9 +416,7 @@ export async function getGroupRanking(
     const currentRank = i + 1;
     const snapRank = rankInSnapByUser.get(m.userId);
     const rankDelta = snapRank ? snapRank - currentRank : null;
-    const isOnline = m.lastActiveAt
-      ? now - m.lastActiveAt.getTime() <= ONLINE_WINDOW_MS
-      : false;
+    const isOnline = m.lastActiveAt ? now - m.lastActiveAt.getTime() <= ONLINE_WINDOW_MS : false;
     return {
       userId: m.userId,
       username: m.username,
@@ -457,10 +440,7 @@ export async function getGroupRanking(
  * que el admin pueda ver el histórico, pero el listado activo es
  * el que admite acciones (expulsar / transferir admin).
  */
-export async function getGroupMembers(
-  db: Database,
-  groupId: string,
-): Promise<GroupMemberRow[]> {
+export async function getGroupMembers(db: Database, groupId: string): Promise<GroupMemberRow[]> {
   const rows = await db
     .select({
       userId: groupMemberships.userId,
@@ -539,10 +519,7 @@ export async function getPendingGroupInvitations(
  * admin sepa cuáles ya no funcionan. Revocados se incluyen también
  * con flag para histórico.
  */
-export async function getGroupLinks(
-  db: Database,
-  groupId: string,
-): Promise<GroupLinkRow[]> {
+export async function getGroupLinks(db: Database, groupId: string): Promise<GroupLinkRow[]> {
   const rows = await db
     .select({
       linkId: groupLinks.id,
@@ -602,12 +579,7 @@ export async function getOutboundGroupInvitations(
     .from(groupInvitations)
     .innerJoin(groups, eq(groups.id, groupInvitations.groupId))
     .leftJoin(invitee, eq(invitee.id, groupInvitations.inviteeId))
-    .where(
-      and(
-        eq(groupInvitations.groupId, groupId),
-        eq(groupInvitations.status, "pending"),
-      ),
-    )
+    .where(and(eq(groupInvitations.groupId, groupId), eq(groupInvitations.status, "pending")))
     .orderBy(desc(groupInvitations.createdAt));
 
   return rows.map((r) => ({
@@ -638,10 +610,7 @@ export type GroupLinkPreview =
     }
   | { ok: false; code: "not_found" | "revoked" | "exhausted" | "group_deleted" };
 
-export async function previewGroupLink(
-  db: Database,
-  token: string,
-): Promise<GroupLinkPreview> {
+export async function previewGroupLink(db: Database, token: string): Promise<GroupLinkPreview> {
   const rows = await db
     .select({
       groupId: groups.id,

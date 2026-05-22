@@ -98,7 +98,11 @@ describe("syncFixtures", () => {
     const provider = buildProvider([buildSnapshot(), buildSnapshot({ externalId: "fix-2" })]);
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    const report = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
+    const report = await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 1, season: 2022 },
+    });
 
     expect(report).toEqual({
       source: "test-provider",
@@ -116,7 +120,11 @@ describe("syncFixtures", () => {
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
     await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
-    const second = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
+    const second = await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 1, season: 2022 },
+    });
 
     expect(second.inserted).toBe(0);
     expect(second.updated).toBe(0);
@@ -142,7 +150,11 @@ describe("syncFixtures", () => {
     });
     const provider = buildProvider([buildSnapshot()]);
 
-    const report = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
+    const report = await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 1, season: 2022 },
+    });
 
     expect(report.updated).toBe(1);
     expect(report.inserted).toBe(0);
@@ -161,7 +173,11 @@ describe("syncFixtures", () => {
     ]);
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    const report = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
+    const report = await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 1, season: 2022 },
+    });
 
     expect(report.inserted).toBe(2);
     expect(report.skipped).toBe(1);
@@ -202,9 +218,9 @@ describe("syncFixtures", () => {
     };
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    await expect(syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } })).rejects.toThrow(
-      ProviderError,
-    );
+    await expect(
+      syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } }),
+    ).rejects.toThrow(ProviderError);
   });
 
   it("captures persistence failures into report.errors without aborting the batch", async () => {
@@ -221,7 +237,11 @@ describe("syncFixtures", () => {
       return originalInsert(...args);
     };
 
-    const report = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
+    const report = await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 1, season: 2022 },
+    });
 
     expect(report.inserted).toBe(1);
     expect(report.errors).toHaveLength(1);
@@ -344,7 +364,11 @@ describe("syncFixtures", () => {
     ]);
     const repo = buildInMemoryRepo({ teams: TEAM_MAP });
 
-    const report = await syncFixtures({ provider, repo, fetch: { mode: "season", leagueId: 1, season: 2022 } });
+    const report = await syncFixtures({
+      provider,
+      repo,
+      fetch: { mode: "season", leagueId: 1, season: 2022 },
+    });
 
     expect(report.inserted).toBe(1);
     expect(report.updated).toBe(1);

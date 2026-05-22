@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
-import { dlog, derr } from "@/lib/debug-log";
+import { derr, dlog } from "@/lib/debug-log";
 import { env } from "@/lib/env";
 import { checkCronLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
-import { db } from "@/server/db/client";
 import { autoRejectStaleBotRequests } from "@/server/bots/auto-reject";
 import { refreshLiveBotPresence } from "@/server/bots/presence";
+import { db } from "@/server/db/client";
+import { NextResponse } from "next/server";
 
 /**
  * Cron diario que marca como `rejected` los friend requests y group
@@ -54,10 +54,7 @@ export async function POST(req: Request) {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     derr("cron", "auto-reject-bot-requests failed", { err: message });
-    return NextResponse.json(
-      { error: "internal_error", message },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "internal_error", message }, { status: 500 });
   }
 }
 

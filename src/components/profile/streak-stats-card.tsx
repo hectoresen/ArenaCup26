@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
 import type { OwnerStreakStats } from "@/server/profile/owner-extras";
+import { useTranslations } from "next-intl";
 
 type Props = {
   stats: OwnerStreakStats;

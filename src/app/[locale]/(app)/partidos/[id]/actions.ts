@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { assertNotInMaintenance } from "@/server/admin/maintenance-guard";
 import type { PredictionKind, PredictionWinner } from "@/server/dashboard/types";
 import { db } from "@/server/db/client";
 import {
@@ -28,6 +29,7 @@ export async function submitPredictionAction(args: SubmitArgs): Promise<SubmitPr
   if (!session?.user?.id) {
     return { ok: false, code: "match_not_found" };
   }
+  await assertNotInMaintenance();
 
   const result = await submitPrediction({
     db,
@@ -54,6 +56,7 @@ export async function submitPredictionAction(args: SubmitArgs): Promise<SubmitPr
 export async function deletePredictionAction(matchId: string): Promise<void> {
   const session = await auth();
   if (!session?.user?.id) return;
+  await assertNotInMaintenance();
   await deletePrediction(db, session.user.id, matchId);
   revalidatePath(`/partidos/${matchId}`);
   revalidatePath("/inicio");

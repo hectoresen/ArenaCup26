@@ -26,9 +26,7 @@ export function InvitationsPlaceholderCard({ count }: Props) {
         </h2>
       </header>
       {count === 0 ? (
-        <p className="mb-3 text-[12px] font-bold leading-relaxed text-muted">
-          {t("emptyBody")}
-        </p>
+        <p className="mb-3 text-[12px] font-bold leading-relaxed text-muted">{t("emptyBody")}</p>
       ) : (
         <p className="mb-3 text-[12px] font-bold leading-relaxed text-foreground">
           {t("countBody", { count })}

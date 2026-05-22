@@ -96,11 +96,7 @@ export function AchievementCard({ achievement, ownerUsername }: Props) {
 
       {/* Unlocked check — bottom-right, SVG (no emoji) */}
       {unlocked && (
-        <span
-          aria-hidden="true"
-          className="absolute bottom-2.5 end-2.5"
-          title={t("unlockedLabel")}
-        >
+        <span aria-hidden="true" className="absolute bottom-2.5 end-2.5" title={t("unlockedLabel")}>
           <svg width="16" height="16" viewBox="0 0 16 16">
             <use href="#ach-unlocked" />
           </svg>

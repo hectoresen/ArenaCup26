@@ -1,12 +1,12 @@
 "use server";
 
+import { auth } from "@/lib/auth";
+import { dlog } from "@/lib/debug-log";
+import { db } from "@/server/db/client";
+import { users } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { dlog } from "@/lib/debug-log";
-import { auth } from "@/lib/auth";
-import { db } from "@/server/db/client";
-import { users } from "@/server/db/schema";
 import type { UserPrivacy } from "./apply";
 
 const privacySchema = z.object({
@@ -52,4 +52,3 @@ export async function updatePrivacy(input: UserPrivacy): Promise<UpdatePrivacyRe
 
   return { ok: true };
 }
-

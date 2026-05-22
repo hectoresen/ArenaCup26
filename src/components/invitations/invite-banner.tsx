@@ -1,8 +1,8 @@
 "use client";
 
 import { dismissInviteCookie } from "@/server/invitations/actions";
-import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 
 type Props = {
   inviterName: string;

@@ -102,11 +102,7 @@ function RankProgressCard({ progress }: { progress: Progress }) {
         </span>
       </div>
       {hasHistory ? (
-        <LiveRankBody
-          initialRank={rank}
-          dayAgoRank={dayAgoRank}
-          historical={historical}
-        />
+        <LiveRankBody initialRank={rank} dayAgoRank={dayAgoRank} historical={historical} />
       ) : (
         <>
           <div className="mb-2 font-display text-[28px] leading-none tracking-[-0.5px] text-gold">

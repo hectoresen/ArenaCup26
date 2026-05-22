@@ -1,10 +1,10 @@
-import { inArray } from "drizzle-orm";
 import { backfillTeamSpirit } from "@/server/achievements/backfill-team-spirit";
 import { seedAchievements } from "@/server/achievements/seed";
 import { seedBotUsers } from "@/server/bots/seed";
 import { seedBotPredictions } from "@/server/bots/seed-predictions";
 import { db } from "@/server/db/client";
 import { users } from "@/server/db/schema";
+import { inArray } from "drizzle-orm";
 
 /**
  * Bootstrap idempotente que se ejecuta como parte del pre-deploy en
@@ -59,9 +59,7 @@ async function main() {
 
   console.log("→ Bootstrap: seeding 27 bot users…");
   const botResult = await seedBotUsers(db);
-  console.log(
-    `✓ Bots reconciled — created=${botResult.created}, updated=${botResult.updated}.`,
-  );
+  console.log(`✓ Bots reconciled — created=${botResult.created}, updated=${botResult.updated}.`);
 
   if (process.env.SEED_BOT_PREDICTIONS === "true") {
     console.log("→ Bootstrap: seeding bot predictions (SEED_BOT_PREDICTIONS=true)…");
@@ -70,9 +68,7 @@ async function main() {
       `✓ Bot predictions — created=${predResult.predictionsCreated}, matches=${predResult.matchesScanned}, bots=${predResult.botsProcessed}.`,
     );
   } else {
-    console.log(
-      "→ Skipping bot predictions seed (set SEED_BOT_PREDICTIONS=true to run).",
-    );
+    console.log("→ Skipping bot predictions seed (set SEED_BOT_PREDICTIONS=true to run).");
   }
 
   console.log("→ Bootstrap: backfilling team-spirit for users with active groups…");
@@ -101,7 +97,10 @@ async function migrateOldPlaceholders(): Promise<number> {
     "00000000-0000-4000-a000-000000000006",
     "00000000-0000-4000-a000-000000000007",
   ];
-  const deleted = await db.delete(users).where(inArray(users.id, OLD_IDS)).returning({ id: users.id });
+  const deleted = await db
+    .delete(users)
+    .where(inArray(users.id, OLD_IDS))
+    .returning({ id: users.id });
   return deleted.length;
 }
 

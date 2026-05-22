@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-import { renderWithProviders, screen } from "@/test/render-with-providers";
 import type { DashboardData } from "@/server/dashboard/types";
+import { renderWithProviders, screen } from "@/test/render-with-providers";
+import { describe, expect, it, vi } from "vitest";
 
 // LiveAutoRefresh usa `useRouter` de next/navigation que requiere
 // AppRouterProvider — no disponible en jsdom. Lo mockeamos a no-op.

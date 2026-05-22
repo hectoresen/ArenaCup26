@@ -1,12 +1,12 @@
 "use server";
 
-import { and, eq, ne } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { dlog } from "@/lib/debug-log";
 import { db } from "@/server/db/client";
-import { users, usernameHistory } from "@/server/db/schema";
+import { usernameHistory, users } from "@/server/db/schema";
+import { and, eq, ne } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 /**
  * Reglas de username: 3-20 chars, lowercase, alfanumérico + guion.

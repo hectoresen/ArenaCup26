@@ -1,11 +1,11 @@
 "use server";
 
-import { eq } from "drizzle-orm";
 import { signOut } from "@/lib/auth";
 import { auth } from "@/lib/auth";
 import { dlog } from "@/lib/debug-log";
 import { db } from "@/server/db/client";
 import { users } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 import { DELETE_CONFIRMATION_PHRASE } from "./delete-account-constants";
 
 export type DeleteAccountResult =

@@ -30,9 +30,10 @@ describe("matchRowToOutcome", () => {
   });
 
   it("combines homeScore + awayScore en scoreAt90 solo si AMBOS son números", () => {
-    expect(
-      matchRowToOutcome(baseRow({ homeScore: 2, awayScore: 1 })).scoreAt90,
-    ).toEqual({ home: 2, away: 1 });
+    expect(matchRowToOutcome(baseRow({ homeScore: 2, awayScore: 1 })).scoreAt90).toEqual({
+      home: 2,
+      away: 1,
+    });
 
     // Solo uno set → null (defensivo: el provider podría enviar
     // estado inconsistente y no queremos puntuar contra un marcador
@@ -43,23 +44,21 @@ describe("matchRowToOutcome", () => {
 
   it("propaga scoreAtExtra solo cuando hubo prórroga real (ambos campos set)", () => {
     expect(
-      matchRowToOutcome(
-        baseRow({ homeScoreExtra: 3, awayScoreExtra: 2 }),
-      ).scoreAtExtra,
+      matchRowToOutcome(baseRow({ homeScoreExtra: 3, awayScoreExtra: 2 })).scoreAtExtra,
     ).toEqual({ home: 3, away: 2 });
     expect(matchRowToOutcome(baseRow({ homeScoreExtra: 3 })).scoreAtExtra).toBeNull();
   });
 
   it("traduce penaltyWinnerTeamId al lado correcto del partido", () => {
     // Local ganó penales.
-    expect(
-      matchRowToOutcome(baseRow({ penaltyWinnerTeamId: "team-home" })).penaltyWinner,
-    ).toBe("home");
+    expect(matchRowToOutcome(baseRow({ penaltyWinnerTeamId: "team-home" })).penaltyWinner).toBe(
+      "home",
+    );
 
     // Visitante ganó.
-    expect(
-      matchRowToOutcome(baseRow({ penaltyWinnerTeamId: "team-away" })).penaltyWinner,
-    ).toBe("away");
+    expect(matchRowToOutcome(baseRow({ penaltyWinnerTeamId: "team-away" })).penaltyWinner).toBe(
+      "away",
+    );
 
     // Sin penales.
     expect(matchRowToOutcome(baseRow()).penaltyWinner).toBeNull();
@@ -80,11 +79,7 @@ describe("matchRowToOutcome", () => {
   it("acepta un partido `voided` o `cancelled` sin reventar (status crudo)", () => {
     // El engine después decide qué hacer con statuses no-finished;
     // este helper solo traduce.
-    expect(matchRowToOutcome(baseRow({ status: "cancelled" })).status).toBe(
-      "cancelled",
-    );
-    expect(matchRowToOutcome(baseRow({ status: "postponed" })).status).toBe(
-      "postponed",
-    );
+    expect(matchRowToOutcome(baseRow({ status: "cancelled" })).status).toBe("cancelled");
+    expect(matchRowToOutcome(baseRow({ status: "postponed" })).status).toBe("postponed");
   });
 });

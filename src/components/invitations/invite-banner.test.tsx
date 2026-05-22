@@ -1,7 +1,7 @@
-import { renderWithProviders, screen } from "@/test/render-with-providers";
 import { dismissInviteCookie } from "@/server/invitations/actions";
+import { renderWithProviders, screen } from "@/test/render-with-providers";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InviteBanner } from "./invite-banner";
 
 const mockedDismiss = vi.mocked(dismissInviteCookie);

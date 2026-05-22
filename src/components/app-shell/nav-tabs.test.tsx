@@ -3,12 +3,7 @@ import { APP_SHELL_TABS, isTabActive } from "./nav-tabs";
 
 describe("APP_SHELL_TABS", () => {
   it("contains exactly the 4 expected tabs in order", () => {
-    expect(APP_SHELL_TABS.map((t) => t.labelKey)).toEqual([
-      "home",
-      "matches",
-      "ranking",
-      "social",
-    ]);
+    expect(APP_SHELL_TABS.map((t) => t.labelKey)).toEqual(["home", "matches", "ranking", "social"]);
   });
 
   it("each tab has a unique href and iconId", () => {

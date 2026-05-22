@@ -1,5 +1,5 @@
-import type { GroupColor } from "@/server/db/schema";
 import { GROUP_COLOR_STYLES } from "@/lib/group-colors";
+import type { GroupColor } from "@/server/db/schema";
 
 type Props = {
   color: GroupColor;

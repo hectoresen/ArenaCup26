@@ -67,11 +67,7 @@ describe("<LiveSection>", () => {
 
   it("renders 'Se calcula al final' placeholder when there's no provisional yet", () => {
     renderWithProviders(
-      <LiveSection
-        live={{ ...liveMatch, provisional: null }}
-        nextMatch={null}
-        now={NOW}
-      />,
+      <LiveSection live={{ ...liveMatch, provisional: null }} nextMatch={null} now={NOW} />,
     );
     expect(screen.getByText(/Se calcula al final del partido/)).toBeInTheDocument();
     expect(screen.queryByText(/\+30 pts/)).not.toBeInTheDocument();

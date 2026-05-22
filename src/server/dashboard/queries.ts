@@ -56,22 +56,30 @@ export async function getDashboardData(db: Database, userId: string): Promise<Da
     ? Math.max(0, NAME_COOLDOWN_MS - (Date.now() - nameChangedAt.getTime()))
     : 0;
 
-  const [stats, live, liveCountRows, upcomingRaw, progress, miniGlobal, miniFriends, achievementsTotal] =
-    await Promise.all([
-      getUserStats(db, userId),
-      getLiveMatchForUser(db, userId),
-      // Conteo de partidos `live` para el link "ver otros en vivo"
-      // (la live card pinta solo uno).
-      db
-        .select({ total: sql<number>`count(*)::int` })
-        .from(matches)
-        .where(eq(matches.status, "live")),
-      getUpcomingMatches(db, userId, UPCOMING_LIMIT * 2),
-      getProgress(db, userId),
-      getMiniLeaderboard(db, userId, 5),
-      getFriendsMiniLeaderboard(db, userId, 5),
-      countAchievementDefinitions(db),
-    ]);
+  const [
+    stats,
+    live,
+    liveCountRows,
+    upcomingRaw,
+    progress,
+    miniGlobal,
+    miniFriends,
+    achievementsTotal,
+  ] = await Promise.all([
+    getUserStats(db, userId),
+    getLiveMatchForUser(db, userId),
+    // Conteo de partidos `live` para el link "ver otros en vivo"
+    // (la live card pinta solo uno).
+    db
+      .select({ total: sql<number>`count(*)::int` })
+      .from(matches)
+      .where(eq(matches.status, "live")),
+    getUpcomingMatches(db, userId, UPCOMING_LIMIT * 2),
+    getProgress(db, userId),
+    getMiniLeaderboard(db, userId, 5),
+    getFriendsMiniLeaderboard(db, userId, 5),
+    countAchievementDefinitions(db),
+  ]);
   const mini: MiniLeaderboardData = { global: miniGlobal, friends: miniFriends };
   const liveCount = liveCountRows[0]?.total ?? 0;
 
@@ -402,12 +410,10 @@ export async function getProgress(db: Database, userId: string): Promise<Progres
   // rankDelta positivo significa que has SUBIDO posiciones (rank
   // numéricamente menor) en las últimas 24h. Convención: ▲ +N para
   // "has subido N", ▼ -N para "has bajado N". Sin histórico → null.
-  const rankDelta =
-    history.dayAgoRank === null ? null : history.dayAgoRank - rank;
+  const rankDelta = history.dayAgoRank === null ? null : history.dayAgoRank - rank;
   // Sparkline: incluimos el snapshot del momento al final para que la
   // gráfica refleje el rank actual sin esperar al cron de mañana.
-  const sparkline =
-    history.sparkline === null ? null : [...history.sparkline, rank];
+  const sparkline = history.sparkline === null ? null : [...history.sparkline, rank];
 
   return {
     rank: { rank, rankDelta, dayAgoRank: history.dayAgoRank, sparkline },
@@ -606,12 +612,7 @@ export async function getFriendsMiniLeaderboard(
   const aheadInGroup = await db
     .select({ n: sql<number>`count(*)::int` })
     .from(userPoints)
-    .where(
-      and(
-        inArray(userPoints.userId, groupIds),
-        sql`${userPoints.totalPoints} > ${myPoints}`,
-      ),
-    );
+    .where(and(inArray(userPoints.userId, groupIds), sql`${userPoints.totalPoints} > ${myPoints}`));
   const me: LeaderboardEntry = {
     userId,
     name: meData.name?.trim() || "Jugador",

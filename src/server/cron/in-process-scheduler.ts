@@ -1,4 +1,4 @@
-import { dlog, derr } from "@/lib/debug-log";
+import { derr, dlog } from "@/lib/debug-log";
 import { env } from "@/lib/env";
 import { db } from "@/server/db/client";
 import { createApiFootballProvider } from "@/server/match-data/providers/api-football";
@@ -113,9 +113,7 @@ export function startInProcessScheduler(): void {
               from: todayStart,
               to: tomorrowStart,
               leagueIds:
-                env.MATCH_DATA_LEAGUE_FILTER.length > 0
-                  ? env.MATCH_DATA_LEAGUE_FILTER
-                  : undefined,
+                env.MATCH_DATA_LEAGUE_FILTER.length > 0 ? env.MATCH_DATA_LEAGUE_FILTER : undefined,
             } as const)
           : ({
               mode: "season" as const,

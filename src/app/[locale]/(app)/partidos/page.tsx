@@ -74,8 +74,7 @@ function parseFilters(raw: {
       raw.status === "live" || raw.status === "scheduled" || raw.status === "finished"
         ? raw.status
         : "all",
-    stage:
-      raw.stage === "group" || raw.stage === "knockout" ? raw.stage : "all",
+    stage: raw.stage === "group" || raw.stage === "knockout" ? raw.stage : "all",
     predictedOnly: raw.mias === "true",
   };
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
 import { sendFriendRequest } from "@/server/friends/actions";
+import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
 
 /**
  * Mini-form para enviar solicitud por @username. Optimistic: deshabilita

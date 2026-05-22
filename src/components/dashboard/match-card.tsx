@@ -1,10 +1,10 @@
-import { useLocale, useTranslations } from "next-intl";
 import { LocalTime } from "@/components/common/local-time";
 import { TeamFlag } from "@/components/common/team-flag";
-import { formatMatchDate, type SupportedLocale } from "@/lib/format/date";
 import { Link } from "@/i18n/navigation";
+import { type SupportedLocale, formatMatchDate } from "@/lib/format/date";
 import { isMatchTBD } from "@/server/dashboard/transforms";
 import type { PredictionView, UpcomingMatch } from "@/server/dashboard/types";
+import { useLocale, useTranslations } from "next-intl";
 
 type Props = {
   match: UpcomingMatch;

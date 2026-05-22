@@ -1,13 +1,13 @@
-import { headers } from "next/headers";
-import { setRequestLocale } from "next-intl/server";
-import { redirect } from "next/navigation";
-import { LeaderboardView } from "@/components/leaderboard/leaderboard-view";
 import { ThrottledState } from "@/components/common/throttled-state";
+import { LeaderboardView } from "@/components/leaderboard/leaderboard-view";
 import { auth } from "@/lib/auth";
 import { getRealSnapshot } from "@/lib/leaderboard/real";
 import { checkPublicReadLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { db } from "@/server/db/client";
+import { setRequestLocale } from "next-intl/server";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function HomePage({
   params,

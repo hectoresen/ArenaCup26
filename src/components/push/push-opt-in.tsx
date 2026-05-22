@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
 import { subscribePush, unsubscribePush } from "@/server/push/actions";
+import { useTranslations } from "next-intl";
+import { useEffect, useState, useTransition } from "react";
 
 type Props = {
   /** Clave pública VAPID — pasada al hook desde el server.
@@ -115,15 +115,15 @@ export function PushOptIn({ vapidPublicKey }: Props) {
   return (
     <section className="rounded-2xl border-2 border-border bg-card p-4">
       <header className="mb-2 flex items-center gap-2">
-        <span aria-hidden="true" className="text-base leading-none">🔔</span>
+        <span aria-hidden="true" className="text-base leading-none">
+          🔔
+        </span>
         <h2 className="font-display text-[14px] uppercase tracking-[0.12em] text-gold">
           {t("title")}
         </h2>
       </header>
       <p className="mb-3 text-[12px] font-bold leading-snug text-muted">{t("body")}</p>
-      {state === "denied" && (
-        <p className="text-[12px] font-extrabold text-warm">{t("denied")}</p>
-      )}
+      {state === "denied" && <p className="text-[12px] font-extrabold text-warm">{t("denied")}</p>}
       {state === "idle" && (
         <button
           type="button"

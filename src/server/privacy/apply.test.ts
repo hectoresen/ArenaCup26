@@ -1,6 +1,6 @@
+import type { UserPrivacy } from "@/server/db/schema";
 import { describe, expect, it } from "vitest";
 import { canViewProfile, normalizePrivacy } from "./apply";
-import type { UserPrivacy } from "@/server/db/schema";
 
 const defaults = { visibility: "public" as const, showHistory: true };
 

@@ -1,8 +1,8 @@
-import { asc, desc, eq, sql } from "drizzle-orm";
 import { dlog } from "@/lib/debug-log";
 import { countryCodeToFlag } from "@/lib/format/country";
 import type { Database } from "@/server/db/client";
 import { predictions, userPoints, users } from "@/server/db/schema";
+import { asc, desc, eq, sql } from "drizzle-orm";
 import type { LeaderboardSnapshot, Player } from "./types";
 
 const TOP_LIMIT = 100;

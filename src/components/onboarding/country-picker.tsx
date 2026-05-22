@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
 import { CountryFlag } from "@/components/common/country-flag";
 import { COUNTRIES } from "@/lib/format/countries";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Props = {
   value: string;

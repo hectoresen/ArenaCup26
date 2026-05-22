@@ -1,18 +1,16 @@
 "use server";
 
+import { auth } from "@/lib/auth";
+import { derr, dlog } from "@/lib/debug-log";
+import { evaluateAndUnlock } from "@/server/achievements/unlock";
+import { assertNotInMaintenance } from "@/server/admin/maintenance-guard";
+import { db } from "@/server/db/client";
+import { groupMemberships, groups, userPoints } from "@/server/db/schema";
+import { notifyWithPush } from "@/server/notifications/notify-with-push";
 import { and, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { dlog, derr } from "@/lib/debug-log";
-import { auth } from "@/lib/auth";
-import { db } from "@/server/db/client";
-import { groupMemberships, groups, userPoints } from "@/server/db/schema";
-import { evaluateAndUnlock } from "@/server/achievements/unlock";
-import { notifyWithPush } from "@/server/notifications/notify-with-push";
-import {
-  canJoinAnotherGroup,
-  hasRoomForOneMore,
-} from "./caps";
+import { canJoinAnotherGroup, hasRoomForOneMore } from "./caps";
 import { buildGroupInviteUrl } from "./tokens";
 import type { GroupActionResult } from "./types";
 
@@ -32,6 +30,7 @@ export async function leaveGroup(input: {
 }): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   const schema = z.object({ groupId: z.string().uuid() });
@@ -75,9 +74,7 @@ export async function leaveGroup(input: {
       frozenStreakMax: p.streakMax,
       frozenSimpleHits: p.simpleHits,
     })
-    .where(
-      and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, userId)),
-    );
+    .where(and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, userId)));
 
   // Notificar al admin que un miembro abandonó.
   try {
@@ -131,6 +128,7 @@ export async function expelMember(input: {
 }): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const adminId = session.user.id;
 
   const schema = z.object({
@@ -161,9 +159,7 @@ export async function expelMember(input: {
   const targetRows = await db
     .select({ leftAt: groupMemberships.leftAt })
     .from(groupMemberships)
-    .where(
-      and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, memberUserId)),
-    )
+    .where(and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, memberUserId)))
     .limit(1);
   const target = targetRows[0];
   if (!target) return { ok: false, code: "not_member" };
@@ -189,9 +185,7 @@ export async function expelMember(input: {
       frozenStreakMax: ep.streakMax,
       frozenSimpleHits: ep.simpleHits,
     })
-    .where(
-      and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, memberUserId)),
-    );
+    .where(and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, memberUserId)));
 
   // Notificar al expulsado (push activo) + al resto de miembros (in-app).
   try {
@@ -206,9 +200,7 @@ export async function expelMember(input: {
     const others = await db
       .select({ userId: groupMemberships.userId })
       .from(groupMemberships)
-      .where(
-        and(eq(groupMemberships.groupId, groupId), isNull(groupMemberships.leftAt)),
-      );
+      .where(and(eq(groupMemberships.groupId, groupId), isNull(groupMemberships.leftAt)));
     for (const o of others) {
       if (o.userId === adminId) continue;
       await notifyWithPush({
@@ -239,6 +231,7 @@ export async function expelMember(input: {
 export async function joinPublicGroup(groupId: string): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   if (!z.string().uuid().safeParse(groupId).success) {
@@ -281,9 +274,7 @@ export async function joinPublicGroup(groupId: string): Promise<GroupActionResul
         frozenSimpleHits: null,
         joinedAt: new Date(),
       })
-      .where(
-        and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, userId)),
-      );
+      .where(and(eq(groupMemberships.groupId, groupId), eq(groupMemberships.userId, userId)));
   } else {
     // Nuevo membership. Caps.
     const cap = await canJoinAnotherGroup(db, userId);
@@ -325,6 +316,7 @@ export async function joinPublicGroup(groupId: string): Promise<GroupActionResul
 export async function joinGroupViaLink(token: string): Promise<GroupActionResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
+  await assertNotInMaintenance();
   const userId = session.user.id;
 
   if (typeof token !== "string" || token.length === 0) {
@@ -383,9 +375,7 @@ export async function joinGroupViaLink(token: string): Promise<GroupActionResult
         frozenSimpleHits: null,
         joinedAt: new Date(),
       })
-      .where(
-        and(eq(groupMemberships.groupId, r.groupId), eq(groupMemberships.userId, userId)),
-      );
+      .where(and(eq(groupMemberships.groupId, r.groupId), eq(groupMemberships.userId, userId)));
   } else {
     await db.insert(groupMemberships).values({
       groupId: r.groupId,

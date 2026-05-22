@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
 import { getAvatar } from "@/server/profile/avatars";
+import { useTranslations } from "next-intl";
 
 /**
  * Iniciales para el fallback del avatar. Toma la primera letra de las

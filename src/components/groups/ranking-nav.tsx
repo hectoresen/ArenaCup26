@@ -1,6 +1,6 @@
 import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
 import type { GroupColor } from "@/server/db/schema";
+import { useTranslations } from "next-intl";
 
 export type RankingScope = "global" | "amigos" | "grupos";
 
@@ -39,11 +39,7 @@ export function RankingNav({ scope, activeGroupId, groups, hasFriends }: Props) 
             label={t("tabFriends")}
           />
         )}
-        <NavPill
-          href="/ranking?scope=grupos"
-          active={scope === "grupos"}
-          label={t("tabGroups")}
-        />
+        <NavPill href="/ranking?scope=grupos" active={scope === "grupos"} label={t("tabGroups")} />
       </nav>
 
       {scope === "grupos" && groups.length > 0 && (

@@ -15,17 +15,24 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockCreate = vi.hoisted(() => vi.fn(async () => ({ id: "notif-1" })));
 const mockGetSubs = vi.hoisted(() =>
-  vi.fn(async (_db: unknown, _userId: string) => [] as Array<{
-    id: string;
-    endpoint: string;
-    p256dh: string;
-    auth: string;
-  }>),
+  vi.fn(
+    async (_db: unknown, _userId: string) =>
+      [] as Array<{
+        id: string;
+        endpoint: string;
+        p256dh: string;
+        auth: string;
+      }>,
+  ),
 );
 const mockSend = vi.hoisted(() =>
   vi.fn(
     async (_sub: unknown, _payload: unknown) =>
-      null as null | { kind: "gone"; endpoint: string } | { kind: "not_configured" } | { kind: "transient"; message: string },
+      null as
+        | null
+        | { kind: "gone"; endpoint: string }
+        | { kind: "not_configured" }
+        | { kind: "transient"; message: string },
   ),
 );
 const mockDelete = vi.hoisted(() => vi.fn(async () => undefined));
@@ -137,10 +144,7 @@ describe("notifyWithPush", () => {
   });
 
   it("cleans up subscriptions that return 'gone'", async () => {
-    mockGetSubs.mockResolvedValue([
-      sub("s1", "https://fcm/1"),
-      sub("s2", "https://mozilla/2"),
-    ]);
+    mockGetSubs.mockResolvedValue([sub("s1", "https://fcm/1"), sub("s2", "https://mozilla/2")]);
     mockSend.mockImplementation(async (rawSub) => {
       const s = rawSub as { endpoint: string };
       if (s.endpoint === "https://fcm/1") {

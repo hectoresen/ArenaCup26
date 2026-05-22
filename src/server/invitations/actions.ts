@@ -1,12 +1,12 @@
 "use server";
 
-import { and, eq, isNull, sql } from "drizzle-orm";
-import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
-import { dlog } from "@/lib/debug-log";
 import { auth } from "@/lib/auth";
+import { dlog } from "@/lib/debug-log";
 import { db } from "@/server/db/client";
 import { invitations } from "@/server/db/schema";
+import { and, eq, isNull, sql } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { INVITE_COOKIE } from "./cookie";
 import { generateInvitationToken } from "./redemption";
 
@@ -25,9 +25,7 @@ const MAX_ACTIVE_LINKS = 5;
  * `maxUses` 0 = ilimitado; cualquier número positivo limita los
  * redeems totales.
  */
-export async function createInvitation(
-  maxUses: number,
-): Promise<CreateInvitationResult> {
+export async function createInvitation(maxUses: number): Promise<CreateInvitationResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
   if (!Number.isInteger(maxUses) || maxUses < 0 || maxUses > 100) {
@@ -81,20 +79,13 @@ export type RevokeInvitationResult =
  * consolidadas (`friendships`) NO se tocan — son independientes
  * del link que las originó.
  */
-export async function revokeInvitation(
-  invitationId: string,
-): Promise<RevokeInvitationResult> {
+export async function revokeInvitation(invitationId: string): Promise<RevokeInvitationResult> {
   const session = await auth();
   if (!session?.user?.id) return { ok: false, code: "unauthorized" };
 
   const rows = await db
     .delete(invitations)
-    .where(
-      and(
-        eq(invitations.id, invitationId),
-        eq(invitations.inviterId, session.user.id),
-      ),
-    )
+    .where(and(eq(invitations.id, invitationId), eq(invitations.inviterId, session.user.id)))
     .returning({ id: invitations.id });
 
   if (rows.length === 0) return { ok: false, code: "not_found" };

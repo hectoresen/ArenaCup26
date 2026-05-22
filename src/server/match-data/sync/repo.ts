@@ -148,10 +148,7 @@ export function createMatchRepo(db: Database): MatchRepo {
         .select({ teamId: teamExternalIds.teamId })
         .from(teamExternalIds)
         .where(
-          and(
-            eq(teamExternalIds.source, source),
-            eq(teamExternalIds.externalId, team.externalId),
-          ),
+          and(eq(teamExternalIds.source, source), eq(teamExternalIds.externalId, team.externalId)),
         )
         .limit(1);
       if (existingMapping[0]) {

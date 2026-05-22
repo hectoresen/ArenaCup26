@@ -45,22 +45,20 @@ export function Hero({ userName, stats, nameCooldownRemainingMs }: Props) {
     >
       <div className="mb-1 flex items-start justify-between gap-3">
         <div className="font-display text-[30px] leading-[1.1] tracking-[0.02em]">
-          {first ? (
-            t.rich("greeting", {
-              name: first,
-              em: () => (
-                <em className="not-italic text-gold">
-                  <EditableName
-                    initial={userName}
-                    display={first}
-                    cooldownRemainingMs={nameCooldownRemainingMs}
-                  />
-                </em>
-              ),
-            })
-          ) : (
-            t("greetingNew")
-          )}
+          {first
+            ? t.rich("greeting", {
+                name: first,
+                em: () => (
+                  <em className="not-italic text-gold">
+                    <EditableName
+                      initial={userName}
+                      display={first}
+                      cooldownRemainingMs={nameCooldownRemainingMs}
+                    />
+                  </em>
+                ),
+              })
+            : t("greetingNew")}
         </div>
         {streakActive && (
           <span

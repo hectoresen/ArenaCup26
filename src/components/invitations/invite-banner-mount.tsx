@@ -1,8 +1,8 @@
-import { cookies } from "next/headers";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
-import { INVITE_COOKIE } from "@/server/invitations/cookie-constants";
 import { getActiveInviteContext } from "@/server/invitations/cookie";
+import { INVITE_COOKIE } from "@/server/invitations/cookie-constants";
+import { cookies } from "next/headers";
 import { InviteBanner } from "./invite-banner";
 
 /**
@@ -36,10 +36,5 @@ export async function InviteBannerMount() {
   const ctx = await getActiveInviteContext(db, token);
   if (!ctx) return null;
 
-  return (
-    <InviteBanner
-      inviterName={ctx.inviterName}
-      inviterUsername={ctx.inviterUsername}
-    />
-  );
+  return <InviteBanner inviterName={ctx.inviterName} inviterUsername={ctx.inviterUsername} />;
 }

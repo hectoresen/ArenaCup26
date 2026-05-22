@@ -1,12 +1,6 @@
-import { dlog, derr } from "@/lib/debug-log";
+import { derr, dlog } from "@/lib/debug-log";
 import type { Database } from "@/server/db/client";
-import {
-  matches,
-  notifications,
-  predictions,
-  teams,
-  users,
-} from "@/server/db/schema";
+import { matches, notifications, predictions, teams, users } from "@/server/db/schema";
 import { and, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { notifyWithPush } from "./notify-with-push";

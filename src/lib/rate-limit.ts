@@ -121,10 +121,7 @@ export type RateLimitResult = {
  * inesperada (OOM en el INCR), el caller debería dejar pasar la
  * request; lo gestionamos con try/catch en `check`.
  */
-function check(
-  scope: LimiterConfig["name"],
-  identifier: string,
-): RateLimitResult {
+function check(scope: LimiterConfig["name"], identifier: string): RateLimitResult {
   const config = CONFIG_BY_NAME.get(scope);
   if (!config) {
     return { ok: true, remaining: 999, reset: 0 };

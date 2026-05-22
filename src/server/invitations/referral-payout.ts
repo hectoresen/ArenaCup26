@@ -1,12 +1,8 @@
-import { and, eq, isNull, sql } from "drizzle-orm";
-import { dlog, derr } from "@/lib/debug-log";
+import { derr, dlog } from "@/lib/debug-log";
 import type { Database } from "@/server/db/client";
-import {
-  invitationRedemptions,
-  pointEvents,
-  userPoints,
-} from "@/server/db/schema";
+import { invitationRedemptions, pointEvents, userPoints } from "@/server/db/schema";
 import { createNotification } from "@/server/notifications/create";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 /**
  * Bonus en puntos que recibe el inviter cuando uno de sus invitados
@@ -48,10 +44,7 @@ export async function payReferralBonusIfFirstHit(
     .update(invitationRedemptions)
     .set({ firstHitAt: new Date() })
     .where(
-      and(
-        eq(invitationRedemptions.inviteeId, inviteeId),
-        isNull(invitationRedemptions.firstHitAt),
-      ),
+      and(eq(invitationRedemptions.inviteeId, inviteeId), isNull(invitationRedemptions.firstHitAt)),
     )
     .returning({ inviterId: invitationRedemptions.inviterId });
 

@@ -1,10 +1,7 @@
 import { CountryFlag } from "@/components/common/country-flag";
 import { Link } from "@/i18n/navigation";
 import { type PointsLocale, formatPoints } from "@/lib/format/number";
-import type {
-  LeaderboardEntry,
-  MiniLeaderboardData,
-} from "@/server/dashboard/types";
+import type { LeaderboardEntry, MiniLeaderboardData } from "@/server/dashboard/types";
 import { useLocale, useTranslations } from "next-intl";
 
 export type MiniTab = "global" | "amigos";
@@ -43,9 +40,7 @@ export function MiniLeaderboard({ mini, active }: Props) {
             {effective === "amigos" ? t("emptyFriends") : t("emptyGlobal")}
           </li>
         ) : (
-          view.top.map((entry) => (
-            <Row key={entry.userId} entry={entry} isMe={false} />
-          ))
+          view.top.map((entry) => <Row key={entry.userId} entry={entry} isMe={false} />)
         )}
         {view.me && (
           <>

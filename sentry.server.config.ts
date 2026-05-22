@@ -10,8 +10,8 @@
  * no está configurado.
  */
 
-import * as Sentry from "@sentry/nextjs";
 import { scrubPiiBeforeSend } from "@/lib/sentry-scrub";
+import * as Sentry from "@sentry/nextjs";
 
 const DSN = process.env.SENTRY_DSN;
 const ENV = process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV;

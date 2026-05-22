@@ -1,6 +1,6 @@
-import { and, eq, isNull } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { groupMemberships, groups, userAchievements } from "@/server/db/schema";
+import { and, eq, isNull } from "drizzle-orm";
 
 /**
  * Backfill idempotente del logro `team-spirit`. Para cada user con
@@ -36,15 +36,8 @@ export async function backfillTeamSpirit(db: Database): Promise<number> {
     .selectDistinct({ userId: groupMemberships.userId })
     .from(groupMemberships)
     .innerJoin(groups, eq(groups.id, groupMemberships.groupId))
-    .where(
-      and(
-        isNull(groupMemberships.leftAt),
-        isNull(groups.deletedAt),
-      ),
-    );
-  const toBackfill = eligibleRows
-    .map((r) => r.userId)
-    .filter((id) => !alreadyHave.includes(id));
+    .where(and(isNull(groupMemberships.leftAt), isNull(groups.deletedAt)));
+  const toBackfill = eligibleRows.map((r) => r.userId).filter((id) => !alreadyHave.includes(id));
 
   if (toBackfill.length === 0) return 0;
 

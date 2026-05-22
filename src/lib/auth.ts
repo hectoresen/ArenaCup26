@@ -9,9 +9,9 @@ import { redeemInvitationForUser } from "@/server/invitations/redemption";
 import { resolveAvailableUsername, slugifyName } from "@/server/users/username";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
-import { cookies, headers } from "next/headers";
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import { cookies, headers } from "next/headers";
 
 /**
  * Auth.js v5 configuration.
@@ -100,12 +100,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const cookieStore = await cookies();
         const token = cookieStore.get(INVITE_COOKIE)?.value;
         if (token) {
-          const result = await redeemInvitationForUser(
-            db,
-            user.id,
-            token,
-            user.name ?? null,
-          );
+          const result = await redeemInvitationForUser(db, user.id, token, user.name ?? null);
           dlog("ranking", "invite redemption attempted on createUser", {
             userId: user.id,
             ok: result.ok,

@@ -93,7 +93,9 @@ async function main() {
       console.log("  7. DELETE FROM notifications  (huérfanas + scoring/achievements)");
     }
     console.log("");
-    console.log(`Estado actual: ${realUsersTouched} HUMANOS con datos de scoring (los bots se resetean siempre).`);
+    console.log(
+      `Estado actual: ${realUsersTouched} HUMANOS con datos de scoring (los bots se resetean siempre).`,
+    );
     if (realUsersTouched > 0) {
       console.log("");
       console.log("⚠  Si ejecutas esto, ESOS humanos pierden sus puntos.");

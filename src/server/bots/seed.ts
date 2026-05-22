@@ -1,6 +1,6 @@
-import { eq, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { users } from "@/server/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { BOT_CATALOG, botEmail } from "./catalog";
 import { refreshLiveBotPresence } from "./presence";
 

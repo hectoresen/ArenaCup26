@@ -1,13 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import {
-  acceptGroupInvitation,
-  rejectGroupInvitation,
-} from "@/server/groups/invitations";
+import { acceptGroupInvitation, rejectGroupInvitation } from "@/server/groups/invitations";
 import type { GroupInvitationRow } from "@/server/groups/types";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { GroupAvatar } from "./group-avatar";
 
 type Props = {
@@ -74,9 +71,7 @@ export function GroupInvitationsInbox({ invitations: initial }: Props) {
         >
           <GroupAvatar color={inv.groupColor} name={inv.groupName} />
           <div className="min-w-0 flex-1">
-            <div className="truncate font-display text-[14px] text-foreground">
-              {inv.groupName}
-            </div>
+            <div className="truncate font-display text-[14px] text-foreground">{inv.groupName}</div>
             {inv.invitedByName && (
               <div className="text-[11px] font-bold text-muted">
                 {t("invitedBy", { name: inv.invitedByName })}

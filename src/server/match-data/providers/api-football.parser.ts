@@ -151,9 +151,7 @@ export function parseApiFootballFixture(
     // postponed) lo descartamos: el dato técnico está en
     // `score.fulltime`, no en el reloj.
     minute:
-      (status === "live" ||
-        status === "extra_time" ||
-        status === "penalty_shootout") &&
+      (status === "live" || status === "extra_time" || status === "penalty_shootout") &&
       typeof raw.fixture.status.elapsed === "number"
         ? raw.fixture.status.elapsed
         : null,
