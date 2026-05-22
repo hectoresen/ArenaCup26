@@ -479,6 +479,7 @@
           "match_finished": "Match finished",
           "achievement_unlocked": "Achievement unlocked",
           "system": "System",
+          "admin_broadcast": "Notice",
           "friend_request": "Friend request",
           "friend_accepted": "Request accepted",
           "group_invited": "Group invitation",

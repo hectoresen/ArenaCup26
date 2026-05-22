@@ -1,4 +1,4 @@
-import { MaintenanceBanner } from "@/components/admin/maintenance-banner";
+import { MaintenanceWall, getMaintenanceDecision } from "@/components/admin/maintenance-banner";
 import { AppFooter } from "@/components/common/app-footer";
 import { InviteBannerMount } from "@/components/invitations/invite-banner-mount";
 import { isValidLocale, routing } from "@/i18n/routing";
@@ -81,6 +81,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   const messages = await getMessages();
   const dir = locale === "ar" ? "rtl" : "ltr";
+  const maintenance = await getMaintenanceDecision();
 
   return (
     <html lang={locale} dir={dir} className={`${fredokaOne.variable} ${nunito.variable}`}>
@@ -119,16 +120,21 @@ export default async function LocaleLayout({
           {dir === "rtl" ? "تخطّى إلى المحتوى" : "Saltar al contenido"}
         </a>
         <NextIntlClientProvider messages={messages}>
-          {/* Banner global cuando el admin ha activado modo mantenimiento.
-              SSR-only, sin botón de cerrar — debe seguir visible hasta
-              que el admin lo desactive. */}
-          <MaintenanceBanner />
-          {/* Banner sticky cuando hay cookie de invite activa y el
-              visitante NO está logado. SSR-only — el server resuelve
-              el inviter; si no aplica, no se monta nada. */}
-          <InviteBannerMount />
-          {children}
-          <AppFooter />
+          {maintenance.kind === "wall" ? (
+            // Mantenimiento activo + visitante NO admin → reemplazamos
+            // toda la app por un wall fullscreen. No hay forma de
+            // saltarlo desde el cliente: la decisión vive en el server.
+            <MaintenanceWall message={maintenance.message} />
+          ) : (
+            <>
+              {/* Banner sticky cuando hay cookie de invite activa y
+                  el visitante NO está logado. SSR-only — el server
+                  resuelve el inviter; si no aplica, no se monta nada. */}
+              <InviteBannerMount />
+              {children}
+              <AppFooter />
+            </>
+          )}
         </NextIntlClientProvider>
       </body>
     </html>
