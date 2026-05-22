@@ -52,10 +52,7 @@ export default async function AdminHome() {
       </section>
 
       {maintenance.enabled && (
-        <div
-          role="status"
-          className="flex items-center justify-between gap-3 rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm"
-        >
+        <output className="flex items-center justify-between gap-3 rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm">
           <span className="text-rose-100">
             <span className="me-2 inline-block h-2 w-2 animate-pulse rounded-full bg-rose-400" />
             Modo mantenimiento <span className="font-black">activo</span> — los usuarios no admin
@@ -67,7 +64,7 @@ export default async function AdminHome() {
           >
             Gestionar
           </Link>
-        </div>
+        </output>
       )}
 
       <section className="rounded-xl border border-slate-800 bg-slate-900 p-5">

@@ -61,6 +61,12 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
         icon: "wrench",
         description: "Toggle modo mantenimiento global",
       },
+      {
+        href: "/admin/backups",
+        label: "Backups",
+        icon: "database",
+        description: "Listado de snapshots BD",
+      },
     ],
   },
 ];
@@ -279,6 +285,14 @@ function Icon({ name }: { name: string }) {
           <circle cx="9" cy="7" r="4" />
           <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      );
+    case "database":
+      return (
+        <svg {...common} aria-hidden="true">
+          <ellipse cx="12" cy="5" rx="9" ry="3" />
+          <path d="M3 5v14a9 3 0 0 0 18 0V5" />
+          <path d="M3 12a9 3 0 0 0 18 0" />
         </svg>
       );
     case "menu":
