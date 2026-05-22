@@ -17,16 +17,58 @@ type Props = {
  * Bell con dropdown. Muestra hasta 20 notificaciones, marca todas
  * como leídas al abrirse (UX agresiva pero clara: "ya las viste").
  *
- * No usa SSE — se pinta con el snapshot que llega por SSR. Al
- * pinchar una noti con `matchId`, navegamos al detalle del partido.
+ * Polling cada 60s a `/api/notifications/poll` para detectar
+ * broadcasts y otros eventos asíncronos sin requerir F5. El polling
+ * pausa cuando la pestaña está oculta (`document.hidden`) para no
+ * gastar batería ni quota de BD.
  */
+const POLL_INTERVAL_MS = 60_000;
+
 export function NotificationBell({ initialItems, initialUnreadCount, onMarkAllRead }: Props) {
   const t = useTranslations("appShell.bell");
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(initialUnreadCount);
+  const [items, setItems] = useState(initialItems);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function poll() {
+      if (document.hidden) return;
+      try {
+        const res = await fetch("/api/notifications/poll", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          items: NotificationItem[];
+          unreadCount: number;
+        };
+        if (cancelled) return;
+        setItems(data.items);
+        // Si el dropdown está abierto, las nuevas se consideran "vistas"
+        // implícitamente la próxima vez que se cierre/abra. Mantenemos
+        // unread=0 mientras open=true para no parpadear el badge.
+        setUnread((prev) => (open ? prev : data.unreadCount));
+      } catch {
+        // Network error transitorio — ignoramos y reintentamos el
+        // siguiente tick. No tiene sentido mostrar error al user por
+        // un poll de background.
+      }
+    }
+
+    const id = setInterval(poll, POLL_INTERVAL_MS);
+    function onVisibility() {
+      if (!document.hidden) void poll();
+    }
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -99,13 +141,13 @@ export function NotificationBell({ initialItems, initialUnreadCount, onMarkAllRe
           <header className="border-b border-border px-4 py-3">
             <div className="font-display text-sm text-gold">{t("dropdown.title")}</div>
           </header>
-          {initialItems.length === 0 ? (
+          {items.length === 0 ? (
             <p className="px-4 py-6 text-center text-[12px] font-bold text-muted">
               {t("dropdown.empty")}
             </p>
           ) : (
             <ul className="m-0 max-h-[60vh] list-none overflow-y-auto p-0">
-              {initialItems.map((item) => (
+              {items.map((item) => (
                 <NotificationRow key={item.id} item={item} onClose={() => setOpen(false)} />
               ))}
             </ul>

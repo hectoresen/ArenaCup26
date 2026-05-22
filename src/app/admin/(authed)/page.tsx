@@ -51,20 +51,24 @@ export default async function AdminHome() {
         <Stat label="Predicciones" value={predCount?.total ?? 0} />
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2">
-        <ActionCard
-          href="/admin/maintenance"
-          title="Modo mantenimiento"
-          subtitle={maintenance.enabled ? "Activo — banner global mostrándose" : "Apagado"}
-          tone={maintenance.enabled ? "rose" : "slate"}
-        />
-        <ActionCard
-          href="/admin/broadcast"
-          title="Notificación broadcast"
-          subtitle="Envía a la campana de todos los humanos"
-          tone="slate"
-        />
-      </section>
+      {maintenance.enabled && (
+        <div
+          role="status"
+          className="flex items-center justify-between gap-3 rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm"
+        >
+          <span className="text-rose-100">
+            <span className="me-2 inline-block h-2 w-2 animate-pulse rounded-full bg-rose-400" />
+            Modo mantenimiento <span className="font-black">activo</span> — los usuarios no admin
+            ven el wall.
+          </span>
+          <Link
+            href="/admin/maintenance"
+            className="shrink-0 cursor-pointer rounded-md border border-rose-500/50 bg-rose-500/20 px-3 py-1 text-xs font-bold text-rose-100 transition-colors hover:bg-rose-500/30"
+          >
+            Gestionar
+          </Link>
+        </div>
+      )}
 
       <section className="rounded-xl border border-slate-800 bg-slate-900 p-5">
         <h2 className="mb-3 font-display text-sm uppercase tracking-[0.14em] text-slate-300">
@@ -152,34 +156,6 @@ function Stat({ label, value, sub }: { label: string; value: number; sub?: strin
       <div className="mt-1 font-display text-3xl text-slate-100">{value}</div>
       {sub && <div className="mt-0.5 text-[11px] text-slate-500">{sub}</div>}
     </div>
-  );
-}
-
-function ActionCard(props: {
-  href: string;
-  title: string;
-  subtitle: string;
-  tone: "rose" | "slate";
-}) {
-  const ring =
-    props.tone === "rose"
-      ? "border-rose-500/40 hover:border-rose-500/80"
-      : "border-slate-800 hover:border-gold/50";
-  const dot = props.tone === "rose" ? "bg-rose-400 animate-pulse" : "bg-slate-600";
-  return (
-    <Link
-      href={props.href}
-      className={`group flex items-center justify-between rounded-xl border bg-slate-900 p-4 transition-colors ${ring}`}
-    >
-      <div>
-        <div className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${dot}`} />
-          <span className="font-bold text-slate-100">{props.title}</span>
-        </div>
-        <p className="mt-1 text-xs text-slate-400">{props.subtitle}</p>
-      </div>
-      <span className="text-slate-500 transition-colors group-hover:text-gold">→</span>
-    </Link>
   );
 }
 
