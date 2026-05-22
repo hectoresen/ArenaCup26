@@ -52,28 +52,57 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   session: { strategy: "database" },
   trustHost: env.NODE_ENV !== "production" || env.AUTH_TRUST_HOST,
-  // SessionToken con `domain=.arenacup26.com` para que la cookie sea
-  // legible desde www.arenacup26.com Y admin.arenacup26.com. El OAuth
-  // flow corre en www (AUTH_URL=https://www.arenacup26.com), crea la
-  // sesión, y el redirectTo lleva al user al subdomain admin que ve
-  // la cookie cross-subdomain. Sin esto, admin nunca encuentra sesión.
-  // Las cookies temporales del flow OAuth (state, pkce, csrf, callback)
-  // dejan sus defaults — viven solo en www durante el flow y se
-  // descartan tras el callback.
+  // Cookies cross-subdomain (`domain=.arenacup26.com`) para todo el
+  // flow Auth.js. El OAuth flow corre en www (AUTH_URL=www) pero los
+  // Server Actions de signIn pueden arrancar desde admin.* — el
+  // browser persiste cookies en admin que luego www tiene que leer
+  // en `/api/auth/callback/google`. Si solo sessionToken es
+  // cross-domain, los checks PKCE/state/csrf fallan con
+  // `InvalidCheck: pkceCodeVerifier could not be parsed` porque la
+  // cookie está scoped al subdomain de origen.
+  //
+  // Usamos prefix `__Secure-` (no `__Host-`) en TODAS porque
+  // `__Host-` prohíbe `domain=` por spec — incompatible con
+  // multi-subdomain. La protección que pierdes (`__Host-` impide
+  // que un subdomain comprometido inyecte cookies a otro) es
+  // aceptable: controlamos todos los subdominios bajo arenacup26.com.
   cookies:
     env.NODE_ENV === "production"
-      ? {
-          sessionToken: {
-            name: "__Secure-authjs.session-token",
-            options: {
-              domain: ".arenacup26.com",
-              httpOnly: true,
-              sameSite: "lax",
-              secure: true,
-              path: "/",
+      ? (() => {
+          const sharedOptions = {
+            domain: ".arenacup26.com",
+            httpOnly: true,
+            sameSite: "lax" as const,
+            secure: true,
+            path: "/",
+          };
+          return {
+            sessionToken: {
+              name: "__Secure-authjs.session-token",
+              options: sharedOptions,
             },
-          },
-        }
+            callbackUrl: {
+              name: "__Secure-authjs.callback-url",
+              options: sharedOptions,
+            },
+            csrfToken: {
+              name: "__Secure-authjs.csrf-token",
+              options: sharedOptions,
+            },
+            pkceCodeVerifier: {
+              name: "__Secure-authjs.pkce.code_verifier",
+              options: { ...sharedOptions, maxAge: 900 },
+            },
+            state: {
+              name: "__Secure-authjs.state",
+              options: { ...sharedOptions, maxAge: 900 },
+            },
+            nonce: {
+              name: "__Secure-authjs.nonce",
+              options: sharedOptions,
+            },
+          };
+        })()
       : undefined,
   events: {
     async createUser({ user }) {
