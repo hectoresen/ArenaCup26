@@ -960,7 +960,7 @@
       "create": "+ Create group",
       "discover": "Discover",
       "newShort": "+ New",
-      "discoverPublic": "Discover public groups",
+      "discoverPublic": "Discover groups",
       "atCap": "You're at the maximum of {max} active groups. Leave one before joining another."
     },
     "invitationsInbox": {
@@ -1010,6 +1010,29 @@
         "body": "\"{name}\" is a private group. You can only join via invitation or a shared link from the admin.",
         "ariaCard": "Private group: {name}. Invitation only.",
         "ariaIcon": "Private group"
+      },
+      "filters": {
+        "typeLabel": "Type",
+        "typeAll": "All",
+        "typePublic": "Public",
+        "typePrivate": "Private",
+        "availabilityLabel": "Slots",
+        "availabilityAll": "All",
+        "availabilityOpen": "Open",
+        "availabilityFull": "Full"
+      },
+      "join": {
+        "submit": "Join group",
+        "submitting": "Joining…",
+        "groupFull": "This group is full. No more members can join.",
+        "error": {
+          "group_not_found": "Group not found",
+          "private_group": "This group is private",
+          "group_full": "This group is full",
+          "already_member": "You are already a member",
+          "cap_reached": "You are at the max number of groups",
+          "unauthorized": "Sign in to join"
+        }
       }
     },
     "joinLink": {

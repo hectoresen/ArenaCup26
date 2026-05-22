@@ -95,13 +95,37 @@ export async function getUserGroups(db: Database, userId: string): Promise<Group
 export async function getDiscoverableGroups(
   db: Database,
   viewerId: string | null,
-  options: { limit?: number; offset?: number; search?: string } = {},
+  options: {
+    limit?: number;
+    offset?: number;
+    search?: string;
+    /** Filtra por visibility. `undefined` = ambos. */
+    visibility?: "public" | "private";
+    /** Si `"open"`, solo grupos con plazas libres; `"full"`, solo llenos. */
+    availability?: "open" | "full";
+  } = {},
 ): Promise<GroupSummary[]> {
-  const { limit = 30, offset = 0, search } = options;
+  const { limit = 30, offset = 0, search, visibility, availability } = options;
 
   const conds = [isNull(groups.deletedAt)];
   if (search && search.trim().length > 0) {
     conds.push(sql`${groups.name} ILIKE ${"%" + search.trim() + "%"}`);
+  }
+  if (visibility) {
+    conds.push(eq(groups.visibility, visibility));
+  }
+  if (availability === "open") {
+    conds.push(sql`(
+      SELECT count(*)::int FROM ${groupMemberships}
+      WHERE ${groupMemberships.groupId} = ${groups.id}
+        AND ${groupMemberships.leftAt} IS NULL
+    ) < ${groups.maxMembers}`);
+  } else if (availability === "full") {
+    conds.push(sql`(
+      SELECT count(*)::int FROM ${groupMemberships}
+      WHERE ${groupMemberships.groupId} = ${groups.id}
+        AND ${groupMemberships.leftAt} IS NULL
+    ) >= ${groups.maxMembers}`);
   }
 
   const baseQuery = db

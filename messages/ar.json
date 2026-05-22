@@ -960,7 +960,7 @@
       "create": "+ إنشاء مجموعة",
       "discover": "اكتشاف",
       "newShort": "+ جديد",
-      "discoverPublic": "اكتشف المجموعات العامة",
+      "discoverPublic": "اكتشف المجموعات",
       "atCap": "وصلت إلى الحد الأقصى وهو {max} مجموعات نشطة. غادر إحداها قبل الانضمام إلى أخرى."
     },
     "invitationsInbox": {
@@ -1010,6 +1010,29 @@
         "body": "\"{name}\" مجموعة خاصة. لا يمكن الانضمام إلا عبر دعوة أو رابط مشارك من المشرف.",
         "ariaCard": "مجموعة خاصة: {name}. بالدعوة فقط.",
         "ariaIcon": "مجموعة خاصة"
+      },
+      "filters": {
+        "typeLabel": "النوع",
+        "typeAll": "الكل",
+        "typePublic": "عامة",
+        "typePrivate": "خاصة",
+        "availabilityLabel": "الأماكن",
+        "availabilityAll": "الكل",
+        "availabilityOpen": "متاحة",
+        "availabilityFull": "ممتلئة"
+      },
+      "join": {
+        "submit": "الانضمام للمجموعة",
+        "submitting": "جاري الانضمام…",
+        "groupFull": "هذه المجموعة ممتلئة. لا يمكن إضافة أعضاء.",
+        "error": {
+          "group_not_found": "لم يتم العثور على المجموعة",
+          "private_group": "هذه المجموعة خاصة",
+          "group_full": "هذه المجموعة ممتلئة",
+          "already_member": "أنت عضو بالفعل",
+          "cap_reached": "وصلت إلى الحد الأقصى من المجموعات",
+          "unauthorized": "سجل الدخول للانضمام"
+        }
       }
     },
     "joinLink": {

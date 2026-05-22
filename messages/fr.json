@@ -960,7 +960,7 @@
       "create": "+ Créer un groupe",
       "discover": "Découvrir",
       "newShort": "+ Nouveau",
-      "discoverPublic": "Découvrir les groupes publics",
+      "discoverPublic": "Découvrir les groupes",
       "atCap": "Tu es au maximum de {max} groupes actifs. Quitte-en un avant de rejoindre un autre."
     },
     "invitationsInbox": {
@@ -1010,6 +1010,29 @@
         "body": "\"{name}\" est un groupe privé. Accessible uniquement sur invitation ou via un lien partagé par l'admin.",
         "ariaCard": "Groupe privé : {name}. Sur invitation uniquement.",
         "ariaIcon": "Groupe privé"
+      },
+      "filters": {
+        "typeLabel": "Type",
+        "typeAll": "Tous",
+        "typePublic": "Publics",
+        "typePrivate": "Privés",
+        "availabilityLabel": "Places",
+        "availabilityAll": "Toutes",
+        "availabilityOpen": "Disponibles",
+        "availabilityFull": "Complets"
+      },
+      "join": {
+        "submit": "Rejoindre le groupe",
+        "submitting": "Connexion…",
+        "groupFull": "Ce groupe est complet. Aucun nouveau membre.",
+        "error": {
+          "group_not_found": "Groupe introuvable",
+          "private_group": "Ce groupe est privé",
+          "group_full": "Ce groupe est complet",
+          "already_member": "Tu es déjà membre",
+          "cap_reached": "Tu as atteint le maximum de groupes",
+          "unauthorized": "Connecte-toi pour rejoindre"
+        }
       }
     },
     "joinLink": {
