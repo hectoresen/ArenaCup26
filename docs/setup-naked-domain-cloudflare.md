@@ -1,134 +1,155 @@
 # Setup `arenacup26.com` (apex) via Cloudflare
 
-Cómo hacer que `https://arenacup26.com/es` (sin `www.`) cargue la app.
+Hacer que `https://arenacup26.com/...` redirija a `https://www.arenacup26.com/...`
+sin consumir slot de custom domain en Railway (los dos que tenemos son
+`www` y `admin`).
 
-## Por qué Cloudflare y no Arsys directo
+## Estrategia
 
-- **Railway pide un CNAME en el apex** (`@ → vmdo025k.up.railway.app`).
-- **Arsys no permite CNAME en `@`** porque entra en conflicto con los
-  registros NS/SOA obligatorios del dominio (RFC 1035). Es restricción
-  histórica de muchos registrars antiguos.
-- **Cloudflare hace "CNAME flattening"**: acepta el CNAME en apex
-  internamente y lo expone al mundo como A record con la IP resuelta.
-  Sin conflicto.
-- **Coste**: plan Free de Cloudflare cubre esto al 100%.
+Cloudflare actúa como proxy + redirector:
+- DNS del dominio se gestiona desde Cloudflare (cambio NS en Arsys).
+- `www` y `admin` siguen siendo CNAME a Railway (proxy OFF → conexión
+  directa, Railway emite su cert SSL).
+- El apex `arenacup26.com` apunta a una IP dummy con **proxy ON**
+  (Cloudflare intercepta).
+- Una **Single Redirect Rule** de Cloudflare manda
+  `https://arenacup26.com/*` → `https://www.arenacup26.com/$1` con
+  301. Cloudflare emite el cert SSL del apex (plan Free Universal SSL).
 
-## Estado inicial asumido
+Coste total: 0€. Plan Free de Cloudflare es indefinido y sin tarjeta.
 
-- `www.arenacup26.com` ya funciona como custom domain en Railway (CNAME
-  `aq4m11ep.up.railway.app` desde Arsys).
-- `arenacup26.com` (apex) ya está añadido como custom domain en
-  Railway (CNAME `vmdo025k.up.railway.app`), con TXT verify
-  `_railway-verify`.
-- Arsys tiene los DNS de `www.arenacup26.com` pero no del apex
-  (porque rechazó el CNAME).
+## Datos que vamos a meter
+
+| Dato                            | Valor                                                                              |
+|---------------------------------|------------------------------------------------------------------------------------|
+| CNAME `www`                     | `aq4m11ep.up.railway.app`                                                          |
+| CNAME `admin`                   | `w4bklyzw.up.railway.app`                                                          |
+| TXT `_railway-verify.www`       | `railway-verify=7221f2d0faf1e893918099f9cfdf1991f013484e34d5a03377b477910a715bda`  |
+| TXT `_railway-verify.admin`     | `railway-verify=3996a86b33c716f97b327f2d3f35f592264e1663a7b4571f8b992b7ecc9a5ca8`  |
+| A `@` (apex, dummy)             | `192.0.2.1` (test IP RFC5737, no existe — Cloudflare intercepta)                   |
 
 ## Pasos
 
-### 1) Crear cuenta Cloudflare + añadir el dominio
+### 1. Crear cuenta + añadir dominio
 
-1. https://cloudflare.com → **Sign Up** (gratis).
-2. Dashboard → **Add a Site** → escribir `arenacup26.com`.
-3. Seleccionar plan **Free**.
-4. Cloudflare escanea los DNS actuales de Arsys e importa lo que
-   encuentre. **Confirma que detecta el record `www → aq4m11ep.up.railway.app`**.
-   - Si no aparece, déjalo y lo añadimos manualmente en el paso 3.
-5. Cloudflare te muestra **2 nameservers** propios (tipo
-   `xxx.ns.cloudflare.com` y `yyy.ns.cloudflare.com`). Cópialos.
+1. https://cloudflare.com → **Sign Up** (gratis, sin tarjeta).
+2. Dashboard → **Add a Site** → `arenacup26.com` → **Free** plan.
+3. Cloudflare escanea los DNS actuales de Arsys e importa lo que
+   detecte. Probablemente detecte:
+   - `www CNAME aq4m11ep.up.railway.app`
+   - `admin CNAME w4bklyzw.up.railway.app`
+   - Quizá los TXT `_railway-verify.*` si Arsys los tenía.
+4. Cloudflare te muestra 2 **nameservers** propios (formato
+   `xxx.ns.cloudflare.com`). Cópialos para el paso 3.
 
-### 2) En Cloudflare — preconfigurar los 3 records ANTES de cambiar NS
+### 2. En Cloudflare — DNS records (antes de cambiar NS en Arsys)
 
-Esto se hace **antes** del cambio en Arsys para que cuando los NS
-propaguen Cloudflare ya tenga la zona correcta y `www` no caiga.
+Configura todo ANTES de cambiar los NS para que cuando propaguen no
+caiga `www` ni `admin`.
 
-DNS → Records → **Add record** uno por uno:
+**Verifica que están estos 5 records (añade los que falten):**
 
-**a) `www` (verificar/crear si no se importó):**
 ```
-Type:    CNAME
-Name:    www
-Target:  aq4m11ep.up.railway.app
-Proxy:   ❌ DNS only (nube GRIS)
-TTL:     Auto
-```
-⚠️ **No actives el proxy (naranja)** en el `www`. Railway emite el
-cert SSL del `www` y necesita conexión directa cliente↔Railway.
-
-**b) Apex (CNAME flattening):**
-```
-Type:    CNAME
-Name:    @     (o "arenacup26.com" según cómo lo pida el formulario)
-Target:  vmdo025k.up.railway.app
-Proxy:   ❌ DNS only (nube GRIS)
-TTL:     Auto
-```
-Cloudflare aceptará el CNAME en apex (Arsys no lo hacía).
-
-**c) Verificación Railway:**
-```
-Type:    TXT
-Name:    _railway-verify
-Content: railway-verify=f8b12f690cc1669e2a14c1ee836c7fb6b94c61141ded8cb4eaaf4b3e14cfb003
-TTL:     Auto
+Type: CNAME      Name: www                    Target: aq4m11ep.up.railway.app                 Proxy: 🔘 DNS only (GRIS)
+Type: CNAME      Name: admin                  Target: w4bklyzw.up.railway.app                 Proxy: 🔘 DNS only (GRIS)
+Type: TXT        Name: _railway-verify.www    Content: railway-verify=7221f2d0faf1...         (no proxy, no aplica)
+Type: TXT        Name: _railway-verify.admin  Content: railway-verify=3996a86b33c7...         (no proxy, no aplica)
+Type: A          Name: @                      Target: 192.0.2.1                               Proxy: 🟠 Proxied (NARANJA)
 ```
 
-### 3) En Arsys — cambiar nameservers
+⚠️ **Crítico**:
+- Los CNAME a Railway DEBEN ir con **proxy OFF (gris)**. Si activas
+  proxy en ellos, Cloudflare termina TLS con su cert y Railway no ve
+  el host original → error 526 / cert mismatch.
+- El A del apex DEBE ir con **proxy ON (naranja)** para que la
+  Redirect Rule del paso 4 pueda interceptar.
 
-⚠️ Esto **transfiere toda la gestión DNS** del dominio a Cloudflare. Es
-lo único que tocas en Arsys, y solo una vez.
+### 3. En Arsys — cambiar nameservers
 
-1. Panel Arsys → `arenacup26.com` → sección **Servidores DNS** /
+⚠️ Esto **transfiere toda la gestión DNS** del dominio de Arsys a
+Cloudflare. Una vez hecho, todos los DNS se editan desde Cloudflare.
+
+1. Panel Arsys → `arenacup26.com` → **Servidores DNS** /
    **Nameservers** / **Editar DNS**.
-2. Sustituir los nameservers actuales (los de Arsys) por **los 2 de
-   Cloudflare** del paso 1.5.
+2. Sustituir los dos NS actuales por los **2 de Cloudflare** del paso 1.4.
 3. Guardar.
-4. Espera. Propagación normalmente 5-30 min, máximo 24h.
 
-Cloudflare te enviará un email cuando detecte el cambio:
-> "Your site is now active on Cloudflare"
+Propagación 5-30 min (a veces hasta 24h). Cloudflare manda un email
+"Your site is now active on Cloudflare" cuando lo detecta.
 
-### 4) Verificar
+### 4. En Cloudflare — Single Redirect del apex a www
 
-Cuando llegue el email de Cloudflare:
+Cloudflare → tu dominio `arenacup26.com` → menu izquierdo **Rules** →
+**Redirect Rules** → **Create rule**.
+
+```
+Rule name:      apex-to-www
+When incoming requests match:
+  Field:        Hostname
+  Operator:     equals
+  Value:        arenacup26.com
+Then:
+  Type:         Dynamic
+  Expression:   concat("https://www.arenacup26.com", http.request.uri.path)
+  Status code:  301
+  Preserve query string: ✅ ON
+```
+
+**Deploy**.
+
+> Truco del A → `192.0.2.1`: la regla aplica antes de que Cloudflare
+> intente alcanzar el origin. La IP nunca se llama de verdad. Si
+> alguna vez la regla se desactivara, los visitantes verían un timeout
+> (no expone nada porque `192.0.2.0/24` es bloque de test RFC5737).
+
+### 5. Verificar
+
+Cuando llegue el email de Cloudflare ("Your site is now active"):
 
 ```bash
-# Resolución apex (debe dar IP de Railway, no vacío)
+# Apex resuelve a IPs de Cloudflare (no a 192.0.2.1, eso es solo el origin)
 dig +short arenacup26.com
+# → 104.21.x.x  /  172.67.x.x  (rangos Cloudflare)
 
-# Comprobar TXT de verificación
-dig +short _railway-verify.arenacup26.com TXT
+# www sigue resolviendo a Railway
+dig +short CNAME www.arenacup26.com
+# → aq4m11ep.up.railway.app.
 
-# Probar HTTPS — debe responder 200 con cert válido para arenacup26.com
-curl -I https://arenacup26.com/es
+# admin sigue resolviendo a Railway
+dig +short CNAME admin.arenacup26.com
+# → w4bklyzw.up.railway.app.
+
+# Apex → 301 a www con cert SSL Cloudflare
+curl -I https://arenacup26.com
+# HTTP/2 301
+# location: https://www.arenacup26.com/
+
+# Path se preserva
+curl -I https://arenacup26.com/es/inicio
+# HTTP/2 301
+# location: https://www.arenacup26.com/es/inicio
+
+# Y www sigue funcionando normal con cert Railway
+curl -I https://www.arenacup26.com/
+# HTTP/2 307 (redirect normal de la app)
 ```
-
-En Railway → wmundial → Settings → Networking, el custom domain
-`arenacup26.com` debe pasar de "Pending verification" a "Active" en
-~5 min después de la propagación.
-
-Visita `https://arenacup26.com/es` → carga la app.
 
 ## Caveats
 
-- **El `www` se gestiona ahora desde Cloudflare**, no desde Arsys. Si
-  alguna vez quieres cambiar algo del DNS (subdomain nuevo, etc.), lo
-  haces en Cloudflare.
-- **No actives proxy (naranja) en ninguno de los records.** Si lo
-  activas, Cloudflare termina el TLS con su propio cert y Railway no
-  ve el host original. Resultado: cert mismatch / 526. Mantén siempre
-  "DNS only" (nube gris).
-- **Plan Free de Cloudflare es indefinido**. No expira, no piden
-  tarjeta. Si algún día Cloudflare cambia su política, los NS se
-  pueden devolver a Arsys con el mismo procedimiento al revés (pero
-  perderás CNAME flattening y volvemos al punto de partida).
+- **No actives proxy (naranja) en los CNAME a Railway.** Si lo activas
+  Cloudflare termina TLS con su cert y Railway responde 526 / cert
+  mismatch.
+- **El cert SSL del apex lo emite Cloudflare** (Universal SSL gratis).
+  Para `www` y `admin` lo sigue emitiendo Railway (Let's Encrypt).
+- Si Railway alguna vez marca `www` o `admin` como "unverified", abre
+  el panel Railway y verás los TXT que necesita. Los mete en
+  Cloudflare igual que cualquier otro record.
+- **Plan Free de Cloudflare** cubre esto al 100%. No expira, sin
+  tarjeta. Si algún día revertimos, los NS se devuelven a Arsys con
+  el mismo procedimiento al revés.
 
 ## Si quieres lo mismo con `arenacup26.es`
 
-Mismo procedimiento, otra zona en Cloudflare (gratis también soporta
-N dominios). Pero recuerda que en Railway ya no tienes
-`www.arenacup26.es` (lo borraste para liberar slot). Si quieres
-soportar también el `.es`:
-- Opción 1: upgrade plan Railway (~$20/mes) para tener más customs.
-- Opción 2: mismo Cloudflare redirige `arenacup26.es/*` →
-  `https://www.arenacup26.com/*` con una Redirect Rule. Sin slot
-  Railway, gratis.
+Mismo procedimiento, otra zona Cloudflare (gratis soporta N dominios).
+Single Redirect Rule: `https://arenacup26.es/*` →
+`https://www.arenacup26.com/$1`. Cero slots Railway.
