@@ -354,6 +354,7 @@
     "weeklyDeltaFlat": "بدون تغيير هذا الأسبوع",
     "weeklyDeltaNone": "يبدأ التسجيل في 11 يونيو",
     "accordionLabel": "الإنجازات",
+    "gateBanner": "تُفتح الإنجازات بعد لعب {threshold} مباريات على الأقل من كأس العالم. حاليًا {finished}/{threshold}.",
     "unlockedCount": "{unlocked} من {total} مفتوحة",
     "unlockedLabel": "مفتوح",
     "lockedLabel": "مغلق",

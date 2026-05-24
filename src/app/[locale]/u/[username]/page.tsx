@@ -12,6 +12,7 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { checkPublicReadLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
+import { getAchievementsGateStatus } from "@/server/achievements/gate";
 import { db } from "@/server/db/client";
 import { getViewerRelationWithId } from "@/server/friends/queries";
 import { getOwnerExtras } from "@/server/profile/owner-extras";
@@ -93,6 +94,9 @@ export default async function PublicProfilePage({
   // pagan estas queries.
   const ownerExtras = isOwner && viewerId ? await getOwnerExtras(db, viewerId) : null;
 
+  // Gate de logros: si está activo, el acordeón pinta un aviso.
+  const achievementsGate = await getAchievementsGateStatus();
+
   // Relación de amistad para el CTA. Solo se computa si hay viewer y
   // no es el dueño — el resto de visitantes no ven el botón.
   const friendInfo =
@@ -143,6 +147,7 @@ export default async function PublicProfilePage({
         <AchievementsAccordion
           achievements={profile.achievements}
           ownerUsername={profile.identity.username}
+          gate={achievementsGate}
         />
         {/* Los ajustes de cuenta viven ahora en `/ajustes`, accesible
             desde el dropdown del avatar (top right). Antes vivían

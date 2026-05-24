@@ -354,6 +354,7 @@
     "weeklyDeltaFlat": "No change this week",
     "weeklyDeltaNone": "History starts on June 11",
     "accordionLabel": "Achievements",
+    "gateBanner": "Achievements unlock after at least {threshold} matches of the World Cup. Currently {finished}/{threshold}.",
     "unlockedCount": "{unlocked} of {total} unlocked",
     "unlockedLabel": "Unlocked",
     "lockedLabel": "Locked",

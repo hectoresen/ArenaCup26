@@ -354,6 +354,7 @@
     "weeklyDeltaFlat": "Aucun changement cette semaine",
     "weeklyDeltaNone": "Suivi à partir du 11 juin",
     "accordionLabel": "Succès",
+    "gateBanner": "Les succès se débloquent après au moins {threshold} matchs de la Coupe. Actuellement {finished}/{threshold}.",
     "unlockedCount": "{unlocked} sur {total} débloqués",
     "unlockedLabel": "Débloqué",
     "lockedLabel": "Verrouillé",

@@ -52,7 +52,8 @@ export function RankingNav({ scope, activeGroupId, groups, hasFriends }: Props) 
                   key={g.groupId}
                   href={`/ranking?scope=grupos&g=${g.groupId}`}
                   scroll={false}
-                  className={`shrink-0 rounded-full border-2 px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.08em] no-underline transition-colors ${
+                  title={g.groupName}
+                  className={`block max-w-[160px] shrink-0 truncate rounded-full border-2 px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.08em] no-underline transition-colors ${
                     isActive
                       ? "border-transparent bg-gold text-background"
                       : "border-border bg-card text-muted hover:border-gold/40 hover:text-foreground"

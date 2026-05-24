@@ -1,3 +1,4 @@
+import type { AchievementsGateStatus } from "@/server/achievements/gate";
 import type { ProfileAchievements } from "@/server/public-profile/types";
 import { useTranslations } from "next-intl";
 import { AchievementsIconSprite } from "./achievement-sprite";
@@ -6,6 +7,8 @@ import { TierSection } from "./tier-section";
 type Props = {
   achievements: ProfileAchievements;
   ownerUsername: string;
+  /** Si `active`, mostramos un aviso "logros bloqueados hasta N partidos". */
+  gate?: AchievementsGateStatus;
 };
 
 /**
@@ -15,7 +18,7 @@ type Props = {
  * primero que se vea sin que el user tenga que clicar. Se mantiene el
  * mecanismo de plegado para quien quiera ahorrar scroll.
  */
-export function AchievementsAccordion({ achievements, ownerUsername }: Props) {
+export function AchievementsAccordion({ achievements, ownerUsername, gate }: Props) {
   const t = useTranslations("publicProfile");
   const pct =
     achievements.totalCount > 0
@@ -63,6 +66,14 @@ export function AchievementsAccordion({ achievements, ownerUsername }: Props) {
         </summary>
 
         <div className="space-y-6 border-t border-border px-4 py-5">
+          {gate?.active && (
+            <div className="-mx-1 rounded-xl border-2 border-amber-500/40 bg-amber-500/10 px-3 py-2.5 text-[12px] font-bold text-amber-200">
+              {t("gateBanner", {
+                threshold: gate.threshold,
+                finished: gate.finishedCount,
+              })}
+            </div>
+          )}
           {achievements.groups.map((group) => (
             <TierSection key={group.tier} group={group} ownerUsername={ownerUsername} />
           ))}

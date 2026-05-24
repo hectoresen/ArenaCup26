@@ -354,6 +354,7 @@
     "weeklyDeltaFlat": "Sin cambios esta semana",
     "weeklyDeltaNone": "El histórico empieza el 11 de junio",
     "accordionLabel": "Logros",
+    "gateBanner": "Los logros se desbloquean al jugar al menos {threshold} partidos del Mundial. Llevamos {finished}/{threshold}.",
     "unlockedCount": "{unlocked} de {total} desbloqueados",
     "unlockedLabel": "Desbloqueado",
     "lockedLabel": "Bloqueado",
