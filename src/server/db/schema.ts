@@ -417,6 +417,13 @@ export const userPoints = pgTable("user_points", {
   // `processFinishedMatch` cuando `streak > streakMax`. Usado como
   // segundo criterio del desempate del ranking (docs/scoring.md §X).
   streakMax: integer("streak_max").notNull().default(0),
+  /**
+   * Cuántas veces el user ha alcanzado el hito streak=5 a lo largo
+   * del torneo. Se incrementa en `persistScore` cuando la racha pasa
+   * de < 5 a >= 5. Soporta el logro `double-streak` (2 rachas de 5).
+   * NO se decrementa al romperse la racha — es histórico append-only.
+   */
+  streakMilestones5: integer("streak_milestones_5").notNull().default(0),
   // Cantidad de hits "high-quality" (kind = "simple" o "exact").
   // Tercer criterio del desempate: predicciones simples/exactas
   // tienen más peso que dobles. Se incrementa en

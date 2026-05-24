@@ -1,0 +1,1 @@
+ALTER TABLE "user_points" ADD COLUMN "streak_milestones_5" integer DEFAULT 0 NOT NULL;

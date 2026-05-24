@@ -8,6 +8,7 @@ import {
   invitationRedemptions,
   matches,
   pointEvents,
+  predictions,
   userAchievements,
   userPoints,
 } from "@/server/db/schema";
@@ -46,6 +47,32 @@ type UnlockContext = {
    * `team-spirit` se desbloquea al llegar a 1.
    */
   activeGroupCount: number;
+  /**
+   * Cuántas veces el user ha alcanzado streak=5 a lo largo del
+   * torneo. Counter en `user_points.streak_milestones_5` que se
+   * incrementa cuando la racha cruza de <5 a >=5 en `persistScore`.
+   * Soporta el logro `double-streak` (≥2).
+   */
+  streakMilestones5: number;
+  /**
+   * Stats agregadas para los logros del torneo. "Torneo" = todos los
+   * matches en BD con `stage != 'regular-season'` (durante pre-Mundial
+   * borramos cualquier match de liga regular para que solo queden los
+   * del Mundial). Si esto cambia, hay que filtrar por tournamentId.
+   */
+  tournamentMatchesTotal: number;
+  tournamentMatchesGroup: number;
+  userPredictionsTotal: number;
+  userPredictionsGroup: number;
+  /** Acertó (cualquier kind con puntos > 0) en al menos una semi. */
+  hitASemi: boolean;
+  /** Hizo `exact` en la final. */
+  exactInFinal: boolean;
+  /**
+   * El Mundial terminó = el match de stage='final' está en status
+   * 'finished'. Solo entonces evaluamos `the-goat`.
+   */
+  tournamentEnded: boolean;
 };
 
 const UNLOCK_RULES: Record<string, (ctx: UnlockContext) => boolean> = {
@@ -75,6 +102,28 @@ const UNLOCK_RULES: Record<string, (ctx: UnlockContext) => boolean> = {
   "on-the-podium": (c) => c.rank !== null && c.rank <= 3,
   "runner-up": (c) => c.rank !== null && c.rank <= 2,
   "king-of-the-moment": (c) => c.rank === 1,
+
+  // ───── Mundial-específicos ─────
+  // Predijo ≥10 partidos de fase de grupos del torneo.
+  "group-analyst": (c) => c.userPredictionsGroup >= 10,
+  // Predijo TODOS los partidos de fase de grupos del torneo.
+  "total-strategist": (c) =>
+    c.tournamentMatchesGroup > 0 && c.userPredictionsGroup >= c.tournamentMatchesGroup,
+  // ≥50% de los partidos del torneo predichos.
+  "half-world": (c) =>
+    c.tournamentMatchesTotal > 0 &&
+    c.userPredictionsTotal / c.tournamentMatchesTotal >= 0.5,
+  // 100% de los partidos del torneo predichos.
+  "world-citizen": (c) =>
+    c.tournamentMatchesTotal > 0 && c.userPredictionsTotal >= c.tournamentMatchesTotal,
+  // 2 rachas distintas que llegaron al hito de 5.
+  "double-streak": (c) => c.streakMilestones5 >= 2,
+  // Acertó (cualquier kind con puntos>0) en una semifinal.
+  "the-step-before": (c) => c.hitASemi,
+  // Marcador exacto en la Gran Final.
+  "the-prophet": (c) => c.exactInFinal,
+  // Mundial terminado + rank 1 global.
+  "the-goat": (c) => c.tournamentEnded && c.rank === 1,
 };
 
 /**
@@ -82,16 +131,12 @@ const UNLOCK_RULES: Record<string, (ctx: UnlockContext) => boolean> = {
  * semifinales, "todos los partidos del torneo") y no se evalúan
  * todavía. Documentados aquí para que cualquiera vea el roadmap.
  */
-const PENDING_RULES = new Set([
-  "group-analyst", // necesita contar predictions en stage=group
-  "total-strategist", // necesita "todos los partidos de fase de grupos"
-  "half-world", // 50% de partidos del Mundial
-  "the-step-before", // semifinal del Mundial
-  "double-streak", // 2 rachas de 5
-  "world-citizen", // todos los partidos del Mundial
-  "the-prophet", // exact en la Gran Final
-  "the-goat", // número 1 al finalizar el Mundial
-]);
+// Todos los logros del catálogo están ahora implementados en
+// UNLOCK_RULES. El set queda vacío como contrato — si en el futuro
+// añadimos achievement_definitions sin lógica de unlock, lo
+// listamos aquí para que sea explícito en el código y la UI lo
+// pueda renderizar como "próximamente" en vez de aparentar bug.
+const PENDING_RULES = new Set<string>([]);
 
 /**
  * Evalúa todos los logros para un user, desbloquea los nuevos
@@ -217,6 +262,7 @@ async function loadContext(db: Database, userId: string): Promise<UnlockContext>
       totalPoints: userPoints.totalPoints,
       streak: userPoints.streak,
       correctCount: userPoints.correctCount,
+      streakMilestones5: userPoints.streakMilestones5,
     })
     .from(userPoints)
     .where(eq(userPoints.userId, userId))
@@ -270,6 +316,67 @@ async function loadContext(db: Database, userId: string): Promise<UnlockContext>
     );
   const activeGroupCount = groupCountRow[0]?.total ?? 0;
 
+  // Stats del torneo. "Torneo" = matches con stage != 'regular-season'
+  // (durante pre-Mundial se borran las ligas regulares).
+  const tournamentTotalsRow = await db
+    .select({
+      total: sql<number>`count(*)::int`,
+      group: sql<number>`count(*) filter (where ${matches.stage} = 'group')::int`,
+    })
+    .from(matches)
+    .where(sql`${matches.stage} != 'regular-season'`);
+  const tournamentMatchesTotal = tournamentTotalsRow[0]?.total ?? 0;
+  const tournamentMatchesGroup = tournamentTotalsRow[0]?.group ?? 0;
+
+  // Predicciones del user sobre matches del torneo.
+  const userPredictionsRow = await db
+    .select({
+      total: sql<number>`count(distinct ${predictions.matchId})::int`,
+      group: sql<number>`count(distinct ${predictions.matchId}) filter (where ${matches.stage} = 'group')::int`,
+    })
+    .from(predictions)
+    .innerJoin(matches, eq(matches.id, predictions.matchId))
+    .where(
+      and(eq(predictions.userId, userId), sql`${matches.stage} != 'regular-season'`),
+    );
+  const userPredictionsTotal = userPredictionsRow[0]?.total ?? 0;
+  const userPredictionsGroup = userPredictionsRow[0]?.group ?? 0;
+
+  // Acierto (cualquier kind con puntos > 0) en una semi.
+  const semiHitRow = await db
+    .select({ hit: sql<number>`count(*)::int` })
+    .from(pointEvents)
+    .innerJoin(matches, eq(matches.id, pointEvents.matchId))
+    .where(
+      and(
+        eq(pointEvents.userId, userId),
+        eq(matches.stage, "semi"),
+        sql`${pointEvents.points} > 0`,
+      ),
+    );
+  const hitASemi = (semiHitRow[0]?.hit ?? 0) > 0;
+
+  // Exact en la final.
+  const finalExactRow = await db
+    .select({ hit: sql<number>`count(*)::int` })
+    .from(pointEvents)
+    .innerJoin(matches, eq(matches.id, pointEvents.matchId))
+    .where(
+      and(
+        eq(pointEvents.userId, userId),
+        eq(matches.stage, "final"),
+        eq(pointEvents.kind, "exact"),
+      ),
+    );
+  const exactInFinal = (finalExactRow[0]?.hit ?? 0) > 0;
+
+  // El Mundial terminó = al menos una final con status 'finished'.
+  const finalFinishedRow = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(matches)
+    .where(and(eq(matches.stage, "final"), eq(matches.status, "finished")));
+  const tournamentEnded = (finalFinishedRow[0]?.count ?? 0) > 0;
+
   return {
     totalPoints: points?.totalPoints ?? 0,
     streak: points?.streak ?? 0,
@@ -279,6 +386,14 @@ async function loadContext(db: Database, userId: string): Promise<UnlockContext>
     totalUsers,
     referredFirstHits,
     activeGroupCount,
+    streakMilestones5: points?.streakMilestones5 ?? 0,
+    tournamentMatchesTotal,
+    tournamentMatchesGroup,
+    userPredictionsTotal,
+    userPredictionsGroup,
+    hitASemi,
+    exactInFinal,
+    tournamentEnded,
   };
 }
 

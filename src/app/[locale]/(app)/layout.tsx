@@ -1,4 +1,8 @@
 import { AppShell } from "@/components/app-shell/app-shell";
+import {
+  MaintenanceWall,
+  getMaintenanceDecision,
+} from "@/components/admin/maintenance-banner";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { users } from "@/server/db/schema";
@@ -8,6 +12,8 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { markAllReadAction } from "./_actions";
+
+export const dynamic = "force-dynamic";
 
 /**
  * Layout del route group `(app)`. Envuelve todas las rutas privadas:
@@ -31,6 +37,20 @@ export default async function AppGroupLayout({
   if (!session?.user?.id) {
     // El redirect respeta el locale activo (es → `/es`, en → `/en`, ...).
     redirect(`/${locale}`);
+  }
+
+  // Maintenance guard: re-chequeamos AQUÍ además del root layout
+  // porque Next.js memoiza el root layout entre navegaciones
+  // client-side. Cuando el admin activa mantenimiento, un user ya
+  // logueado que navegue entre páginas de `(app)` no volverá a
+  // ejecutar el root layout — pero SÍ este, que es `force-dynamic`.
+  // Sin este check, los users humanos con sesión activa pueden
+  // seguir navegando y solo descubren el mantenimiento al intentar
+  // mutar algo (predecir, etc) por el `assertNotInMaintenance` de
+  // las server actions, lo cual es una UX horrible.
+  const maintenance = await getMaintenanceDecision();
+  if (maintenance.kind === "wall") {
+    return <MaintenanceWall message={maintenance.message} />;
   }
 
   // Onboarding guard: si el user no ha completado el wizard

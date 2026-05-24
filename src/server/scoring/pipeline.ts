@@ -302,6 +302,14 @@ async function persistScore({
   //      del desempate del ranking.
   const isHighQualityHit = scored.kind === "simple" || scored.kind === "exact";
   const newStreakMaxSql = sql`greatest(${userPoints.streakMax}, ${scored.streakAfter.current})`;
+  // Hito de racha 5: incrementamos counter cuando la racha cruza
+  // de <5 a >=5. El check SQL lee el valor previo de `userPoints.streak`
+  // (antes del UPDATE) y solo incrementa cuando era <5 y el nuevo es >=5.
+  // Si la racha post no llega a 5, no hace falta evaluar nada en SQL.
+  const streakHits5Increment =
+    scored.streakAfter.current >= 5
+      ? sql`CASE WHEN ${userPoints.streak} < 5 THEN 1 ELSE 0 END`
+      : sql`0`;
   await db
     .insert(userPoints)
     .values({
@@ -311,6 +319,7 @@ async function persistScore({
       streak: scored.streakAfter.current,
       streakMax: scored.streakAfter.current,
       simpleHits: isHighQualityHit ? 1 : 0,
+      streakMilestones5: scored.streakAfter.current >= 5 ? 1 : 0,
     })
     .onConflictDoUpdate({
       target: userPoints.userId,
@@ -320,6 +329,7 @@ async function persistScore({
         streak: scored.streakAfter.current,
         streakMax: newStreakMaxSql,
         simpleHits: sql`${userPoints.simpleHits} + ${isHighQualityHit ? 1 : 0}`,
+        streakMilestones5: sql`${userPoints.streakMilestones5} + ${streakHits5Increment}`,
         updatedAt: sql`now()`,
       },
     });
