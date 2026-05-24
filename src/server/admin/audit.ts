@@ -15,6 +15,8 @@ export type AdminAction =
   | "user_unbanned"
   | "user_sessions_revoked"
   | "points_adjusted"
+  | "achievement_granted"
+  | "achievement_revoked"
   | "tournament_reset";
 
 export type LogAdminActionInput = {

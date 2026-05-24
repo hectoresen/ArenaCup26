@@ -66,7 +66,11 @@ export default async function AdminUserDetailPage({
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <Stat label="Puntos" value={user.stats.totalPoints} highlight />
         <Stat label="Predicciones" value={user.stats.predictionsCount} />
-        <Stat label="Logros" value={user.stats.achievementsCount} />
+        <StatLink
+          label="Logros"
+          value={user.stats.achievementsCount}
+          href={`/admin/users/${user.id}/achievements`}
+        />
         <Stat label="Amigos" value={user.stats.friendsCount} />
         <Stat label="Grupos" value={user.stats.groupsCount} />
       </section>
@@ -124,6 +128,33 @@ function Stat({
         {value.toLocaleString("es")}
       </div>
     </div>
+  );
+}
+
+function StatLink({
+  label,
+  value,
+  href,
+}: {
+  label: string;
+  value: number;
+  href: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="block cursor-pointer rounded-xl border border-slate-800 bg-slate-900 p-3 no-underline transition-colors hover:border-gold/40"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[10px] font-black uppercase tracking-[0.12em] text-slate-500">
+          {label}
+        </span>
+        <span className="text-[10px] text-slate-500 transition-colors group-hover:text-gold">
+          →
+        </span>
+      </div>
+      <div className="mt-1 font-display text-2xl text-slate-100">{value.toLocaleString("es")}</div>
+    </Link>
   );
 }
 
