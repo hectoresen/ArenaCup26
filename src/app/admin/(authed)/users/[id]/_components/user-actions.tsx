@@ -2,6 +2,7 @@
 
 import { adjustPointsAction } from "@/server/admin/actions/adjust-points";
 import { banUserAction, unbanUserAction } from "@/server/admin/actions/ban-user";
+import { sendUserNotificationAction } from "@/server/admin/actions/notify-user";
 import { revokeUserSessionsAction } from "@/server/admin/actions/revoke-sessions";
 import { useState, useTransition } from "react";
 
@@ -31,6 +32,7 @@ export function UserActions({
     <section className="space-y-4">
       <h2 className="font-display text-sm uppercase tracking-[0.14em] text-slate-300">Acciones</h2>
       <div className="grid gap-3 lg:grid-cols-2">
+        <NotifyUserCard userId={userId} userName={userName} />
         {isBanned ? (
           <UnbanCard userId={userId} userName={userName} />
         ) : (
@@ -353,13 +355,102 @@ function RevokeSessionsCard({
   );
 }
 
+function NotifyUserCard({
+  userId,
+  userName,
+}: {
+  userId: string;
+  userName: string | null;
+}) {
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [pending, startTransition] = useTransition();
+  const [feedback, setFeedback] = useState<Feedback>(null);
+
+  function submit() {
+    setFeedback(null);
+    if (title.trim().length === 0) {
+      setFeedback({ kind: "err", text: "Título obligatorio." });
+      return;
+    }
+    startTransition(async () => {
+      const r = await sendUserNotificationAction({
+        userId,
+        title: title.trim(),
+        body: body.trim().length > 0 ? body.trim() : null,
+      });
+      if (r.ok) {
+        setFeedback({ kind: "ok", text: "Notificación enviada." });
+        setTitle("");
+        setBody("");
+      } else {
+        setFeedback({ kind: "err", text: `Error: ${r.error}` });
+      }
+    });
+  }
+
+  return (
+    <Card title="Enviar notificación" tone="sky">
+      <p className="text-xs text-slate-400">
+        Crea una notificación in-app a <strong>{userName ?? "este usuario"}</strong>. Aparece en su
+        campana como un "Aviso" (sin push web).
+      </p>
+      <div>
+        <label
+          htmlFor={`notify-title-${userId}`}
+          className="block text-[10px] font-black uppercase tracking-[0.12em] text-slate-400"
+        >
+          Título (obligatorio)
+        </label>
+        <input
+          id={`notify-title-${userId}`}
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={140}
+          placeholder="Aviso importante"
+          className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-gold focus:outline-none"
+        />
+        <div className="mt-1 text-right text-[10px] text-slate-500">{title.length}/140</div>
+      </div>
+      <div>
+        <label
+          htmlFor={`notify-body-${userId}`}
+          className="block text-[10px] font-black uppercase tracking-[0.12em] text-slate-400"
+        >
+          Cuerpo (opcional)
+        </label>
+        <textarea
+          id={`notify-body-${userId}`}
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          maxLength={500}
+          rows={3}
+          placeholder="Detalle del mensaje…"
+          className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-gold focus:outline-none"
+        />
+        <div className="mt-1 text-right text-[10px] text-slate-500">{body.length}/500</div>
+      </div>
+      <button
+        type="button"
+        onClick={submit}
+        disabled={pending || title.trim().length === 0}
+        className="cursor-pointer rounded-md border border-sky-500/40 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-200 transition-colors hover:bg-sky-500/20 disabled:opacity-50"
+      >
+        {pending ? "Enviando…" : "Enviar notificación"}
+      </button>
+      <FeedbackLine feedback={feedback} />
+    </Card>
+  );
+}
+
 function Card({
   title,
   tone,
   children,
 }: {
   title: string;
-  tone: "amber" | "emerald" | "gold" | "rose";
+  tone: "amber" | "emerald" | "gold" | "rose" | "sky";
   children: React.ReactNode;
 }) {
   const border = {
@@ -367,6 +458,7 @@ function Card({
     emerald: "border-emerald-500/30",
     gold: "border-gold/30",
     rose: "border-rose-500/30",
+    sky: "border-sky-500/30",
   }[tone];
   return (
     <div className={`space-y-3 rounded-xl border ${border} bg-slate-900 p-4`}>

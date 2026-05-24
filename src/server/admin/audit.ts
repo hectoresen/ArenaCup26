@@ -10,6 +10,7 @@ import { desc, eq } from "drizzle-orm";
 export type AdminAction =
   | "maintenance_toggle"
   | "broadcast_sent"
+  | "user_notification_sent"
   | "user_banned"
   | "user_unbanned"
   | "user_sessions_revoked"
