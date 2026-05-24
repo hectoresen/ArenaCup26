@@ -5,7 +5,9 @@ import { dlog } from "@/lib/debug-log";
 import { logAdminAction } from "@/server/admin/audit";
 import {
   TargetSchema,
+  type UserSearchRow,
   estimateTargetRecipients,
+  searchUsersForBroadcast,
   sendTargetedBroadcast,
 } from "@/server/admin/targeted-broadcast";
 import { z } from "zod";
@@ -16,9 +18,7 @@ const BroadcastSchema = z.object({
   target: TargetSchema,
 });
 
-export type SendBroadcastResult =
-  | { ok: true; recipients: number; notFoundIdentifiers: string[] }
-  | { ok: false; error: string };
+export type SendBroadcastResult = { ok: true; recipients: number } | { ok: false; error: string };
 
 export async function sendBroadcast(input: unknown): Promise<SendBroadcastResult> {
   dlog("ranking", "sendBroadcast invoked", {
@@ -47,14 +47,12 @@ export async function sendBroadcast(input: unknown): Promise<SendBroadcastResult
       body,
       target: parsed.data.target,
       recipients: result.recipients,
-      notFoundCount: result.notFoundIdentifiers.length,
     },
   });
 
   return {
     ok: true,
     recipients: result.recipients,
-    notFoundIdentifiers: result.notFoundIdentifiers,
   };
 }
 
@@ -74,4 +72,18 @@ export async function previewBroadcastTarget(input: unknown): Promise<PreviewRes
 
   const count = await estimateTargetRecipients(parsed.data);
   return { ok: true, count };
+}
+
+export type SearchUsersResult = { ok: true; rows: UserSearchRow[] } | { ok: false; error: string };
+
+/**
+ * Server action que el autocomplete del tab "Selección" llama para
+ * buscar usuarios. Filtra ya en el servidor por allowlist de admin
+ * (defensa en profundidad: aunque el cliente esté en admin, validamos).
+ */
+export async function searchUsers(q: string): Promise<SearchUsersResult> {
+  const check = await checkAdmin();
+  if (!check.ok) return { ok: false, error: "no-permission" };
+  const rows = await searchUsersForBroadcast(q ?? "");
+  return { ok: true, rows };
 }

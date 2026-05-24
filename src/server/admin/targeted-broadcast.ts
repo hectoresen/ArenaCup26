@@ -1,6 +1,6 @@
 import { db } from "@/server/db/client";
 import { groupMemberships, groups, notifications, userPoints, users } from "@/server/db/schema";
-import { and, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 /**
@@ -18,8 +18,8 @@ export const TargetSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("all") }),
   z.object({
     kind: z.literal("users"),
-    /** Emails o usernames, máximo 200 por seguridad. */
-    identifiers: z.array(z.string().trim().min(1)).min(1).max(200),
+    /** Lista de userIds (UUID), máximo 200 por envío. */
+    userIds: z.array(z.string().uuid()).min(1).max(200),
   }),
   z.object({
     kind: z.literal("group"),
@@ -58,24 +58,14 @@ export async function resolveTargetUserIds(
   }
 
   if (target.kind === "users") {
-    const ids = target.identifiers.map((s) => s.trim()).filter((s) => s.length > 0);
-    if (ids.length === 0) return { userIds: [], notFoundIdentifiers: [] };
-    const idsLower = ids.map((i) => i.toLowerCase());
-    const orClause = or(
-      inArray(sql<string>`lower(${users.email})`, idsLower),
-      inArray(users.username, ids),
-    );
+    if (target.userIds.length === 0) return { userIds: [] };
+    // Validamos que los uuids existan y pasen el filtro notBannedOrBot
+    // (un userId congelado en el cliente pudo banearse en medio del flow).
     const rows = await db
-      .select({ id: users.id, email: users.email, username: users.username })
+      .select({ id: users.id })
       .from(users)
-      .where(orClause ? and(notBannedOrBot, orClause) : notBannedOrBot);
-    const foundLower = new Set<string>();
-    for (const r of rows) {
-      foundLower.add(r.email.toLowerCase());
-      if (r.username) foundLower.add(r.username.toLowerCase());
-    }
-    const notFound = ids.filter((i) => !foundLower.has(i.toLowerCase()));
-    return { userIds: rows.map((r) => r.id), notFoundIdentifiers: notFound };
+      .where(and(notBannedOrBot, inArray(users.id, target.userIds)));
+    return { userIds: rows.map((r) => r.id) };
   }
 
   if (target.kind === "group") {
@@ -122,6 +112,63 @@ export async function resolveTargetUserIds(
   return { userIds: rows.map((r) => r.id) };
 }
 
+export type UserSearchRow = {
+  id: string;
+  name: string | null;
+  email: string;
+  username: string | null;
+  country: string | null;
+  image: string | null;
+  avatarId: string | null;
+};
+
+/**
+ * Autocompletado del tab "Selección" del broadcast. Devuelve hasta
+ * 20 humanos activos (no banned, no bot) que coincidan con la query
+ * en email, name o username (case-insensitive substring). Si la
+ * query está vacía, devuelve los 20 humanos más recientemente
+ * activos para que el admin tenga un punto de partida.
+ */
+export async function searchUsersForBroadcast(q: string): Promise<UserSearchRow[]> {
+  const query = q.trim();
+  const notBannedOrBot = and(
+    eq(users.isBot, false),
+    sql`(${users.bannedUntil} IS NULL OR ${users.bannedUntil} <= now())`,
+  );
+
+  const baseSelect = db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      username: users.username,
+      country: users.country,
+      image: users.image,
+      avatarId: users.avatarId,
+    })
+    .from(users);
+
+  if (query.length === 0) {
+    const rows = await baseSelect
+      .where(notBannedOrBot)
+      .orderBy(desc(users.lastActiveAt), asc(users.id))
+      .limit(20);
+    return rows;
+  }
+
+  const pattern = `%${query}%`;
+  const rows = await baseSelect
+    .where(
+      and(
+        notBannedOrBot,
+        or(ilike(users.email, pattern), ilike(users.name, pattern), ilike(users.username, pattern)),
+      ),
+    )
+    .orderBy(asc(users.name))
+    .limit(20);
+  return rows;
+}
+
 export type TargetedBroadcastInput = {
   title: string;
   body: string | null;
@@ -130,7 +177,6 @@ export type TargetedBroadcastInput = {
 
 export type TargetedBroadcastResult = {
   recipients: number;
-  notFoundIdentifiers: string[];
 };
 
 /**
@@ -148,8 +194,8 @@ export async function sendTargetedBroadcast(
   if (title.length > 140) throw new Error("sendTargetedBroadcast: title too long");
   if (body && body.length > 500) throw new Error("sendTargetedBroadcast: body too long");
 
-  const { userIds, notFoundIdentifiers = [] } = await resolveTargetUserIds(input.target);
-  if (userIds.length === 0) return { recipients: 0, notFoundIdentifiers };
+  const { userIds } = await resolveTargetUserIds(input.target);
+  if (userIds.length === 0) return { recipients: 0 };
 
   await db.insert(notifications).values(
     userIds.map((uid) => ({
@@ -160,7 +206,7 @@ export async function sendTargetedBroadcast(
     })),
   );
 
-  return { recipients: userIds.length, notFoundIdentifiers };
+  return { recipients: userIds.length };
 }
 
 /**

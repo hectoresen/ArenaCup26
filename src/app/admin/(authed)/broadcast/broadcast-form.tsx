@@ -1,13 +1,15 @@
 "use client";
 
+import type { UserSearchRow } from "@/server/admin/targeted-broadcast";
 import { useEffect, useState, useTransition } from "react";
 import { previewBroadcastTarget, sendBroadcast } from "./actions";
+import { UsersPicker } from "./users-picker";
 
 type TargetKind = "all" | "users" | "filter" | "group";
 
 type Target =
   | { kind: "all" }
-  | { kind: "users"; identifiers: string[] }
+  | { kind: "users"; userIds: string[] }
   | { kind: "group"; groupId: string }
   | {
       kind: "filter";
@@ -27,8 +29,8 @@ export function BroadcastForm({ totalHumans, countries, groups }: Props) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
-  // State del tab "Selección"
-  const [identifiersRaw, setIdentifiersRaw] = useState("");
+  // State del tab "Selección": lista de users pickeados.
+  const [selectedUsers, setSelectedUsers] = useState<UserSearchRow[]>([]);
 
   // State del tab "Filtro"
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
@@ -44,12 +46,12 @@ export function BroadcastForm({ totalHumans, countries, groups }: Props) {
 
   const [pending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<
-    { kind: "ok"; recipients: number; notFound: string[] } | { kind: "err"; text: string } | null
+    { kind: "ok"; recipients: number } | { kind: "err"; text: string } | null
   >(null);
 
   const target = buildTarget({
     kind,
-    identifiersRaw,
+    selectedUserIds: selectedUsers.map((u) => u.id),
     selectedCountries,
     topNRaw,
     activeDaysRaw,
@@ -57,22 +59,30 @@ export function BroadcastForm({ totalHumans, countries, groups }: Props) {
   });
 
   // Preview con debounce 400ms.
+  //
+  // `target` se reconstruye en CADA render (buildTarget devuelve
+  // objeto nuevo). Si lo usamos como dep del useEffect tal cual,
+  // el efecto se re-ejecuta indefinidamente → bucle de fetches
+  // cada segundo + parpadeo del "Calculando…". Solución: usar el
+  // valor SERIALIZADO como dep — solo cambia cuando el contenido
+  // cambia, no la referencia.
+  const targetKey = target ? JSON.stringify(target) : null;
   useEffect(() => {
-    if (!target) {
+    if (!targetKey) {
       setPreview(null);
       return;
     }
+    const targetParsed = JSON.parse(targetKey) as Target;
     setPreviewLoading(true);
     const id = setTimeout(async () => {
-      const r = await previewBroadcastTarget(target);
+      const r = await previewBroadcastTarget(targetParsed);
       setPreview(r.ok ? r.count : null);
       setPreviewLoading(false);
     }, 400);
     return () => {
       clearTimeout(id);
-      setPreviewLoading(false);
     };
-  }, [target]);
+  }, [targetKey]);
 
   function submit() {
     setFeedback(null);
@@ -91,13 +101,10 @@ export function BroadcastForm({ totalHumans, countries, groups }: Props) {
         target,
       });
       if (r.ok) {
-        setFeedback({
-          kind: "ok",
-          recipients: r.recipients,
-          notFound: r.notFoundIdentifiers,
-        });
+        setFeedback({ kind: "ok", recipients: r.recipients });
         setTitle("");
         setBody("");
+        setSelectedUsers([]);
       } else {
         setFeedback({ kind: "err", text: `Error: ${r.error}` });
       }
@@ -115,7 +122,7 @@ export function BroadcastForm({ totalHumans, countries, groups }: Props) {
           </p>
         )}
 
-        {kind === "users" && <UsersTab value={identifiersRaw} onChange={setIdentifiersRaw} />}
+        {kind === "users" && <UsersPicker selected={selectedUsers} onChange={setSelectedUsers} />}
 
         {kind === "filter" && (
           <FilterTab
@@ -183,16 +190,9 @@ export function BroadcastForm({ totalHumans, countries, groups }: Props) {
           {pending ? "Enviando…" : "Enviar"}
         </button>
         {feedback?.kind === "ok" && (
-          <div className="text-xs">
-            <span className="font-bold text-emerald-300">
-              Enviado a {feedback.recipients} usuarios.
-            </span>
-            {feedback.notFound.length > 0 && (
-              <div className="mt-1 text-amber-300">
-                No encontrados: {feedback.notFound.join(", ")}
-              </div>
-            )}
-          </div>
+          <span className="text-xs font-bold text-emerald-300">
+            Enviado a {feedback.recipients} usuarios.
+          </span>
         )}
         {feedback?.kind === "err" && (
           <span className="text-xs font-bold text-rose-300">{feedback.text}</span>
@@ -236,28 +236,6 @@ function Tabs({
           )}
         </button>
       ))}
-    </div>
-  );
-}
-
-function UsersTab({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  return (
-    <div>
-      <label
-        htmlFor="bc-users"
-        className="block text-[10px] font-black uppercase tracking-[0.12em] text-slate-400"
-      >
-        Usuarios (uno por línea, email o username)
-      </label>
-      <textarea
-        id="bc-users"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        rows={6}
-        placeholder={"hector.escolante@clouddistrict.com\nusername123\n…"}
-        className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-slate-100 placeholder:text-slate-500 focus:border-gold focus:outline-none"
-      />
-      <p className="mt-1 text-[10px] text-slate-500">Máximo 200 por envío.</p>
     </div>
   );
 }
@@ -425,7 +403,7 @@ function PreviewLine({
 
 function buildTarget(input: {
   kind: TargetKind;
-  identifiersRaw: string;
+  selectedUserIds: string[];
   selectedCountries: string[];
   topNRaw: string;
   activeDaysRaw: string;
@@ -434,12 +412,10 @@ function buildTarget(input: {
   if (input.kind === "all") return { kind: "all" };
 
   if (input.kind === "users") {
-    const ids = input.identifiersRaw
-      .split(/\r?\n/)
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-    if (ids.length === 0 || ids.length > 200) return null;
-    return { kind: "users", identifiers: ids };
+    if (input.selectedUserIds.length === 0 || input.selectedUserIds.length > 200) {
+      return null;
+    }
+    return { kind: "users", userIds: input.selectedUserIds };
   }
 
   if (input.kind === "group") {
