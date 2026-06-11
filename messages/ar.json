@@ -474,6 +474,8 @@
       "dropdown": {
         "title": "الإشعارات",
         "empty": "لا شيء هنا بعد.",
+        "readMore": "قراءة الرسالة",
+        "modalCloseAria": "إغلاق الرسالة",
         "kind": {
           "prediction_sent": "تم إرسال التوقع",
           "prediction_locked": "تم قفل التوقع",

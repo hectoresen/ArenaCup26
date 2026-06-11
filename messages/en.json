@@ -474,6 +474,8 @@
       "dropdown": {
         "title": "Notifications",
         "empty": "Nothing here yet.",
+        "readMore": "Read message",
+        "modalCloseAria": "Close message",
         "kind": {
           "prediction_sent": "Prediction sent",
           "prediction_locked": "Prediction locked",

@@ -474,6 +474,8 @@
       "dropdown": {
         "title": "Notifications",
         "empty": "Rien ici pour l'instant.",
+        "readMore": "Lire le message",
+        "modalCloseAria": "Fermer le message",
         "kind": {
           "prediction_sent": "Prédiction envoyée",
           "prediction_locked": "Prédiction verrouillée",

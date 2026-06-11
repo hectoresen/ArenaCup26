@@ -31,6 +31,12 @@ export function resolveNotificationHref(item: NotificationItem): string | null {
       return item.matchId ? `/partidos/${item.matchId}` : null;
     case "system":
       return null;
+    case "admin_broadcast":
+      // Los avisos del equipo (broadcast/individual desde admin) no
+      // tienen destino — el contenido vive en title+body. La campana
+      // renderiza un modal con el mensaje completo cuando el body
+      // excede el ancho del dropdown (notification-bell.tsx).
+      return null;
     case "group_invited":
     case "group_joined":
     case "group_left":

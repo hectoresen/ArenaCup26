@@ -4,6 +4,7 @@ export type NotificationKind =
   | "match_finished"
   | "achievement_unlocked"
   | "system"
+  | "admin_broadcast"
   | "friend_request"
   | "friend_accepted"
   | "group_invited"
