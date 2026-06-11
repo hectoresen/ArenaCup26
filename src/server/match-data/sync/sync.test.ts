@@ -135,6 +135,8 @@ describe("syncFixtures", () => {
     const initial: CurrentMatchRow = {
       id: "uuid-match-1",
       status: "live",
+      homeTeamId: "uuid-team-home",
+      awayTeamId: "uuid-team-away",
       homeScore: 1,
       awayScore: 0,
       homeScoreExtra: null,
@@ -292,6 +294,8 @@ describe("syncFixtures", () => {
     const initial: CurrentMatchRow = {
       id: "uuid-match-1",
       status: "live",
+      homeTeamId: "uuid-team-home",
+      awayTeamId: "uuid-team-away",
       homeScore: 1,
       awayScore: 0,
       homeScoreExtra: null,

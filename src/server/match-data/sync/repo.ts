@@ -47,6 +47,8 @@ export function createMatchRepo(db: Database): MatchRepo {
         .select({
           id: matches.id,
           status: matches.status,
+          homeTeamId: matches.homeTeamId,
+          awayTeamId: matches.awayTeamId,
           homeScore: matches.homeScore,
           awayScore: matches.awayScore,
           homeScoreExtra: matches.homeScoreExtra,
@@ -63,6 +65,8 @@ export function createMatchRepo(db: Database): MatchRepo {
       const result: CurrentMatchRow = {
         id: row.id,
         status: row.status as DbMatchStatus,
+        homeTeamId: row.homeTeamId ?? "",
+        awayTeamId: row.awayTeamId ?? "",
         homeScore: row.homeScore,
         awayScore: row.awayScore,
         homeScoreExtra: row.homeScoreExtra,

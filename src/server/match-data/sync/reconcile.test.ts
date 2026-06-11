@@ -34,6 +34,8 @@ function currentRow(overrides: Partial<CurrentMatchRow> = {}): CurrentMatchRow {
   return {
     id: "uuid-match",
     status: "scheduled",
+    homeTeamId: "uuid-arg",
+    awayTeamId: "uuid-fra",
     homeScore: null,
     awayScore: null,
     homeScoreExtra: null,

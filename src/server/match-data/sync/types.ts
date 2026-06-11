@@ -21,6 +21,8 @@ export type DbMatchStatus =
 export type CurrentMatchRow = {
   id: string;
   status: DbMatchStatus;
+  homeTeamId: string;
+  awayTeamId: string;
   homeScore: number | null;
   awayScore: number | null;
   homeScoreExtra: number | null;
@@ -45,6 +47,13 @@ export type MatchUpdatePatch = {
   kickoffAt?: Date;
   /** Minuto en juego. Null cuando el partido ya no está en curso. */
   minute?: number | null;
+  /**
+   * Teams. Solo cambian si api-football corrige el fixture antes del
+   * kickoff (sorteos provisionales, errores de data). El `reconcile`
+   * gatea por status para no tocar nunca un partido `live`/`finished`.
+   */
+  homeTeamId?: string;
+  awayTeamId?: string;
 };
 
 /**

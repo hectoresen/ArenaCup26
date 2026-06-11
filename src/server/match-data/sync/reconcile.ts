@@ -104,6 +104,20 @@ export function reconcileMatch(input: ReconcileInput): ReconcileResult {
 
   const patch: MatchUpdatePatch = {};
 
+  // Teams: api-football puede corregir un fixture (mismo external_id)
+  // si publicó equipos provisionales antes del sorteo final o si
+  // re-asigna un equipo. Si difieren, actualizamos — PERO solo
+  // mientras el partido aún no ha empezado: cambiar los teams una
+  // vez está `live`/`finished` sería catastrófico para el scoring.
+  if (current.status === "scheduled" || current.status === "scheduled-tbd") {
+    if (homeTeamId !== current.homeTeamId) {
+      patch.homeTeamId = homeTeamId;
+    }
+    if (awayTeamId !== current.awayTeamId) {
+      patch.awayTeamId = awayTeamId;
+    }
+  }
+
   const nextStatus = chooseStatus(current.status, dbStatus);
   if (nextStatus !== current.status) {
     patch.status = nextStatus;
