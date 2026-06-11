@@ -307,7 +307,13 @@ export const usernameHistory = pgTable(
 
 export const teams = pgTable("teams", {
   id: uuid("id").primaryKey().defaultRandom(),
-  code: varchar("code", { length: 3 }).notNull().unique(),
+  // Code interno (label corto del team). Hasta 8 chars para dar
+  // espacio al algoritmo de upsert: la heurística pruebca code
+  // de 3 chars (ISO-ish), pero si colisiona con un team existente
+  // que tiene OTRO mapping de provider, generamos un code derivado
+  // del externalId (p.ej. `AF1531` para api-football team 1531).
+  // Ampliado de 3 → 8 en 2026-06-08 (migration 0020).
+  code: varchar("code", { length: 8 }).notNull().unique(),
   name: text("name").notNull(),
   flag: text("flag"),
 });

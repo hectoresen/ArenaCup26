@@ -1,0 +1,1 @@
+ALTER TABLE "teams" ALTER COLUMN "code" SET DATA TYPE varchar(8);

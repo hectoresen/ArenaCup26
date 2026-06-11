@@ -147,7 +147,10 @@ export function createMatchRepo(db: Database): MatchRepo {
     },
 
     async upsertTeamFromProvider(team: ProviderTeamUpsert, source: string) {
-      // 1) ¿Ya existe el mapping (externalId, source)? Reusar su teamId.
+      // Identidad del team: (source, externalId). Si ese par YA tiene
+      // mapping, reusamos su teamId. Si NO, creamos un team COMPLETAMENTE
+      // nuevo — nunca reusamos un team por nombre o code, eso fue el
+      // bug histórico que contaminaba la BD al hacer matches cross-provider.
       const existingMapping = await db
         .select({ teamId: teamExternalIds.teamId })
         .from(teamExternalIds)
@@ -159,30 +162,23 @@ export function createMatchRepo(db: Database): MatchRepo {
         return existingMapping[0].teamId;
       }
 
-      // 2) Si no, generar un código único. Si el provider trae uno, lo
-      //    intentamos primero; si colisiona o no es válido, derivamos
-      //    del nombre con sufijo defensivo basado en el externalId.
-      const code = await resolveUniqueCode(db, team);
+      // Generar code garantizado único (varchar(8) → espacio sobrado).
+      // El resolver hace fallback a `<PREFIX><EXT>` si la heurística
+      // colisiona — nunca devuelve un code que YA exista.
+      const code = await resolveUniqueCode(db, team, source);
 
-      // 3) Insertar el team (upsert por code).
-      await db
+      // INSERT plano (no upsert): si el code colisiona aquí es bug —
+      // queremos verlo, no sobreescribir silenciosamente otro team.
+      const inserted = await db
         .insert(teams)
         .values({ code, name: team.name, flag: team.flag })
-        .onConflictDoUpdate({
-          target: teams.code,
-          set: { name: team.name, flag: team.flag },
-        });
-      const teamRow = await db
-        .select({ id: teams.id })
-        .from(teams)
-        .where(eq(teams.code, code))
-        .limit(1);
-      const teamId = teamRow[0]?.id;
+        .returning({ id: teams.id });
+      const teamId = inserted[0]?.id;
       if (!teamId) {
-        throw new Error(`upsertTeamFromProvider: team row not found after insert (code=${code})`);
+        throw new Error(`upsertTeamFromProvider: team insert returned no row (code=${code})`);
       }
 
-      // 4) Crear la entry en team_external_ids.
+      // Crear el mapping (source, externalId) → teamId.
       await db.insert(teamExternalIds).values({
         teamId,
         source,
@@ -200,9 +196,30 @@ export function createMatchRepo(db: Database): MatchRepo {
  *   2. Si no, derivar del nombre (primeras letras de las palabras).
  *   3. Si colisiona, añadir un sufijo basado en el externalId.
  */
-async function resolveUniqueCode(db: Database, team: ProviderTeamUpsert): Promise<string> {
+/**
+ * Genera un code único de hasta 8 chars para un team nuevo. Estrategia:
+ *
+ *  1. Si el provider trae un `code` corto y NO colisiona → ese.
+ *  2. Si no, derivar 3 chars del nombre. Si NO colisiona → ese.
+ *  3. Si colisiona, garantizar uniqueness con un code derivado del
+ *     `(source, externalId)`. Formato `<PREFIX><EXT>` (p.ej.
+ *     `AF1531` para api-football team 1531). El PREFIX viene del
+ *     source (`AF` para `api-football`). Si por alguna razón el
+ *     code derivado siguiera colisionando (caso extremadamente
+ *     improbable: mismo source+externalId ya tiene team), añadimos
+ *     un sufijo numérico hasta encontrar uno libre.
+ *
+ * NUNCA reusa un team existente — esa decisión la toma el caller
+ * antes de llamar a esta función (lookup por mapping). Si llegamos
+ * aquí es porque queremos un team NUEVO.
+ */
+async function resolveUniqueCode(
+  db: Database,
+  team: ProviderTeamUpsert,
+  source: string,
+): Promise<string> {
   const provided = (team.code ?? "").toUpperCase();
-  if (provided.length === 3 && !(await codeExists(db, provided))) {
+  if (provided.length >= 2 && provided.length <= 8 && !(await codeExists(db, provided))) {
     return provided;
   }
 
@@ -211,15 +228,23 @@ async function resolveUniqueCode(db: Database, team: ProviderTeamUpsert): Promis
     return derived;
   }
 
-  // Colisión: probar variantes con el último dígito del externalId.
-  for (const suffix of team.externalId.split("").reverse()) {
-    const variant = (derived.slice(0, 2) + suffix).toUpperCase();
-    if (variant.length === 3 && !(await codeExists(db, variant))) {
-      return variant;
-    }
+  // Heurística colisiona → fallback garantizado único por externalId.
+  // Prefix por source (mantiene el code legible).
+  const prefix = source === "api-football" ? "AF" : source.slice(0, 2).toUpperCase();
+  const extPart = team.externalId.replace(/[^0-9A-Za-z]/g, "").slice(0, 6);
+  let candidate = `${prefix}${extPart}`.slice(0, 8);
+  if (!(await codeExists(db, candidate))) return candidate;
+
+  // Último recurso: añadir sufijo numérico (eslogan: si esto se
+  // dispara, hay un bug — un team con el mismo source+externalId
+  // ya debería haber sido capturado por el mapping lookup).
+  for (let i = 1; i < 99; i++) {
+    candidate = `${prefix}${extPart}${i}`.slice(0, 8);
+    if (!(await codeExists(db, candidate))) return candidate;
   }
-  // Último recurso: hash trivial del externalId.
-  return `X${team.externalId.slice(-2).padStart(2, "0").toUpperCase()}`.slice(0, 3);
+  throw new Error(
+    `resolveUniqueCode: no free code after 99 tries for ${source}/${team.externalId}`,
+  );
 }
 
 async function codeExists(db: Database, code: string): Promise<boolean> {
