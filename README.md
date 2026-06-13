@@ -6,6 +6,21 @@ Plataforma social y competitiva alrededor de la **Copa Mundial 2026** (Canadá �
 
 Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundial, ganar puntos según los aciertos, escalar posiciones en un ranking en tiempo real e invitar a amigos para competir uno contra uno. No es un servicio de apuestas: no hay dinero ni premios materiales — es un juego de predicciones para que el torneo se vea con más emoción y con tus amigos.
 
+### Vista previa
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/media/arenacuplogin.png" alt="Modal de login" /></td>
+    <td width="33%"><img src="docs/media/arenacupdashboard1.png" alt="Panel principal" /></td>
+    <td width="33%"><img src="docs/media/arenacupdashboard2.png" alt="Predicción en vivo" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Login con Google.</b> Una sola fricción para entrar; tus datos sirven solo para identificarte en el ranking.</sub></td>
+    <td align="center"><sub><b>Panel personal.</b> Puntos totales, posición global con sparkline de 7 días y progreso de logros, todo en un vistazo.</sub></td>
+    <td align="center"><sub><b>Marcador en vivo.</b> Mientras el partido se juega ves tu predicción y los <i>+puntos provisionales</i> que te llevarías si acabara así.</sub></td>
+  </tr>
+</table>
+
 ## Funcionalidades
 
 ### Predicciones y puntuación
@@ -17,6 +32,17 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 - **Ventana de predicción**: las predicciones se cierran al kickoff del partido.
 - **Puntos provisionales** durante un partido en vivo se confirman al `finished` y se descartan si el partido se pospone o cancela.
 
+<table>
+  <tr>
+    <td width="50%"><img src="docs/media/arenacupdashboardproximospartidos.png" alt="Próximos partidos en el panel" /></td>
+    <td width="50%"><img src="docs/media/arenacupprivatepartidos.png" alt="Listado completo de partidos" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Próximos partidos.</b> El panel sugiere los partidos de hoy con el estado de tu predicción (<i>enviada</i>, <i>predecir</i>, <i>editable</i> hasta el kickoff).</sub></td>
+    <td align="center"><sub><b>Pestaña Partidos.</b> Los 104 fixtures del Mundial filtrables por estado (en vivo / pronto / acabados), por fase (grupos vs bracket) o solo los que has predicho.</sub></td>
+  </tr>
+</table>
+
 ### Ranking
 
 - **Ranking global inamovible**: todos los users registrados aparecen siempre con su info básica (nombre, bandera, puntos). La privacidad del perfil no oculta al user del ranking — solo decide si su perfil público es visitable.
@@ -25,6 +51,25 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 - **Sparkline + delta semanal** en la card "Tu posición" del panel, alimentados por un snapshot diario del ranking.
 - **Actualización en vivo**: la página pública del ranking usa Server-Sent Events para refrescar cada 15 s sin recargar.
 - **Mini-ranking** en el panel `/inicio` con el Top 5 + tu fila si estás fuera.
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/media/arenacuprankingprivateglobal.png" alt="Ranking global con podio" /></td>
+    <td width="33%"><img src="docs/media/arenacuprankingamigos.png" alt="Ranking entre amigos" /></td>
+    <td width="33%"><img src="docs/media/rankingpublic1.png" alt="Ranking público pre-Mundial" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Global.</b> Podio dorado + lista con racha y aciertos confirmados; el indicador verde marca quién estuvo activo en las últimas 24 h.</sub></td>
+    <td align="center"><sub><b>Amigos.</b> Pestaña dedicada para competir solo contra tu círculo y los grupos privados a los que perteneces.</sub></td>
+    <td align="center"><sub><b>Pre-kickoff.</b> Página pública (sin login) con la cuenta atrás al primer partido y el podio en vivo durante la fase pre-Mundial.</sub></td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="docs/media/arenacupdashboardtopdelmomento.png" alt="Mini-ranking Top del momento" width="60%" />
+  <br />
+  <sub><b>Top del momento.</b> Bloque del panel con el Top 5 global o de tus amigos; tu fila siempre se ancla aunque estés fuera del top.</sub>
+</p>
 
 ### Perfil y privacidad
 
@@ -36,11 +81,43 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 - **Stats personales** visibles solo para el dueño del perfil: rachas (actual, mejor, milestones), últimas 5 predicciones, links de invitación.
 - **Ajustes de cuenta** accesibles desde el dropdown del avatar (`/ajustes`): privacidad, push notifications, eliminar cuenta.
 
+<table>
+  <tr>
+    <td width="50%"><img src="docs/media/arenacupuserprofile.png" alt="Perfil público de un jugador" /></td>
+    <td width="50%"><img src="docs/media/arenacupprofiledropdownmenu.png" alt="Menú del avatar" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Perfil público.</b> Avatar, bandera, posición, puntos oficiales, últimas predicciones, logros y CTA "Añadir amigo".</sub></td>
+    <td align="center"><sub><b>Menú del avatar.</b> Acceso rápido a perfil, ajustes, historial, logros, FAQ, políticas y cerrar sesión.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/media/arenacupajustes.png" alt="Ajustes de visibilidad del perfil" /></td>
+    <td width="50%"><img src="docs/media/arenacupajustes2.png" alt="Notificaciones push y zona peligrosa" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Visibilidad.</b> Tres niveles (público / solo amigos / privado) más un toggle para enseñar o esconder tu historial de predicciones.</sub></td>
+    <td align="center"><sub><b>Push & zona peligrosa.</b> Opt-in de web push y eliminación irreversible de la cuenta con doble confirmación (checkbox + frase exacta).</sub></td>
+  </tr>
+</table>
+
 ### Amistad y social
 
 - **Sistema de amigos bidireccional**: enviar/aceptar/rechazar/eliminar solicitudes. CTA contextual en `/u/<username>` que cambia según la relación actual.
 - **Bandeja de solicitudes** en `/amigos` con buscador por `@username`.
 - **Links de invitación**: el user genera un link único; quien entra con él se convierte automáticamente en amigo en ambos perfiles tras iniciar sesión con Google. Cuando el invitado acierta su primera predicción, el invitador recibe **+10 pts** y el logro `better-with-friends`. Cada link soporta 1 o N usos, se puede rescindir en cualquier momento, y existe un cap de 5 links activos por user.
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/media/arenacupsocial1.png" alt="Amigos y grupos" /></td>
+    <td width="33%"><img src="docs/media/arenacupsocial2.png" alt="Generar link de invitación" /></td>
+    <td width="33%"><img src="docs/media/arenacupsocial3.png" alt="Varios links activos" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Amigos & grupos.</b> Buscador por <code>@username</code>, listado de tus amigos con su puntuación y tus grupos privados (con admin y capacidad).</sub></td>
+    <td align="center"><sub><b>Auto-amistad por link.</b> Genera un enlace de invitación; quien entre con él se vuelve amigo automáticamente al iniciar sesión.</sub></td>
+    <td align="center"><sub><b>Hasta 5 links activos.</b> Mezcla de links ilimitados o de un solo uso, copiables o rescindibles en cualquier momento.</sub></td>
+  </tr>
+</table>
 
 ### Logros
 
@@ -48,6 +125,32 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 - **Catálogo público** visible en cualquier perfil + página `/logros` con progreso por tier.
 - **Logros compartibles** (legendarios/míticos/GOAT) llevan un share-chip al hover.
 - **Gate de arranque del torneo**: durante los primeros N partidos del Mundial (configurable vía `ACHIEVEMENTS_MIN_FINISHED_MATCHES`, default 0 en QA, set 5 antes del kickoff), `evaluateAndUnlock` no concede ningún logro. Evita que un acierto trivial del día 1 produzca un GOAT desbloqueado.
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/media/logros1.png" alt="Tier común" /></td>
+    <td width="33%"><img src="docs/media/logros2.png" alt="Tier poco común" /></td>
+    <td width="33%"><img src="docs/media/logros3.png" alt="Tier épico" /></td>
+  </tr>
+  <tr>
+    <td width="33%"><img src="docs/media/logros4.png" alt="Tier épico (continuación) y legendario" /></td>
+    <td width="33%"><img src="docs/media/logros5.png" alt="Tier mítico" /></td>
+    <td width="33%"><img src="docs/media/logros6.png" alt="Tier GOAT" /></td>
+  </tr>
+  <tr>
+    <td colspan="3" align="center"><sub><b>Catálogo en móvil.</b> Los 24 logros organizados en 6 tiers (común → poco común → épico → legendario → mítico → GOAT). Cada card se ilumina al desbloquearse y muestra el contador <code>x / y</code> por tier.</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/media/logrospc1.png" alt="Logros en desktop (1/2)" /></td>
+    <td width="50%"><img src="docs/media/logrospc2.png" alt="Logros en desktop (2/2)" /></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><sub><b>Catálogo en desktop.</b> En la sección "Últimas predicciones + Logros" del perfil, el grid pasa a dos columnas y caben todos los tiers a la vez para ver de un vistazo lo desbloqueado vs lo pendiente.</sub></td>
+  </tr>
+</table>
 
 ### Partidos
 
@@ -80,6 +183,19 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 - **Monitorización de errores** vía Sentry activo, con scrub de PII en `beforeSend`.
 - **Páginas legales** completas en 4 idiomas (privacidad + términos) con contacto `contact@arenacup26.com` integrado. Accesibles sin login.
 - **Guardrails contra ops destructivas**: el script `dev-reset-matches.ts` cuenta usuarios reales con datos antes de aceptar `--apply`, y requiere doble flag `--really-prod` si detecta cualquiera. Ver `docs/incident-2026-05-18-data-wipe.md` para el contexto.
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/media/arenacupmodomantenimiento.png" alt="Modo mantenimiento global" /></td>
+    <td width="33%"><img src="docs/media/arenacuppoliticaprivacidad.png" alt="Política de privacidad" /></td>
+    <td width="33%"><img src="docs/media/arenacupterminosdeuso.png" alt="Términos de uso" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Modo mantenimiento.</b> Switch global desde el panel de admin para mostrar este cartel mientras se aplica una migración o una intervención sensible — los admins siguen entrando.</sub></td>
+    <td align="center"><sub><b>Política de privacidad.</b> Texto autocontenido y traducido a 4 idiomas, con la lista exacta de datos guardados y cómo pedir el borrado.</sub></td>
+    <td align="center"><sub><b>Términos de uso.</b> Reglas claras del juego: mayoría de edad, una cuenta por persona, antifraude y reglas de puntuación congeladas durante el torneo.</sub></td>
+  </tr>
+</table>
 
 ---
 
