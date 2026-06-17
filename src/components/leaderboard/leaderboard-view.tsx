@@ -6,7 +6,9 @@ import { TopChrome } from "@/components/layout/top-chrome";
 import { useLiveSnapshot } from "@/hooks/use-live-snapshot";
 import type { LeaderboardEvent, LeaderboardSnapshot } from "@/lib/leaderboard/types";
 import { useTranslations } from "next-intl";
+import { Fragment } from "react";
 import { FloatingBalls } from "./floating-balls";
+import { LEAGUE_DIVIDERS, LeagueDivider } from "./league-divider";
 import { LiveBadge } from "./live-badge";
 import { MundialCountdown } from "./mundial-countdown";
 import { PodiumCard } from "./podium-card";
@@ -117,11 +119,26 @@ export function LeaderboardView({
         </div>
 
         <ol className="flex flex-col gap-1.5">
-          {rest.map((player, i) => (
-            <li key={player.id}>
-              <RankRow player={player} index={i} />
-            </li>
-          ))}
+          {rest.map((player, i) => {
+            // Divisor de liga: si este jugador ocupa el último puesto
+            // de un tramo (10/20/30), insertamos la línea justo después
+            // de su fila. Anclado al rank actual y no a la posición en
+            // el array — si el snapshot se reordena vía SSE, el divisor
+            // sigue al puesto correcto sin parpadear.
+            const dividerTier = LEAGUE_DIVIDERS[player.rank];
+            return (
+              <Fragment key={player.id}>
+                <li>
+                  <RankRow player={player} index={i} />
+                </li>
+                {dividerTier && (
+                  <li aria-hidden="true">
+                    <LeagueDivider tier={dividerTier} />
+                  </li>
+                )}
+              </Fragment>
+            );
+          })}
         </ol>
 
         <footer className="mt-4 flex items-center justify-between px-0.5 opacity-0 [animation:fadeUp_0.4s_ease_1s_forwards]">
