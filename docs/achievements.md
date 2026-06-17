@@ -44,7 +44,7 @@ La paleta está alineada con `docs/leaderboard-reference.html` y el mockup en `d
 | `exact-shot`  | Exacto            | Acertar el marcador exacto de un partido.                            |    no     |
 | `top-100`     | Top 100           | Entrar al menos una vez en el top 100 del ranking global.            |    no     |
 
-### Épico (6)
+### Épico (7)
 
 | ID                  | Título              | Trigger                                                                          | Shareable |
 | ------------------- | ------------------- | -------------------------------------------------------------------------------- | :-------: |
@@ -54,8 +54,9 @@ La paleta está alineada con `docs/leaderboard-reference.html` y el mockup en `d
 | `top-50`            | Top 50              | Entrar al menos una vez en el top 50 del ranking global.                         |    no     |
 | `double-streak`     | Doble Racha         | Conseguir al menos **2 rachas que alcancen el hito de 5** a lo largo del torneo. |    no     |
 | `the-step-before`   | El Penúltimo Paso   | Acertar el resultado de **una** semifinal del Mundial.                           |    no     |
+| `division-bronze`   | División de Bronce  | Entrar en el top 30 del ranking global (espejo del divisor de bronce del leaderboard). |    no     |
 
-### Legendario (4)
+### Legendario (5)
 
 | ID                | Título               | Trigger                                                                 | Shareable |
 | ----------------- | -------------------- | ----------------------------------------------------------------------- | :-------: |
@@ -63,14 +64,16 @@ La paleta está alineada con `docs/leaderboard-reference.html` y el mockup en `d
 | `top-10`          | Top 10               | Entrar al menos una vez en el top 10 del ranking global.                |    sí     |
 | `world-citizen`   | Ciudadano del Mundo  | Realizar predicciones en absolutamente todos los partidos del Mundial.  |    sí     |
 | `the-prophet`     | El Gran Profeta      | Acertar el marcador exacto de la Gran Final.                            |    sí     |
+| `division-silver` | División de Plata    | Entrar en el top 20 del ranking global (espejo del divisor de plata).   |    sí     |
 
-### Mítico (3)
+### Mítico (4)
 
 | ID                   | Título              | Trigger                                                  | Shareable |
 | -------------------- | ------------------- | -------------------------------------------------------- | :-------: |
 | `on-the-podium`      | En el Podio         | Aparecer al menos una vez en el top 3 durante el torneo. |    sí     |
 | `runner-up`          | Subcampeón          | Llegar a ocupar el top 2 en algún momento.               |    sí     |
 | `king-of-the-moment` | El Rey del Momento  | Ocupar el #1 al menos una vez durante el torneo.         |    sí     |
+| `division-gold`      | División de Oro     | Entrar en el top 10 del ranking global (espejo del divisor de oro). Comparte umbral con `top-10` pero su narrativa es de prestigio máximo. |    sí     |
 
 ### GOAT (1)
 
@@ -78,8 +81,9 @@ La paleta está alineada con `docs/leaderboard-reference.html` y el mockup en `d
 | ------------- | ----------------- | ---------------------------------------------------------------- | :-------: |
 | `the-goat`    | El Mayor de Todos | Terminar el Mundial 2026 como **#1 absoluto** del ranking.       |    sí     |
 
-**Total: 25 logros** (24 originales + `team-spirit` añadido 2026-05-19
-con la feature de grupos de competición).
+**Total: 28 logros** — 24 originales + `team-spirit` (2026-05-19, feature
+de grupos) + 3 logros `division-*` (2026-06-17) ligados a las líneas
+divisorias del leaderboard (oro/plata/bronce).
 
 ### Gate global de partidos
 

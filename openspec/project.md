@@ -51,7 +51,7 @@ Experiencia social-competitiva alrededor del Mundial 2026. La estrella es un **r
 - **Scoring** (2026-05-05, ampliado 2026-05-06 con doble predicción) — tabla de puntuación, combos, doble oportunidad, anti-trampas y política de referidos fijados en `docs/scoring.md`.
 - **Notificaciones — fase 1** (2026-05-06) — solo **in-app** (toasts, feed de actividad, badge de campana). Web Push y email transaccional diferidos a fase 2.
 - **Auth — fase 1** (2026-05-06) — solo **Google OAuth**. El registro manual con email/contraseña queda diferido a fase 2 (requeriría infra de email transaccional para verificación y recuperación de contraseña).
-- **Achievements** (2026-05-06) — catálogo de 24 logros en 6 tiers fijado en `docs/achievements.md`. Evaluación al cierre oficial de partido (no con provisionales).
+- **Achievements** (2026-05-06, ampliado 2026-05-19 con `team-spirit` y 2026-06-17 con tres `division-*`) — catálogo de 28 logros en 6 tiers fijado en `docs/achievements.md`. Evaluación al cierre oficial de partido (no con provisionales).
 - **Perfil público** (2026-05-06) — alcance fijado en `docs/public-profile.md`: identidad, stats básicas, bandera opcional, catálogo de logros. Accesible sin login.
 - **Reglas de partidos** (2026-05-07) — taxonomía de 7 estados, ventana de predicción desde fixture, comportamiento de pospuesto y cancelado, reglas específicas de eliminatoria (marcador hasta 120', ganador con penaltis, dobles `1X`/`X2`/`12` desactivadas). Detalles en `docs/business-rules.md`.
 - **Reglas de cuenta** (2026-05-07) — username `[a-z0-9_]` 3-20 lowercase, lista cerrada de rutas reservadas, cambio único con reserva permanente del viejo, hard delete al eliminar cuenta. Detalles en `docs/business-rules.md`.

@@ -21,7 +21,7 @@ function buildData(overrides: Partial<DashboardData> = {}): DashboardData {
       streak: 5,
       correctCount: 12,
       achievementsUnlocked: 8,
-      achievementsTotal: 24,
+      achievementsTotal: 28,
       rank: 42,
       totalPlayers: 12480,
     },
@@ -49,7 +49,7 @@ function buildData(overrides: Partial<DashboardData> = {}): DashboardData {
       rank: { rank: 42, rankDelta: null, dayAgoRank: null, sparkline: null },
       achievements: {
         unlocked: 8,
-        total: 24,
+        total: 28,
         lastUnlockedTitle: "Buen Ojo",
         lastUnlockedAt: NOW,
       },

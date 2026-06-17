@@ -93,15 +93,25 @@ const UNLOCK_RULES: Record<string, (ctx: UnlockContext) => boolean> = {
   // ───── Épico ─────
   "elite-shooter": (c) => c.exactCount >= 10,
   "top-50": (c) => c.rank !== null && c.rank <= 50,
+  // Entrar al top 30 desbloquea la división de bronce — espejo
+  // narrativo del divisor de bronce del leaderboard.
+  "division-bronze": (c) => c.rank !== null && c.rank <= 30,
 
   // ───── Legendario ─────
   seer: (c) => c.exactCount >= 20,
   "top-10": (c) => c.rank !== null && c.rank <= 10,
+  // Top 20 = división de plata. Coincide narrativamente con la
+  // línea divisoria de plata del ranking (after rank 20).
+  "division-silver": (c) => c.rank !== null && c.rank <= 20,
 
   // ───── Mítico ─────
   "on-the-podium": (c) => c.rank !== null && c.rank <= 3,
   "runner-up": (c) => c.rank !== null && c.rank <= 2,
   "king-of-the-moment": (c) => c.rank === 1,
+  // Top 10 = división de oro. Coincide con el divisor de oro del
+  // leaderboard. Comparte umbral con `top-10` (legendary) pero su
+  // narrativa es de prestigio máximo y por eso vive en mítico.
+  "division-gold": (c) => c.rank !== null && c.rank <= 10,
 
   // ───── Mundial-específicos ─────
   // Predijo ≥10 partidos de fase de grupos del torneo.

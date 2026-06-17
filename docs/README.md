@@ -11,7 +11,7 @@ El README principal del repo ([`../README.md`](../README.md)) tiene el dosier co
 | [`glossary.md`](glossary.md)                   | vivo       | Vocabulario del dominio (predicción, combo, racha, TBD…).            |
 | [`business-rules.md`](business-rules.md)       | cerrado    | Reglas operativas no-scoring: 7 estados de partido, eliminatorias, ventana de predicción, username, eliminar cuenta. |
 | [`scoring.md`](scoring.md)                     | cerrado    | Tabla canónica de puntos. Source of truth del scoring engine.        |
-| [`achievements.md`](achievements.md)           | cerrado    | Catálogo formal de los 25 logros con id, tier, trigger y si es compartible. |
+| [`achievements.md`](achievements.md)           | cerrado    | Catálogo formal de los 28 logros con id, tier, trigger y si es compartible. |
 | [`public-profile.md`](public-profile.md)       | cerrado    | Estructura del perfil público `/u/<username>`.                       |
 | [`groups.md`](groups.md)                       | vivo       | Grupos de competición: caps, notificaciones, ranking del grupo, reglas leave/expel, descubrir con candado. |
 | [`bots.md`](bots.md)                           | activo     | Bots que pueblan el ranking durante el cold-start del Mundial. 27 usuarios sintéticos con comportamiento funcional idéntico al real. |

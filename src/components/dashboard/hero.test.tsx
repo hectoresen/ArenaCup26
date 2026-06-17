@@ -8,7 +8,7 @@ const baseStats: UserStats = {
   streak: 5,
   correctCount: 12,
   achievementsUnlocked: 8,
-  achievementsTotal: 24,
+  achievementsTotal: 28,
   rank: 42,
   totalPlayers: 12480,
 };
@@ -63,7 +63,7 @@ describe("<Hero>", () => {
 
   it("shows achievements fraction X/Y", () => {
     renderWithProviders(<Hero userName="Carlos Mendoza" stats={baseStats} />);
-    expect(screen.getByText("8/24")).toBeInTheDocument();
+    expect(screen.getByText("8/28")).toBeInTheDocument();
   });
 
   it("'Mi posición' mini-stat links to /ranking", () => {
@@ -74,7 +74,7 @@ describe("<Hero>", () => {
 
   it("'Logros' mini-stat links to /logros", () => {
     renderWithProviders(<Hero userName="Carlos Mendoza" stats={baseStats} />);
-    const link = screen.getByRole("link", { name: /8 Logros 24/i });
+    const link = screen.getByRole("link", { name: /8 Logros 28/i });
     expect(link.getAttribute("href")).toMatch(/\/logros$/);
   });
 

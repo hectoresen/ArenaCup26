@@ -1067,6 +1067,73 @@ export function AchievementsIconSprite() {
           />
         </symbol>
 
+        {/* DIVISIÓN BRONCE — division-bronze (epic). Diamante facetado
+            con los mismos colores del divisor de bronce del leaderboard
+            (--color-bronze). Forzamos hex en stroke/fill porque el card
+            recolorea via `color:` y aquí queremos el matiz medalla
+            siempre, no el del tier. */}
+        <symbol id="ach-div-bronze" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15" fill="none" stroke="#e8834a" strokeWidth="1.3" opacity="0.35" />
+          <polygon
+            points="18,7 27,15 18,29 9,15"
+            fill="#e8834a"
+            fillOpacity="0.16"
+            stroke="#e8834a"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M9 15 L27 15 M18 7 L13 15 M18 7 L23 15"
+            stroke="#e8834a"
+            strokeWidth="1.1"
+            opacity="0.85"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </symbol>
+
+        {/* DIVISIÓN PLATA — division-silver (legendary). */}
+        <symbol id="ach-div-silver" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15" fill="none" stroke="#c8d8f0" strokeWidth="1.3" opacity="0.35" />
+          <polygon
+            points="18,7 27,15 18,29 9,15"
+            fill="#c8d8f0"
+            fillOpacity="0.16"
+            stroke="#c8d8f0"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M9 15 L27 15 M18 7 L13 15 M18 7 L23 15"
+            stroke="#c8d8f0"
+            strokeWidth="1.1"
+            opacity="0.85"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </symbol>
+
+        {/* DIVISIÓN ORO — division-gold (mythic). */}
+        <symbol id="ach-div-gold" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15" fill="none" stroke="#f5c842" strokeWidth="1.3" opacity="0.35" />
+          <polygon
+            points="18,7 27,15 18,29 9,15"
+            fill="#f5c842"
+            fillOpacity="0.16"
+            stroke="#f5c842"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M9 15 L27 15 M18 7 L13 15 M18 7 L23 15"
+            stroke="#f5c842"
+            strokeWidth="1.1"
+            opacity="0.85"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </symbol>
+
         {/* Lock — estado bloqueado */}
         <symbol id="ach-lock" viewBox="0 0 16 16">
           <rect
@@ -1125,6 +1192,9 @@ export function achSymbolHref(iconId: string): string {
     "ico-crown",
     "ico-goat",
     "ico-team",
+    "ico-div-bronze",
+    "ico-div-silver",
+    "ico-div-gold",
   ]);
   if (!knownIds.has(iconId)) return "#ach-dart";
   return `#ach-${iconId.replace(/^ico-/, "")}`;

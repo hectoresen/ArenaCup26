@@ -9,11 +9,11 @@ describe("<AchievementsAccordion>", () => {
     renderWithProviders(
       <AchievementsAccordion achievements={achievements} ownerUsername="carlos" />,
     );
-    // El summary muestra "0 de 25"
-    expect(screen.getByText(/0 de 25/)).toBeInTheDocument();
+    // El summary muestra "0 de 28"
+    expect(screen.getByText(/0 de 28/)).toBeInTheDocument();
     // El `<details>` viene con atributo `open` para que el catálogo
     // sea lo primero que se ve sin clic.
-    const details = screen.getByText(/0 de 25/).closest("details");
+    const details = screen.getByText(/0 de 28/).closest("details");
     expect(details?.hasAttribute("open")).toBe(true);
   });
 
@@ -28,13 +28,13 @@ describe("<AchievementsAccordion>", () => {
     expect(sections.length).toBe(6);
   });
 
-  it("renders all 25 achievement cards in the body", () => {
+  it("renders all 28 achievement cards in the body", () => {
     const achievements = buildProfileAchievements(new Map());
     const { container } = renderWithProviders(
       <AchievementsAccordion achievements={achievements} ownerUsername="carlos" />,
     );
     const cards = container.querySelectorAll("[data-tier]");
-    expect(cards.length).toBe(25);
+    expect(cards.length).toBe(28);
   });
 
   it("computes progress percentage from unlocked / total", () => {
@@ -47,7 +47,7 @@ describe("<AchievementsAccordion>", () => {
     const { container } = renderWithProviders(
       <AchievementsAccordion achievements={achievements} ownerUsername="carlos" />,
     );
-    // 3/24 ≈ 13%
+    // 3/28 ≈ 11%
     const bar = container.querySelector('[style*="width"]') as HTMLElement | null;
     expect(bar?.style.width).toMatch(/^\d+%$/);
   });

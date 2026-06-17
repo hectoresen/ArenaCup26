@@ -35,11 +35,14 @@ const RULES: Record<string, (c: Ctx) => boolean> = {
   "top-100": (c) => c.rank !== null && c.rank <= 100,
   "elite-shooter": (c) => c.exactCount >= 10,
   "top-50": (c) => c.rank !== null && c.rank <= 50,
+  "division-bronze": (c) => c.rank !== null && c.rank <= 30,
   seer: (c) => c.exactCount >= 20,
   "top-10": (c) => c.rank !== null && c.rank <= 10,
+  "division-silver": (c) => c.rank !== null && c.rank <= 20,
   "on-the-podium": (c) => c.rank !== null && c.rank <= 3,
   "runner-up": (c) => c.rank !== null && c.rank <= 2,
   "king-of-the-moment": (c) => c.rank === 1,
+  "division-gold": (c) => c.rank !== null && c.rank <= 10,
 };
 
 function ctx(overrides: Partial<Ctx> = {}): Ctx {
@@ -116,9 +119,28 @@ describe("achievement unlock rules", () => {
     expect(RULES["king-of-the-moment"]?.(ctx({ rank: 2 }))).toBe(false);
   });
 
-  it("rules covers 17 evaluable achievements (rest are pending)", () => {
-    // 17 = 15 originales + better-with-friends (2026-05-16) + team-spirit
-    // (2026-05-19, al aterrizar grupos). PENDING_RULES sigue en 8.
-    expect(Object.keys(RULES)).toHaveLength(17);
+  it("division rules unlock at the leaderboard cutoffs (30 / 20 / 10)", () => {
+    expect(RULES["division-bronze"]?.(ctx({ rank: 31 }))).toBe(false);
+    expect(RULES["division-bronze"]?.(ctx({ rank: 30 }))).toBe(true);
+    expect(RULES["division-silver"]?.(ctx({ rank: 21 }))).toBe(false);
+    expect(RULES["division-silver"]?.(ctx({ rank: 20 }))).toBe(true);
+    expect(RULES["division-gold"]?.(ctx({ rank: 11 }))).toBe(false);
+    expect(RULES["division-gold"]?.(ctx({ rank: 10 }))).toBe(true);
+    // null rank → nunca dispara, igual que los demás rank rules.
+    expect(RULES["division-bronze"]?.(ctx({ rank: null }))).toBe(false);
+  });
+
+  it("entering top 10 unlocks the three divisions simultaneously", () => {
+    const c = ctx({ rank: 5 });
+    expect(RULES["division-bronze"]?.(c)).toBe(true);
+    expect(RULES["division-silver"]?.(c)).toBe(true);
+    expect(RULES["division-gold"]?.(c)).toBe(true);
+  });
+
+  it("rules covers 20 evaluable achievements (rest are pending)", () => {
+    // 20 = 15 originales + better-with-friends (2026-05-16) +
+    // team-spirit (2026-05-19) + 3 division-* (2026-06-17).
+    // PENDING_RULES sigue en 8.
+    expect(Object.keys(RULES)).toHaveLength(20);
   });
 });
