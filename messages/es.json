@@ -368,6 +368,14 @@
       "copied": "Enlace copiado al portapapeles",
       "copyFailed": "No pude copiar el enlace"
     },
+    "medal": {
+      "aria": "Medalla {division}",
+      "labels": {
+        "gold": "División de Oro",
+        "silver": "División de Plata",
+        "bronze": "División de Bronce"
+      }
+    },
     "tier": {
       "common": "Común",
       "rare": "Poco común",
@@ -649,7 +657,11 @@
         },
         "achievements": {
           "q": "¿Qué son los logros?",
-          "a": "Insignias que desbloqueas al cumplir condiciones (rachas, primer acierto, top 100, etc.). No otorgan puntos: son cosméticos y se muestran en tu perfil público. Hay 24 logros en 6 niveles de rareza, desde 'Común' hasta 'GOAT'."
+          "a": "Insignias que desbloqueas al cumplir condiciones (rachas, primer acierto, top 100, etc.). No otorgan puntos: son cosméticos y se muestran en tu perfil público. Hay 28 logros en 6 niveles de rareza, desde 'Común' hasta 'GOAT'."
+        },
+        "divisions": {
+          "q": "¿Qué son las divisiones y la medalla del perfil?",
+          "a": "El ranking global se divide cosméticamente en tres tramos: División de Oro (puestos 1-10), División de Plata (11-20) y División de Bronce (21-30). En tu perfil aparece la medalla de la división que ocupas en este momento, derivada de tu rank actual: si subes o bajas, la medalla cambia o desaparece automáticamente (no es para toda la vida, es reversible). Cruzar por primera vez cada umbral desbloquea además un logro permanente (División de Bronce, Plata y Oro) que sí queda en tu colección aunque luego pierdas la medalla."
         },
         "username": {
           "q": "¿Puedo cambiar mi nombre de usuario?",

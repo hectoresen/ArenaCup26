@@ -15,6 +15,7 @@ const QUESTION_IDS = [
   "provisional",
   "streakAndCombo",
   "achievements",
+  "divisions",
   "username",
   "deleteAccount",
 ] as const;

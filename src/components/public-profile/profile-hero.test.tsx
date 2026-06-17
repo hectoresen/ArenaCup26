@@ -49,4 +49,22 @@ describe("<ProfileHero>", () => {
     renderWithProviders(<ProfileHero identity={buildIdentity()} />);
     expect(screen.getByRole("button", { name: /Copiar enlace/i })).toBeInTheDocument();
   });
+
+  it("renders the gold medal when division='gold' is passed", () => {
+    renderWithProviders(<ProfileHero identity={buildIdentity()} division="gold" />);
+    expect(screen.getByTestId("division-medal-gold")).toBeInTheDocument();
+  });
+
+  it("renders the silver medal when division='silver' is passed", () => {
+    renderWithProviders(<ProfileHero identity={buildIdentity()} division="silver" />);
+    expect(screen.getByTestId("division-medal-silver")).toBeInTheDocument();
+  });
+
+  it("renders no medal when division is null/undefined (outside top 30)", () => {
+    renderWithProviders(<ProfileHero identity={buildIdentity()} division={null} />);
+    expect(screen.queryByTestId(/^division-medal-/)).not.toBeInTheDocument();
+    // y por defecto (sin prop) tampoco.
+    const second = renderWithProviders(<ProfileHero identity={buildIdentity()} />);
+    expect(second.container.querySelector('[data-testid^="division-medal-"]')).toBeNull();
+  });
 });

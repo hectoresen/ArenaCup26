@@ -10,6 +10,7 @@ import { ProfileHero } from "@/components/public-profile/profile-hero";
 import { StatsRow } from "@/components/public-profile/stats-row";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
+import { getDivisionForRank } from "@/lib/leaderboard/division";
 import { checkPublicReadLimit } from "@/lib/rate-limit";
 import { getRequestIp } from "@/lib/request-ip";
 import { getAchievementsGateStatus } from "@/server/achievements/gate";
@@ -118,6 +119,7 @@ export default async function PublicProfilePage({
           identity={profile.identity}
           isOwner={isOwner}
           cooldowns={ownerExtras?.cooldowns}
+          division={getDivisionForRank(profile.stats.rank)}
         />
         {friendInfo && (
           <div className="mt-3 flex justify-center">
