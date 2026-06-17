@@ -83,7 +83,9 @@ La paleta está alineada con `docs/leaderboard-reference.html` y el mockup en `d
 
 **Total: 28 logros** — 24 originales + `team-spirit` (2026-05-19, feature
 de grupos) + 3 logros `division-*` (2026-06-17) ligados a las líneas
-divisorias del leaderboard (oro/plata/bronce).
+divisorias del leaderboard (oro/plata/bronce). **Ver `docs/divisions.md`**
+para la historia completa del sistema de divisiones (visualización en el
+ranking, thresholds, unlock, backfill).
 
 ### Gate global de partidos
 

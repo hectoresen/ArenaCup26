@@ -360,9 +360,9 @@
     "unlockedCount": "{unlocked} من {total} مفتوحة",
     "unlockedLabel": "مفتوح",
     "lockedLabel": "مغلق",
-    "shareLabel": "مشاركة الإنجاز",
+    "shareLabel": "مشاركة",
     "share": {
-      "shareLabel": "مشاركة الإنجاز",
+      "shareLabel": "مشاركة",
       "title": "إنجازي: {name}",
       "text": "لقد فتحت {name} في ArenaCup26 — كأس العالم 2026",
       "copied": "تم نسخ الرابط",

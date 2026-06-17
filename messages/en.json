@@ -360,9 +360,9 @@
     "unlockedCount": "{unlocked} of {total} unlocked",
     "unlockedLabel": "Unlocked",
     "lockedLabel": "Locked",
-    "shareLabel": "Share achievement",
+    "shareLabel": "Share",
     "share": {
-      "shareLabel": "Share achievement",
+      "shareLabel": "Share",
       "title": "My achievement: {name}",
       "text": "I unlocked {name} on ArenaCup26 — World Cup 2026",
       "copied": "Link copied to clipboard",
