@@ -368,6 +368,14 @@
       "copied": "Link copied to clipboard",
       "copyFailed": "Couldn't copy the link"
     },
+    "medal": {
+      "aria": "{division} medal",
+      "labels": {
+        "gold": "Gold Division",
+        "silver": "Silver Division",
+        "bronze": "Bronze Division"
+      }
+    },
     "tier": {
       "common": "Common",
       "rare": "Rare",
@@ -649,7 +657,11 @@
         },
         "achievements": {
           "q": "What are achievements?",
-          "a": "Badges you unlock by meeting conditions (streaks, first correct, top 100, etc.). They award no points: they're cosmetic and shown on your public profile. There are 24 achievements across 6 rarity tiers, from 'Common' to 'GOAT'."
+          "a": "Badges you unlock by meeting conditions (streaks, first correct, top 100, etc.). They award no points: they're cosmetic and shown on your public profile. There are 28 achievements across 6 rarity tiers, from 'Common' to 'GOAT'."
+        },
+        "divisions": {
+          "q": "What are the divisions and the profile medal?",
+          "a": "The global ranking is cosmetically split into three brackets: Gold Division (ranks 1-10), Silver Division (11-20) and Bronze Division (21-30). Your profile shows the medal of the division you currently occupy, derived from your live rank: if you climb or drop, the medal changes or disappears automatically (it's not permanent — it's reversible). Crossing each threshold for the first time also unlocks a permanent achievement (Bronze, Silver and Gold Division) that stays in your collection even if you later lose the medal."
         },
         "username": {
           "q": "Can I change my username?",

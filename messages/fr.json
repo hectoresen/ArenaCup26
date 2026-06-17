@@ -368,6 +368,14 @@
       "copied": "Lien copié dans le presse-papiers",
       "copyFailed": "Impossible de copier le lien"
     },
+    "medal": {
+      "aria": "Médaille {division}",
+      "labels": {
+        "gold": "Division d'Or",
+        "silver": "Division d'Argent",
+        "bronze": "Division de Bronze"
+      }
+    },
     "tier": {
       "common": "Commun",
       "rare": "Rare",
@@ -649,7 +657,11 @@
         },
         "achievements": {
           "q": "Que sont les succès ?",
-          "a": "Des badges débloqués en remplissant des conditions (séries, première bonne prédiction, top 100, etc.). Ils ne donnent pas de points : ils sont cosmétiques et visibles sur votre profil public. Il y a 24 succès répartis sur 6 niveaux de rareté, de 'Commun' à 'GOAT'."
+          "a": "Des badges débloqués en remplissant des conditions (séries, première bonne prédiction, top 100, etc.). Ils ne donnent pas de points : ils sont cosmétiques et visibles sur votre profil public. Il y a 28 succès répartis sur 6 niveaux de rareté, de 'Commun' à 'GOAT'."
+        },
+        "divisions": {
+          "q": "Qu'est-ce que les divisions et la médaille du profil ?",
+          "a": "Le classement global est divisé en trois paliers cosmétiques : Division d'Or (places 1-10), Division d'Argent (11-20) et Division de Bronze (21-30). Ton profil affiche la médaille de la division que tu occupes actuellement, dérivée de ton rang en temps réel : si tu montes ou descends, la médaille change ou disparaît automatiquement (elle n'est pas permanente — elle est réversible). Franchir chaque seuil pour la première fois débloque aussi un succès permanent (Division de Bronze, d'Argent et d'Or) qui reste dans ta collection même si tu perds la médaille ensuite."
         },
         "username": {
           "q": "Puis-je changer mon nom d'utilisateur ?",

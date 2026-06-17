@@ -15,6 +15,12 @@ Tres "divisiones" cosméticas que segmentan visualmente el ranking global y dan 
 
 El umbral es **estrictamente posicional**: si el ranking se reordena el día siguiente, el divisor se ancla siempre al jugador con `rank === 10/20/30` actual — no a un jugador concreto.
 
+El sistema tiene **tres manifestaciones** complementarias:
+
+1. **Línea divisoria visual** en el ranking (entre rank 10/20/30 y el siguiente). Ver §"Cómo se renderiza el divisor en el leaderboard".
+2. **Logro permanente** `division-bronze/silver/gold` desbloqueado al cruzar cada umbral por primera vez. Una vez desbloqueado, no se pierde aunque caigas de división. Ver §"Cómo se desbloquean los logros".
+3. **Medalla del perfil**, derivada del rank ACTUAL del owner, reversible (cae con el rank). Ver §"Medalla en el perfil".
+
 ## Cómo se renderiza el divisor en el leaderboard
 
 Componente: `src/components/leaderboard/league-divider.tsx`. Se inserta como `<li aria-hidden="true">` dentro del `<ol>` del ranking, justo después de la fila cuyo `player.rank` coincide con un corte.
@@ -83,6 +89,56 @@ Solución: `backfillRankAchievements` (`src/server/achievements/backfill-rank-ac
 
 Mismo pattern que `backfillTeamSpirit`, también en bootstrap. Esto cubre el cold-start de cualquier futuro logro de rank que añadamos sin tener que hacer un script puntual.
 
+## Medalla en el perfil
+
+Cada user del top 30 muestra en la esquina superior derecha de su `<ProfileHero>` una medalla SVG (oro/plata/bronce) con un copy minimalista debajo ("División de Oro", traducido en `messages/{locale}.json` namespace `publicProfile.medal.labels`).
+
+| Rank actual | Medalla |
+| ----------- | ------- |
+| 1-10        | Oro    |
+| 11-20       | Plata  |
+| 21-30       | Bronce |
+| 31+ o `null`| (sin medalla) |
+
+### Derivada, NO persistida
+
+La medalla es estado **derivado** del rank actual del user. NO se guarda en BD. Cada render del perfil:
+
+1. `getPublicProfile` computa `profile.stats.rank` (mismo tie-break canónico que el leaderboard).
+2. La página `/u/<username>` aplica `getDivisionForRank(rank)` (en `src/lib/leaderboard/division.ts`).
+3. `<ProfileHero>` recibe `division: Division | null` y renderiza `<DivisionMedal>` si no es null.
+
+Esto la hace inherentemente **reversible**:
+
+- Si caes de #10 a #11, el siguiente render muestra plata en lugar de oro.
+- Si caes a #31, la medalla desaparece (sin gracia period — refleja la verdad del ranking).
+- Si subes a #1, la medalla sigue siendo oro (no hay una "división supreme" especial; el user diferencia su #1 por el logro `king-of-the-moment` y el resto de mítico/GOAT).
+
+### Diferencia con los logros `division-*`
+
+| | Medalla | Logro |
+| --- | --- | --- |
+| Persistido en BD | No | Sí (`user_achievements`) |
+| Reversible | Sí (cae con el rank) | No (irrevocable) |
+| Refleja | Estado actual | Mejor estado histórico (cima alcanzada) |
+| Visible | Solo en el `<ProfileHero>` | En el catálogo de logros del perfil + dashboard |
+
+Resumen narrativo: **la medalla dice "dónde estás hoy", el logro dice "hasta dónde llegaste"**.
+
+### Por qué no necesita cron ni evento "ranking moved"
+
+Como el rank se computa fresco en cada visita al perfil (y el perfil es la única superficie donde aparece la medalla), no hay desincronización posible. Si un día queremos extender la medalla al ranking, dashboard u otra superficie, igual con derivar en cada query. La única condición para que sea correcto es que `profile.stats.rank` sea fresco — y lo es porque `getPublicProfile` ejecuta el COUNT del rank en cada llamada.
+
+### SVG: componente `DivisionMedal`
+
+`src/components/public-profile/division-medal.tsx`. Diseño:
+
+- Pendant circular con cinta en V superior, ornamento central distinto por tier (estrella oro, laurel plata, palmera simplificada bronce — funcionan también en grayscale para accesibilidad).
+- Color via `var(--color-gold/silver/bronze)` con `drop-shadow` del mismo color al 40% alpha.
+- Copy debajo en `text-[10px] font-extrabold uppercase`, alineado al center bajo la medalla.
+
+NO usa el sprite global de logros: el SVG es pequeño, único por perfil, y mantenerlo inline simplifica la lectura del componente.
+
 ## Cómo ampliar el sistema
 
 ### Añadir una nueva división (ej. "platino" para top 5)
@@ -104,5 +160,8 @@ NO es retroactivo. Bajar `division-gold` de top 10 a top 5 NO revoca el logro a 
 - `docs/achievements.md` — catálogo formal con las 3 entradas + total 28.
 - `docs/scoring.md` §Sistema de desempate — tie-break que decide el rank.
 - `docs/architecture.md` §Capability `achievements` — mención del sistema.
-- `src/components/leaderboard/league-divider.tsx` — implementación visual.
+- `src/lib/leaderboard/division.ts` — helper `getDivisionForRank` + tipo `Division`.
+- `src/components/leaderboard/league-divider.tsx` — implementación visual del divisor.
+- `src/components/public-profile/division-medal.tsx` — medalla del perfil.
 - `src/server/achievements/backfill-rank-achievements.ts` — backfill operacional.
+- FAQ del producto: pregunta `divisions` en `messages/{locale}.json` namespace `faq.questions.items`.

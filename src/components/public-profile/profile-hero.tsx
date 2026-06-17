@@ -1,10 +1,12 @@
 import { CountryFlag } from "@/components/common/country-flag";
 import { AvatarPicker } from "@/components/profile/avatar-picker";
 import { EditableName } from "@/components/profile/editable-name";
+import type { Division } from "@/lib/leaderboard/division";
 import { getAvatar } from "@/server/profile/avatars";
 import type { ProfileIdentity } from "@/server/public-profile/types";
 import { useTranslations } from "next-intl";
 import { CopyLinkButton } from "./copy-link-button";
+import { DivisionMedal } from "./division-medal";
 
 type Props = {
   identity: ProfileIdentity;
@@ -19,6 +21,12 @@ type Props = {
     nameCooldownRemainingMs: number;
     avatarCooldownRemainingMs: number;
   };
+  /**
+   * División actual del owner (derivada de su rank). `null` si está
+   * fuera del top 30 → no se renderiza medalla. Ver
+   * `docs/divisions.md` §Medalla en el perfil.
+   */
+  division?: Division | null;
 };
 
 /**
@@ -29,7 +37,7 @@ type Props = {
  * nombre también (<EditableName> inline). Ambos respetan cooldown
  * 48h vía server action.
  */
-export function ProfileHero({ identity, isOwner = false, cooldowns }: Props) {
+export function ProfileHero({ identity, isOwner = false, cooldowns, division = null }: Props) {
   const t = useTranslations("publicProfile");
   const initial = (identity.name?.[0] ?? identity.username[0] ?? "?").toUpperCase();
   const galleryAvatar = getAvatar(identity.avatarId);
@@ -78,6 +86,16 @@ export function ProfileHero({ identity, isOwner = false, cooldowns }: Props) {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(245,200,66,0.08)_0%,transparent_70%)]"
       />
+
+      {/* Medalla de división — esquina superior derecha. Se ancla con
+          posición absoluta para no afectar al layout central (avatar
+          centrado, nombre, etc) ni cuando el owner no tiene división.
+          Documentación: `docs/divisions.md` §Medalla en el perfil. */}
+      {division && (
+        <div className="absolute end-3 top-3 z-[1]">
+          <DivisionMedal division={division} />
+        </div>
+      )}
 
       <div className="relative flex flex-col items-center gap-3">
         {isOwner ? (
