@@ -51,15 +51,16 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 - **Sparkline + delta semanal** en la card "Tu posición" del panel, alimentados por un snapshot diario del ranking.
 - **Actualización en vivo**: la página pública del ranking usa Server-Sent Events para refrescar cada 15 s sin recargar.
 - **Mini-ranking** en el panel `/inicio` con el Top 5 + tu fila si estás fuera.
+- **Divisiones de Oro / Plata / Bronce** que segmentan el top 30 con una línea divisoria entre puestos 10/20/30 y otorgan una medalla al perfil del jugador. Ver el bloque siguiente y [`docs/divisions.md`](docs/divisions.md) para el detalle.
 
 <table>
   <tr>
-    <td width="33%"><img src="docs/media/arenacuprankingprivateglobal.png" alt="Ranking global con podio" /></td>
+    <td width="33%"><img src="docs/media/rankingwithdivisions1.png" alt="Ranking global con podio y divisor de oro" /></td>
     <td width="33%"><img src="docs/media/arenacuprankingamigos.png" alt="Ranking entre amigos" /></td>
     <td width="33%"><img src="docs/media/rankingpublic1.png" alt="Ranking público pre-Mundial" /></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Global.</b> Podio dorado + lista con racha y aciertos confirmados; el indicador verde marca quién estuvo activo en las últimas 24 h.</sub></td>
+    <td align="center"><sub><b>Global.</b> Podio dorado + top 10 con racha y aciertos confirmados. Al final del bloque, la <b>línea divisoria de oro</b> cierra la primera división del torneo.</sub></td>
     <td align="center"><sub><b>Amigos.</b> Pestaña dedicada para competir solo contra tu círculo y los grupos privados a los que perteneces.</sub></td>
     <td align="center"><sub><b>Pre-kickoff.</b> Página pública (sin login) con la cuenta atrás al primer partido y el podio en vivo durante la fase pre-Mundial.</sub></td>
   </tr>
@@ -71,6 +72,29 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
   <sub><b>Top del momento.</b> Bloque del panel con el Top 5 global o de tus amigos; tu fila siempre se ancla aunque estés fuera del top.</sub>
 </p>
 
+### Divisiones y medallas
+
+El top 30 se segmenta en tres divisiones cosméticas: **Oro** (puestos 1-10), **Plata** (11-20) y **Bronce** (21-30). El sistema tiene tres manifestaciones complementarias:
+
+1. **Línea divisoria** dentro del ranking justo después del rank 10, 20 y 30 — gradiente con gema centrado del color del tier.
+2. **Medalla** en la esquina superior derecha del perfil que refleja la división **actual** del owner. Es **reversible**: si cae fuera de su división, la medalla cambia o desaparece en el siguiente render.
+3. **Logro permanente** (`División de Bronce / Plata / Oro`) que se desbloquea al cruzar cada umbral por primera vez y **queda para siempre** en el catálogo del owner, aunque pierda la medalla.
+
+> Resumen narrativo: **la medalla dice "dónde estás hoy", el logro dice "hasta dónde llegaste"**.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/media/rankingwithdivisions2.png" alt="Línea divisoria de plata entre el puesto 20 y el 21" /></td>
+    <td width="50%"><img src="docs/media/profilev2popupdivisiontext.png" alt="Modal explicativo de la División de Oro" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Divisor visual en el ranking.</b> Justo entre el puesto 20 y el 21 aparece la línea de plata con la gema en el centro, marcando el corte entre divisiones.</sub></td>
+    <td align="center"><sub><b>Click en tu medalla.</b> Modal que explica qué significa estar en esa división, cómo se gana, que es reversible, y un <i>"Ver más"</i> que abre la pregunta de divisiones del FAQ con la respuesta ya desplegada.</sub></td>
+  </tr>
+</table>
+
+Documentación end-to-end: [`docs/divisions.md`](docs/divisions.md).
+
 ### Perfil y privacidad
 
 - **Perfil público** en `/u/<username>`: avatar, bandera, posición, puntos, historial (opcional), logros.
@@ -80,14 +104,15 @@ Una webapp en la que registrarse con Google, predecir los 104 partidos del Mundi
 - **AvatarPicker preview → save** explícito: clicar un emoji solo marca selección; "Guardar"/"Descartar" finaliza. Evita cambios accidentales y propagación de cooldown.
 - **Stats personales** visibles solo para el dueño del perfil: rachas (actual, mejor, milestones), últimas 5 predicciones, links de invitación.
 - **Ajustes de cuenta** accesibles desde el dropdown del avatar (`/ajustes`): privacidad, push notifications, eliminar cuenta.
+- **Medalla de división** en la esquina superior derecha del card cuando el owner está dentro del top 30 (oro/plata/bronce). Reflejo en tiempo real de su posición — ver sección [Divisiones y medallas](#divisiones-y-medallas) arriba.
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/media/arenacupuserprofile.png" alt="Perfil público de un jugador" /></td>
+    <td width="50%"><img src="docs/media/profilev2img1.png" alt="Perfil público con medalla de División de Oro" /></td>
     <td width="50%"><img src="docs/media/arenacupprofiledropdownmenu.png" alt="Menú del avatar" /></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Perfil público.</b> Avatar, bandera, posición, puntos oficiales, últimas predicciones, logros y CTA "Añadir amigo".</sub></td>
+    <td align="center"><sub><b>Perfil público con medalla.</b> Avatar, bandera, posición, puntos oficiales, rachas, últimas predicciones y, en la esquina superior derecha, la <b>medalla de división actual</b> del owner (aquí, División de Oro). Clicable: abre el modal explicativo.</sub></td>
     <td align="center"><sub><b>Menú del avatar.</b> Acceso rápido a perfil, ajustes, historial, logros, FAQ, políticas y cerrar sesión.</sub></td>
   </tr>
   <tr>
