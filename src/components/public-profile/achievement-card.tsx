@@ -33,6 +33,22 @@ export function AchievementCard({ achievement, ownerUsername }: Props) {
   const { definition, unlocked } = achievement;
   const shareable = isShareable(achievement);
 
+  // Caso especial `division-*`: estos tres logros reutilizan la gema
+  // del divisor del leaderboard y deben pintarse en el color de la
+  // MEDALLA (oro/plata/bronce), no en el del tier. El `style.color` se
+  // sobrescribe — el filter (drop-shadow) usa el mismo tono para que
+  // el halo combine con la medalla en lugar de chocar con el morado /
+  // dorado / naranja heredado del tier.
+  const medalColor = MEDAL_ICON_COLOR[definition.iconId];
+  const iconColor = unlocked
+    ? (medalColor ?? tierIconColor(definition.tier))
+    : undefined;
+  const iconFilter = unlocked
+    ? (medalColor !== undefined
+        ? medalIconFilter(medalColor)
+        : tierIconFilter(definition.tier))
+    : "";
+
   return (
     <article
       id={`ach-${definition.id}`}
@@ -66,15 +82,10 @@ export function AchievementCard({ achievement, ownerUsername }: Props) {
       <div
         aria-hidden="true"
         className="mb-2 block leading-none"
-        style={unlocked ? { color: tierIconColor(definition.tier) } : undefined}
+        style={iconColor ? { color: iconColor } : undefined}
       >
         {unlocked ? (
-          <svg
-            width="36"
-            height="36"
-            viewBox="0 0 36 36"
-            className={tierIconFilter(definition.tier)}
-          >
+          <svg width="36" height="36" viewBox="0 0 36 36" className={iconFilter}>
             <use href={achSymbolHref(definition.iconId)} />
           </svg>
         ) : (
@@ -277,4 +288,25 @@ function shareChipClass(tier: ProfileAchievement["definition"]["tier"]): string 
     default:
       return "border-border bg-card text-muted";
   }
+}
+
+/**
+ * Overrides para los logros `division-*`: usan los hex de los tokens
+ * oro/plata/bronce (mismos que `--color-gold/silver/bronze` en
+ * `globals.css`) para que el icono herede el color de la medalla,
+ * no el del tier. El drop-shadow utiliza un alpha 0x59 (≈35%) sobre
+ * el mismo color para que el halo case con la gema.
+ */
+const MEDAL_ICON_COLOR: Record<string, string> = {
+  "ico-div-gold": "#f5c842",
+  "ico-div-silver": "#c8d8f0",
+  "ico-div-bronze": "#e8834a",
+};
+
+/** Filtro Tailwind arbitrary que tinta el drop-shadow con el color medalla. */
+function medalIconFilter(hex: string): string {
+  // 59 = ~35% alpha en hex (0x59 / 0xFF ≈ 0.35). Mismo orden de
+  // magnitud que el filter dorado/plateado del tier para mantener
+  // consistencia visual.
+  return `[filter:drop-shadow(0_0_8px_${hex}59)]`;
 }

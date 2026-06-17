@@ -2,13 +2,14 @@ import { describe, expect, it } from "vitest";
 import { ACHIEVEMENT_CATALOG } from "./catalog";
 
 describe("ACHIEVEMENT_CATALOG", () => {
-  it("contains exactly 25 achievements", () => {
-    // 24 originales + team-spirit (común, añadido 2026-05-19 con
-    // la feature de grupos de competición).
-    expect(ACHIEVEMENT_CATALOG).toHaveLength(25);
+  it("contains exactly 28 achievements", () => {
+    // 24 originales + team-spirit (común, 2026-05-19) + tres
+    // division-* (epic/legendary/mythic, 2026-06-17) ligados a las
+    // líneas divisorias del leaderboard.
+    expect(ACHIEVEMENT_CATALOG).toHaveLength(28);
   });
 
-  it("has the expected tier distribution (7/4/6/4/3/1)", () => {
+  it("has the expected tier distribution (7/4/7/5/4/1)", () => {
     const counts: Record<string, number> = {};
     for (const def of ACHIEVEMENT_CATALOG) {
       counts[def.tier] = (counts[def.tier] ?? 0) + 1;
@@ -16,9 +17,9 @@ describe("ACHIEVEMENT_CATALOG", () => {
     expect(counts).toEqual({
       common: 7,
       rare: 4,
-      epic: 6,
-      legendary: 4,
-      mythic: 3,
+      epic: 7,
+      legendary: 5,
+      mythic: 4,
       goat: 1,
     });
   });
@@ -28,15 +29,15 @@ describe("ACHIEVEMENT_CATALOG", () => {
     expect(ids.size).toBe(ACHIEVEMENT_CATALOG.length);
   });
 
-  it("uses unique sortOrder values; sequence 1-24 + team-spirit at 25", () => {
+  it("uses unique sortOrder values; sequence 1-24 + team-spirit at 25 + division-* at 26-28", () => {
     // El catálogo se construyó originalmente con sortOrder secuencial
-    // 1..24. `team-spirit` (común, añadido 2026-05-19) ocupa el slot
-    // 25 fuera del rango ordenado — el agrupado por tier en el UI
-    // lo coloca al final del bloque común.
+    // 1..24. `team-spirit` (común, 2026-05-19) ocupa el slot 25 y las
+    // tres `division-*` los slots 26 (bronce), 27 (plata) y 28 (oro).
+    // El UI agrupa por tier, así que el orden global no importa.
     const sortOrders = ACHIEVEMENT_CATALOG.map((d) => d.sortOrder);
     expect(new Set(sortOrders).size).toBe(sortOrders.length);
     expect(Math.min(...sortOrders)).toBe(1);
-    expect(Math.max(...sortOrders)).toBe(25);
+    expect(Math.max(...sortOrders)).toBe(28);
   });
 
   it("marks legendary, mythic and goat tiers as shareable; lower tiers not", () => {
@@ -99,6 +100,9 @@ describe("ACHIEVEMENT_CATALOG", () => {
       "runner-up",
       "king-of-the-moment",
       "the-goat",
+      "division-bronze",
+      "division-silver",
+      "division-gold",
     ]) {
       expect(ids, `ID '${required}' debe existir`).toContain(required);
     }

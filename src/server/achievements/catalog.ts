@@ -1,5 +1,5 @@
 /**
- * Catálogo canónico de los 24 logros de ArenaCup26.
+ * Catálogo canónico de los 28 logros de ArenaCup26.
  *
  * Source of truth en código. Refleja `docs/achievements.md` 1:1.
  * Cualquier cambio aquí requiere actualizar el doc y abrir una propuesta
@@ -190,6 +190,21 @@ export const ACHIEVEMENT_CATALOG: AchievementDefinition[] = [
     iconId: "ico-bolt",
     sortOrder: 16,
   },
+  {
+    id: "division-bronze",
+    title: "División de Bronce",
+    description:
+      "Entra en el top 30 del ranking global y desbloquea la división de bronce.",
+    tier: "epic",
+    // No shareable: el chip de compartir se reserva a logros de
+    // élite (legendary+) según la convención de `docs/scoring.md`.
+    isShareable: false,
+    iconId: "ico-div-bronze",
+    // sortOrder 26: tras `team-spirit` (25) y el último épico
+    // original (`the-step-before`, 16). Mantenemos numeración
+    // global creciente.
+    sortOrder: 26,
+  },
 
   // ───── Legendario (4) ─────
   {
@@ -228,6 +243,16 @@ export const ACHIEVEMENT_CATALOG: AchievementDefinition[] = [
     iconId: "ico-trophy",
     sortOrder: 20,
   },
+  {
+    id: "division-silver",
+    title: "División de Plata",
+    description:
+      "Entra en el top 20 del ranking global y desbloquea la división de plata.",
+    tier: "legendary",
+    isShareable: true,
+    iconId: "ico-div-silver",
+    sortOrder: 27,
+  },
 
   // ───── Mítico (3) ─────
   {
@@ -256,6 +281,16 @@ export const ACHIEVEMENT_CATALOG: AchievementDefinition[] = [
     isShareable: true,
     iconId: "ico-crown",
     sortOrder: 23,
+  },
+  {
+    id: "division-gold",
+    title: "División de Oro",
+    description:
+      "Entra en el top 10 del ranking global y desbloquea la división de oro.",
+    tier: "mythic",
+    isShareable: true,
+    iconId: "ico-div-gold",
+    sortOrder: 28,
   },
 
   // ───── GOAT (1) ─────

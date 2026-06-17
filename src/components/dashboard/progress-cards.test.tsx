@@ -10,7 +10,7 @@ function buildProgress(overrides: Partial<Progress> = {}): Progress {
     rank: { rank: 42, rankDelta: null, dayAgoRank: null, sparkline: null },
     achievements: {
       unlocked: 8,
-      total: 24,
+      total: 28,
       lastUnlockedTitle: "Buen Ojo",
       lastUnlockedAt: new Date("2026-06-11T10:00:00Z"),
     },
@@ -22,7 +22,7 @@ describe("<ProgressCards>", () => {
   it("renders achievements as 'X / Y' with the last unlocked", () => {
     renderWithProviders(<ProgressCards progress={buildProgress()} now={NOW} />);
     expect(screen.getByText(/^8$/)).toBeInTheDocument();
-    expect(screen.getByText(/\/ 24/)).toBeInTheDocument();
+    expect(screen.getByText(/\/ 28/)).toBeInTheDocument();
     expect(screen.getByText(/Buen Ojo/)).toBeInTheDocument();
   });
 

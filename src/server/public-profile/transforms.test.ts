@@ -4,24 +4,24 @@ import { TIER_ORDER, buildProfileAchievements, isShareable } from "./transforms"
 import type { ProfileAchievement } from "./types";
 
 describe("buildProfileAchievements", () => {
-  it("includes all 25 achievements grouped by tier in canonical order", () => {
+  it("includes all 28 achievements grouped by tier in canonical order", () => {
     const result = buildProfileAchievements(new Map());
-    expect(result.totalCount).toBe(25);
+    expect(result.totalCount).toBe(28);
     expect(result.unlockedCount).toBe(0);
     expect(result.groups.map((g) => g.tier)).toEqual([...TIER_ORDER]);
     const totalItems = result.groups.reduce((sum, g) => sum + g.items.length, 0);
-    expect(totalItems).toBe(25);
+    expect(totalItems).toBe(28);
   });
 
-  it("respects the 7/4/6/4/3/1 distribution of the catalog", () => {
+  it("respects the 7/4/7/5/4/1 distribution of the catalog", () => {
     const result = buildProfileAchievements(new Map());
     const counts = Object.fromEntries(result.groups.map((g) => [g.tier, g.total]));
     expect(counts).toEqual({
       common: 7,
       rare: 4,
-      epic: 6,
-      legendary: 4,
-      mythic: 3,
+      epic: 7,
+      legendary: 5,
+      mythic: 4,
       goat: 1,
     });
   });
