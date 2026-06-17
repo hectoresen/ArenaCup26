@@ -22,7 +22,7 @@ export function LeagueDivider({ tier }: { tier: Tier }) {
       <span
         className="h-[2px] flex-1 rounded-[2px]"
         style={{
-          background: `linear-gradient(90deg, transparent, ${tone}A6 50%, transparent)`,
+          background: `linear-gradient(90deg, transparent, color-mix(in srgb, ${tone} 65%, transparent) 50%, transparent)`,
         }}
       />
       <span
@@ -63,7 +63,7 @@ export function LeagueDivider({ tier }: { tier: Tier }) {
       <span
         className="h-[2px] flex-1 rounded-[2px]"
         style={{
-          background: `linear-gradient(90deg, transparent, ${tone}A6 50%, transparent)`,
+          background: `linear-gradient(90deg, transparent, color-mix(in srgb, ${tone} 65%, transparent) 50%, transparent)`,
         }}
       />
     </div>
