@@ -128,18 +128,13 @@ export async function getDiscoverableGroups(
     ) >= ${groups.maxMembers}`);
   }
 
-  const baseQuery = db
+  const rows = await db
     .select({
       id: groups.id,
       name: groups.name,
       color: groups.color,
       visibility: groups.visibility,
       maxMembers: groups.maxMembers,
-      memberCount: sql<number>`(
-        SELECT count(*)::int FROM ${groupMemberships}
-        WHERE ${groupMemberships.groupId} = ${groups.id}
-          AND ${groupMemberships.leftAt} IS NULL
-      )`,
     })
     .from(groups)
     .where(and(...conds))
@@ -147,7 +142,23 @@ export async function getDiscoverableGroups(
     .limit(limit)
     .offset(offset);
 
-  const rows = await baseQuery;
+  if (rows.length === 0) return [];
+
+  // Conteo de miembros activos por grupo en una sola query (mismo
+  // patrón que `getUserGroups`). Antes lo hacíamos como correlated
+  // subquery en el SELECT, pero devolvía 0 para todos los grupos en
+  // este código path — refactor a aggregate query separada elimina
+  // la ambigüedad y rinde igual.
+  const groupIds = rows.map((r) => r.id);
+  const counts = await db
+    .select({
+      groupId: groupMemberships.groupId,
+      total: sql<number>`count(*)::int`,
+    })
+    .from(groupMemberships)
+    .where(and(inArray(groupMemberships.groupId, groupIds), isNull(groupMemberships.leftAt)))
+    .groupBy(groupMemberships.groupId);
+  const countMap = new Map(counts.map((c) => [c.groupId, c.total]));
 
   // Resolver viewerRole de cada grupo. Antes filtrábamos los grupos
   // donde el viewer era miembro, pero la regla 2026-05-19 es
@@ -171,7 +182,7 @@ export async function getDiscoverableGroups(
     color: r.color as GroupColor,
     visibility: r.visibility,
     maxMembers: r.maxMembers,
-    memberCount: r.memberCount,
+    memberCount: countMap.get(r.id) ?? 0,
     viewerRole: roleMap.get(r.id) ?? null,
   }));
 }
