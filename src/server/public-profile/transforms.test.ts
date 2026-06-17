@@ -74,19 +74,17 @@ function entry(
 }
 
 describe("isShareable", () => {
-  it("returns true for legendary/mythic/goat when unlocked", () => {
+  it("returns true for ANY tier when unlocked (2026-06-17: el desbloqueo es ya el hito)", () => {
+    expect(isShareable(entry("common", true))).toBe(true);
+    expect(isShareable(entry("rare", true))).toBe(true);
+    expect(isShareable(entry("epic", true))).toBe(true);
     expect(isShareable(entry("legendary", true))).toBe(true);
     expect(isShareable(entry("mythic", true))).toBe(true);
     expect(isShareable(entry("goat", true))).toBe(true);
   });
 
-  it("returns false for common/rare/epic regardless of unlock state", () => {
-    expect(isShareable(entry("common", true))).toBe(false);
-    expect(isShareable(entry("rare", true))).toBe(false);
-    expect(isShareable(entry("epic", true))).toBe(false);
-  });
-
-  it("returns false when locked (even for high tiers)", () => {
+  it("returns false for any tier when locked", () => {
+    expect(isShareable(entry("common", false))).toBe(false);
     expect(isShareable(entry("legendary", false))).toBe(false);
     expect(isShareable(entry("goat", false))).toBe(false);
   });

@@ -41,34 +41,35 @@ describe("<AchievementCard>", () => {
     expect(container.querySelector('use[href="#ach-lock"]')).not.toBeNull();
   });
 
-  it("renders the share-chip ONLY when unlocked AND tier is legendary/mythic/goat", () => {
-    // common unlocked → sin chip
+  it("renders the share button on ANY unlocked achievement (2026-06-17)", () => {
+    // common unlocked → ahora con chip
     const c1 = renderWithProviders(
       <AchievementCard achievement={build("first-hit", true)} ownerUsername="carlos" />,
     );
-    expect(c1.container.querySelector("a[href*='#ach-']")).toBeNull();
+    expect(c1.container.querySelector("button")).not.toBeNull();
     c1.unmount();
 
     // legendary unlocked → con chip
     const c2 = renderWithProviders(
       <AchievementCard achievement={build("the-prophet", true)} ownerUsername="carlos" />,
     );
-    expect(c2.container.querySelector("a[href*='#ach-the-prophet']")).not.toBeNull();
+    expect(c2.container.querySelector("button")).not.toBeNull();
     c2.unmount();
 
     // legendary locked → sin chip (no se puede compartir lo que no tienes)
     const c3 = renderWithProviders(
       <AchievementCard achievement={build("the-prophet", false)} ownerUsername="carlos" />,
     );
-    expect(c3.container.querySelector("a[href*='#ach-']")).toBeNull();
+    expect(c3.container.querySelector("button")).toBeNull();
   });
 
-  it("share-chip uses the owner username in the href", () => {
+  it("share button uses the SVG share icon (not the emoji arrow)", () => {
     const { container } = renderWithProviders(
       <AchievementCard achievement={build("the-goat", true)} ownerUsername="layla" />,
     );
-    const chip = container.querySelector("a[href*='#ach-']");
-    expect(chip?.getAttribute("href")).toBe("/u/layla#ach-the-goat");
+    expect(container.querySelector('use[href="#ach-share"]')).not.toBeNull();
+    // Y NO debe quedar la flecha de emojipedia que había antes.
+    expect(container.textContent).not.toMatch(/↗/);
   });
 
   it("attaches id='ach-<id>' to enable deep-link anchors", () => {

@@ -361,6 +361,13 @@
     "unlockedLabel": "Desbloqueado",
     "lockedLabel": "Bloqueado",
     "shareLabel": "Compartir logro",
+    "share": {
+      "shareLabel": "Compartir logro",
+      "title": "Mi logro: {name}",
+      "text": "He desbloqueado {name} en ArenaCup26 — Mundial 2026",
+      "copied": "Enlace copiado al portapapeles",
+      "copyFailed": "No pude copiar el enlace"
+    },
     "tier": {
       "common": "Común",
       "rare": "Poco común",

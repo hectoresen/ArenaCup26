@@ -14,17 +14,13 @@ export const TIER_ORDER: readonly AchievementTier[] = [
 ] as const;
 
 /**
- * Tiers en los que el `share-chip` aparece al hover sobre una card
- * desbloqueada. `docs/public-profile.md` §Compartir.
- */
-const SHARE_TIERS = new Set<AchievementTier>(["legendary", "mythic", "goat"]);
-
-/**
- * `true` si el logro debe mostrar el botón "Compartir" al hover. Solo
- * tiers altos Y desbloqueado.
+ * `true` si el logro debe mostrar el botón "Compartir" al hover.
+ * Cualquier logro desbloqueado lo lleva (decisión 2026-06-17:
+ * desbloquear es ya el hito; el user debería poder presumir de
+ * cualquiera, no solo de los de élite).
  */
 export function isShareable(achievement: ProfileAchievement): boolean {
-  return achievement.unlocked && SHARE_TIERS.has(achievement.definition.tier);
+  return achievement.unlocked;
 }
 
 /**

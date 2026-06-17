@@ -361,6 +361,13 @@
     "unlockedLabel": "مفتوح",
     "lockedLabel": "مغلق",
     "shareLabel": "مشاركة الإنجاز",
+    "share": {
+      "shareLabel": "مشاركة الإنجاز",
+      "title": "إنجازي: {name}",
+      "text": "لقد فتحت {name} في ArenaCup26 — كأس العالم 2026",
+      "copied": "تم نسخ الرابط",
+      "copyFailed": "تعذّر نسخ الرابط"
+    },
     "tier": {
       "common": "شائع",
       "rare": "نادر",

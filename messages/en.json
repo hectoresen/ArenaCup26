@@ -361,6 +361,13 @@
     "unlockedLabel": "Unlocked",
     "lockedLabel": "Locked",
     "shareLabel": "Share achievement",
+    "share": {
+      "shareLabel": "Share achievement",
+      "title": "My achievement: {name}",
+      "text": "I unlocked {name} on ArenaCup26 — World Cup 2026",
+      "copied": "Link copied to clipboard",
+      "copyFailed": "Couldn't copy the link"
+    },
     "tier": {
       "common": "Common",
       "rare": "Rare",
