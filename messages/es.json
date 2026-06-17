@@ -360,9 +360,9 @@
     "unlockedCount": "{unlocked} de {total} desbloqueados",
     "unlockedLabel": "Desbloqueado",
     "lockedLabel": "Bloqueado",
-    "shareLabel": "Compartir logro",
+    "shareLabel": "Compartir",
     "share": {
-      "shareLabel": "Compartir logro",
+      "shareLabel": "Compartir",
       "title": "Mi logro: {name}",
       "text": "He desbloqueado {name} en ArenaCup26 — Mundial 2026",
       "copied": "Enlace copiado al portapapeles",

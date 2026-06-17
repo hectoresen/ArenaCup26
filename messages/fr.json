@@ -360,9 +360,9 @@
     "unlockedCount": "{unlocked} sur {total} débloqués",
     "unlockedLabel": "Débloqué",
     "lockedLabel": "Verrouillé",
-    "shareLabel": "Partager le succès",
+    "shareLabel": "Partager",
     "share": {
-      "shareLabel": "Partager le succès",
+      "shareLabel": "Partager",
       "title": "Mon succès : {name}",
       "text": "J'ai débloqué {name} sur ArenaCup26 — Coupe du monde 2026",
       "copied": "Lien copié dans le presse-papiers",
