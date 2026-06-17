@@ -1,3 +1,4 @@
+import { FaqHashOpener } from "@/components/faq/faq-hash-opener";
 import { FaqItem } from "@/components/faq/faq-item";
 import { ScoringTable } from "@/components/faq/scoring-table";
 import { TopChrome } from "@/components/layout/top-chrome";
@@ -61,12 +62,16 @@ function FaqPageContent({
 
           <div className="flex flex-col gap-2">
             {QUESTION_IDS.map((id) => (
-              <FaqItem key={id} question={t(`questions.items.${id}.q`)}>
+              <FaqItem key={id} id={`faq-${id}`} question={t(`questions.items.${id}.q`)}>
                 {t(`questions.items.${id}.a`)}
               </FaqItem>
             ))}
           </div>
         </section>
+
+        {/* Abre el <details> referenciado por el hash de la URL si el
+            user aterriza via deep-link (ej. desde la medalla del perfil). */}
+        <FaqHashOpener />
 
         <div className="mt-10 flex justify-center">
           <Link

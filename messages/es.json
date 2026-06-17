@@ -374,6 +374,17 @@
         "gold": "División de Oro",
         "silver": "División de Plata",
         "bronze": "División de Bronce"
+      },
+      "popover": {
+        "ariaTrigger": "Abrir info sobre {division}",
+        "closeAria": "Cerrar",
+        "body": {
+          "gold": "Estás entre los 10 primeros del ranking global. La medalla es tuya mientras te mantengas en el top 10: si caes al puesto 11, pasarás a Plata.",
+          "silver": "Estás entre los puestos 11 y 20 del ranking global. Si subes al top 10 el Oro será tuyo; si caes al 21, heredarás el Bronce.",
+          "bronze": "Estás entre los puestos 21 y 30 del ranking global. Sube para reclamar Plata u Oro; si caes fuera del top 30, perderás la medalla."
+        },
+        "howItWorks": "La medalla refleja tu posición ahora mismo y cambia cuando subes o bajas. Cruzar cada umbral por primera vez te desbloquea además un logro permanente que sí queda para siempre en tu colección.",
+        "viewMore": "Ver más"
       }
     },
     "tier": {

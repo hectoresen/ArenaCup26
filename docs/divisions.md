@@ -133,11 +133,24 @@ Como el rank se computa fresco en cada visita al perfil (y el perfil es la únic
 
 `src/components/public-profile/division-medal.tsx`. Diseño:
 
-- Pendant circular con cinta en V superior, ornamento central distinto por tier (estrella oro, laurel plata, palmera simplificada bronce — funcionan también en grayscale para accesibilidad).
-- Color via `var(--color-gold/silver/bronze)` con `drop-shadow` del mismo color al 40% alpha.
+- Pendant circular con cinta en V superior (doble tira para sugerir pliegue 3D), ornamento central distinto por tier (estrella oro, laurel plata, palmera simplificada bronce — funcionan también en grayscale para accesibilidad).
+- Profundidad mediante `<radialGradient>` para el fill (centro brillante → borde apagado) + specular highlight upper-left que simula reflejo sobre metal pulido.
+- Color via `var(--color-gold/silver/bronze)` con `drop-shadow` del mismo color al 50% alpha.
 - Copy debajo en `text-[10px] font-extrabold uppercase`, alineado al center bajo la medalla.
 
 NO usa el sprite global de logros: el SVG es pequeño, único por perfil, y mantenerlo inline simplifica la lectura del componente.
+
+### Click → modal explicativo
+
+La medalla es **clickable**. Al pulsarla se abre un modal centrado (mismo pattern que `NotificationModal` del shell) con:
+
+1. Header con la medalla en pequeño + título de la división.
+2. Body con dos párrafos: explicación específica del tier ("estás en el top 10…") + cómo funciona el sistema (reversible + logro permanente).
+3. Footer con un link **"Ver más"** que navega a `/faq#faq-divisions`.
+
+El FAQ tiene soporte de deep-link: cada `<FaqItem>` lleva `id={\`faq-${id}\`}` y la página monta `<FaqHashOpener>` (client) que abre el `<details>` referenciado por el hash al cargar. Resultado: el user pulsa la medalla → modal → "Ver más" → aterriza en el FAQ con la pregunta ya abierta.
+
+Copys del modal en `messages/{locale}.json` namespace `publicProfile.medal.popover`.
 
 ## Cómo ampliar el sistema
 

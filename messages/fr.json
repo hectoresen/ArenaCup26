@@ -374,6 +374,17 @@
         "gold": "Division d'Or",
         "silver": "Division d'Argent",
         "bronze": "Division de Bronze"
+      },
+      "popover": {
+        "ariaTrigger": "Ouvrir l'info sur {division}",
+        "closeAria": "Fermer",
+        "body": {
+          "gold": "Tu es dans le top 10 du classement global. La médaille reste à toi tant que tu restes dans le top 10 : si tu tombes à la 11e place, tu passeras à l'Argent.",
+          "silver": "Tu es entre les places 11 et 20 du classement global. Monte dans le top 10 pour décrocher l'Or ; tombe à la 21e et le Bronze prend le relais.",
+          "bronze": "Tu es entre les places 21 et 30 du classement global. Monte pour décrocher Argent ou Or ; sors du top 30 et tu perds la médaille."
+        },
+        "howItWorks": "La médaille reflète ta position en temps réel et change quand tu montes ou descends. Franchir chaque seuil pour la première fois te débloque aussi un succès permanent qui reste à jamais dans ta collection.",
+        "viewMore": "En savoir plus"
       }
     },
     "tier": {

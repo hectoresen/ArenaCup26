@@ -374,6 +374,17 @@
         "gold": "Gold Division",
         "silver": "Silver Division",
         "bronze": "Bronze Division"
+      },
+      "popover": {
+        "ariaTrigger": "Open info about {division}",
+        "closeAria": "Close",
+        "body": {
+          "gold": "You're in the top 10 of the global ranking. The medal stays yours as long as you stay in the top 10: drop to 11 and you'll move to Silver.",
+          "silver": "You're between positions 11 and 20 of the global ranking. Climb into the top 10 to claim Gold; drop to 21 and Bronze takes over.",
+          "bronze": "You're between positions 21 and 30 of the global ranking. Climb to claim Silver or Gold; drop out of the top 30 and you lose the medal."
+        },
+        "howItWorks": "The medal reflects your live position and changes when you climb or drop. Crossing each threshold for the first time also unlocks a permanent achievement that stays in your collection forever.",
+        "viewMore": "Learn more"
       }
     },
     "tier": {
