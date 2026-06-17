@@ -4,6 +4,7 @@ import type { Division } from "@/lib/leaderboard/division";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   division: Division;
@@ -39,7 +40,17 @@ export function DivisionMedal({ division }: Props) {
   const cfg = MEDAL_CONFIG[division];
   const gradId = useId();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Marcador post-mount para usar createPortal con seguridad. El modal
+  // se renderiza vía portal a `document.body` porque el ancestor
+  // `<article>` del ProfileHero tiene `animation` que crea un
+  // containing block, atrapando `position: fixed` dentro del card y
+  // generando scroll interno. El portal escapa esa jaula.
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -157,24 +168,26 @@ export function DivisionMedal({ division }: Props) {
         </span>
       </button>
 
-      {open && (
-        <div
-          // biome-ignore lint/a11y/useSemanticElements: <dialog> nativo requiere .showModal() imperativo; usamos overlay manual con role=dialog para coherencia con NotificationModal
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={`medal-modal-title-${division}`}
-          className="fixed inset-0 z-[80] grid place-items-center px-4 py-8"
-        >
-          <button
-            type="button"
-            aria-label={t("popover.closeAria")}
-            onClick={() => setOpen(false)}
-            className="absolute inset-0 cursor-pointer border-0 bg-black/70 backdrop-blur-sm"
-          />
+      {open &&
+        mounted &&
+        createPortal(
           <div
-            className="relative w-full max-w-md rounded-2xl border-2 bg-card text-foreground shadow-[0_24px_48px_rgba(0,0,0,0.6)] [animation:popIn_0.2s_cubic-bezier(0.34,1.56,0.64,1)_forwards]"
-            style={{ borderColor: `${cfg.color}55` }}
+            // biome-ignore lint/a11y/useSemanticElements: <dialog> nativo requiere .showModal() imperativo; usamos overlay manual con role=dialog para coherencia con NotificationModal
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`medal-modal-title-${division}`}
+            className="fixed inset-0 z-[80] grid place-items-center px-4 py-8"
           >
+            <button
+              type="button"
+              aria-label={t("popover.closeAria")}
+              onClick={() => setOpen(false)}
+              className="absolute inset-0 cursor-pointer border-0 bg-black/70 backdrop-blur-sm"
+            />
+            <div
+              className="relative w-full max-w-md rounded-2xl border-2 bg-card text-foreground shadow-[0_24px_48px_rgba(0,0,0,0.6)] [animation:popIn_0.2s_cubic-bezier(0.34,1.56,0.64,1)_forwards]"
+              style={{ borderColor: `${cfg.color}55` }}
+            >
             <header className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
               <div className="flex min-w-0 items-center gap-3">
                 <span style={{ color: cfg.color }} className="shrink-0">
@@ -232,9 +245,10 @@ export function DivisionMedal({ division }: Props) {
                 {t("popover.viewMore")} <span aria-hidden="true">→</span>
               </Link>
             </footer>
-          </div>
-        </div>
-      )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 }
