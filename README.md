@@ -392,4 +392,10 @@ npm run dev                # http://localhost:3000
 
 ## Licencia
 
-Por definir.
+**Copyright © 2026 Hector Escolante. All rights reserved.**
+
+ArenaCup26 es un proyecto personal. Su código fuente se aloja públicamente en GitHub **para transparencia y revisión educativa**.
+
+No se concede ninguna licencia (expresa o implícita) para usar, copiar, modificar, redistribuir, sublicenciar, vender o desplegar este software (o partes de él) sin permiso previo por escrito del titular del copyright. Esto incluye los nombres "ArenaCup26" / "ArenaCup", el dominio `arenacup26.com` y todos los assets visuales del repositorio (medallas, iconos, sprites, fixtures de referencia).
+
+Detalle legal completo en [`LICENSE`](LICENSE). Para consultas de licenciamiento o permisos: `contact@arenacup26.com`.

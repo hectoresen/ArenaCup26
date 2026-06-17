@@ -2,6 +2,7 @@
   "name": "arenacup26",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "description": "Plataforma social y competitiva alrededor del Mundial de Fútbol 2026",
   "engines": {
     "node": ">=22"
