@@ -18,6 +18,7 @@ describe("edge-case fixtures", () => {
   it("includes group, knockout, voided and combo scenarios", () => {
     const stages = new Set(EDGE_CASE_FIXTURES.map((f) => f.match.stage));
     expect(stages.has("group")).toBe(true);
+    expect(stages.has("round-of-32")).toBe(true);
     expect(
       [...stages].some(
         (s) => s === "round-of-16" || s === "quarter" || s === "semi" || s === "final",

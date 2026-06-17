@@ -216,6 +216,7 @@
     },
     "stages": {
       "group": "Phase de groupes",
+      "round-of-32": "Seizièmes de finale",
       "round-of-16": "Huitièmes de finale",
       "quarter": "Quarts de finale",
       "semi": "Demi-finales",
@@ -238,6 +239,7 @@
     },
     "bracket": {
       "rounds": {
+        "round-of-32": "Seizièmes",
         "round-of-16": "Huitièmes",
         "quarter": "Quarts",
         "semi": "Demies",

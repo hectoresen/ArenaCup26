@@ -50,7 +50,13 @@ export type MatchDetail = MatchListItem & {
  * `match_stage` salvo `group`/`regular-season` que no entran en el
  * bracket. El orden de las claves marca el orden visual en la vista.
  */
-export type BracketRound = "round-of-16" | "quarter" | "semi" | "third-place" | "final";
+export type BracketRound =
+  | "round-of-32"
+  | "round-of-16"
+  | "quarter"
+  | "semi"
+  | "third-place"
+  | "final";
 
 export type BracketRoundGroup = {
   round: BracketRound;

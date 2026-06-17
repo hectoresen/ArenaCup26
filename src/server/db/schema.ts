@@ -65,6 +65,7 @@ export const matchStatusEnum = pgEnum("match_status", [
 
 export const matchStageEnum = pgEnum("match_stage", [
   "group",
+  "round-of-32",
   "round-of-16",
   "quarter",
   "semi",

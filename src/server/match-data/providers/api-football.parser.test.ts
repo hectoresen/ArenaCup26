@@ -16,6 +16,9 @@ describe("parseStage", () => {
     ["Group F - 3", "group"],
     ["Regular Season - 1", "regular-season"],
     ["Regular Season - 38", "regular-season"],
+    ["Round of 32", "round-of-32"],
+    ["Last 32", "round-of-32"],
+    ["1/16 Finals", "round-of-32"],
     ["Round of 16", "round-of-16"],
     ["1/8 Finals", "round-of-16"],
     ["Quarter-finals", "quarter"],
@@ -39,6 +42,15 @@ describe("parseStage", () => {
     expect(parseStage("  GROUP B - 1  ")).toBe("group");
     expect(parseStage("FINAL")).toBe("final");
     expect(parseStage("semi-Finals")).toBe("semi");
+  });
+
+  it("matches round-of-32 before round-of-16 (precedence)", () => {
+    // El check de "round of 32" se evalúa antes que el de "round of 16";
+    // si el orden se invirtiese, "Round of 32" caería en round-of-16 por
+    // contener la sustring "16" — no es el caso, pero este test lo
+    // protege ante refactors.
+    expect(parseStage("Round of 32")).toBe("round-of-32");
+    expect(parseStage("Round of 16")).toBe("round-of-16");
   });
 });
 

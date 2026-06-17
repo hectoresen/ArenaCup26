@@ -13,7 +13,14 @@ import type {
   MatchesFilters,
 } from "./types";
 
-const BRACKET_ROUNDS: BracketRound[] = ["round-of-16", "quarter", "semi", "third-place", "final"];
+const BRACKET_ROUNDS: BracketRound[] = [
+  "round-of-32",
+  "round-of-16",
+  "quarter",
+  "semi",
+  "third-place",
+  "final",
+];
 
 /**
  * Status "scheduled" en la UI agrupa los 3 estados que comparten

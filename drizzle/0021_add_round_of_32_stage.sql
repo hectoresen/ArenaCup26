@@ -1,0 +1,1 @@
+ALTER TYPE "public"."match_stage" ADD VALUE 'round-of-32' BEFORE 'round-of-16';
