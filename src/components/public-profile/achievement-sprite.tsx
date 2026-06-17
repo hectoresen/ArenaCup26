@@ -1154,6 +1154,17 @@ export function AchievementsIconSprite() {
           />
           <circle cx="8" cy="11" r="1.2" fill="currentColor" />
         </symbol>
+
+        {/* SHARE — icono del botón "Compartir logro". Tres círculos
+            unidos por líneas: silueta universal de "share". Copia 1:1
+            del `ico-share` de `docs/achievements-reference.html`. */}
+        <symbol id="ach-share" viewBox="0 0 12 12">
+          <circle cx="9.5" cy="2.5" r="1.5" fill="none" stroke="currentColor" strokeWidth="1" />
+          <circle cx="9.5" cy="9.5" r="1.5" fill="none" stroke="currentColor" strokeWidth="1" />
+          <circle cx="2.5" cy="6" r="1.5" fill="none" stroke="currentColor" strokeWidth="1" />
+          <line x1="8" y1="3.2" x2="4" y2="5.3" stroke="currentColor" strokeWidth="0.9" />
+          <line x1="4" y1="6.7" x2="8" y2="8.8" stroke="currentColor" strokeWidth="0.9" />
+        </symbol>
       </defs>
     </svg>
   );

@@ -361,6 +361,13 @@
     "unlockedLabel": "Débloqué",
     "lockedLabel": "Verrouillé",
     "shareLabel": "Partager le succès",
+    "share": {
+      "shareLabel": "Partager le succès",
+      "title": "Mon succès : {name}",
+      "text": "J'ai débloqué {name} sur ArenaCup26 — Coupe du monde 2026",
+      "copied": "Lien copié dans le presse-papiers",
+      "copyFailed": "Impossible de copier le lien"
+    },
     "tier": {
       "common": "Commun",
       "rare": "Rare",

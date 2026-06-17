@@ -2,6 +2,7 @@ import { isShareable } from "@/server/public-profile/transforms";
 import type { ProfileAchievement } from "@/server/public-profile/types";
 import { useTranslations } from "next-intl";
 import { achSymbolHref } from "./achievement-sprite";
+import { ShareAchievementButton } from "./share-achievement-button";
 
 type Props = {
   achievement: ProfileAchievement;
@@ -114,14 +115,15 @@ export function AchievementCard({ achievement, ownerUsername }: Props) {
         </span>
       )}
 
-      {/* Share chip — solo unlocked + tier alto, hover-revealed */}
+      {/* Share chip — unlocked, hover-revealed. Web Share API o
+          fallback al portapapeles (ver ShareAchievementButton). */}
       {shareable && (
-        <a
-          href={`/u/${ownerUsername}#ach-${definition.id}`}
+        <ShareAchievementButton
+          ownerUsername={ownerUsername}
+          achievementId={definition.id}
+          achievementTitle={definition.title}
           className={`mt-2 inline-flex items-center gap-1 rounded-md border-[1.5px] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.06em] opacity-0 transition-opacity group-hover:opacity-100 ${shareChipClass(definition.tier)}`}
-        >
-          ↗ {t("shareLabel")}
-        </a>
+        />
       )}
     </article>
   );
@@ -278,15 +280,23 @@ function tierTitleClass(tier: ProfileAchievement["definition"]["tier"]): string 
 }
 
 function shareChipClass(tier: ProfileAchievement["definition"]["tier"]): string {
+  // Cada tier tiene su chip propio para mantener la jerarquía
+  // cromática del catálogo. Los tres bajos usan colores menos
+  // saturados (verde/azul/morado) para no robar protagonismo a los
+  // tier altos cuando un usuario los presume todos.
   switch (tier) {
+    case "common":
+      return "border-success/30 bg-success/10 text-success";
+    case "rare":
+      return "border-info/30 bg-info/10 text-info";
+    case "epic":
+      return "border-purple-400/30 bg-purple-400/10 text-purple-400";
     case "legendary":
       return "border-gold/30 bg-gold/10 text-gold";
     case "mythic":
       return "border-warm/30 bg-warm/10 text-warm";
     case "goat":
       return "border-silver/30 bg-silver/10 text-silver";
-    default:
-      return "border-border bg-card text-muted";
   }
 }
 

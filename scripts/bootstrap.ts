@@ -1,3 +1,4 @@
+import { backfillRankAchievements } from "@/server/achievements/backfill-rank-achievements";
 import { backfillTeamSpirit } from "@/server/achievements/backfill-team-spirit";
 import { seedAchievements } from "@/server/achievements/seed";
 import { seedBotUsers } from "@/server/bots/seed";
@@ -74,6 +75,10 @@ async function main() {
   console.log("→ Bootstrap: backfilling team-spirit for users with active groups…");
   const backfilled = await backfillTeamSpirit(db);
   console.log(`✓ Team-spirit backfilled for ${backfilled} user(s).`);
+
+  console.log("→ Bootstrap: backfilling rank-based achievements (top-N + division-*)…");
+  const rankBackfilled = await backfillRankAchievements(db);
+  console.log(`✓ Rank achievements backfilled — ${rankBackfilled} (user × achievement) rows inserted.`);
 
   process.exit(0);
 }
