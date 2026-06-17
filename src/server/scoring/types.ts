@@ -2,6 +2,7 @@ import type { ComboMilestone } from "./rules";
 
 export type MatchStage =
   | "group"
+  | "round-of-32"
   | "round-of-16"
   | "quarter"
   | "semi"

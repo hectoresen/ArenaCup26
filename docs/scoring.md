@@ -32,7 +32,7 @@ El usuario puede cubrir **dos de los tres resultados posibles** (victoria local,
 - Las dobles son **siempre de resultado**, sin marcador exacto. No existe acierto exacto en una doble.
 - Una doble acertada cuenta como **un acierto** de cara a la racha (suma 1).
 - Una doble fallida resetea la racha a 0, igual que una predicción simple fallida.
-- **En eliminatoria, las dobles `1X` y `X2` no aplican** (no hay empate oficial). La `12` es trivial y se desactiva. Solo se permite predicción simple con marcador exacto opcional. Ver `docs/business-rules.md`.
+- **En eliminatoria, las dobles `1X` y `X2` no aplican** (no hay empate oficial). La `12` es trivial y se desactiva. Solo se permite predicción simple con marcador exacto opcional. Aplica idénticamente a todas las rondas del bracket: `round-of-32` (Mundial 26, formato 48 equipos), `round-of-16`, `quarter`, `semi`, `third-place` y `final`. Ver `docs/business-rules.md`.
 
 ### UX obligatoria
 

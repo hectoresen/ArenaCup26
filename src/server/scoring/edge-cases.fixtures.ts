@@ -124,6 +124,31 @@ export const EDGE_CASE_FIXTURES: ScoringFixture[] = [
 
   // ──────────────── ELIMINATORIA ──────────────────────────────
   {
+    id: "04b-round-of-32-prorroga-simple",
+    description:
+      "Round-of-32 del Mundial 26 (formato 48 equipos): 1-1@90', 2-1 prórroga; simple 'home' acierta. Confirma que round-of-32 hereda reglas de eliminatoria sin lógica nueva en el engine.",
+    match: {
+      status: "finished",
+      stage: "round-of-32",
+      scoreAt90: { home: 1, away: 1 },
+      scoreAtExtra: { home: 2, away: 1 },
+      penaltyWinner: null,
+    },
+    prediction: {
+      kind: "simple",
+      predictedWinner: "home",
+      predictedHomeScore: null,
+      predictedAwayScore: null,
+    },
+    streakBefore: NO_STREAK,
+    expected: {
+      points: 10,
+      kind: "simple",
+      streakAfter: { current: 1, containsDouble: false },
+      comboBonuses: [],
+    },
+  },
+  {
     id: "05-eliminatoria-prorroga-simple",
     description:
       "Eliminatoria 1-1 al 90', 2-1 en prórroga; predicción simple 'home' acierta usando el marcador de prórroga.",

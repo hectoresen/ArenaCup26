@@ -88,18 +88,29 @@ const STATUS_MAP: Record<ApiFootballStatusCode, ProviderMatchStatus> = {
  * Mapea la etiqueta de ronda (string libre) a `MatchStage`.
  * api-football usa convenciones consistentes:
  *   - "Group A - 1", "Group F - 3" → group
- *   - "Round of 16" → round-of-16
+ *   - "Round of 32", "Last 32", "1/16 Finals" → round-of-32
+ *     (formato WC 2026: 48 equipos → 32 a knockouts → 16 partidos
+ *     en la primera ronda eliminatoria)
+ *   - "Round of 16", "1/8 Finals" → round-of-16
  *   - "Quarter-finals" → quarter
  *   - "Semi-finals" → semi
  *   - "3rd Place Final" → third-place
  *   - "Final" → final
  *   - "Regular Season - 12" (formato de ligas: La Liga, Premier, etc.) → regular-season
+ *
+ * Orden importa: el check de `round-of-32` (más específico) va antes
+ * que el de `round-of-16` para evitar que `"Round of 32"` colisione
+ * con un patrón menos específico. api-football usa exactamente el
+ * número de equipos en el label, así que la sustring "16" en
+ * "Round of 16" no contamina al chequear "32" primero.
  */
 export function parseStage(round: string | null | undefined): MatchStage | null {
   if (!round) return null;
   const lower = round.toLowerCase().trim();
   if (lower.startsWith("regular season")) return "regular-season";
   if (lower.startsWith("group")) return "group";
+  if (lower.includes("round of 32") || lower.includes("last 32") || lower.includes("1/16"))
+    return "round-of-32";
   if (lower.includes("round of 16") || lower.includes("1/8")) return "round-of-16";
   if (lower.includes("quarter")) return "quarter";
   if (lower.includes("semi")) return "semi";

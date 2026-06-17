@@ -148,6 +148,13 @@
       "when": 1781180738275,
       "tag": "0020_redundant_silver_fox",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1781683123459,
+      "tag": "0021_add_round_of_32_stage",
+      "breakpoints": true
     }
   ]
 }

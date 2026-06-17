@@ -1,8 +1,5 @@
+import { MaintenanceWall, getMaintenanceDecision } from "@/components/admin/maintenance-banner";
 import { AppShell } from "@/components/app-shell/app-shell";
-import {
-  MaintenanceWall,
-  getMaintenanceDecision,
-} from "@/components/admin/maintenance-banner";
 import { auth } from "@/lib/auth";
 import { db } from "@/server/db/client";
 import { users } from "@/server/db/schema";

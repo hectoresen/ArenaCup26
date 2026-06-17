@@ -8,6 +8,7 @@ const NOW = new Date("2026-06-12T10:00:00Z");
 function emptyBracket(): BracketData {
   return {
     rounds: [
+      { round: "round-of-32", matches: [] },
       { round: "round-of-16", matches: [] },
       { round: "quarter", matches: [] },
       { round: "semi", matches: [] },
@@ -18,8 +19,9 @@ function emptyBracket(): BracketData {
 }
 
 describe("<BracketView>", () => {
-  it("renders all 5 round headers even with no matches", () => {
+  it("renders all 6 round headers even with no matches", () => {
     renderWithProviders(<BracketView bracket={emptyBracket()} now={NOW} />);
+    expect(screen.getByRole("heading", { name: "Dieciseisavos" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Octavos" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Cuartos" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Semis" })).toBeInTheDocument();
@@ -29,9 +31,9 @@ describe("<BracketView>", () => {
 
   it("renders placeholder when a round has no matches", () => {
     renderWithProviders(<BracketView bracket={emptyBracket()} now={NOW} />);
-    // 5 placeholders, uno por ronda vacía.
+    // 6 placeholders, uno por ronda vacía.
     const placeholders = screen.getAllByText(/aún sin partidos confirmados/);
-    expect(placeholders).toHaveLength(5);
+    expect(placeholders).toHaveLength(6);
   });
 
   it("renders a BracketCard for each match within its round", () => {

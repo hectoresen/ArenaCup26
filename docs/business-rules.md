@@ -42,7 +42,7 @@ Reglas operativas que **no** son del sistema de puntuación (ver `scoring.md`) p
 
 ## Reglas específicas de partidos de eliminatoria
 
-Las eliminatorias del Mundial pueden ir a **prórroga (120')** y **tanda de penaltis**. Estas reglas se suman a las generales:
+Las eliminatorias del Mundial pueden ir a **prórroga (120')** y **tanda de penaltis**. Estas reglas se suman a las generales y se aplican **idénticamente** a todas las rondas del bracket: `round-of-32` (dieciseisavos, formato 48 equipos del Mundial 26), `round-of-16` (octavos), `quarter` (cuartos), `semi`, `third-place` y `final`.
 
 - **Marcador exacto**: cuenta el resultado al **final de la prórroga (120')**, sin incluir los penaltis. Ej. `Argentina 3-3 Francia (Argentina gana 4-2 por penaltis)` → marcador del partido = `3-3`.
 - **Ganador (predicción simple)**: el **ganador oficial**, decidido por penaltis si los hubo. En el ejemplo, gana Argentina.

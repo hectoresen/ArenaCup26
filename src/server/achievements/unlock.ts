@@ -111,8 +111,7 @@ const UNLOCK_RULES: Record<string, (ctx: UnlockContext) => boolean> = {
     c.tournamentMatchesGroup > 0 && c.userPredictionsGroup >= c.tournamentMatchesGroup,
   // ≥50% de los partidos del torneo predichos.
   "half-world": (c) =>
-    c.tournamentMatchesTotal > 0 &&
-    c.userPredictionsTotal / c.tournamentMatchesTotal >= 0.5,
+    c.tournamentMatchesTotal > 0 && c.userPredictionsTotal / c.tournamentMatchesTotal >= 0.5,
   // 100% de los partidos del torneo predichos.
   "world-citizen": (c) =>
     c.tournamentMatchesTotal > 0 && c.userPredictionsTotal >= c.tournamentMatchesTotal,
@@ -336,9 +335,7 @@ async function loadContext(db: Database, userId: string): Promise<UnlockContext>
     })
     .from(predictions)
     .innerJoin(matches, eq(matches.id, predictions.matchId))
-    .where(
-      and(eq(predictions.userId, userId), sql`${matches.stage} != 'regular-season'`),
-    );
+    .where(and(eq(predictions.userId, userId), sql`${matches.stage} != 'regular-season'`));
   const userPredictionsTotal = userPredictionsRow[0]?.total ?? 0;
   const userPredictionsGroup = userPredictionsRow[0]?.group ?? 0;
 
