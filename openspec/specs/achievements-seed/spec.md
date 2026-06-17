@@ -1,18 +1,18 @@
 # Purpose
 
-Sembrar el catálogo de los 24 logros de ArenaCup26 en `achievement_definitions` desde un módulo TypeScript versionado, fiel a `docs/achievements.md`. Idempotente: re-correr el seed tras un cambio en código sincroniza la BD sin duplicados.
+Sembrar el catálogo de los 28 logros de ArenaCup26 en `achievement_definitions` desde un módulo TypeScript versionado, fiel a `docs/achievements.md`. Idempotente: re-correr el seed tras un cambio en código sincroniza la BD sin duplicados.
 
 # Requirements
 
-## Requirement 1: Catálogo canónico con 24 entradas
+## Requirement 1: Catálogo canónico con 28 entradas
 
-`ACHIEVEMENT_CATALOG` exporta exactamente 24 logros, distribuidos por tier según `docs/achievements.md`.
+`ACHIEVEMENT_CATALOG` exporta exactamente 28 logros, distribuidos por tier según `docs/achievements.md`.
 
 ### Scenario: Conteo total
 
 - **Given** el módulo `src/server/achievements/catalog.ts`
 - **When** se importa `ACHIEVEMENT_CATALOG`
-- **Then** el array tiene `length === 24`.
+- **Then** el array tiene `length === 28`.
 
 ### Scenario: Distribución por tier
 

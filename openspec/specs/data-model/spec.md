@@ -112,7 +112,7 @@ Para implementar las reglas de eliminatoria, `matches` distingue marcador de 90'
 
 ## Requirement 8: Catálogo de logros y desbloqueos
 
-`achievement_definitions` siembra los 24 logros de `docs/achievements.md`; `user_achievements` registra unlocks por usuario.
+`achievement_definitions` siembra los 28 logros de `docs/achievements.md`; `user_achievements` registra unlocks por usuario.
 
 ### Scenario: Unlock idempotente
 

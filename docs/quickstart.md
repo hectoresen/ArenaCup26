@@ -84,7 +84,7 @@ Ambas dejan la BD lista con las 14 tablas del modelo. En local da igual cuál us
 npm run bootstrap
 ```
 
-Solo siembra el catálogo de 25 logros + backfill `team-spirit`. Idempotente. **No hay datos demo de partidos** — los partidos vienen del sync real con api-football (sección 9.2). En Railway esto pasa solo en el pre-deploy; aquí lo lanzas a mano la primera vez.
+Solo siembra el catálogo de 28 logros + backfill `team-spirit`. Idempotente. **No hay datos demo de partidos** — los partidos vienen del sync real con api-football (sección 9.2). En Railway esto pasa solo en el pre-deploy; aquí lo lanzas a mano la primera vez.
 
 > Datos dinámicos (teams, matches) los sembraremos llamando al endpoint de sync. Si te falta API_FOOTBALL_KEY, simplemente la app queda con BD vacía: el dashboard mostrará "Empieza tu primera predicción" y `/partidos` estará vacío hasta que sincronices.
 

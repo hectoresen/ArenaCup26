@@ -66,7 +66,7 @@ Configura Railway para que aplique migraciones Y siembre el catálogo de logros 
 Cada deploy ahora:
 1. Compila el código (`pnpm run build`).
 2. Aplica migraciones pendientes (`drizzle-kit migrate`) — solo las nuevas, las ya aplicadas se saltan.
-3. Ejecuta `bootstrap`: siembra el catálogo de 25 logros (idempotente, `ON CONFLICT DO UPDATE`) + backfill de `team-spirit` para usuarios con grupos activos sin el logro.
+3. Ejecuta `bootstrap`: siembra el catálogo de 28 logros (idempotente, `ON CONFLICT DO UPDATE`) + backfill de `team-spirit` para usuarios con grupos activos sin el logro.
 4. Si algo falla, el deploy se cancela.
 5. Arranca `pnpm run start`.
 

@@ -222,7 +222,7 @@ Dry-run por default; aplicar con `--apply`.
 
 `scripts/bootstrap.ts` se ejecuta en cada deploy. Idempotente:
 
-- **`seedAchievements`** → inserta/actualiza el catálogo de 25 logros
+- **`seedAchievements`** → inserta/actualiza el catálogo de 28 logros
   en `achievement_definitions`.
 - **`backfillTeamSpirit`** → reconcilia el logro `team-spirit` para
   usuarios con ≥1 membership activa que no lo tienen aún. Idempotente,
